@@ -209,3 +209,20 @@
 - Build user management UI with role assignment
 - Implement location-based filtering in all data queries
 - Add permission checks in all mutations
+
+
+## Location Switcher & Context Management
+- [x] Create LocationContext provider to manage active location state
+- [x] Create useLocation hook to access active location and permissions
+- [x] Build location switcher dropdown component
+- [x] Add location switcher to DashboardLayout header
+- [x] Show user's accessible locations in dropdown
+- [x] Persist selected location in localStorage
+- [ ] Update Dashboard to show selected location's data
+- [ ] Update CompanyProfile to filter by selected location
+- [ ] Update Locations page to highlight selected location
+- [ ] Add read-only badge/indicator when user only has read access
+- [ ] Disable edit buttons when user doesn't have write permission
+- [ ] Update all future data queries to filter by selected location
+- [ ] Test switching between locations
+- [ ] Test read-only vs read-write permissions
