@@ -470,3 +470,36 @@
 ## Final Testing and Delivery
 - [x] Test all three features end-to-end (automation scheduler running, incidents page working, analytics dashboard functional)
 - [x] Save checkpoint and push to GitHub
+
+
+## Build Audit Schedule Management UI
+- [x] Create schedule management page with list view
+- [x] Add create schedule form with frequency settings
+- [x] Implement edit schedule functionality
+- [x] Add delete schedule with confirmation
+- [x] Build reminder configuration UI
+- [x] Add schedule status indicators (active/paused)
+- [x] Add schedule database functions
+- [x] Create schedule tRPC endpoints
+- [x] Add route to App.tsx
+- [ ] Test schedule management end-to-end
+
+## Implement Compliance Report Generator
+- [x] Create report generation page (ComplianceReports.tsx)
+- [x] Build report configuration form (date range, sections, locations)
+- [x] Implement PDF generation with company branding (jsPDF + autoTable)
+- [x] Add audit summaries to report
+- [x] Include RAG status breakdowns
+- [x] Add action plan lists to report with target dates
+- [x] Format report for CQC submission standards
+- [x] Add report database functions
+- [x] Create reports tRPC router
+- [x] Add Reports route and navigation
+- [ ] Test PDF generation and download
+
+
+## Fix Audit Response Options
+- [x] Update ConductAudit page to include "Not Applicable" option (already supported)
+- [x] Add yes_no_na to questionType enum in schema
+- [x] Update all existing audit questions to use yes_no_na
+- [ ] Test audit responses with all three options

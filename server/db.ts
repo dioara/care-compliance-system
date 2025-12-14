@@ -22,6 +22,7 @@ import {
   auditResponses,
   auditActionPlans,
   auditEvidence,
+  auditSchedules,
   incidents,
   type InsertUser,
   type InsertTenant,
@@ -1374,4 +1375,129 @@ export async function getAuditsByType(tenantId: number) {
   }
   
   return Object.values(types).sort((a, b) => b.count - a.count);
+}
+
+
+// ============================================
+// Audit Schedule Management Functions
+// ============================================
+
+export async function getAuditSchedulesByTenant(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  return db
+    .select({
+      schedule: auditSchedules,
+      auditType: auditTypes,
+      location: locations,
+    })
+    .from(auditSchedules)
+    .leftJoin(auditTypes, eq(auditSchedules.auditTypeId, auditTypes.id))
+    .leftJoin(locations, eq(auditSchedules.locationId, locations.id))
+    .where(eq(auditSchedules.tenantId, tenantId))
+    .orderBy(desc(auditSchedules.createdAt));
+}
+
+export async function createAuditSchedule(data: {
+  tenantId: number;
+  auditTypeId: number;
+  locationId: number;
+  frequency: string;
+  nextAuditDue: Date;
+  reminderDays: number;
+  isActive: boolean;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  const result = await db.insert(auditSchedules).values(data);
+  return { id: Number(result.insertId), ...data };
+}
+
+export async function updateAuditSchedule(
+  scheduleId: number,
+  data: {
+    frequency?: string;
+    nextAuditDue?: Date;
+    reminderDays?: number;
+    isActive?: boolean;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db
+    .update(auditSchedules)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(auditSchedules.id, scheduleId));
+  return { id: scheduleId, ...data };
+}
+
+export async function deleteAuditSchedule(scheduleId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+  await db.delete(auditSchedules).where(eq(auditSchedules.id, scheduleId));
+}
+
+
+// ============================================
+// Compliance Report Functions
+// ============================================
+
+export async function getComplianceReportData(
+  tenantId: number,
+  startDate: Date,
+  endDate: Date,
+  locationIds?: number[]
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  const conditions = [
+    eq(auditInstances.tenantId, tenantId),
+  ];
+
+  if (locationIds && locationIds.length > 0) {
+    conditions.push(inArray(auditInstances.locationId, locationIds));
+  }
+
+  return db
+    .select({
+      instance: auditInstances,
+      template: auditTemplates,
+      auditType: auditTypes,
+      location: locations,
+    })
+    .from(auditInstances)
+    .leftJoin(auditTemplates, eq(auditInstances.auditTemplateId, auditTemplates.id))
+    .leftJoin(auditTypes, eq(auditTemplates.auditTypeId, auditTypes.id))
+    .leftJoin(locations, eq(auditInstances.locationId, locations.id))
+    .where(and(...conditions));
+}
+
+export async function getActionPlansForReport(
+  tenantId: number,
+  startDate: Date,
+  endDate: Date,
+  locationIds?: number[]
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  const conditions = [
+    eq(auditActionPlans.tenantId, tenantId),
+  ];
+
+  if (locationIds && locationIds.length > 0) {
+    conditions.push(inArray(auditActionPlans.locationId, locationIds));
+  }
+
+  return db
+    .select({
+      actionPlan: auditActionPlans,
+      location: locations,
+      instance: auditInstances,
+    })
+    .from(auditActionPlans)
+    .leftJoin(locations, eq(auditActionPlans.locationId, locations.id))
+    .leftJoin(auditInstances, eq(auditActionPlans.auditInstanceId, auditInstances.id))
+    .where(and(...conditions));
 }

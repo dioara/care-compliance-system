@@ -504,7 +504,7 @@ export const auditTemplateQuestions = mysqlTable("auditTemplateQuestions", {
   auditTemplateSectionId: int("auditTemplateSectionId").notNull(),
   questionNumber: varchar("questionNumber", { length: 50 }).notNull(), // e.g., '1.1', '2.3'
   questionText: text("questionText").notNull(),
-  questionType: mysqlEnum("questionType", ["yes_no", "pass_fail", "text", "number", "date", "multiple_choice", "checklist"]).notNull(),
+  questionType: mysqlEnum("questionType", ["yes_no", "yes_no_na", "pass_fail", "text", "number", "date", "multiple_choice", "checklist"]).notNull(),
   options: text("options"), // JSON array for multiple_choice/checklist
   isRequired: boolean("isRequired").default(true).notNull(),
   guidance: text("guidance"),

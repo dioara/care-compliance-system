@@ -1,0 +1,1 @@
+ALTER TABLE `auditTemplateQuestions` MODIFY COLUMN `questionType` enum('yes_no','yes_no_na','pass_fail','text','number','date','multiple_choice','checklist') NOT NULL;

@@ -606,6 +606,56 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    // Get audit schedules
+    getSchedules: protectedProcedure
+      .input(z.object({ tenantId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditSchedulesByTenant(input.tenantId);
+      }),
+
+    // Create audit schedule
+    createSchedule: protectedProcedure
+      .input(
+        z.object({
+          tenantId: z.number(),
+          auditTypeId: z.number(),
+          locationId: z.number(),
+          frequency: z.string(),
+          nextAuditDue: z.date(),
+          reminderDays: z.number(),
+          isActive: z.boolean(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const schedule = await db.createAuditSchedule(input);
+        return schedule;
+      }),
+
+    // Update audit schedule
+    updateSchedule: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          frequency: z.string().optional(),
+          nextAuditDue: z.date().optional(),
+          reminderDays: z.number().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        const schedule = await db.updateAuditSchedule(id, data);
+        return schedule;
+      }),
+
+    // Delete audit schedule
+    deleteSchedule: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteAuditSchedule(input.id);
+        return { success: true };
+      }),
+
     // Upload evidence
     uploadEvidence: protectedProcedure
       .input(
