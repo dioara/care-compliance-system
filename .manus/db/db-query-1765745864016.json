@@ -1,0 +1,80 @@
+{
+  "query": "SELECT questionNumber, LEFT(questionText, 50) as questionText, sectionId FROM complianceQuestions WHERE questionText LIKE '%Quality Assessment Tool%' LIMIT 20",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT questionNumber, LEFT(questionText, 50) as questionText, sectionId FROM complianceQuestions WHERE questionText LIKE '%Quality Assessment Tool%' LIMIT 20",
+  "rows": [
+    {
+      "questionNumber": "1.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "1"
+    },
+    {
+      "questionNumber": "2.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "2"
+    },
+    {
+      "questionNumber": "3.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "3"
+    },
+    {
+      "questionNumber": "4.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "4"
+    },
+    {
+      "questionNumber": "5.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "5"
+    },
+    {
+      "questionNumber": "6.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "6"
+    },
+    {
+      "questionNumber": "7.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "7"
+    },
+    {
+      "questionNumber": "8.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "8"
+    },
+    {
+      "questionNumber": "9.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "9"
+    },
+    {
+      "questionNumber": "10.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "10"
+    },
+    {
+      "questionNumber": "14.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "14"
+    },
+    {
+      "questionNumber": "15.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "15"
+    },
+    {
+      "questionNumber": "16.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "16"
+    },
+    {
+      "questionNumber": "2.1",
+      "questionText": "Quality Assessment Tool Questions",
+      "sectionId": "24"
+    }
+  ],
+  "messages": [],
+  "stdout": "questionNumber\tquestionText\tsectionId\n1.1\tQuality Assessment Tool Questions\t1\n2.1\tQuality Assessment Tool Questions\t2\n3.1\tQuality Assessment Tool Questions\t3\n4.1\tQuality Assessment Tool Questions\t4\n5.1\tQuality Assessment Tool Questions\t5\n6.1\tQuality Assessment Tool Questions\t6\n7.1\tQuality Assessment Tool Questions\t7\n8.1\tQuality Assessment Tool Questions\t8\n9.1\tQuality Assessment Tool Questions\t9\n10.1\tQuality Assessment Tool Questions\t10\n14.1\tQuality Assessment Tool Questions\t14\n15.1\tQuality Assessment Tool Questions\t15\n16.1\tQuality Assessment Tool Questions\t16\n2.1\tQuality Assessment Tool Questions\t24\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

@@ -1,0 +1,8 @@
+{
+  "query": "SELECT cs.sectionNumber, cs.title, COUNT(cq.id) as question_count FROM complianceSections cs LEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId WHERE cs.sectionType = 'service_user' GROUP BY cs.id ORDER BY cs.sectionNumber",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT cs.sectionNumber, cs.title, COUNT(cq.id) as question_count FROM complianceSections cs LEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId WHERE cs.sectionType = 'service_user' GROUP BY cs.id ORDER BY cs.sectionNumber",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'cs.title' in 'field list'"
+  ]
+}

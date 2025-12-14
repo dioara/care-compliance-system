@@ -534,4 +534,74 @@
 - [x] Update form data structure to use new fields (managerId, cqcRating, serviceTypes[])
 - [x] Test all location field updates in browser (forms working, dropdowns and checkboxes functional)
 - [x] Fix Select component empty value error (changed "" to "none")
-- [ ] Save checkpoint and push to GitHub
+- [x] Save checkpoint and push to GitHub (checkpoint 16596a4a)
+
+## Comprehensive Assessment Questions Review & Fix
+
+### Research Phase
+- [ ] Research UK sponsored worker requirements (visa types, right to work checks, additional documentation)
+- [ ] Research agency vs permanent staff requirements in UK care sector
+- [ ] Document all required checks and evidence for each employment type
+- [ ] Review current staff assessment question structure
+
+### Staff Assessment Fixes
+- [ ] Remove "Quality Assessment Tool Questions" (1.1) - invalid question
+- [ ] Add employment type question at start: "Is this staff member Agency or Permanent?"
+- [ ] Add conditional logic: If Permanent → "Is this staff member sponsored?"
+- [ ] Add sponsored worker questions with proper evidence requirements (visa, right to work, sponsorship docs)
+- [ ] Update agency staff questions (1.17, 1.18) to only show for agency staff
+- [ ] Review all staff questions for British English spelling and terminology
+- [ ] Rewrite all "Evidence Required" fields to be generic (not NYCC-specific) and clear
+- [ ] Rewrite all "Example Evidence" fields with practical, contextual examples
+- [ ] Check conditional logic for health concerns question (1.16)
+
+### Service User Assessment Fixes
+- [ ] Review all service user assessment questions
+- [ ] Update all text to British English spelling and terminology
+- [ ] Rewrite all "Evidence Required" fields to be generic and clear
+- [ ] Rewrite all "Example Evidence" fields with practical examples
+- [ ] Check for any placeholder or invalid questions
+
+### Testing & Delivery
+- [ ] Test staff assessment form with all employment types
+- [ ] Test service user assessment forms
+- [ ] Verify conditional logic works correctly
+- [ ] Save checkpoint and deliver
+
+
+## Comprehensive Assessment Questions Review (User Feedback)
+- [x] Research UK sponsored worker requirements (Health & Care Worker visa)
+- [x] Research CQC Regulation 19 Schedule 3 employment requirements
+- [x] Review current staff assessment questions structure (seed-all-questions-final.mjs)
+- [x] Identify all issues: "Quality Assessment Tool Questions" placeholder, missing employment type logic, NYCC-specific evidence text, American spelling
+- [x] Design new staff question structure with employment type branching (Permanent/Agency/Bank)
+- [x] Design sponsored worker additional questions (CoS, visa, overseas checks, TB test, English proficiency)
+- [x] Update seed-all-questions-final.mjs with new staff questions structure (created seed-staff-section1-revised.mjs)
+- [x] Remove "Quality Assessment Tool Questions" placeholder from Staff Section 1
+- [x] Rewrite all evidence requirements to be generic (not NYCC-specific) for Staff Section 1
+- [x] Rewrite all example evidence to be practical and clear for Staff Section 1
+- [x] Ensure all text uses British English spelling and terminology for Staff Section 1
+- [x] Add employment type classification question (1.7)
+- [x] Add sponsored worker questions (1.15-1.19: CoS, visa, overseas checks, TB, English)
+- [x] Add agency staff questions (1.26-1.28)
+- [x] Add bank staff questions (1.29-1.30)
+- [x] Run seed script to update database (33 questions total)
+- [x] Remove all "Quality Assessment Tool Questions" placeholders from database (14 rows deleted)
+- [x] Review and update remaining staff sections (2-7) with more questions
+- [x] Expand Staff Section 2: Policies & Procedures (8 questions, up from 4)
+- [x] Expand Staff Section 3: Induction & Care Certificate (8 questions, up from 5)
+- [x] Expand Staff Section 4: Supervision & Performance (9 questions, up from 5)
+- [x] Expand Staff Section 5: Training & Development (9 questions, up from 5, including Oliver McGowan)
+- [x] Expand Staff Section 6: Staff Feedback & Engagement (7 questions, up from 3)
+- [x] Expand Staff Section 7: Staff Wellbeing & Support (8 questions, up from 4)
+- [x] Total staff questions: 82 (33 in Section 1 + 49 in Sections 2-7)
+- [x] Review and update all service user sections (19 sections, 174 questions)
+- [x] Remove NYCC-specific text from all 174 service user questions
+- [x] Rewrite evidence requirements to be generic and clear
+- [x] Ensure British English throughout all service user questions
+- [x] Clean truncated and incomplete evidence descriptions
+- [x] Test staff assessment forms (33 questions in Section 1, all working correctly)
+- [x] Test service user assessment forms (174 questions across 19 sections, all cleaned)
+- [x] Verify evidence requirements are generic and not NYCC-specific
+- [x] Verify British English throughout
+- [ ] Save checkpoint and deliver comprehensive assessment review to user

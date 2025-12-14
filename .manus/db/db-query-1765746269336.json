@@ -1,0 +1,355 @@
+{
+  "query": "SELECT cq.id, cs.sectionNumber, cq.questionNumber, LEFT(cq.questionText, 80) as questionText, LEFT(cq.standardDescription, 80) as evidenceReq FROM complianceQuestions cq JOIN complianceSections cs ON cq.sectionId = cs.id WHERE cs.sectionType = 'service_user' ORDER BY cs.sectionNumber, cq.questionNumber LIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT cq.id, cs.sectionNumber, cq.questionNumber, LEFT(cq.questionText, 80) as questionText, LEFT(cq.standardDescription, 80) as evidenceReq FROM complianceQuestions cq JOIN complianceSections cs ON cq.sectionId = cs.id WHERE cs.sectionType = 'service_user' ORDER BY cs.sectionNumber, cq.questionNumber LIMIT 50",
+  "rows": [
+    {
+      "id": "30181",
+      "sectionNumber": "1",
+      "questionNumber": "1.10",
+      "questionText": "Observations confirmed people are given information in an appropriate way to mak",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30182",
+      "sectionNumber": "1",
+      "questionNumber": "1.11",
+      "questionText": "People confirmed that they feel supported by staff to make informed decisions ",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30183",
+      "sectionNumber": "1",
+      "questionNumber": "1.12",
+      "questionText": "People confirmed that they are supported to maintain relationships, access a var",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30184",
+      "sectionNumber": "1",
+      "questionNumber": "1.13",
+      "questionText": "Staff are observed to have positive and meaningful interactions with people who ",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30173",
+      "sectionNumber": "1",
+      "questionNumber": "1.2",
+      "questionText": "There is evidence that care and support files express individual’s views, choice",
+      "evidenceReq": "There is evidence on file that the care plans express views, choices and prefere"
+    },
+    {
+      "id": "30175",
+      "sectionNumber": "1",
+      "questionNumber": "1.4",
+      "questionText": "The provider has a process in place to ensure that relevant documentation is ava",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30176",
+      "sectionNumber": "1",
+      "questionNumber": "1.5",
+      "questionText": "There is evidence that care, and support files are available and accessible to t",
+      "evidenceReq": "There is evidence that staff have considered how the individual would like care "
+    },
+    {
+      "id": "30177",
+      "sectionNumber": "1",
+      "questionNumber": "1.6",
+      "questionText": "There is evidence that care, and support files demonstrate privacy, dignity, and",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30178",
+      "sectionNumber": "1",
+      "questionNumber": "1.7",
+      "questionText": "People who use the service felt treated with dignity and respect ",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30179",
+      "sectionNumber": "1",
+      "questionNumber": "1.8",
+      "questionText": "People were encouraged to maintain their independence and their choices and pref",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30180",
+      "sectionNumber": "1",
+      "questionNumber": "1.9",
+      "questionText": "Staff can explain how people’s dignity and privacy are respected  ",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30186",
+      "sectionNumber": "2",
+      "questionNumber": "2.2",
+      "questionText": "There is evidence of appropriately signed consent for all relevant decisions whe",
+      "evidenceReq": "1 In the first care plan reviewed, the care plan states that the individual has "
+    },
+    {
+      "id": "30187",
+      "sectionNumber": "2",
+      "questionNumber": "2.3",
+      "questionText": "There is evidence of appropriately signed consent by the relevant LPA (Lasting P",
+      "evidenceReq": "Both care files reviewed referenced that they had an LPA in place, however there"
+    },
+    {
+      "id": "30188",
+      "sectionNumber": "2",
+      "questionNumber": "2.4",
+      "questionText": "There is evidence of appropriate mental capacity assessments and best interest d",
+      "evidenceReq": "The first care plan reviewed states that the individual is deemed to have capaci"
+    },
+    {
+      "id": "30189",
+      "sectionNumber": "2",
+      "questionNumber": "2.5",
+      "questionText": "There is evidence that the service has DOLs in place as required which demonstra",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30190",
+      "sectionNumber": "2",
+      "questionNumber": "2.6",
+      "questionText": "There is a system in place to track, identify conditions and expiry date of DOLs",
+      "evidenceReq": "We did not see evidence of a system in place to track, identify conditions and e"
+    },
+    {
+      "id": "30191",
+      "sectionNumber": "2",
+      "questionNumber": "2.7",
+      "questionText": "Staff are observed obtaining consent from people.",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30192",
+      "sectionNumber": "2",
+      "questionNumber": "2.8",
+      "questionText": "Staff can describe how they ensure the principles of the MCA and how it is put i",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30202",
+      "sectionNumber": "3",
+      "questionNumber": "3.10",
+      "questionText": "There is evidence that risk assessments are regularly reviewed and any change in",
+      "evidenceReq": "There is evidence that the risk assessments are reviewed in line with the suppor"
+    },
+    {
+      "id": "30203",
+      "sectionNumber": "3",
+      "questionNumber": "3.11",
+      "questionText": "There is evidence that daily records are completed per shift or visit. ",
+      "evidenceReq": "10 In the first file reviewed, there lacked evidence that daily records were com"
+    },
+    {
+      "id": "30204",
+      "sectionNumber": "3",
+      "questionNumber": "3.12",
+      "questionText": "There is evidence that daily entries are factual, dated, timed, legible, and sig",
+      "evidenceReq": "Daily entries that were recorded were sometimes difficult to understand. For exa"
+    },
+    {
+      "id": "30205",
+      "sectionNumber": "3",
+      "questionNumber": "3.13",
+      "questionText": "There is evidence that daily entries provide a reflective account of care and su",
+      "evidenceReq": "The daily records are not completed and the notes that are completed are not con"
+    },
+    {
+      "id": "30206",
+      "sectionNumber": "3",
+      "questionNumber": "3.14",
+      "questionText": "There is evidence that intervention charts are comprehensively completed and are",
+      "evidenceReq": "There was evidence of intervention charts for each individual reviewed, however "
+    },
+    {
+      "id": "30207",
+      "sectionNumber": "3",
+      "questionNumber": "3.15",
+      "questionText": "There is evidence that activity and social interactions are recorded.",
+      "evidenceReq": "In the first individuals file reviewed, there was little evidence of daily notes"
+    },
+    {
+      "id": "30208",
+      "sectionNumber": "3",
+      "questionNumber": "3.16",
+      "questionText": "There is documented evidence of involvement from other health and social care pr",
+      "evidenceReq": "We did not evidence any documented involvement from health professionals on eith"
+    },
+    {
+      "id": "30209",
+      "sectionNumber": "3",
+      "questionNumber": "3.17",
+      "questionText": "There is evidence of an accurately completed DNACPR/ ReSPECT document signed by ",
+      "evidenceReq": "In the first file reviewed the individuals care plan states that he does have a "
+    },
+    {
+      "id": "30210",
+      "sectionNumber": "3",
+      "questionNumber": "3.18",
+      "questionText": "People confirmed that the care and support received is carried out in a way that",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30194",
+      "sectionNumber": "3",
+      "questionNumber": "3.2",
+      "questionText": "There is evidence that people have appropriate contact details of their care and",
+      "evidenceReq": "The provider has a normal guide and easy read service user guide which is given "
+    },
+    {
+      "id": "30195",
+      "sectionNumber": "3",
+      "questionNumber": "3.3",
+      "questionText": "There is evidence of a fully completed pre assessment prior to the person access",
+      "evidenceReq": "In the first file we reviewed there was evidence of a “Gathering Information for"
+    },
+    {
+      "id": "30196",
+      "sectionNumber": "3",
+      "questionNumber": "3.4",
+      "questionText": "There is evidence of documented life history/about me information.",
+      "evidenceReq": "In the first file viewed, there was very little information regarding the indivi"
+    },
+    {
+      "id": "30197",
+      "sectionNumber": "3",
+      "questionNumber": "3.5",
+      "questionText": "There are relevant care and support plans in place to deliver safe and effective",
+      "evidenceReq": "In the first file reviewed, there was a good level of person-centred detail thro"
+    },
+    {
+      "id": "30198",
+      "sectionNumber": "3",
+      "questionNumber": "3.6",
+      "questionText": "There is evidence that care, and support plans are strength based, person centre",
+      "evidenceReq": "There is evidence in both care and support file that support should be provided "
+    },
+    {
+      "id": "30199",
+      "sectionNumber": "3",
+      "questionNumber": "3.7",
+      "questionText": "There is evidence that care, and support plans include individual personalised o",
+      "evidenceReq": "There is evidence throughout both care and support plans reviewed that they incl"
+    },
+    {
+      "id": "30200",
+      "sectionNumber": "3",
+      "questionNumber": "3.8",
+      "questionText": "There is evidence of appropriate risk assessments to deliver safe and effective ",
+      "evidenceReq": "Both care plans reviewed did not evidence appropriate risk assessments for all a"
+    },
+    {
+      "id": "30201",
+      "sectionNumber": "3",
+      "questionNumber": "3.9",
+      "questionText": "There is evidence that care and support plans are regularly reviewed and any cha",
+      "evidenceReq": "There is evidence that support plans are reviewed regularly and within the three"
+    },
+    {
+      "id": "30220",
+      "sectionNumber": "4",
+      "questionNumber": "4.10",
+      "questionText": "There was a positive person-centred mealtime experience.",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30212",
+      "sectionNumber": "4",
+      "questionNumber": "4.2",
+      "questionText": "There is evidence of a varied menu which promotes healthy eating choices and ack",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30213",
+      "sectionNumber": "4",
+      "questionNumber": "4.3",
+      "questionText": "There is access to sufficient supplies of fresh food and fluids over a 24 hour p",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30214",
+      "sectionNumber": "4",
+      "questionNumber": "4.4",
+      "questionText": "There are nutritional support plans in place that include food allergies, likes,",
+      "evidenceReq": "Nutritional support plan did include likes and dislikes and dietary requirements"
+    },
+    {
+      "id": "30215",
+      "sectionNumber": "4",
+      "questionNumber": "4.5",
+      "questionText": "Where required there is a nutritional support plan which details any other dieta",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30216",
+      "sectionNumber": "4",
+      "questionNumber": "4.6",
+      "questionText": "Where required there is a nutritional support plan which details the MUST level ",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30217",
+      "sectionNumber": "4",
+      "questionNumber": "4.7",
+      "questionText": "Where required there is a MUST tool for each person which is accurately complete",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30218",
+      "sectionNumber": "4",
+      "questionNumber": "4.8",
+      "questionText": "There was a menu displayed that is visible and accurate.",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30219",
+      "sectionNumber": "4",
+      "questionNumber": "4.9",
+      "questionText": "People confirmed that person requests of food and drinks can be accommodated e.g",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30222",
+      "sectionNumber": "5",
+      "questionNumber": "5.2",
+      "questionText": "Where there is shared involvement from another provider this is clearly document",
+      "evidenceReq": "In the second file reviewed, care plans reference CMHT and District Nurse involv"
+    },
+    {
+      "id": "30223",
+      "sectionNumber": "5",
+      "questionNumber": "5.3",
+      "questionText": "There is a Must do Care Plan/ Hospital Passport reflective of current need.",
+      "evidenceReq": "There is a MUST Do Hospital Passport in place for both individuals that is refle"
+    },
+    {
+      "id": "30224",
+      "sectionNumber": "5",
+      "questionNumber": "5.4",
+      "questionText": "People confirmed that they are supported to access other social care/health serv",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30234",
+      "sectionNumber": "6",
+      "questionNumber": "6.10",
+      "questionText": "CQC notifications are submitted appropriately and in a timely way",
+      "evidenceReq": ""
+    },
+    {
+      "id": "30235",
+      "sectionNumber": "6",
+      "questionNumber": "6.11",
+      "questionText": "There is evidence of completed Herbert Protocols when required",
+      "evidenceReq": "The provider informed us that they don’t support anyone currently that requires "
+    }
+  ],
+  "messages": [
+    "30174\t1\t1.3\tThere is evidence that care, and support files have been written with involvemen\t\tThere is evidence that care plans have been written with input from the person "
+  ],
+  "stdout": "id\tsectionNumber\tquestionNumber\tquestionText\tevidenceReq\n30181\t1\t1.10\tObservations confirmed people are given information in an appropriate way to mak\t\n30182\t1\t1.11\tPeople confirmed that they feel supported by staff to make informed decisions \t\n30183\t1\t1.12\tPeople confirmed that they are supported to maintain relationships, access a var\t\n30184\t1\t1.13\tStaff are observed to have positive and meaningful interactions with people who \t\n30173\t1\t1.2\tThere is evidence that care and support files express individual’s views, choice\tThere is evidence on file that the care plans express views, choices and prefere\n30174\t1\t1.3\tThere is evidence that care, and support files have been written with involvemen\t\tThere is evidence that care plans have been written with input from the person \n30175\t1\t1.4\tThe provider has a process in place to ensure that relevant documentation is ava\t\n30176\t1\t1.5\tThere is evidence that care, and support files are available and accessible to t\tThere is evidence that staff have considered how the individual would like care \n30177\t1\t1.6\tThere is evidence that care, and support files demonstrate privacy, dignity, and\t\n30178\t1\t1.7\tPeople who use the service felt treated with dignity and respect \t\n30179\t1\t1.8\tPeople were encouraged to maintain their independence and their choices and pref\t\n30180\t1\t1.9\tStaff can explain how people’s dignity and privacy are respected  \t\n30186\t2\t2.2\tThere is evidence of appropriately signed consent for all relevant decisions whe\t1 In the first care plan reviewed, the care plan states that the individual has \n30187\t2\t2.3\tThere is evidence of appropriately signed consent by the relevant LPA (Lasting P\tBoth care files reviewed referenced that they had an LPA in place, however there\n30188\t2\t2.4\tThere is evidence of appropriate mental capacity assessments and best interest d\tThe first care plan reviewed states that the individual is deemed to have capaci\n30189\t2\t2.5\tThere is evidence that the service has DOLs in place as required which demonstra\t\n30190\t2\t2.6\tThere is a system in place to track, identify conditions and expiry date of DOLs\tWe did not see evidence of a system in place to track, identify conditions and e\n30191\t2\t2.7\tStaff are observed obtaining consent from people.\t\n30192\t2\t2.8\tStaff can describe how they ensure the principles of the MCA and how it is put i\t\n30202\t3\t3.10\tThere is evidence that risk assessments are regularly reviewed and any change in\tThere is evidence that the risk assessments are reviewed in line with the suppor\n30203\t3\t3.11\tThere is evidence that daily records are completed per shift or visit. \t10 In the first file reviewed, there lacked evidence that daily records were com\n30204\t3\t3.12\tThere is evidence that daily entries are factual, dated, timed, legible, and sig\tDaily entries that were recorded were sometimes difficult to understand. For exa\n30205\t3\t3.13\tThere is evidence that daily entries provide a reflective account of care and su\tThe daily records are not completed and the notes that are completed are not con\n30206\t3\t3.14\tThere is evidence that intervention charts are comprehensively completed and are\tThere was evidence of intervention charts for each individual reviewed, however \n30207\t3\t3.15\tThere is evidence that activity and social interactions are recorded.\tIn the first individuals file reviewed, there was little evidence of daily notes\n30208\t3\t3.16\tThere is documented evidence of involvement from other health and social care pr\tWe did not evidence any documented involvement from health professionals on eith\n30209\t3\t3.17\tThere is evidence of an accurately completed DNACPR/ ReSPECT document signed by \tIn the first file reviewed the individuals care plan states that he does have a \n30210\t3\t3.18\tPeople confirmed that the care and support received is carried out in a way that\t\n30194\t3\t3.2\tThere is evidence that people have appropriate contact details of their care and\tThe provider has a normal guide and easy read service user guide which is given \n30195\t3\t3.3\tThere is evidence of a fully completed pre assessment prior to the person access\tIn the first file we reviewed there was evidence of a “Gathering Information for\n30196\t3\t3.4\tThere is evidence of documented life history/about me information.\tIn the first file viewed, there was very little information regarding the indivi\n30197\t3\t3.5\tThere are relevant care and support plans in place to deliver safe and effective\tIn the first file reviewed, there was a good level of person-centred detail thro\n30198\t3\t3.6\tThere is evidence that care, and support plans are strength based, person centre\tThere is evidence in both care and support file that support should be provided \n30199\t3\t3.7\tThere is evidence that care, and support plans include individual personalised o\tThere is evidence throughout both care and support plans reviewed that they incl\n30200\t3\t3.8\tThere is evidence of appropriate risk assessments to deliver safe and effective \tBoth care plans reviewed did not evidence appropriate risk assessments for all a\n30201\t3\t3.9\tThere is evidence that care and support plans are regularly reviewed and any cha\tThere is evidence that support plans are reviewed regularly and within the three\n30220\t4\t4.10\tThere was a positive person-centred mealtime experience.\t\n30212\t4\t4.2\tThere is evidence of a varied menu which promotes healthy eating choices and ack\t\n30213\t4\t4.3\tThere is access to sufficient supplies of fresh food and fluids over a 24 hour p\t\n30214\t4\t4.4\tThere are nutritional support plans in place that include food allergies, likes,\tNutritional support plan did include likes and dislikes and dietary requirements\n30215\t4\t4.5\tWhere required there is a nutritional support plan which details any other dieta\t\n30216\t4\t4.6\tWhere required there is a nutritional support plan which details the MUST level \t\n30217\t4\t4.7\tWhere required there is a MUST tool for each person which is accurately complete\t\n30218\t4\t4.8\tThere was a menu displayed that is visible and accurate.\t\n30219\t4\t4.9\tPeople confirmed that person requests of food and drinks can be accommodated e.g\t\n30222\t5\t5.2\tWhere there is shared involvement from another provider this is clearly document\tIn the second file reviewed, care plans reference CMHT and District Nurse involv\n30223\t5\t5.3\tThere is a Must do Care Plan/ Hospital Passport reflective of current need.\tThere is a MUST Do Hospital Passport in place for both individuals that is refle\n30224\t5\t5.4\tPeople confirmed that they are supported to access other social care/health serv\t\n30234\t6\t6.10\tCQC notifications are submitted appropriately and in a timely way\t\n30235\t6\t6.11\tThere is evidence of completed Herbert Protocols when required\tThe provider informed us that they don’t support anyone currently that requires \n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

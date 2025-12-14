@@ -1,0 +1,86 @@
+{
+  "query": "SELECT cs.sectionNumber, COUNT(cq.id) as question_count FROM complianceSections cs LEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId WHERE cs.sectionType = 'service_user' GROUP BY cs.id, cs.sectionNumber ORDER BY question_count ASC, cs.sectionNumber",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT cs.sectionNumber, COUNT(cq.id) as question_count FROM complianceSections cs LEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId WHERE cs.sectionType = 'service_user' GROUP BY cs.id, cs.sectionNumber ORDER BY question_count ASC, cs.sectionNumber",
+  "rows": [
+    {
+      "sectionNumber": "5",
+      "question_count": "3"
+    },
+    {
+      "sectionNumber": "22",
+      "question_count": "3"
+    },
+    {
+      "sectionNumber": "17",
+      "question_count": "5"
+    },
+    {
+      "sectionNumber": "18",
+      "question_count": "5"
+    },
+    {
+      "sectionNumber": "19",
+      "question_count": "5"
+    },
+    {
+      "sectionNumber": "20",
+      "question_count": "5"
+    },
+    {
+      "sectionNumber": "21",
+      "question_count": "5"
+    },
+    {
+      "sectionNumber": "15",
+      "question_count": "6"
+    },
+    {
+      "sectionNumber": "2",
+      "question_count": "7"
+    },
+    {
+      "sectionNumber": "10",
+      "question_count": "7"
+    },
+    {
+      "sectionNumber": "16",
+      "question_count": "7"
+    },
+    {
+      "sectionNumber": "7",
+      "question_count": "8"
+    },
+    {
+      "sectionNumber": "4",
+      "question_count": "9"
+    },
+    {
+      "sectionNumber": "14",
+      "question_count": "10"
+    },
+    {
+      "sectionNumber": "1",
+      "question_count": "12"
+    },
+    {
+      "sectionNumber": "6",
+      "question_count": "14"
+    },
+    {
+      "sectionNumber": "3",
+      "question_count": "17"
+    },
+    {
+      "sectionNumber": "8",
+      "question_count": "22"
+    },
+    {
+      "sectionNumber": "9",
+      "question_count": "24"
+    }
+  ],
+  "messages": [],
+  "stdout": "sectionNumber\tquestion_count\n5\t3\n22\t3\n17\t5\n18\t5\n19\t5\n20\t5\n21\t5\n15\t6\n2\t7\n10\t7\n16\t7\n7\t8\n4\t9\n14\t10\n1\t12\n6\t14\n3\t17\n8\t22\n9\t24\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}
