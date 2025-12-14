@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Users, Plus, Pencil, Trash2, Loader2, Calendar, Heart } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, Loader2, Calendar, Heart, ClipboardCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useLocation as useRouter } from "wouter";
 
 export default function ServiceUsers() {
   const { activeLocationId, canWrite } = useLocation();
@@ -313,6 +314,17 @@ export default function ServiceUsers() {
                     <p className="mt-1 text-sm line-clamp-2">{serviceUser.supportNeeds}</p>
                   </div>
                 )}
+                
+                <div className="pt-3 border-t">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.location.href = `/service-users/${serviceUser.id}/compliance`}
+                  >
+                    <ClipboardCheck className="mr-2 h-4 w-4" />
+                    View Compliance (22 sections)
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

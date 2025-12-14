@@ -287,3 +287,14 @@
 - [x] Test complete assessment workflow
 - [ ] Implement evidence document upload (S3) - placeholder added
 - [ ] Seed compliance questions for each section
+
+
+## Restructure Compliance to be Per-Person
+- [x] Update compliance assessment approach: assessments should be per staff member or service user, not per location
+- [x] Modify Staff page to show compliance status for each staff member (7 sections)
+- [x] Modify Service User page to show compliance status for each service user (22 sections)
+- [x] Add "View Compliance" button on each staff/service user card
+- [x] Create person-specific compliance page showing their sections
+- [x] Update database queries to fetch assessments by person ID
+- [x] Test complete per-person compliance workflow
+- [ ] Add detailed compliance questions for 29 sections (optional - sections work without questions)

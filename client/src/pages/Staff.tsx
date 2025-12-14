@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle } from "lucide-react";
+import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { useLocation as useRouter } from "wouter";
 
 export default function Staff() {
   const { activeLocationId, canWrite } = useLocation();
@@ -345,6 +346,17 @@ export default function Staff() {
                     <span>{new Date(staffMember.dbsDate).toLocaleDateString()}</span>
                   </div>
                 )}
+                
+                <div className="pt-3 border-t">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => window.location.href = `/staff/${staffMember.id}/compliance`}
+                  >
+                    <ClipboardCheck className="mr-2 h-4 w-4" />
+                    View Compliance (7 sections)
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

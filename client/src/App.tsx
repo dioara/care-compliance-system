@@ -15,6 +15,7 @@ import CompanyProfile from "./pages/CompanyProfile";
 import Locations from "./pages/Locations";
 import Compliance from "./pages/Compliance";
 import ComplianceSection from "./pages/ComplianceSection";
+import PersonCompliance from "./pages/PersonCompliance";
 import Audits from "./pages/Audits";
 import AIAudits from "./pages/AIAudits";
 import Incidents from "./pages/Incidents";
@@ -67,6 +68,18 @@ function Router() {
       <Route path="/compliance/section/:sectionId">
         <DashboardLayout>
           <ComplianceSection />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/staff/:id/compliance">
+        <DashboardLayout>
+          <PersonCompliance personType="staff" />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/service-users/:id/compliance">
+        <DashboardLayout>
+          <PersonCompliance personType="service_user" />
         </DashboardLayout>
       </Route>
       
