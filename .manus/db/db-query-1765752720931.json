@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, questionNumber, questionText FROM complianceQuestions WHERE id = 30173",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, questionNumber, questionText FROM complianceQuestions WHERE id = 30173",
+  "rows": [
+    {
+      "id": "30173",
+      "questionNumber": "1.2",
+      "questionText": "There is evidence that care and support files express individual’s views, choices, and preferences. - Includes pre admission, care plans, daily notes and life history "
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tquestionNumber\tquestionText\n30173\t1.2\tThere is evidence that care and support files express individual’s views, choices, and preferences. - Includes pre admission, care plans, daily notes and life history \n",
+  "stderr": "",
+  "execution_time_ms": 60
+}

@@ -1,0 +1,298 @@
+{
+  "query": "SELECT questionNumber, questionText \nFROM complianceQuestions \nWHERE sectionId IN (SELECT id FROM complianceSections WHERE sectionType = 'service_user')\nORDER BY CAST(SUBSTRING_INDEX(questionNumber, '.', 1) AS UNSIGNED), CAST(SUBSTRING_INDEX(questionNumber, '.', -1) AS UNSIGNED)\nLIMIT 50",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT questionNumber, questionText \nFROM complianceQuestions \nWHERE sectionId IN (SELECT id FROM complianceSections WHERE sectionType = 'service_user')\nORDER BY CAST(SUBSTRING_INDEX(questionNumber, '.', 1) AS UNSIGNED), CAST(SUBSTRING_INDEX(questionNumber, '.', -1) AS UNSIGNED)\nLIMIT 50",
+  "rows": [
+    {
+      "questionNumber": "1.2",
+      "questionText": "There is evidence that care and support files express individual’s views, choices, and preferences. - Includes pre admission, care plans, daily notes and life history "
+    },
+    {
+      "questionNumber": "1.3",
+      "questionText": "There is evidence that care, and support files have been written with involvement from the person and or their representative. (Where able, the documentation should be agreed and signed by the person). "
+    },
+    {
+      "questionNumber": "1.4",
+      "questionText": "The provider has a process in place to ensure that relevant documentation is available upon request in other formats i.e., easy read, large print, pictorial, other languages. "
+    },
+    {
+      "questionNumber": "1.5",
+      "questionText": "There is evidence that care, and support files are available and accessible to the person and their representatives in an appropriate format. "
+    },
+    {
+      "questionNumber": "1.6",
+      "questionText": "There is evidence that care, and support files demonstrate privacy, dignity, and independence. In line with their personal choices, prefences and wishes (not just in relation to personal care) "
+    },
+    {
+      "questionNumber": "1.7",
+      "questionText": "People who use the service felt treated with dignity and respect "
+    },
+    {
+      "questionNumber": "1.8",
+      "questionText": "People were encouraged to maintain their independence and their choices and preferences are upheld "
+    },
+    {
+      "questionNumber": "1.9",
+      "questionText": "Staff can explain how people’s dignity and privacy are respected  "
+    },
+    {
+      "questionNumber": "1.10",
+      "questionText": "Observations confirmed people are given information in an appropriate way to make decisions i.e., Clothing, meals, and activities "
+    },
+    {
+      "questionNumber": "1.11",
+      "questionText": "People confirmed that they feel supported by staff to make informed decisions "
+    },
+    {
+      "questionNumber": "1.12",
+      "questionText": "People confirmed that they are supported to maintain relationships, access a variety of activities and the community "
+    },
+    {
+      "questionNumber": "1.13",
+      "questionText": "Staff are observed to have positive and meaningful interactions with people who use the service "
+    },
+    {
+      "questionNumber": "2.2",
+      "questionText": "There is evidence of appropriately signed consent for all relevant decisions where the person is deemed to have capacity. For example."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "24hr care and support"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Medication"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Photographs (care purposes and social media)."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Sharing information "
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Restrictive practice (sensors)"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Key holding"
+    },
+    {
+      "questionNumber": "2.3",
+      "questionText": "There is evidence of appropriately signed consent by the relevant LPA (Lasting Power of Attorney) where the person is deemed not to have capacity for a specific decision and there is a copy of the LPA on file."
+    },
+    {
+      "questionNumber": "2.4",
+      "questionText": "There is evidence of appropriate mental capacity assessments and best interest decisions where the person is deemed to not have capacity for a specific decision.  These decisions have been made in collabouration with other representatives and/or other relevant parties. For example, -"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Person"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Family "
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Advocate "
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "Other involved professionals"
+    },
+    {
+      "questionNumber": "2.5",
+      "questionText": "There is evidence that the service has DOLs in place as required which demonstrates that least restrictive measures have been considered and where conditions are in place these are being adhered to."
+    },
+    {
+      "questionNumber": "2.6",
+      "questionText": "There is a system in place to track, identify conditions and expiry date of DOLs."
+    },
+    {
+      "questionNumber": "2.7",
+      "questionText": "Staff are observed obtaining consent from people."
+    },
+    {
+      "questionNumber": "2.8",
+      "questionText": "Staff can describe how they ensure the principles of the MCA and how it is put into practice in their daily work."
+    },
+    {
+      "questionNumber": "3.2",
+      "questionText": "There is evidence that people have appropriate contact details of their care and support provider including relevant out of hour contact details, e.g. contact details are documented in a service user guide."
+    },
+    {
+      "questionNumber": "3.3",
+      "questionText": "There is evidence of a fully completed pre assessment prior to the person accessing the service, covering all areas of care and support, including risk, that demonstrates the provider can meet the person’s needs."
+    },
+    {
+      "questionNumber": "3.4",
+      "questionText": "There is evidence of documented life history/about me information."
+    },
+    {
+      "questionNumber": "3.5",
+      "questionText": "There are relevant care and support plans in place to deliver safe and effective care, e.g.:"
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "pain management."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "sight, hearing and communication."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "personal care and physical well-being, including promoting healthy lifestyles including smoking and alcohol consumption."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "oral care."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "continence care."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "skin integrity."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "foot care."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "dietary preferences and nutrition."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "social interests, hobbies, and access to the community."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "religious, cultural, and emotional needs."
+    },
+    {
+      "questionNumber": "•",
+      "questionText": "carer and family involvem"
+    },
+    {
+      "questionNumber": "3.6",
+      "questionText": "There is evidence that care, and support plans are strength based, person centred and promotes independence. "
+    },
+    {
+      "questionNumber": "3.7",
+      "questionText": "There is evidence that care, and support plans include individual personalised outcomes. NB this may be as simple as maintaining a persons level of independence in relation to activities of daily living "
+    },
+    {
+      "questionNumber": "3.8",
+      "questionText": "There is evidence of appropriate risk assessments to deliver safe and effective care, and there are actions recorded to mitigate risk. "
+    },
+    {
+      "questionNumber": "3.9",
+      "questionText": "There is evidence that care and support plans are regularly reviewed and any change in needs are reflected accordingly. "
+    },
+    {
+      "questionNumber": "3.10",
+      "questionText": "There is evidence that risk assessments are regularly reviewed and any change in needs are reflected accordingly."
+    },
+    {
+      "questionNumber": "3.11",
+      "questionText": "There is evidence that daily records are completed per shift or visit. "
+    },
+    {
+      "questionNumber": "3.12",
+      "questionText": "There is evidence that daily entries are factual, dated, timed, legible, and signed by the member of staff(s), including their job role(s). "
+    },
+    {
+      "questionNumber": "3.13",
+      "questionText": "There is evidence that daily entries provide a reflective account of care and support delivered and the persons health and wellbeing. NB Daily notes should be person centred "
+    },
+    {
+      "questionNumber": "3.14",
+      "questionText": "There is evidence that intervention charts are comprehensively completed and are signed and dated, e.g., food and fluid charts, repositioning charts, and pain charts. "
+    },
+    {
+      "questionNumber": "3.15",
+      "questionText": "There is evidence that activity and social interactions are recorded."
+    },
+    {
+      "questionNumber": "3.16",
+      "questionText": "There is documented evidence of involvement from other health and social care professionals."
+    },
+    {
+      "questionNumber": "3.17",
+      "questionText": "There is evidence of an accurately completed DNACPR/ ReSPECT document signed by a relevant health professional and easily accessible."
+    },
+    {
+      "questionNumber": "3.18",
+      "questionText": "People confirmed that the care and support received is carried out in a way that meets their needs in line with their personal preferences."
+    },
+    {
+      "questionNumber": "4.2",
+      "questionText": "There is evidence of a varied menu which promotes healthy eating choices and acknowledges cultural and personal preferences."
+    },
+    {
+      "questionNumber": "4.3",
+      "questionText": "There is access to sufficient supplies of fresh food and fluids over a 24 hour period."
+    },
+    {
+      "questionNumber": "4.4",
+      "questionText": "There are nutritional support plans in place that include food allergies, likes, dislikes and any dietary restrictions including IDDSI."
+    },
+    {
+      "questionNumber": "4.5",
+      "questionText": "Where required there is a nutritional support plan which details any other dietary advice e.g., dietician/SALT."
+    },
+    {
+      "questionNumber": "4.6",
+      "questionText": "Where required there is a nutritional support plan which details the MUST level and any actions to be taken to mitigate the risk."
+    },
+    {
+      "questionNumber": "4.7",
+      "questionText": "Where required there is a MUST tool for each person which is accurately completed and reviewed in line with the tool. NB to be completed at least monthly or following a change in need "
+    },
+    {
+      "questionNumber": "4.8",
+      "questionText": "There was a menu displayed that is visible and accurate."
+    },
+    {
+      "questionNumber": "4.9",
+      "questionText": "People confirmed that person requests of food and drinks can be accommodated e.g., flavoured tea, decaffeinated coffee."
+    },
+    {
+      "questionNumber": "4.10",
+      "questionText": "There was a positive person-centred mealtime experience."
+    },
+    {
+      "questionNumber": "5.2",
+      "questionText": "Where there is shared involvement from another provider this is clearly documented and there are clear processes in place to share information in a timely manner."
+    },
+    {
+      "questionNumber": "5.3",
+      "questionText": "There is a Must do Care Plan/ Hospital Passport reflective of current need."
+    },
+    {
+      "questionNumber": "5.4",
+      "questionText": "People confirmed that they are supported to access other social care/health services."
+    },
+    {
+      "questionNumber": "6.2",
+      "questionText": "There is a safeguarding policy in place that reflects the North Yorkshire multiagency safeguarding policy."
+    },
+    {
+      "questionNumber": "6.3",
+      "questionText": "There is a record of DBS status for visiting professionals (e.g., chiropodist, hairdresser, entertainers)."
+    }
+  ],
+  "messages": [
+    "Care files can either be written in the first person (I statements) or third person. Care plans don't necessarily need to be signed by the person or rep as long as the content is detailed and person centred  ",
+    "NB If the service doesnt have anyone who is able to consent to any decisions, then this would not apply",
+    "NB Assessment tools should be reviewed in line with national guidance eg MUST at least monthly "
+  ],
+  "stdout": "questionNumber\tquestionText\n1.2\tThere is evidence that care and support files express individual’s views, choices, and preferences. - Includes pre admission, care plans, daily notes and life history \n1.3\tThere is evidence that care, and support files have been written with involvement from the person and or their representative. (Where able, the documentation should be agreed and signed by the person). \nCare files can either be written in the first person (I statements) or third person. Care plans don't necessarily need to be signed by the person or rep as long as the content is detailed and person centred  \n1.4\tThe provider has a process in place to ensure that relevant documentation is available upon request in other formats i.e., easy read, large print, pictorial, other languages. \n1.5\tThere is evidence that care, and support files are available and accessible to the person and their representatives in an appropriate format. \n1.6\tThere is evidence that care, and support files demonstrate privacy, dignity, and independence. In line with their personal choices, prefences and wishes (not just in relation to personal care) \n1.7\tPeople who use the service felt treated with dignity and respect \n1.8\tPeople were encouraged to maintain their independence and their choices and preferences are upheld \n1.9\tStaff can explain how people’s dignity and privacy are respected  \n1.10\tObservations confirmed people are given information in an appropriate way to make decisions i.e., Clothing, meals, and activities \n1.11\tPeople confirmed that they feel supported by staff to make informed decisions \n1.12\tPeople confirmed that they are supported to maintain relationships, access a variety of activities and the community \n1.13\tStaff are observed to have positive and meaningful interactions with people who use the service \n2.2\tThere is evidence of appropriately signed consent for all relevant decisions where the person is deemed to have capacity. For example.\n•\t24hr care and support\n•\tMedication\n•\tPhotographs (care purposes and social media).\n•\tSharing information \n•\tRestrictive practice (sensors)\n•\tKey holding\nNB If the service doesnt have anyone who is able to consent to any decisions, then this would not apply\n2.3\tThere is evidence of appropriately signed consent by the relevant LPA (Lasting Power of Attorney) where the person is deemed not to have capacity for a specific decision and there is a copy of the LPA on file.\n2.4\tThere is evidence of appropriate mental capacity assessments and best interest decisions where the person is deemed to not have capacity for a specific decision.  These decisions have been made in collabouration with other representatives and/or other relevant parties. For example, -\n•\tPerson\n•\tFamily \n•\tAdvocate \n•\tOther involved professionals\n2.5\tThere is evidence that the service has DOLs in place as required which demonstrates that least restrictive measures have been considered and where conditions are in place these are being adhered to.\n2.6\tThere is a system in place to track, identify conditions and expiry date of DOLs.\n2.7\tStaff are observed obtaining consent from people.\n2.8\tStaff can describe how they ensure the principles of the MCA and how it is put into practice in their daily work.\n3.2\tThere is evidence that people have appropriate contact details of their care and support provider including relevant out of hour contact details, e.g. contact details are documented in a service user guide.\n3.3\tThere is evidence of a fully completed pre assessment prior to the person accessing the service, covering all areas of care and support, including risk, that demonstrates the provider can meet the person’s needs.\n3.4\tThere is evidence of documented life history/about me information.\n3.5\tThere are relevant care and support plans in place to deliver safe and effective care, e.g.:\n•\tpain management.\n•\tsight, hearing and communication.\n•\tpersonal care and physical well-being, including promoting healthy lifestyles including smoking and alcohol consumption.\n•\toral care.\n•\tcontinence care.\n•\tskin integrity.\n•\tfoot care.\n•\tdietary preferences and nutrition.\n•\tsocial interests, hobbies, and access to the community.\n•\treligious, cultural, and emotional needs.\n•\tcarer and family involvem\n3.6\tThere is evidence that care, and support plans are strength based, person centred and promotes independence. \n3.7\tThere is evidence that care, and support plans include individual personalised outcomes. NB this may be as simple as maintaining a persons level of independence in relation to activities of daily living \n3.8\tThere is evidence of appropriate risk assessments to deliver safe and effective care, and there are actions recorded to mitigate risk. \n3.9\tThere is evidence that care and support plans are regularly reviewed and any change in needs are reflected accordingly. \n3.10\tThere is evidence that risk assessments are regularly reviewed and any change in needs are reflected accordingly.\nNB Assessment tools should be reviewed in line with national guidance eg MUST at least monthly \n3.11\tThere is evidence that daily records are completed per shift or visit. \n3.12\tThere is evidence that daily entries are factual, dated, timed, legible, and signed by the member of staff(s), including their job role(s). \n3.13\tThere is evidence that daily entries provide a reflective account of care and support delivered and the persons health and wellbeing. NB Daily notes should be person centred \n3.14\tThere is evidence that intervention charts are comprehensively completed and are signed and dated, e.g., food and fluid charts, repositioning charts, and pain charts. \n3.15\tThere is evidence that activity and social interactions are recorded.\n3.16\tThere is documented evidence of involvement from other health and social care professionals.\n3.17\tThere is evidence of an accurately completed DNACPR/ ReSPECT document signed by a relevant health professional and easily accessible.\n3.18\tPeople confirmed that the care and support received is carried out in a way that meets their needs in line with their personal preferences.\n4.2\tThere is evidence of a varied menu which promotes healthy eating choices and acknowledges cultural and personal preferences.\n4.3\tThere is access to sufficient supplies of fresh food and fluids over a 24 hour period.\n4.4\tThere are nutritional support plans in place that include food allergies, likes, dislikes and any dietary restrictions including IDDSI.\n4.5\tWhere required there is a nutritional support plan which details any other dietary advice e.g., dietician/SALT.\n4.6\tWhere required there is a nutritional support plan which details the MUST level and any actions to be taken to mitigate the risk.\n4.7\tWhere required there is a MUST tool for each person which is accurately completed and reviewed in line with the tool. NB to be completed at least monthly or following a change in need \n4.8\tThere was a menu displayed that is visible and accurate.\n4.9\tPeople confirmed that person requests of food and drinks can be accommodated e.g., flavoured tea, decaffeinated coffee.\n4.10\tThere was a positive person-centred mealtime experience.\n5.2\tWhere there is shared involvement from another provider this is clearly documented and there are clear processes in place to share information in a timely manner.\n5.3\tThere is a Must do Care Plan/ Hospital Passport reflective of current need.\n5.4\tPeople confirmed that they are supported to access other social care/health services.\n6.2\tThere is a safeguarding policy in place that reflects the North Yorkshire multiagency safeguarding policy.\n6.3\tThere is a record of DBS status for visiting professionals (e.g., chiropodist, hairdresser, entertainers).\n",
+  "stderr": "",
+  "execution_time_ms": 855
+}

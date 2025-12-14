@@ -130,6 +130,8 @@ export const complianceQuestions = mysqlTable("complianceQuestions", {
   requiredDocuments: text("requiredDocuments"), // JSON array stored as text
   guidance: text("guidance"),
   conditionalLogic: text("conditionalLogic"), // JSON: {"dependsOn": "1.7", "showWhen": ["Permanent", "Sponsored"]}
+  evidenceRequirement: text("evidenceRequirement"), // What evidence is required for this question
+  exampleEvidence: text("exampleEvidence"), // Example of what the evidence should contain
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

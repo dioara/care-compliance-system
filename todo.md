@@ -641,7 +641,7 @@
 - [x] Test care setting selection (Nursing Home selected successfully)
 - [x] Test "View template questions" link appears when care setting selected
 - [ ] Debug template preview dialog (TypeScript errors preventing dialog from opening)
-- [ ] Save checkpoint and deliver assessment templates feature
+- [x] Save checkpoint with conditional display logic and assessment templates (checkpoint a9626cb8)
 
 ## Compliance Dashboard Analytics
 - [ ] Create analytics aggregation functions in server/db.ts
@@ -653,3 +653,18 @@
 - [ ] Add filtering by location, staff member, service user
 - [ ] Test dashboard with real data and edge cases
 - [ ] Save checkpoint and deliver all three features
+
+## Research and Update Evidence Requirements with Detailed Examples
+- [x] Research CQC evidence requirements for staff recruitment and vetting (Regulation 19, Schedule 3)
+- [x] Research CQC evidence requirements for service user care planning (Regulation 9)
+- [x] Document what must be contained in DBS certificates, references, care plans, assessments
+- [x] Add evidenceRequirement and exampleEvidence columns to complianceQuestions schema
+- [x] Push schema migration (0011_magenta_morlun.sql) to add evidence columns
+- [x] Create comprehensive evidence mapping for 140 questions (all staff + partial service user)
+- [x] Update all 82 staff questions with detailed, CQC-researched evidence requirements
+- [x] Update 58 service user questions (Sections 1-3, 10-14, 17-19) with detailed evidence
+- [x] Run update script successfully (140 questions updated, 116 skipped)
+- [x] Test updated questions in browser (Question 1.1 verified - evidence requirements displaying correctly)
+- [x] Verify evidence format matches requirements (document type + what must be in it)
+- [ ] Complete remaining 116 service user questions evidence mappings (Sections 4-9, 15-16, 20-22)
+- [ ] Save checkpoint with 140 questions updated with detailed evidence requirements

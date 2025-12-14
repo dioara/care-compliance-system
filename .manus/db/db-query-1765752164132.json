@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, sectionNumber, sectionName FROM complianceSections WHERE sectionType = 'staff' ORDER BY sectionNumber",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, sectionNumber, sectionName FROM complianceSections WHERE sectionType = 'staff' ORDER BY sectionNumber",
+  "rows": [
+    {
+      "id": "23",
+      "sectionNumber": "1",
+      "sectionName": "Recruitment & Vetting"
+    },
+    {
+      "id": "24",
+      "sectionNumber": "2",
+      "sectionName": "Induction & Onboarding"
+    },
+    {
+      "id": "25",
+      "sectionNumber": "3",
+      "sectionName": "Training & Development"
+    },
+    {
+      "id": "26",
+      "sectionNumber": "4",
+      "sectionName": "Supervision & Appraisal"
+    },
+    {
+      "id": "27",
+      "sectionNumber": "5",
+      "sectionName": "Competency & Observation"
+    },
+    {
+      "id": "28",
+      "sectionNumber": "6",
+      "sectionName": "Health & Wellbeing"
+    },
+    {
+      "id": "29",
+      "sectionNumber": "7",
+      "sectionName": "Conduct & Capability"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsectionNumber\tsectionName\n23\t1\tRecruitment & Vetting\n24\t2\tInduction & Onboarding\n25\t3\tTraining & Development\n26\t4\tSupervision & Appraisal\n27\t5\tCompetency & Observation\n28\t6\tHealth & Wellbeing\n29\t7\tConduct & Capability\n",
+  "stderr": "",
+  "execution_time_ms": 127
+}
