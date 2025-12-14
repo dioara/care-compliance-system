@@ -40,6 +40,7 @@ export const appRouter = router({
           email: z.string().email().optional(),
           website: z.string().optional(),
           managerName: z.string().optional(),
+          careSettingType: z.enum(["residential", "nursing", "domiciliary", "supported_living"]).optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -414,6 +415,29 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.deleteSupportingDocument(input.id);
         return { success: true };
+      }),
+
+    // Assessment Templates
+    templates: publicProcedure.query(async () => {
+      return db.getAllAssessmentTemplates();
+    }),
+
+    templateById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAssessmentTemplateById(input.id);
+      }),
+
+    templateByCareSetting: protectedProcedure
+      .input(z.object({ careSettingType: z.enum(["residential", "nursing", "domiciliary", "supported_living"]) }))
+      .query(async ({ input }) => {
+        return db.getAssessmentTemplateByCareSetting(input.careSettingType);
+      }),
+
+    templateQuestionsWithDetails: protectedProcedure
+      .input(z.object({ templateId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getTemplateQuestionsWithDetails(input.templateId);
       }),
   }),
 

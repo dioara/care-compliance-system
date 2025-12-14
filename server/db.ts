@@ -24,6 +24,8 @@ import {
   auditEvidence,
   auditSchedules,
   incidents,
+  assessmentTemplates,
+  templateQuestions,
   type InsertUser,
   type InsertTenant,
   type InsertLocation,
@@ -760,6 +762,63 @@ export async function getDashboardStats(tenantId: number) {
       red: nonCompliantCount,
     }
   };
+}
+
+// ============================================================================
+// ASSESSMENT TEMPLATES
+// ============================================================================
+
+export async function getAllAssessmentTemplates() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(assessmentTemplates).orderBy(assessmentTemplates.careSettingType);
+}
+
+export async function getAssessmentTemplateById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(assessmentTemplates).where(eq(assessmentTemplates.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getAssessmentTemplateByCareSetting(careSettingType: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(assessmentTemplates)
+    .where(and(
+      eq(assessmentTemplates.careSettingType, careSettingType as any),
+      eq(assessmentTemplates.isDefault, true)
+    ))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getTemplateQuestions(templateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(templateQuestions).where(eq(templateQuestions.templateId, templateId));
+}
+
+export async function getTemplateQuestionsWithDetails(templateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select({
+    id: templateQuestions.id,
+    templateId: templateQuestions.templateId,
+    questionId: templateQuestions.questionId,
+    isRequired: templateQuestions.isRequired,
+    isRecommended: templateQuestions.isRecommended,
+    questionNumber: complianceQuestions.questionNumber,
+    questionText: complianceQuestions.questionText,
+    sectionId: complianceQuestions.sectionId,
+  })
+  .from(templateQuestions)
+  .innerJoin(complianceQuestions, eq(templateQuestions.questionId, complianceQuestions.id))
+  .where(eq(templateQuestions.templateId, templateId))
+  .orderBy(complianceQuestions.sectionId, complianceQuestions.questionNumber);
+  
+  return result;
 }
 
 // ============================================================================

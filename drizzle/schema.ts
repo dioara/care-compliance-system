@@ -35,6 +35,7 @@ export const tenants = mysqlTable("tenants", {
   managerName: varchar("managerName", { length: 255 }),
   managerTitle: varchar("managerTitle", { length: 255 }),
   serviceType: varchar("serviceType", { length: 100 }),
+  careSettingType: mysqlEnum("careSettingType", ["residential", "nursing", "domiciliary", "supported_living"]),
   cqcInspectionDate: date("cqcInspectionDate"),
   cqcRating: varchar("cqcRating", { length: 50 }),
   specialisms: text("specialisms"), // JSON array stored as text
@@ -158,6 +159,31 @@ export const complianceAssessments = mysqlTable("complianceAssessments", {
   assessedAt: timestamp("assessedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Assessment templates for different care settings
+ */
+export const assessmentTemplates = mysqlTable("assessmentTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  careSettingType: mysqlEnum("careSettingType", ["residential", "nursing", "domiciliary", "supported_living"]).notNull(),
+  description: text("description"),
+  isDefault: boolean("isDefault").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Questions included in each assessment template
+ */
+export const templateQuestions = mysqlTable("templateQuestions", {
+  id: int("id").autoincrement().primaryKey(),
+  templateId: int("templateId").notNull(),
+  questionId: int("questionId").notNull(),
+  isRequired: boolean("isRequired").default(false).notNull(),
+  isRecommended: boolean("isRecommended").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
 /**

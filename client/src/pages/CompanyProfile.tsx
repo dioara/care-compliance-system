@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { Building2, Upload, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -23,6 +26,7 @@ export default function CompanyProfile() {
     managerName: "",
     managerTitle: "",
     serviceType: "",
+    careSettingType: "",
     cqcRating: "",
   });
 
@@ -40,6 +44,7 @@ export default function CompanyProfile() {
         managerName: profile.managerName || "",
         managerTitle: profile.managerTitle || "",
         serviceType: profile.serviceType || "",
+        careSettingType: profile.careSettingType || "",
         cqcRating: profile.cqcRating || "",
       });
     }
@@ -228,6 +233,37 @@ export default function CompanyProfile() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="careSettingType">Care Setting Type</Label>
+                  <Select
+                    value={formData.careSettingType}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, careSettingType: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select care setting type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="residential">Residential Care</SelectItem>
+                      <SelectItem value="nursing">Nursing Home</SelectItem>
+                      <SelectItem value="domiciliary">Domiciliary Care</SelectItem>
+                      <SelectItem value="supported_living">Supported Living</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    This helps pre-configure relevant assessment questions for your setting.
+                    {formData.careSettingType && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="link" className="h-auto p-0 text-xs">
+                            View template questions
+                          </Button>
+                        </DialogTrigger>
+                        <TemplatePreviewDialog careSettingType={formData.careSettingType} />
+                      </Dialog>
+                    )}
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="telephone">Telephone</Label>
                   <Input
                     id="telephone"
@@ -310,5 +346,65 @@ export default function CompanyProfile() {
         </Card>
       </div>
     </div>
+  );
+}
+
+// Template Preview Dialog Component
+function TemplatePreviewDialog({ careSettingType }: { careSettingType: string }) {
+  const { data: template, isLoading } = trpc.compliance.templateByCareSetting.useQuery({ careSettingType: careSettingType as any });
+  const { data: templateQuestions } = trpc.compliance.templateQuestionsWithDetails.useQuery(
+    { templateId: template?.id || 0 },
+    { enabled: !!template?.id }
+  );
+
+  const careSettingNames: Record<string, string> = {
+    residential: "Residential Care",
+    nursing: "Nursing Home",
+    domiciliary: "Domiciliary Care",
+    supported_living: "Supported Living"
+  };
+
+  return (
+    <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{careSettingNames[careSettingType]} Assessment Template</DialogTitle>
+        <DialogDescription>
+          This template includes {templateQuestions?.length || 256} compliance questions tailored for {careSettingNames[careSettingType].toLowerCase()} settings.
+        </DialogDescription>
+      </DialogHeader>
+
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="rounded-lg border p-4 bg-muted/50">
+            <h3 className="font-semibold mb-2">Template Overview</h3>
+            <p className="text-sm text-muted-foreground">{template?.description}</p>
+            <div className="mt-4 flex gap-2">
+              <Badge variant="outline">{templateQuestions?.length || 0} questions</Badge>
+              <Badge variant="outline">All sections included</Badge>
+            </div>
+          </div>
+
+          {templateQuestions && templateQuestions.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-3">Included Questions</h3>
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {templateQuestions.map((q: any) => (
+                  <div key={q.id} className="flex items-start gap-2 text-sm p-2 rounded hover:bg-muted/50">
+                    <Badge variant="secondary" className="shrink-0 mt-0.5">
+                      {q.questionNumber}
+                    </Badge>
+                    <span className="text-muted-foreground">{q.questionText}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </DialogContent>
   );
 }

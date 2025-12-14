@@ -1,0 +1,21 @@
+{
+  "query": "SELECT * FROM complianceSections LIMIT 1",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT * FROM complianceSections LIMIT 1",
+  "rows": [
+    {
+      "id": "1",
+      "sectionNumber": "1",
+      "sectionName": "Respecting & Involving People",
+      "sectionType": "service_user",
+      "description": "Ensuring person-centred care, dignity, respect, and involvement in decision-making",
+      "tooltip": "This section covers how well you respect service users' choices, preferences, and dignity. Focus on person-centred care practices, communication, and involvement in care planning.",
+      "auditFrequency": "quarterly",
+      "isActive": "1",
+      "createdAt": "2025-12-14 08:01:22"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsectionNumber\tsectionName\tsectionType\tdescription\ttooltip\tauditFrequency\tisActive\tcreatedAt\n1\t1\tRespecting & Involving People\tservice_user\tEnsuring person-centred care, dignity, respect, and involvement in decision-making\tThis section covers how well you respect service users' choices, preferences, and dignity. Focus on person-centred care practices, communication, and involvement in care planning.\tquarterly\t1\t2025-12-14 08:01:22\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

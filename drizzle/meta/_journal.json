@@ -71,6 +71,13 @@
       "when": 1765746683758,
       "tag": "0009_black_fenris",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1765748289150,
+      "tag": "0010_familiar_inertia",
+      "breakpoints": true
     }
   ]
 }
