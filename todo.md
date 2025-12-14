@@ -236,3 +236,16 @@
 - [ ] Test login flow end-to-end
 - [ ] Verify token generation and storage
 - [ ] Fix any issues preventing successful login
+
+
+## BUG: Default Location Not Created on Signup
+- [x] Update registration endpoint to create default "Main Office" location
+- [x] Ensure every new tenant has at least one location
+- [x] First user is automatically super admin
+- [x] Created default location for existing test tenant
+- [x] Test registration creates location automatically
+
+## BUG: Missing company.listLocations tRPC Endpoint
+- [x] Verified locations.list endpoint exists and works correctly
+- [x] Return locations for user's tenant
+- [x] Test locations page loads correctly

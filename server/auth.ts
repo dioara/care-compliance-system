@@ -38,6 +38,15 @@ export const authRouter = router({
         telephone: input.companyTelephone || null,
       });
 
+      // Create default location (Main Office)
+      await db.createLocation({
+        tenantId: tenant.id,
+        name: "Main Office",
+        address: input.companyAddress || "",
+        numberOfServiceUsers: 0,
+        numberOfStaff: 0,
+      });
+
       // Create user as admin of the company
       const userResult = await db.createUser({
         email: input.email,
@@ -45,6 +54,7 @@ export const authRouter = router({
         name: input.name,
         tenantId: tenant.id,
         role: "admin",
+        superAdmin: true, // First user is super admin
       });
 
       return {
