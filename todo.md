@@ -339,5 +339,5 @@
 - [x] Update compliance questions to use British spelling
 - [x] Update UI text to use British spelling
 - [x] Update section descriptions to use British spelling
-- [ ] Test changes across all pages
-- [ ] Commit to GitHub
+- [x] Test changes across all pages
+- [x] Commit to GitHub (committed locally, will be synced via checkpoint)
