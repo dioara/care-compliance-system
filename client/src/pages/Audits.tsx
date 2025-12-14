@@ -319,7 +319,14 @@ export default function Audits() {
                 <Card
                   key={audit.id}
                   className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setLocation(`/audits/${audit.id}`)}
+                  onClick={() => {
+                    // Navigate to results page for completed audits, conduct page for in-progress
+                    if (audit.status === 'completed' || audit.status === 'reviewed' || audit.status === 'archived') {
+                      setLocation(`/audits/${audit.id}/results`);
+                    } else {
+                      setLocation(`/audits/${audit.id}`);
+                    }
+                  }}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
