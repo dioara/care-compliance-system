@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,12 +11,12 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, ClipboardList, FileText, AlertCircle, CheckCircle2, Clock, Plus } from "lucide-react";
 import { format } from "date-fns";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function Audits() {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedAuditType, setSelectedAuditType] = useState<number | null>(null);
@@ -35,7 +35,7 @@ export default function Audits() {
     onSuccess: (data) => {
       toast.success("Audit scheduled successfully");
       setIsScheduleDialogOpen(false);
-      navigate(`/audits/${data.id}`);
+      setLocation(`/audits/${data.id}`);
     },
     onError: (error) => {
       toast.error(`Failed to schedule audit: ${error.message}`);
@@ -319,7 +319,7 @@ export default function Audits() {
                 <Card
                   key={audit.id}
                   className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/audits/${audit.id}`)}
+                  onClick={() => setLocation(`/audits/${audit.id}`)}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
