@@ -298,3 +298,16 @@
 - [x] Update database queries to fetch assessments by person ID
 - [x] Test complete per-person compliance workflow
 - [ ] Add detailed compliance questions for 29 sections (optional - sections work without questions)
+
+
+## Extract Questions from Intervention Plan Document
+- [x] Review intervention plan document to extract all compliance questions
+- [x] Extract evidence requirements for each question (198 questions extracted)
+- [x] Create seed script with all questions organized by section
+- [x] Populate complianceQuestions table with all extracted questions (198 added)
+- [x] Fix section filtering bug - removed duplicate sections, fixed section types
+- [x] Update PersonCompliance UI to display questions within sections using Accordion
+- [x] Add getAllComplianceQuestions database function
+- [x] Add questions endpoint to tRPC compliance router
+- [x] Test question-by-question assessment workflow
+- [x] Commit all changes to GitHub

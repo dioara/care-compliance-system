@@ -273,6 +273,11 @@ export const appRouter = router({
       return db.getAllComplianceSections();
     }),
 
+    // Get all compliance questions
+    questions: publicProcedure.query(async () => {
+      return db.getAllComplianceQuestions();
+    }),
+
     // Get section by ID with questions
     sectionDetails: protectedProcedure
       .input(z.object({ sectionId: z.number() }))

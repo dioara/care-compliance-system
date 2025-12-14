@@ -5,11 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation as useRouter, useParams } from "wouter";
-import { ArrowLeft, CheckCircle2, XCircle, AlertTriangle, Loader2, Save, ClipboardCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, XCircle, AlertTriangle, Loader2, Save, ClipboardCheck, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -40,6 +41,9 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     select: (sections) => sections.filter(s => s.sectionType === personType)
   });
 
+  // Fetch all questions
+  const { data: allQuestions } = trpc.compliance.questions.useQuery();
+
   // Fetch assessments for this person
   const { data: assessments, refetch: refetchAssessments } = trpc.compliance.assessmentsByLocation.useQuery(
     { locationId: activeLocationId || 0 },
@@ -53,7 +57,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
 
   const saveAssessment = trpc.compliance.saveAssessment.useMutation();
 
-  // Local state for form data per section
+  // Local state for form data per question
   const [formData, setFormData] = useState<Record<number, any>>({});
 
   if (!activeLocationId) {
@@ -88,12 +92,19 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     );
   }
 
-  // Create a map of section assessments
-  const sectionAssessments = new Map();
+  // Create a map of question assessments
+  const questionAssessments = new Map();
   assessments?.forEach(assessment => {
-    // Group by section - we'll need to update this when questions are added
-    // For now, just map by questionId
-    sectionAssessments.set(assessment.questionId, assessment);
+    questionAssessments.set(assessment.questionId, assessment);
+  });
+
+  // Group questions by section
+  const questionsBySection = new Map<number, any[]>();
+  allQuestions?.forEach(question => {
+    if (!questionsBySection.has(question.sectionId)) {
+      questionsBySection.set(question.sectionId, []);
+    }
+    questionsBySection.get(question.sectionId)?.push(question);
   });
 
   const getRAGBadge = (status: string | undefined) => {
@@ -126,13 +137,13 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     }
   };
 
-  const handleSaveAssessment = async (sectionId: number) => {
+  const handleSaveAssessment = async (questionId: number) => {
     if (!user || !activeLocationId || !canWrite) {
       toast.error("You don't have permission to save assessments");
       return;
     }
 
-    const data = formData[sectionId];
+    const data = formData[questionId];
     if (!data || !data.ragStatus) {
       toast.error("Please select a RAG status");
       return;
@@ -142,7 +153,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
       await saveAssessment.mutateAsync({
         tenantId: user.tenantId!,
         locationId: activeLocationId,
-        questionId: sectionId, // Using sectionId as questionId for now
+        questionId: questionId,
         assessmentType: personType,
         staffMemberId: personType === "staff" ? personId : undefined,
         serviceUserId: personType === "service_user" ? personId : undefined,
@@ -159,10 +170,10 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
       toast.success("Assessment saved successfully");
       refetchAssessments();
       
-      // Clear form data for this section
+      // Clear form data for this question
       setFormData(prev => {
         const newData = { ...prev };
-        delete newData[sectionId];
+        delete newData[questionId];
         return newData;
       });
     } catch (error) {
@@ -170,14 +181,31 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     }
   };
 
-  const updateFormData = (sectionId: number, field: string, value: any) => {
+  const updateFormData = (questionId: number, field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
-      [sectionId]: {
-        ...(prev[sectionId] || {}),
+      [questionId]: {
+        ...(prev[questionId] || {}),
         [field]: value,
       },
     }));
+  };
+
+  // Calculate section completion
+  const getSectionCompletion = (sectionId: number) => {
+    const questions = questionsBySection.get(sectionId) || [];
+    if (questions.length === 0) return { completed: 0, total: 0, percentage: 0 };
+    
+    const completed = questions.filter(q => {
+      const assessment = questionAssessments.get(q.id);
+      return assessment && assessment.ragStatus;
+    }).length;
+    
+    return {
+      completed,
+      total: questions.length,
+      percentage: Math.round((completed / questions.length) * 100)
+    };
   };
 
   const personName = (person as any).name || "Unknown";
@@ -201,8 +229,8 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
       <div className="grid gap-6">
         {allSections && allSections.length > 0 ? (
           allSections.map((section) => {
-            const existingAssessment = sectionAssessments.get(section.id);
-            const currentFormData = formData[section.id] || {};
+            const sectionQuestions = questionsBySection.get(section.id) || [];
+            const completion = getSectionCompletion(section.id);
 
             return (
               <Card key={section.id}>
@@ -218,12 +246,14 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                           {section.description}
                         </CardDescription>
                       )}
+                      {sectionQuestions.length > 0 && (
+                        <div className="mt-2">
+                          <Badge variant="outline">
+                            {completion.completed} / {completion.total} questions completed ({completion.percentage}%)
+                          </Badge>
+                        </div>
+                      )}
                     </div>
-                    {existingAssessment && (
-                      <div className="ml-4">
-                        {getRAGBadge(existingAssessment.ragStatus)}
-                      </div>
-                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -233,129 +263,189 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                     </div>
                   )}
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor={`compliance-${section.id}`}>Compliance Status</Label>
-                      <Select
-                        value={currentFormData.complianceStatus || existingAssessment?.complianceStatus || ''}
-                        onValueChange={(value) => updateFormData(section.id, 'complianceStatus', value)}
-                        disabled={!canWrite}
-                      >
-                        <SelectTrigger id={`compliance-${section.id}`}>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="compliant">Compliant</SelectItem>
-                          <SelectItem value="partial">Partial Compliance</SelectItem>
-                          <SelectItem value="non_compliant">Non-Compliant</SelectItem>
-                          <SelectItem value="not_assessed">Not Assessed</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  {sectionQuestions.length > 0 ? (
+                    <Accordion type="multiple" className="w-full">
+                      {sectionQuestions.map((question, idx) => {
+                        const existingAssessment = questionAssessments.get(question.id);
+                        const currentFormData = formData[question.id] || {};
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`rag-${section.id}`}>RAG Status</Label>
-                      <Select
-                        value={currentFormData.ragStatus || existingAssessment?.ragStatus || ''}
-                        onValueChange={(value) => updateFormData(section.id, 'ragStatus', value)}
-                        disabled={!canWrite}
-                      >
-                        <SelectTrigger id={`rag-${section.id}`}>
-                          <SelectValue placeholder="Select RAG status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="green">Green - Compliant</SelectItem>
-                          <SelectItem value="amber">Amber - Partial</SelectItem>
-                          <SelectItem value="red">Red - Non-Compliant</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                        return (
+                          <AccordionItem key={question.id} value={`question-${question.id}`}>
+                            <AccordionTrigger className="hover:no-underline">
+                              <div className="flex items-center justify-between w-full pr-4">
+                                <div className="flex items-center gap-3 text-left">
+                                  <span className="font-mono text-sm text-muted-foreground">
+                                    {question.questionNumber}
+                                  </span>
+                                  <span className="text-sm font-medium">
+                                    {question.questionText.length > 100 
+                                      ? question.questionText.substring(0, 100) + "..." 
+                                      : question.questionText}
+                                  </span>
+                                </div>
+                                {existingAssessment && (
+                                  <div className="ml-4">
+                                    {getRAGBadge(existingAssessment.ragStatus)}
+                                  </div>
+                                )}
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="space-y-4 pt-4">
+                                {/* Full question text */}
+                                <div className="p-3 bg-muted rounded-lg">
+                                  <p className="text-sm font-medium mb-2">Question:</p>
+                                  <p className="text-sm">{question.questionText}</p>
+                                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor={`evidence-${section.id}`}>Evidence Provided</Label>
-                    <Textarea
-                      id={`evidence-${section.id}`}
-                      placeholder="Describe the evidence you have for compliance..."
-                      value={currentFormData.evidenceProvided || existingAssessment?.evidenceProvided || ''}
-                      onChange={(e) => updateFormData(section.id, 'evidenceProvided', e.target.value)}
-                      disabled={!canWrite}
-                      rows={3}
-                    />
-                  </div>
+                                {/* Evidence requirement */}
+                                {question.standardDescription && (
+                                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                    <p className="text-sm font-medium text-amber-900 mb-1 flex items-center gap-2">
+                                      <HelpCircle className="h-4 w-4" />
+                                      Evidence Requirement:
+                                    </p>
+                                    <p className="text-sm text-amber-800">{question.standardDescription}</p>
+                                  </div>
+                                )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor={`gaps-${section.id}`}>Identified Gaps</Label>
-                    <Textarea
-                      id={`gaps-${section.id}`}
-                      placeholder="Describe any gaps or areas for improvement..."
-                      value={currentFormData.identifiedGaps || existingAssessment?.identifiedGaps || ''}
-                      onChange={(e) => updateFormData(section.id, 'identifiedGaps', e.target.value)}
-                      disabled={!canWrite}
-                      rows={2}
-                    />
-                  </div>
+                                {/* Guidance/Example */}
+                                {question.guidance && (
+                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p className="text-sm font-medium text-blue-900 mb-1">Example Evidence:</p>
+                                    <p className="text-sm text-blue-800">{question.guidance}</p>
+                                  </div>
+                                )}
 
-                  <div className="space-y-2">
-                    <Label htmlFor={`action-${section.id}`}>Action Required</Label>
-                    <Textarea
-                      id={`action-${section.id}`}
-                      placeholder="Describe actions needed to achieve compliance..."
-                      value={currentFormData.actionRequired || existingAssessment?.actionRequired || ''}
-                      onChange={(e) => updateFormData(section.id, 'actionRequired', e.target.value)}
-                      disabled={!canWrite}
-                      rows={2}
-                    />
-                  </div>
+                                {/* Assessment form */}
+                                <div className="grid gap-4 md:grid-cols-2 pt-4 border-t">
+                                  <div className="space-y-2">
+                                    <Label htmlFor={`compliance-${question.id}`}>Compliance Status</Label>
+                                    <Select
+                                      value={currentFormData.complianceStatus || existingAssessment?.complianceStatus || ''}
+                                      onValueChange={(value) => updateFormData(question.id, 'complianceStatus', value)}
+                                      disabled={!canWrite}
+                                    >
+                                      <SelectTrigger id={`compliance-${question.id}`}>
+                                        <SelectValue placeholder="Select status" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="compliant">Compliant</SelectItem>
+                                        <SelectItem value="partial">Partial Compliance</SelectItem>
+                                        <SelectItem value="non_compliant">Non-Compliant</SelectItem>
+                                        <SelectItem value="not_assessed">Not Assessed</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor={`target-${section.id}`}>Target Completion Date</Label>
-                      <Input
-                        id={`target-${section.id}`}
-                        type="date"
-                        value={currentFormData.targetCompletionDate || (existingAssessment?.targetCompletionDate ? new Date(existingAssessment.targetCompletionDate).toISOString().split('T')[0] : '')}
-                        onChange={(e) => updateFormData(section.id, 'targetCompletionDate', e.target.value)}
-                        disabled={!canWrite}
-                      />
-                    </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor={`rag-${question.id}`}>RAG Status</Label>
+                                    <Select
+                                      value={currentFormData.ragStatus || existingAssessment?.ragStatus || ''}
+                                      onValueChange={(value) => updateFormData(question.id, 'ragStatus', value)}
+                                      disabled={!canWrite}
+                                    >
+                                      <SelectTrigger id={`rag-${question.id}`}>
+                                        <SelectValue placeholder="Select RAG status" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="green">Green - Compliant</SelectItem>
+                                        <SelectItem value="amber">Amber - Partial</SelectItem>
+                                        <SelectItem value="red">Red - Non-Compliant</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor={`notes-${section.id}`}>Additional Notes</Label>
-                      <Input
-                        id={`notes-${section.id}`}
-                        placeholder="Any additional notes..."
-                        value={currentFormData.notes || existingAssessment?.notes || ''}
-                        onChange={(e) => updateFormData(section.id, 'notes', e.target.value)}
-                        disabled={!canWrite}
-                      />
-                    </div>
-                  </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor={`evidence-${question.id}`}>Evidence Provided</Label>
+                                  <Textarea
+                                    id={`evidence-${question.id}`}
+                                    placeholder="Describe the evidence you have for this requirement..."
+                                    value={currentFormData.evidenceProvided || existingAssessment?.evidenceProvided || ''}
+                                    onChange={(e) => updateFormData(question.id, 'evidenceProvided', e.target.value)}
+                                    disabled={!canWrite}
+                                    rows={3}
+                                  />
+                                </div>
 
-                  {canWrite && (
-                    <div className="flex items-center gap-2 pt-4 border-t">
-                      <Button
-                        onClick={() => handleSaveAssessment(section.id)}
-                        disabled={saveAssessment.isPending || !currentFormData.ragStatus}
-                      >
-                        {saveAssessment.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="mr-2 h-4 w-4" />
-                            Save Assessment
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  )}
+                                <div className="space-y-2">
+                                  <Label htmlFor={`gaps-${question.id}`}>Identified Gaps</Label>
+                                  <Textarea
+                                    id={`gaps-${question.id}`}
+                                    placeholder="Describe any gaps or areas for improvement..."
+                                    value={currentFormData.identifiedGaps || existingAssessment?.identifiedGaps || ''}
+                                    onChange={(e) => updateFormData(question.id, 'identifiedGaps', e.target.value)}
+                                    disabled={!canWrite}
+                                    rows={2}
+                                  />
+                                </div>
 
-                  {existingAssessment && (
-                    <div className="text-xs text-muted-foreground pt-2 border-t">
-                      Last assessed: {existingAssessment.assessedAt ? new Date(existingAssessment.assessedAt).toLocaleString() : 'Never'}
+                                <div className="space-y-2">
+                                  <Label htmlFor={`action-${question.id}`}>Action Required</Label>
+                                  <Textarea
+                                    id={`action-${question.id}`}
+                                    placeholder="Describe actions needed to achieve compliance..."
+                                    value={currentFormData.actionRequired || existingAssessment?.actionRequired || ''}
+                                    onChange={(e) => updateFormData(question.id, 'actionRequired', e.target.value)}
+                                    disabled={!canWrite}
+                                    rows={2}
+                                  />
+                                </div>
+
+                                <div className="grid gap-4 md:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label htmlFor={`target-${question.id}`}>Target Completion Date</Label>
+                                    <Input
+                                      id={`target-${question.id}`}
+                                      type="date"
+                                      value={currentFormData.targetCompletionDate || existingAssessment?.targetCompletionDate || ''}
+                                      onChange={(e) => updateFormData(question.id, 'targetCompletionDate', e.target.value)}
+                                      disabled={!canWrite}
+                                    />
+                                  </div>
+
+                                  <div className="space-y-2">
+                                    <Label htmlFor={`notes-${question.id}`}>Additional Notes</Label>
+                                    <Input
+                                      id={`notes-${question.id}`}
+                                      type="text"
+                                      placeholder="Any additional notes..."
+                                      value={currentFormData.notes || existingAssessment?.notes || ''}
+                                      onChange={(e) => updateFormData(question.id, 'notes', e.target.value)}
+                                      disabled={!canWrite}
+                                    />
+                                  </div>
+                                </div>
+
+                                {canWrite && (
+                                  <Button
+                                    onClick={() => handleSaveAssessment(question.id)}
+                                    disabled={saveAssessment.isPending}
+                                    className="w-full"
+                                  >
+                                    {saveAssessment.isPending ? (
+                                      <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Save className="mr-2 h-4 w-4" />
+                                        Save Assessment
+                                      </>
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        );
+                      })}
+                    </Accordion>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No questions available for this section yet.</p>
                     </div>
                   )}
                 </CardContent>
@@ -364,22 +454,12 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
           })
         ) : (
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <ClipboardCheck className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Compliance Sections</h3>
-              <p className="text-muted-foreground text-center">
-                Compliance sections for {personType === "staff" ? "staff" : "service users"} haven't been configured yet.
-              </p>
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">No compliance sections found</p>
             </CardContent>
           </Card>
         )}
       </div>
-
-      {!canWrite && (
-        <div className="fixed bottom-4 right-4 bg-amber-100 text-amber-900 px-4 py-2 rounded-lg shadow-lg">
-          <p className="text-sm font-medium">Read-only access to this location</p>
-        </div>
-      )}
     </div>
   );
 }

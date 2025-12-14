@@ -1,0 +1,184 @@
+{
+  "query": "SELECT id, sectionNumber, sectionName, sectionType FROM complianceSections ORDER BY sectionType, sectionNumber",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, sectionNumber, sectionName, sectionType FROM complianceSections ORDER BY sectionType, sectionNumber",
+  "rows": [
+    {
+      "id": "1",
+      "sectionNumber": "1",
+      "sectionName": "Respecting & Involving People",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "2",
+      "sectionNumber": "2",
+      "sectionName": "Consent",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "3",
+      "sectionNumber": "3",
+      "sectionName": "Care and Welfare",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "4",
+      "sectionNumber": "4",
+      "sectionName": "Meeting Nutritional Needs",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "5",
+      "sectionNumber": "5",
+      "sectionName": "Co-operating with Providers",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "6",
+      "sectionNumber": "6",
+      "sectionName": "Safeguarding",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "7",
+      "sectionNumber": "7",
+      "sectionName": "Infection Control",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "8",
+      "sectionNumber": "8",
+      "sectionName": "Management of Medicine",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "9",
+      "sectionNumber": "9",
+      "sectionName": "Safety of Premises",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "10",
+      "sectionNumber": "10",
+      "sectionName": "Safety of Equipment",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "11",
+      "sectionNumber": "11",
+      "sectionName": "Recruitment",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "12",
+      "sectionNumber": "12",
+      "sectionName": "Staff Deployment",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "13",
+      "sectionNumber": "13",
+      "sectionName": "Supporting Staff",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "14",
+      "sectionNumber": "14",
+      "sectionName": "Quality Monitoring",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "15",
+      "sectionNumber": "15",
+      "sectionName": "Complaints",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "16",
+      "sectionNumber": "16",
+      "sectionName": "Records",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "17",
+      "sectionNumber": "17",
+      "sectionName": "Financial Management",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "18",
+      "sectionNumber": "18",
+      "sectionName": "Activities and Engagement",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "19",
+      "sectionNumber": "19",
+      "sectionName": "End of Life Care",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "20",
+      "sectionNumber": "20",
+      "sectionName": "Mental Health Support",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "21",
+      "sectionNumber": "21",
+      "sectionName": "Equality and Diversity",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "22",
+      "sectionNumber": "22",
+      "sectionName": "Governance and Leadership",
+      "sectionType": "service_user"
+    },
+    {
+      "id": "23",
+      "sectionNumber": "1",
+      "sectionName": "Recruitment & Vetting",
+      "sectionType": "staff"
+    },
+    {
+      "id": "24",
+      "sectionNumber": "2",
+      "sectionName": "Induction & Onboarding",
+      "sectionType": "staff"
+    },
+    {
+      "id": "25",
+      "sectionNumber": "3",
+      "sectionName": "Training & Development",
+      "sectionType": "staff"
+    },
+    {
+      "id": "26",
+      "sectionNumber": "4",
+      "sectionName": "Supervision & Appraisal",
+      "sectionType": "staff"
+    },
+    {
+      "id": "27",
+      "sectionNumber": "5",
+      "sectionName": "Competency & Observation",
+      "sectionType": "staff"
+    },
+    {
+      "id": "28",
+      "sectionNumber": "6",
+      "sectionName": "Health & Wellbeing",
+      "sectionType": "staff"
+    },
+    {
+      "id": "29",
+      "sectionNumber": "7",
+      "sectionName": "Conduct & Capability",
+      "sectionType": "staff"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsectionNumber\tsectionName\tsectionType\n1\t1\tRespecting & Involving People\tservice_user\n2\t2\tConsent\tservice_user\n3\t3\tCare and Welfare\tservice_user\n4\t4\tMeeting Nutritional Needs\tservice_user\n5\t5\tCo-operating with Providers\tservice_user\n6\t6\tSafeguarding\tservice_user\n7\t7\tInfection Control\tservice_user\n8\t8\tManagement of Medicine\tservice_user\n9\t9\tSafety of Premises\tservice_user\n10\t10\tSafety of Equipment\tservice_user\n11\t11\tRecruitment\tservice_user\n12\t12\tStaff Deployment\tservice_user\n13\t13\tSupporting Staff\tservice_user\n14\t14\tQuality Monitoring\tservice_user\n15\t15\tComplaints\tservice_user\n16\t16\tRecords\tservice_user\n17\t17\tFinancial Management\tservice_user\n18\t18\tActivities and Engagement\tservice_user\n19\t19\tEnd of Life Care\tservice_user\n20\t20\tMental Health Support\tservice_user\n21\t21\tEquality and Diversity\tservice_user\n22\t22\tGovernance and Leadership\tservice_user\n23\t1\tRecruitment & Vetting\tstaff\n24\t2\tInduction & Onboarding\tstaff\n25\t3\tTraining & Development\tstaff\n26\t4\tSupervision & Appraisal\tstaff\n27\t5\tCompetency & Observation\tstaff\n28\t6\tHealth & Wellbeing\tstaff\n29\t7\tConduct & Capability\tstaff\n",
+  "stderr": "",
+  "execution_time_ms": 50
+}

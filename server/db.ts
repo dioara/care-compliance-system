@@ -462,6 +462,13 @@ export async function getAllComplianceSections() {
   return await db.select().from(complianceSections).where(eq(complianceSections.isActive, true)).orderBy(complianceSections.sectionNumber);
 }
 
+export async function getAllComplianceQuestions() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(complianceQuestions).orderBy(complianceQuestions.sectionId, complianceQuestions.questionNumber);
+}
+
 export async function getComplianceSectionById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
