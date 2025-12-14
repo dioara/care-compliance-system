@@ -332,3 +332,12 @@
 - [x] Update database with renumbered questions (233 questions renumbered)
 - [x] Test questions display with correct numbering (verified Section 1 shows 1.1-1.20)
 - [x] Commit to GitHub
+
+
+## Convert to British Spelling
+- [x] Search for American spellings in database (organization, color, license, etc.)
+- [x] Update compliance questions to use British spelling
+- [x] Update UI text to use British spelling
+- [x] Update section descriptions to use British spelling
+- [ ] Test changes across all pages
+- [ ] Commit to GitHub

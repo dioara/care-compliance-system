@@ -71,7 +71,7 @@ export default function Register() {
           </div>
           <CardTitle className="text-2xl text-center">Create Your Account</CardTitle>
           <CardDescription className="text-center">
-            Register your care organization to start managing compliance
+            Register your care organisation to start managing compliance
           </CardDescription>
         </CardHeader>
         <CardContent>

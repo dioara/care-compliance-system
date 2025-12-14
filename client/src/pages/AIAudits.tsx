@@ -50,7 +50,7 @@ export default function AIAudits() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-start gap-2">
                     <span className="text-green-500">✓</span>
-                    <span>Person-centeredness and individual preferences</span>
+                    <span>Person-centredness and individual preferences</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500">✓</span>
@@ -113,7 +113,7 @@ export default function AIAudits() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500">✓</span>
-                    <span>Person-centered language and approach</span>
+                    <span>Person-centred language and approach</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-500">✓</span>
