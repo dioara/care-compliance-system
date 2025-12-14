@@ -267,3 +267,23 @@
 - [x] Test location filtering works correctly
 - [x] Test location defaulting in forms
 - [x] Commit database schema and seed data to GitHub
+
+
+## Complete Compliance Assessment Interface
+- [x] Define all 29 CQC compliance sections with descriptions
+- [x] Create seed data script for compliance sections (questions need to be added)
+- [x] Add database helper functions for compliance assessments
+- [x] Create tRPC endpoints for compliance CRUD operations
+- [x] Build compliance overview page with RAG status grid
+- [x] Show compliance percentage and overdue actions count
+- [x] Build detailed section assessment page
+- [x] Add question-by-question assessment with RAG status
+- [x] Add notes and findings for each question
+- [x] Build action tracking system
+- [x] Add responsible person assignment
+- [x] Add target completion dates
+- [x] Show overdue actions prominently
+- [x] Filter assessments by active location
+- [x] Test complete assessment workflow
+- [ ] Implement evidence document upload (S3) - placeholder added
+- [ ] Seed compliance questions for each section

@@ -1,4 +1,4 @@
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import bcrypt from "bcryptjs";
 import {
@@ -10,6 +10,10 @@ import {
   userRoles,
   serviceUsers,
   staffMembers,
+  complianceSections,
+  complianceQuestions,
+  complianceAssessments,
+  supportingDocuments,
   type InsertUser,
   type InsertTenant,
   type InsertLocation,
@@ -444,4 +448,134 @@ export async function deleteStaffMember(id: number) {
   if (!db) throw new Error("Database not available");
 
   await db.delete(staffMembers).where(eq(staffMembers.id, id));
+}
+
+
+// ============================================================================
+// COMPLIANCE MANAGEMENT
+// ============================================================================
+
+export async function getAllComplianceSections() {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(complianceSections).where(eq(complianceSections.isActive, true)).orderBy(complianceSections.sectionNumber);
+}
+
+export async function getComplianceSectionById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(complianceSections).where(eq(complianceSections.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getQuestionsBySection(sectionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(complianceQuestions).where(eq(complianceQuestions.sectionId, sectionId));
+}
+
+export async function getComplianceAssessmentsByLocation(locationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(complianceAssessments).where(eq(complianceAssessments.locationId, locationId));
+}
+
+export async function getComplianceAssessmentByQuestion(locationId: number, questionId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(complianceAssessments)
+    .where(and(
+      eq(complianceAssessments.locationId, locationId),
+      eq(complianceAssessments.questionId, questionId)
+    ))
+    .limit(1);
+  
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createOrUpdateComplianceAssessment(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if assessment exists
+  const existing = await getComplianceAssessmentByQuestion(data.locationId, data.questionId);
+  
+  if (existing) {
+    // Update existing
+    await db.update(complianceAssessments)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(complianceAssessments.id, existing.id));
+    return existing.id;
+  } else {
+    // Create new
+    const result = await db.insert(complianceAssessments).values(data);
+    return result[0]?.insertId;
+  }
+}
+
+export async function getSupportingDocuments(assessmentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(supportingDocuments).where(eq(supportingDocuments.assessmentId, assessmentId));
+}
+
+export async function createSupportingDocument(data: any) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(supportingDocuments).values(data);
+  return result;
+}
+
+export async function deleteSupportingDocument(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(supportingDocuments).where(eq(supportingDocuments.id, id));
+}
+
+// Get compliance summary for a location
+export async function getComplianceSummaryByLocation(locationId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const assessments = await db.select().from(complianceAssessments)
+    .where(eq(complianceAssessments.locationId, locationId));
+
+  const total = assessments.length;
+  const compliant = assessments.filter(a => a.ragStatus === 'green').length;
+  const partial = assessments.filter(a => a.ragStatus === 'amber').length;
+  const nonCompliant = assessments.filter(a => a.ragStatus === 'red').length;
+  const notAssessed = total === 0 ? await db.select().from(complianceQuestions).then(q => q.length) : 0;
+
+  return {
+    total: total || notAssessed,
+    compliant,
+    partial,
+    nonCompliant,
+    notAssessed,
+    compliancePercentage: total > 0 ? Math.round((compliant / total) * 100) : 0
+  };
+}
+
+// Get overdue actions for a location
+export async function getOverdueActionsByLocation(locationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const today = new Date().toISOString().split('T')[0];
+  
+  return await db.select().from(complianceAssessments)
+    .where(and(
+      eq(complianceAssessments.locationId, locationId),
+      eq(complianceAssessments.ragStatus, 'red'),
+      sql`${complianceAssessments.targetCompletionDate} < ${today}`,
+      sql`${complianceAssessments.actualCompletionDate} IS NULL`
+    ));
 }

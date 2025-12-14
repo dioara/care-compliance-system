@@ -266,6 +266,112 @@ export const appRouter = router({
       }),
   }),
 
+  // Compliance management
+  compliance: router({
+    // Get all compliance sections
+    sections: publicProcedure.query(async () => {
+      return db.getAllComplianceSections();
+    }),
+
+    // Get section by ID with questions
+    sectionDetails: protectedProcedure
+      .input(z.object({ sectionId: z.number() }))
+      .query(async ({ input }) => {
+        const section = await db.getComplianceSectionById(input.sectionId);
+        const questions = await db.getQuestionsBySection(input.sectionId);
+        return { section, questions };
+      }),
+
+    // Get assessments for a location
+    assessmentsByLocation: protectedProcedure
+      .input(z.object({ locationId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getComplianceAssessmentsByLocation(input.locationId);
+      }),
+
+    // Get compliance summary for a location
+    summary: protectedProcedure
+      .input(z.object({ locationId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getComplianceSummaryByLocation(input.locationId);
+      }),
+
+    // Get overdue actions for a location
+    overdueActions: protectedProcedure
+      .input(z.object({ locationId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getOverdueActionsByLocation(input.locationId);
+      }),
+
+    // Create or update assessment
+    saveAssessment: protectedProcedure
+      .input(
+        z.object({
+          tenantId: z.number(),
+          locationId: z.number(),
+          questionId: z.number(),
+          assessmentType: z.enum(["service_user", "staff"]),
+          serviceUserId: z.number().optional(),
+          staffMemberId: z.number().optional(),
+          complianceStatus: z.enum(["compliant", "non_compliant", "partial", "not_assessed"]),
+          ragStatus: z.enum(["red", "amber", "green"]),
+          evidenceProvided: z.string().optional(),
+          identifiedGaps: z.string().optional(),
+          actionRequired: z.string().optional(),
+          responsiblePersonId: z.number().optional(),
+          targetCompletionDate: z.string().optional(),
+          notes: z.string().optional(),
+          assessedById: z.number(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const assessmentId = await db.createOrUpdateComplianceAssessment({
+          ...input,
+          targetCompletionDate: input.targetCompletionDate ? new Date(input.targetCompletionDate) : undefined,
+          assessedAt: new Date(),
+        });
+        return { success: true, assessmentId };
+      }),
+
+    // Get supporting documents
+    documents: protectedProcedure
+      .input(z.object({ assessmentId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getSupportingDocuments(input.assessmentId);
+      }),
+
+    // Upload supporting document
+    uploadDocument: protectedProcedure
+      .input(
+        z.object({
+          tenantId: z.number(),
+          assessmentId: z.number(),
+          documentType: z.string(),
+          documentName: z.string(),
+          fileUrl: z.string(),
+          fileKey: z.string(),
+          fileSize: z.number(),
+          mimeType: z.string(),
+          uploadedById: z.number(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await db.createSupportingDocument({
+          ...input,
+          uploadedAt: new Date(),
+        });
+        return { success: true };
+      }),
+
+    // Delete supporting document
+    deleteDocument: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteSupportingDocument(input.id);
+        return { success: true };
+      }),
+  }),
+
   // User management
   users: router({
     list: adminProcedure.query(async ({ ctx }) => {

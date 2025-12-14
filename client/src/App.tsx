@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import CompanyProfile from "./pages/CompanyProfile";
 import Locations from "./pages/Locations";
 import Compliance from "./pages/Compliance";
+import ComplianceSection from "./pages/ComplianceSection";
 import Audits from "./pages/Audits";
 import AIAudits from "./pages/AIAudits";
 import Incidents from "./pages/Incidents";
@@ -60,6 +61,12 @@ function Router() {
       <Route path="/compliance">
         <DashboardLayout>
           <Compliance />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/compliance/section/:sectionId">
+        <DashboardLayout>
+          <ComplianceSection />
         </DashboardLayout>
       </Route>
       
