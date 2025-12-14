@@ -142,3 +142,14 @@
 - [x] Create initial commit
 - [x] Push to GitHub repository
 - [x] Provide repository link to user
+
+
+## BUG: Mobile Browser Authentication Issue
+- [x] Authentication fails on mobile browsers (iOS Safari, Chrome mobile)
+- [x] HTTP-only cookies with sameSite: none not working on mobile
+- [x] Switch from cookie-based auth to localStorage token storage
+- [x] Update backend to return token in response body
+- [x] Update frontend to store token in localStorage
+- [x] Update context to read token from Authorization header
+- [x] Test on mobile Safari, Chrome mobile, and desktop browsers
+- [x] Ensure token is sent with every API request via Authorization header

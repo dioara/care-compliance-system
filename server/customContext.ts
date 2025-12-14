@@ -20,10 +20,11 @@ export async function createCustomContext({
   let user = null;
 
   try {
-    // Try to get token from cookie
-    const token = req.cookies?.auth_token;
-    console.log("[AUTH] Checking authentication - Cookie present:", !!token);
-    console.log("[AUTH] All cookies:", Object.keys(req.cookies || {}));
+    // Try to get token from Authorization header (Bearer token)
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    console.log("[AUTH] Checking authentication - Token present:", !!token);
+    console.log("[AUTH] Authorization header:", authHeader ? 'present' : 'missing');
 
     if (token) {
       const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -44,7 +45,7 @@ export async function createCustomContext({
         console.log("[AUTH] User not found in database for ID:", decoded.userId);
       }
     } else {
-      console.log("[AUTH] No auth_token cookie found");
+      console.log("[AUTH] No token found in Authorization header");
     }
   } catch (error) {
     // Token invalid or expired, user stays null

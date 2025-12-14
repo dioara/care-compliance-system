@@ -18,14 +18,17 @@ export default function Login() {
   const utils = trpc.useUtils();
   
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: async () => {
+    onSuccess: async (data) => {
       toast.success("Login successful!");
+      // Store token in localStorage
+      if (data.token) {
+        localStorage.setItem('auth_token', data.token);
+        console.log('[LOGIN] Token stored in localStorage');
+      }
       // Invalidate and refetch auth state
       await utils.auth.me.invalidate();
-      // Small delay to ensure cookie is set and query refetched
-      setTimeout(() => {
-        setLocation("/");
-      }, 200);
+      // Redirect to dashboard
+      setLocation("/");
     },
     onError: (error) => {
       toast.error(error.message || "Login failed");

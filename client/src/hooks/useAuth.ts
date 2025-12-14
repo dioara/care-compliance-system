@@ -7,9 +7,21 @@ export function useAuth() {
     refetchOnWindowFocus: false,
   });
 
+  const logoutMutation = trpc.auth.logout.useMutation();
+
   useEffect(() => {
     console.log("[useAuth] Auth state:", { user, isLoading, error, isAuthenticated: !!user });
   }, [user, isLoading, error]);
+
+  const logout = async () => {
+    // Clear token from localStorage
+    localStorage.removeItem('auth_token');
+    console.log('[useAuth] Token removed from localStorage');
+    // Call backend logout
+    await logoutMutation.mutateAsync();
+    // Redirect to login
+    window.location.href = '/login';
+  };
 
   return {
     user: user || null,
@@ -17,5 +29,6 @@ export function useAuth() {
     error,
     isAuthenticated: !!user,
     refetch,
+    logout,
   };
 }
