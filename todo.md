@@ -112,3 +112,17 @@
 - [ ] Final status check
 - [ ] Prepare user documentation
 - [ ] Deliver system to user
+
+
+## URGENT: Custom Authentication & Notifications (User Request)
+- [x] Remove Manus OAuth dependency
+- [x] Implement custom email/password authentication with bcrypt
+- [x] Create registration endpoint with company creation
+- [x] Create login endpoint with JWT token generation
+- [ ] Implement password reset functionality
+- [ ] Add 2FA setup and verification (optional for users)
+- [ ] Replace Manus notification system with SendGrid/Resend
+- [ ] Create email notification service for audit completion, overdue actions
+- [x] Update frontend with login/registration forms
+- [x] Create seed user accounts for testing
+- [x] Provide login credentials to user

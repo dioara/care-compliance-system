@@ -7,6 +7,8 @@ import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 
 // Pages
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import CompanyProfile from "./pages/CompanyProfile";
 import Locations from "./pages/Locations";
@@ -19,6 +21,9 @@ import Reports from "./pages/Reports";
 function Router() {
   return (
     <Switch>
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+      
       <Route path="/">
         <DashboardLayout>
           <Dashboard />
