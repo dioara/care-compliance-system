@@ -1,0 +1,45 @@
+{
+  "query": "SELECT cs.sectionNumber, cs.sectionName, COUNT(cq.id) as questionCount \nFROM complianceSections cs \nLEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId \nWHERE cs.sectionType = 'staff'\nGROUP BY cs.id \nORDER BY cs.sectionNumber",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT cs.sectionNumber, cs.sectionName, COUNT(cq.id) as questionCount \nFROM complianceSections cs \nLEFT JOIN complianceQuestions cq ON cs.id = cq.sectionId \nWHERE cs.sectionType = 'staff'\nGROUP BY cs.id \nORDER BY cs.sectionNumber",
+  "rows": [
+    {
+      "sectionNumber": "1",
+      "sectionName": "Recruitment & Vetting",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "2",
+      "sectionName": "Induction & Onboarding",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "3",
+      "sectionName": "Training & Development",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "4",
+      "sectionName": "Supervision & Appraisal",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "5",
+      "sectionName": "Competency & Observation",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "6",
+      "sectionName": "Health & Wellbeing",
+      "questionCount": "0"
+    },
+    {
+      "sectionNumber": "7",
+      "sectionName": "Conduct & Capability",
+      "questionCount": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "sectionNumber\tsectionName\tquestionCount\n1\tRecruitment & Vetting\t0\n2\tInduction & Onboarding\t0\n3\tTraining & Development\t0\n4\tSupervision & Appraisal\t0\n5\tCompetency & Observation\t0\n6\tHealth & Wellbeing\t0\n7\tConduct & Capability\t0\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

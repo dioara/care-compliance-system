@@ -98,13 +98,22 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     questionAssessments.set(assessment.questionId, assessment);
   });
 
-  // Group questions by section
+  // Group questions by section and sort numerically
   const questionsBySection = new Map<number, any[]>();
   allQuestions?.forEach(question => {
     if (!questionsBySection.has(question.sectionId)) {
       questionsBySection.set(question.sectionId, []);
     }
     questionsBySection.get(question.sectionId)?.push(question);
+  });
+  
+  // Sort questions numerically within each section
+  questionsBySection.forEach((questions, sectionId) => {
+    questions.sort((a, b) => {
+      const numA = parseFloat(a.questionNumber);
+      const numB = parseFloat(b.questionNumber);
+      return numA - numB;
+    });
   });
 
   const getRAGBadge = (status: string | undefined) => {

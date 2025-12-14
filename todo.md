@@ -311,3 +311,16 @@
 - [x] Add questions endpoint to tRPC compliance router
 - [x] Test question-by-question assessment workflow
 - [x] Commit all changes to GitHub
+
+
+## BUG: Question Ordering and Missing Questions
+- [x] Fix question number sorting (11.1, 11.2... 11.10, 11.11 using parseFloat)
+- [x] Re-examine intervention plan Excel to find all sheets with questions (16 sheets, 198 questions)
+- [x] Extract questions for missing staff sections (split Supporting Staff 25 questions across sections 2-7)
+- [x] Create questions for missing service user sections (Financial, Activities, End of Life, Mental Health, Equality - 35 new questions)
+- [x] Update seed script with all missing questions (233 total questions)
+- [x] Populate database with complete question set (233 questions across 26 sections)
+- [x] Fix UI to sort questions by numeric value using parseFloat on questionNumber
+- [x] Verify all 26 sections have questions (7 staff + 19 service user)
+- [x] Test question ordering displays correctly on both staff and service user pages
+- [x] Commit to GitHub
