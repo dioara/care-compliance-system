@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1765698524125,
+      "tag": "0000_light_wallop",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1765699057913,
+      "tag": "0001_gigantic_giant_girl",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1765699131090,
+      "tag": "0002_watery_rocket_raccoon",
+      "breakpoints": true
+    }
+  ]
 }
