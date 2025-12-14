@@ -1,0 +1,8 @@
+{
+  "query": "SELECT id, sectionNumber, sectionName FROM complianceSections WHERE assessmentType = 'service_user' AND sectionNumber IN ('4', '5', '6', '7', '8', '9', '15', '16', '20', '21', '22') ORDER BY CAST(sectionNumber AS UNSIGNED)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, sectionNumber, sectionName FROM complianceSections WHERE assessmentType = 'service_user' AND sectionNumber IN ('4', '5', '6', '7', '8', '9', '15', '16', '20', '21', '22') ORDER BY CAST(sectionNumber AS UNSIGNED)",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'assessmenttype' in 'where clause'"
+  ]
+}

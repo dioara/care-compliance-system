@@ -666,5 +666,26 @@
 - [x] Run update script successfully (140 questions updated, 116 skipped)
 - [x] Test updated questions in browser (Question 1.1 verified - evidence requirements displaying correctly)
 - [x] Verify evidence format matches requirements (document type + what must be in it)
-- [ ] Complete remaining 116 service user questions evidence mappings (Sections 4-9, 15-16, 20-22)
-- [ ] Save checkpoint with 140 questions updated with detailed evidence requirements
+- [x] Save checkpoint with 140 questions updated with detailed evidence requirements (checkpoint d205a4ae)
+- [x] Complete remaining 116 service user questions evidence mappings (Sections 4-9, 15-16, 20-22) - ALL 256 questions now complete!
+
+## Complete Remaining 116 Service User Questions Evidence Mappings
+- [x] Research CQC requirements for service user sections 4-9 (Nutrition, Activities, Environment, etc.)
+- [x] Create evidence mappings for Section 4 questions (9 questions)
+- [x] Create evidence mappings for Section 5 questions (3 questions)
+- [x] Create evidence mappings for Section 6 questions (15 questions)
+- [x] Create evidence mappings for Section 7 questions (8 questions)
+- [x] Create evidence mappings for Section 8 questions (22 questions)
+- [x] Create evidence mappings for Section 9 questions (25 questions)
+
+- [x] Create evidence mappings for Section 15 questions (7 questions)
+- [x] Create evidence mappings for Section 16 questions (8 questions)
+- [x] Create evidence mappings for Section 20 questions (5 questions - Mental Health)
+- [x] Create evidence mappings for Section 21 questions (5 questions - Equality & Diversity)
+- [x] Create evidence mappings for Section 22 questions (3 questions - Leadership & Governance)
+- [x] Update update-all-evidence-requirements.mjs with new mappings
+- [x] Complete final 36 questions (Sections 3, 10, 14, 17, 18, 19)
+- [x] Verify all 256 questions have comprehensive evidence requirements (100% complete)
+- [x] Run update script to update remaining 116 questions (133 + 6 + 36 = 175 questions updated)
+- [x] Test updated questions in browser (Question 3.10 verified - evidence requirements displaying correctly)
+- [ ] Save checkpoint with all 256 questions complete
