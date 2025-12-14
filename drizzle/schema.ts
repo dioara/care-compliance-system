@@ -128,6 +128,7 @@ export const complianceQuestions = mysqlTable("complianceQuestions", {
   tooltip: text("tooltip"),
   requiredDocuments: text("requiredDocuments"), // JSON array stored as text
   guidance: text("guidance"),
+  conditionalLogic: text("conditionalLogic"), // JSON: {"dependsOn": "1.7", "showWhen": ["Permanent", "Sponsored"]}
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

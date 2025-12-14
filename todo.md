@@ -604,4 +604,34 @@
 - [x] Test service user assessment forms (174 questions across 19 sections, all cleaned)
 - [x] Verify evidence requirements are generic and not NYCC-specific
 - [x] Verify British English throughout
-- [ ] Save checkpoint and deliver comprehensive assessment review to user
+- [x] Save checkpoint and deliver comprehensive assessment review to user (checkpoint e536e249)
+
+## Conditional Question Display Logic
+- [x] Update schema to add `conditionalLogic` field to complianceQuestions table
+- [x] Add conditional logic rules to staff Section 1 questions (1.15-1.19 for Sponsored, 1.26-1.28 for Agency, 1.29-1.30 for Bank)
+- [x] Update PersonCompliance component to track Question 1.7 answer with dedicated dropdown
+- [x] Implement question filtering logic based on employment type selection (shouldDisplayQuestion function)
+- [x] Add visual indicator showing hidden questions count (badge in section header)
+- [x] Add employment type dropdown for Question 1.7 with 4 options (Permanent, Sponsored, Agency, Bank)
+- [x] Test conditional display with Sponsored Worker employment type (5 questions revealed, badge updated from 10→5 hidden)
+- [x] Verify conditional logic working correctly (questions 1.15-1.19 visible when Sponsored selected)
+
+## Assessment Templates by Care Setting
+- [ ] Create assessmentTemplates table in schema
+- [ ] Define 4 care setting templates (Residential, Nursing, Domiciliary, Supported Living)
+- [ ] Create seed script for default templates with pre-selected question sets
+- [ ] Add template selection UI to company profile setup
+- [ ] Implement template application logic when creating new assessments
+- [ ] Add ability to customize templates per organization
+- [ ] Test template application for each care setting
+
+## Compliance Dashboard Analytics
+- [ ] Create analytics aggregation functions in server/db.ts
+- [ ] Add tRPC procedures for dashboard analytics data
+- [ ] Design dashboard layout with progress charts
+- [ ] Implement completion rate visualization (by section, overall)
+- [ ] Add RAG status distribution chart (pie/donut chart)
+- [ ] Create overdue actions list with priority sorting
+- [ ] Add filtering by location, staff member, service user
+- [ ] Test dashboard with real data and edge cases
+- [ ] Save checkpoint and deliver all three features

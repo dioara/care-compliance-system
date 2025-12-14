@@ -59,6 +59,32 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
 
   // Local state for form data per question
   const [formData, setFormData] = useState<Record<number, any>>({});
+  
+  // Track employment type answer (Question 1.7) for conditional logic
+  const [employmentType, setEmploymentType] = useState<string | null>(null);
+  
+  // Function to check if a question should be displayed based on conditional logic
+  const shouldDisplayQuestion = (question: any): boolean => {
+    if (!question.conditionalLogic) return true;
+    
+    try {
+      const logic = JSON.parse(question.conditionalLogic);
+      
+      // If this question depends on Question 1.7 (employment type)
+      if (logic.dependsOn === "1.7") {
+        // If employment type hasn't been answered yet, hide conditional questions
+        if (!employmentType) return false;
+        
+        // Check if current employment type is in the showWhen array
+        return logic.showWhen.includes(employmentType);
+      }
+      
+      return true;
+    } catch (e) {
+      // If parsing fails, show the question by default
+      return true;
+    }
+  };
 
   if (!activeLocationId) {
     return (
@@ -100,11 +126,22 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
 
   // Group questions by section and sort numerically
   const questionsBySection = new Map<number, any[]>();
+  const hiddenQuestionsBySection = new Map<number, number>();
+  
   allQuestions?.forEach(question => {
     if (!questionsBySection.has(question.sectionId)) {
       questionsBySection.set(question.sectionId, []);
+      hiddenQuestionsBySection.set(question.sectionId, 0);
     }
-    questionsBySection.get(question.sectionId)?.push(question);
+    
+    // Check if question should be displayed
+    if (shouldDisplayQuestion(question)) {
+      questionsBySection.get(question.sectionId)?.push(question);
+    } else {
+      // Count hidden questions
+      const currentCount = hiddenQuestionsBySection.get(question.sectionId) || 0;
+      hiddenQuestionsBySection.set(question.sectionId, currentCount + 1);
+    }
   });
   
   // Sort questions numerically within each section
@@ -256,10 +293,15 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                         </CardDescription>
                       )}
                       {sectionQuestions.length > 0 && (
-                        <div className="mt-2">
+                        <div className="mt-2 flex gap-2">
                           <Badge variant="outline">
                             {completion.completed} / {completion.total} questions completed ({completion.percentage}%)
                           </Badge>
+                          {hiddenQuestionsBySection.get(section.id)! > 0 && (
+                            <Badge variant="secondary" className="bg-gray-100">
+                              {hiddenQuestionsBySection.get(section.id)} questions hidden
+                            </Badge>
+                          )}
                         </div>
                       )}
                     </div>
@@ -323,6 +365,32 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                                   <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                                     <p className="text-sm font-medium text-blue-900 mb-1">Example Evidence:</p>
                                     <p className="text-sm text-blue-800">{question.guidance}</p>
+                                  </div>
+                                )}
+
+                                {/* Special handling for Question 1.7 (Employment Type) */}
+                                {question.questionNumber === "1.7" && personType === "staff" && (
+                                  <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-300 mb-4">
+                                    <Label htmlFor={`employment-type-${question.id}`} className="text-blue-900 font-semibold">Employment Type Classification</Label>
+                                    <p className="text-sm text-blue-800 mb-3">Select the employment type to show relevant questions below</p>
+                                    <Select
+                                      value={employmentType || ''}
+                                      onValueChange={(value) => {
+                                        setEmploymentType(value);
+                                        updateFormData(question.id, 'evidenceProvided', `Employment Type: ${value}`);
+                                      }}
+                                      disabled={!canWrite}
+                                    >
+                                      <SelectTrigger id={`employment-type-${question.id}`} className="bg-white">
+                                        <SelectValue placeholder="Select employment type" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="Permanent">Permanent Staff</SelectItem>
+                                        <SelectItem value="Sponsored">Sponsored Worker (Visa Holder)</SelectItem>
+                                        <SelectItem value="Agency">Agency Staff</SelectItem>
+                                        <SelectItem value="Bank">Bank Staff</SelectItem>
+                                      </SelectContent>
+                                    </Select>
                                   </div>
                                 )}
 
