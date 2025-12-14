@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean, date } from "drizzle-orm/mysql-core";
+import { mysqlTable, int, varchar, text, timestamp, boolean, mysqlEnum, date, json } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -54,11 +54,14 @@ export const locations = mysqlTable("locations", {
   tenantId: int("tenantId").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   address: text("address"),
-  managerName: varchar("managerName", { length: 255 }),
-  managerEmail: varchar("managerEmail", { length: 255 }),
+  managerId: int("managerId"), // Foreign key to staffMembers
+  managerName: varchar("managerName", { length: 255 }), // Deprecated, use managerId
+  managerEmail: varchar("managerEmail", { length: 255 }), // Deprecated, use managerId
+  cqcRating: varchar("cqcRating", { length: 50 }), // Outstanding, Good, Requires Improvement, Inadequate
   numberOfServiceUsers: int("numberOfServiceUsers"),
   numberOfStaff: int("numberOfStaff"),
-  serviceType: varchar("serviceType", { length: 100 }),
+  serviceType: varchar("serviceType", { length: 100 }), // Deprecated, use serviceTypes
+  serviceTypes: json("serviceTypes").$type<string[]>(), // Multi-select service types
   contactPhone: varchar("contactPhone", { length: 20 }),
   contactEmail: varchar("contactEmail", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

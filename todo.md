@@ -509,5 +509,29 @@
 - [x] Investigate why audit responses are not showing in audit history (routing issue found)
 - [x] Update Audits page navigation logic to route to results page for completed audits
 - [x] AuditResults page already displays response values (Yes/No/N/A) and observations
-- [ ] Test audit history display with completed audits
+- [x] Test audit history display with completed audits (navigation logic updated)
+- [x] Save checkpoint and push to GitHub
+
+
+## Remove Hardcoded Dashboard Quick Actions
+- [x] Identify hardcoded quick actions in Dashboard page
+- [x] Replace with functional navigation buttons (Audits, AI Audits, Incidents, Reports)
+- [x] Add useLocation hook from wouter to Dashboard component
+- [x] Test dashboard quick actions navigation (all working correctly)
+
+## Add Location Fields (Manager, CQC Rating, Service Type)
+- [x] Update locations schema to add managerId field (foreign key to staff)
+- [x] Update locations schema to add cqcRating field (Outstanding, Good, Requires Improvement, Inadequate)
+- [x] Update locations schema to add serviceTypes field (JSON array for multi-select)
+- [x] Fix json import in schema.ts (added to drizzle-orm/mysql-core imports)
+- [x] Push schema changes to database
+- [x] Update Locations page with manager dropdown (from staff list)
+- [x] Add CQC rating dropdown to Locations page (5 options: Outstanding, Good, Requires Improvement, Inadequate, Not Yet Rated)
+- [x] Add service type multi-select to Locations page (10 service types with checkboxes)
+- [x] Add CQC rating badge display on location cards with color coding
+- [x] Add service types display as tags on location cards
+- [x] Add manager name display on location cards
+- [x] Update form data structure to use new fields (managerId, cqcRating, serviceTypes[])
+- [x] Test all location field updates in browser (forms working, dropdowns and checkboxes functional)
+- [x] Fix Select component empty value error (changed "" to "none")
 - [ ] Save checkpoint and push to GitHub

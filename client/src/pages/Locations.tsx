@@ -4,13 +4,43 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Plus, Pencil, Trash2, Loader2, Users, Building } from "lucide-react";
+import { MapPin, Plus, Pencil, Trash2, Loader2, Users, Building, Award } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useLocation } from "@/contexts/LocationContext";
+
+const CQC_RATINGS = [
+  "Outstanding",
+  "Good",
+  "Requires Improvement",
+  "Inadequate",
+  "Not Yet Rated"
+];
+
+const SERVICE_TYPES = [
+  "Residential Care",
+  "Nursing Care",
+  "Dementia Care",
+  "Learning Disabilities",
+  "Mental Health",
+  "Physical Disabilities",
+  "Sensory Impairments",
+  "Palliative Care",
+  "Respite Care",
+  "Supported Living"
+];
 
 export default function Locations() {
+  const { activeLocationId } = useLocation();
   const { data: locations, isLoading, refetch } = trpc.locations.list.useQuery();
+  const { data: staffMembers } = trpc.staff.list.useQuery(
+    { locationId: activeLocationId || 0 },
+    { enabled: !!activeLocationId }
+  );
+  
   const createLocation = trpc.locations.create.useMutation();
   const updateLocation = trpc.locations.update.useMutation();
   const deleteLocation = trpc.locations.delete.useMutation();
@@ -22,11 +52,9 @@ export default function Locations() {
   const [formData, setFormData] = useState({
     name: "",
     address: "",
-    managerName: "",
-    managerEmail: "",
-    numberOfServiceUsers: 0,
-    numberOfStaff: 0,
-    serviceType: "",
+    managerId: null as number | null,
+    cqcRating: "",
+    serviceTypes: [] as string[],
     contactPhone: "",
     contactEmail: "",
   });
@@ -35,21 +63,27 @@ export default function Locations() {
     setFormData({
       name: "",
       address: "",
-      managerName: "",
-      managerEmail: "",
-      numberOfServiceUsers: 0,
-      numberOfStaff: 0,
-      serviceType: "",
+      managerId: null,
+      cqcRating: "",
+      serviceTypes: [],
       contactPhone: "",
       contactEmail: "",
     });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const value = e.target.type === 'number' ? parseInt(e.target.value) || 0 : e.target.value;
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: value,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleServiceTypeToggle = (serviceType: string) => {
+    setFormData(prev => ({
+      ...prev,
+      serviceTypes: prev.serviceTypes.includes(serviceType)
+        ? prev.serviceTypes.filter(t => t !== serviceType)
+        : [...prev.serviceTypes, serviceType]
     }));
   };
 
@@ -72,11 +106,9 @@ export default function Locations() {
     setFormData({
       name: location.name || "",
       address: location.address || "",
-      managerName: location.managerName || "",
-      managerEmail: location.managerEmail || "",
-      numberOfServiceUsers: location.numberOfServiceUsers || 0,
-      numberOfStaff: location.numberOfStaff || 0,
-      serviceType: location.serviceType || "",
+      managerId: location.managerId || null,
+      cqcRating: location.cqcRating || "",
+      serviceTypes: location.serviceTypes || [],
       contactPhone: location.contactPhone || "",
       contactEmail: location.contactEmail || "",
     });
@@ -117,6 +149,31 @@ export default function Locations() {
     }
   };
 
+  const getManagerName = (managerId: number | null) => {
+    if (!managerId || !staffMembers) return "Not assigned";
+    const manager = staffMembers.find(s => s.id === managerId);
+    return manager ? manager.name : "Not assigned";
+  };
+
+  const getCQCRatingBadge = (rating: string | null) => {
+    if (!rating) return null;
+    
+    const colors = {
+      "Outstanding": "bg-purple-100 text-purple-800 border-purple-200",
+      "Good": "bg-green-100 text-green-800 border-green-200",
+      "Requires Improvement": "bg-amber-100 text-amber-800 border-amber-200",
+      "Inadequate": "bg-red-100 text-red-800 border-red-200",
+      "Not Yet Rated": "bg-gray-100 text-gray-800 border-gray-200"
+    };
+
+    return (
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${colors[rating as keyof typeof colors] || colors["Not Yet Rated"]}`}>
+        <Award className="h-3 w-3" />
+        {rating}
+      </span>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -141,7 +198,7 @@ export default function Locations() {
               Add Location
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Location</DialogTitle>
               <DialogDescription>
@@ -163,57 +220,42 @@ export default function Locations() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="create-serviceType">Service Type</Label>
-                    <Input
-                      id="create-serviceType"
-                      name="serviceType"
-                      value={formData.serviceType}
-                      onChange={handleInputChange}
-                      placeholder="e.g., Residential Care"
-                    />
+                    <Label htmlFor="create-manager">Manager</Label>
+                    <Select 
+                      value={formData.managerId?.toString() || "none"} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, managerId: value === "none" ? null : parseInt(value) }))}
+                    >
+                      <SelectTrigger id="create-manager">
+                        <SelectValue placeholder="Select manager" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No manager assigned</SelectItem>
+                        {staffMembers?.map(staff => (
+                          <SelectItem key={staff.id} value={staff.id.toString()}>
+                            {staff.name} - {staff.role}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="create-managerName">Manager Name</Label>
-                    <Input
-                      id="create-managerName"
-                      name="managerName"
-                      value={formData.managerName}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="create-managerEmail">Manager Email</Label>
-                    <Input
-                      id="create-managerEmail"
-                      name="managerEmail"
-                      type="email"
-                      value={formData.managerEmail}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="create-numberOfServiceUsers">Number of Service Users</Label>
-                    <Input
-                      id="create-numberOfServiceUsers"
-                      name="numberOfServiceUsers"
-                      type="number"
-                      value={formData.numberOfServiceUsers}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="create-numberOfStaff">Number of Staff</Label>
-                    <Input
-                      id="create-numberOfStaff"
-                      name="numberOfStaff"
-                      type="number"
-                      value={formData.numberOfStaff}
-                      onChange={handleInputChange}
-                    />
+                    <Label htmlFor="create-cqcRating">CQC Rating</Label>
+                    <Select 
+                      value={formData.cqcRating} 
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, cqcRating: value }))}
+                    >
+                      <SelectTrigger id="create-cqcRating">
+                        <SelectValue placeholder="Select CQC rating" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CQC_RATINGS.map(rating => (
+                          <SelectItem key={rating} value={rating}>
+                            {rating}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="space-y-2">
@@ -227,7 +269,7 @@ export default function Locations() {
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="create-contactEmail">Contact Email</Label>
                     <Input
                       id="create-contactEmail"
@@ -248,6 +290,27 @@ export default function Locations() {
                     onChange={handleInputChange}
                     rows={3}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Service Types</Label>
+                  <div className="grid grid-cols-2 gap-3 p-4 border rounded-md">
+                    {SERVICE_TYPES.map(serviceType => (
+                      <div key={serviceType} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`create-${serviceType}`}
+                          checked={formData.serviceTypes.includes(serviceType)}
+                          onCheckedChange={() => handleServiceTypeToggle(serviceType)}
+                        />
+                        <label
+                          htmlFor={`create-${serviceType}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {serviceType}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -270,97 +333,13 @@ export default function Locations() {
         </Dialog>
       </div>
 
-      {locations && locations.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {locations.map((location) => (
-            <Card key={location.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
-                      {location.name}
-                    </CardTitle>
-                    {location.serviceType && (
-                      <CardDescription>{location.serviceType}</CardDescription>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(location)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(location.id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {location.address && (
-                  <p className="text-sm text-muted-foreground">{location.address}</p>
-                )}
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{location.serviceUserCount || 0}</p>
-                      <p className="text-xs text-muted-foreground">Service Users</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">{location.staffCount || 0}</p>
-                      <p className="text-xs text-muted-foreground">Staff</p>
-                    </div>
-                  </div>
-                </div>
-
-                {location.managerName && (
-                  <div className="pt-4 border-t">
-                    <p className="text-sm font-medium">{location.managerName}</p>
-                    <p className="text-xs text-muted-foreground">Location Manager</p>
-                    {location.managerEmail && (
-                      <p className="text-xs text-muted-foreground mt-1">{location.managerEmail}</p>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No locations yet</h3>
-            <p className="text-muted-foreground text-center mb-4">
-              Get started by adding your first care service location.
-            </p>
-            <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Location
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Location</DialogTitle>
             <DialogDescription>
-              Update location information and contact details.
+              Update location information and settings.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate}>
@@ -378,56 +357,42 @@ export default function Locations() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-serviceType">Service Type</Label>
-                  <Input
-                    id="edit-serviceType"
-                    name="serviceType"
-                    value={formData.serviceType}
-                    onChange={handleInputChange}
-                  />
+                  <Label htmlFor="edit-manager">Manager</Label>
+                  <Select 
+                    value={formData.managerId?.toString() || "none"} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, managerId: value === "none" ? null : parseInt(value) }))}
+                  >
+                    <SelectTrigger id="edit-manager">
+                      <SelectValue placeholder="Select manager" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No manager assigned</SelectItem>
+                      {staffMembers?.map(staff => (
+                        <SelectItem key={staff.id} value={staff.id.toString()}>
+                          {staff.name} - {staff.role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="edit-managerName">Manager Name</Label>
-                  <Input
-                    id="edit-managerName"
-                    name="managerName"
-                    value={formData.managerName}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-managerEmail">Manager Email</Label>
-                  <Input
-                    id="edit-managerEmail"
-                    name="managerEmail"
-                    type="email"
-                    value={formData.managerEmail}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-numberOfServiceUsers">Number of Service Users</Label>
-                  <Input
-                    id="edit-numberOfServiceUsers"
-                    name="numberOfServiceUsers"
-                    type="number"
-                    value={formData.numberOfServiceUsers}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-numberOfStaff">Number of Staff</Label>
-                  <Input
-                    id="edit-numberOfStaff"
-                    name="numberOfStaff"
-                    type="number"
-                    value={formData.numberOfStaff}
-                    onChange={handleInputChange}
-                  />
+                  <Label htmlFor="edit-cqcRating">CQC Rating</Label>
+                  <Select 
+                    value={formData.cqcRating} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, cqcRating: value }))}
+                  >
+                    <SelectTrigger id="edit-cqcRating">
+                      <SelectValue placeholder="Select CQC rating" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CQC_RATINGS.map(rating => (
+                        <SelectItem key={rating} value={rating}>
+                          {rating}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -441,7 +406,7 @@ export default function Locations() {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="edit-contactEmail">Contact Email</Label>
                   <Input
                     id="edit-contactEmail"
@@ -463,6 +428,27 @@ export default function Locations() {
                   rows={3}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label>Service Types</Label>
+                <div className="grid grid-cols-2 gap-3 p-4 border rounded-md">
+                  {SERVICE_TYPES.map(serviceType => (
+                    <div key={serviceType} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-${serviceType}`}
+                        checked={formData.serviceTypes.includes(serviceType)}
+                        onCheckedChange={() => handleServiceTypeToggle(serviceType)}
+                      />
+                      <label
+                        htmlFor={`edit-${serviceType}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {serviceType}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
@@ -482,6 +468,119 @@ export default function Locations() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {locations && locations.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {locations.map((location) => (
+            <Card key={location.id}>
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1 flex-1">
+                    <CardTitle className="flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      {location.name}
+                    </CardTitle>
+                    {location.cqcRating && (
+                      <div className="mt-2">
+                        {getCQCRatingBadge(location.cqcRating)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(location)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(location.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {location.address && (
+                  <div className="text-sm text-muted-foreground">
+                    <p>{location.address}</p>
+                  </div>
+                )}
+
+                {location.serviceTypes && location.serviceTypes.length > 0 && (
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">Service Types:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {location.serviceTypes.map((type: string) => (
+                        <span key={type} className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-blue-100 text-blue-800 border border-blue-200">
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Service Users</p>
+                      <p className="text-sm font-medium">{location.numberOfServiceUsers || 0}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Staff</p>
+                      <p className="text-sm font-medium">{location.numberOfStaff || 0}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {location.managerId && (
+                  <div className="pt-3 border-t">
+                    <p className="text-xs text-muted-foreground">Manager</p>
+                    <p className="text-sm font-medium">{getManagerName(location.managerId)}</p>
+                  </div>
+                )}
+
+                {(location.contactPhone || location.contactEmail) && (
+                  <div className="pt-3 border-t space-y-1">
+                    {location.contactPhone && (
+                      <p className="text-xs">
+                        <span className="text-muted-foreground">Phone:</span> {location.contactPhone}
+                      </p>
+                    )}
+                    {location.contactEmail && (
+                      <p className="text-xs">
+                        <span className="text-muted-foreground">Email:</span> {location.contactEmail}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No locations yet</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Get started by adding your first care service location.
+            </p>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Location
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

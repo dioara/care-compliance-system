@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { 
@@ -15,6 +16,7 @@ import {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const { data: profile } = trpc.company.getProfile.useQuery();
   const { data: locations } = trpc.locations.list.useQuery();
   const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery();
@@ -158,15 +160,21 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
+            <button 
+              onClick={() => setLocation('/audits')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+            >
               <ClipboardCheck className="h-5 w-5 text-muted-foreground" />
               <div className="text-left">
-                <p className="text-sm font-medium">Start Compliance Assessment</p>
-                <p className="text-xs text-muted-foreground">Review and update compliance status</p>
+                <p className="text-sm font-medium">Schedule Audit</p>
+                <p className="text-xs text-muted-foreground">Start a new compliance audit</p>
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
+            <button 
+              onClick={() => setLocation('/ai-audits')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+            >
               <FileText className="h-5 w-5 text-muted-foreground" />
               <div className="text-left">
                 <p className="text-sm font-medium">Upload Care Plan for AI Audit</p>
@@ -174,7 +182,10 @@ export default function Dashboard() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
+            <button 
+              onClick={() => setLocation('/incidents')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+            >
               <AlertTriangle className="h-5 w-5 text-muted-foreground" />
               <div className="text-left">
                 <p className="text-sm font-medium">Report Incident</p>
@@ -182,7 +193,10 @@ export default function Dashboard() {
               </div>
             </button>
             
-            <button className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors">
+            <button 
+              onClick={() => setLocation('/reports')}
+              className="w-full flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+            >
               <FileText className="h-5 w-5 text-muted-foreground" />
               <div className="text-left">
                 <p className="text-sm font-medium">Generate Compliance Report</p>
