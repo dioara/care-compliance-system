@@ -18,6 +18,8 @@ import Audits from "./pages/Audits";
 import AIAudits from "./pages/AIAudits";
 import Incidents from "./pages/Incidents";
 import Reports from "./pages/Reports";
+import ServiceUsers from "./pages/ServiceUsers";
+import Staff from "./pages/Staff";
 
 function Router() {
   return (
@@ -40,6 +42,18 @@ function Router() {
       <Route path="/locations">
         <DashboardLayout>
           <Locations />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/service-users">
+        <DashboardLayout>
+          <ServiceUsers />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/staff">
+        <DashboardLayout>
+          <Staff />
         </DashboardLayout>
       </Route>
       

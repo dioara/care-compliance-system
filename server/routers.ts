@@ -121,6 +121,151 @@ export const appRouter = router({
       }),
   }),
 
+  // Service Users management
+  serviceUsers: router({
+    list: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        
+        // If locationId provided, filter by location
+        if (input?.locationId) {
+          return db.getServiceUsersByLocation(input.locationId);
+        }
+        
+        // Otherwise return all for tenant
+        return db.getServiceUsersByTenant(ctx.user.tenantId);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number(),
+          name: z.string(),
+          dateOfBirth: z.string().optional(),
+          carePackageType: z.string().optional(),
+          admissionDate: z.string().optional(),
+          supportNeeds: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "No company associated" });
+        }
+
+        const serviceUser = await db.createServiceUser({
+          ...input,
+          tenantId: ctx.user.tenantId,
+          dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
+          admissionDate: input.admissionDate ? new Date(input.admissionDate) : null,
+        });
+
+        return serviceUser;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          dateOfBirth: z.string().optional(),
+          carePackageType: z.string().optional(),
+          admissionDate: z.string().optional(),
+          supportNeeds: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateServiceUser(id, {
+          ...data,
+          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
+          admissionDate: data.admissionDate ? new Date(data.admissionDate) : undefined,
+        });
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteServiceUser(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // Staff management
+  staff: router({
+    list: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        
+        // If locationId provided, filter by location
+        if (input?.locationId) {
+          return db.getStaffMembersByLocation(input.locationId);
+        }
+        
+        // Otherwise return all for tenant
+        return db.getStaffMembersByTenant(ctx.user.tenantId);
+      }),
+
+    create: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number(),
+          name: z.string(),
+          role: z.string().optional(),
+          employmentDate: z.string().optional(),
+          dbsCertificateNumber: z.string().optional(),
+          dbsDate: z.string().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "No company associated" });
+        }
+
+        const staff = await db.createStaffMember({
+          ...input,
+          tenantId: ctx.user.tenantId,
+          employmentDate: input.employmentDate ? new Date(input.employmentDate) : null,
+          dbsDate: input.dbsDate ? new Date(input.dbsDate) : null,
+          isActive: input.isActive ?? true,
+        });
+
+        return staff;
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          name: z.string().optional(),
+          role: z.string().optional(),
+          employmentDate: z.string().optional(),
+          dbsCertificateNumber: z.string().optional(),
+          dbsDate: z.string().optional(),
+          isActive: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await db.updateStaffMember(id, {
+          ...data,
+          employmentDate: data.employmentDate ? new Date(data.employmentDate) : undefined,
+          dbsDate: data.dbsDate ? new Date(data.dbsDate) : undefined,
+        });
+        return { success: true };
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteStaffMember(input.id);
+        return { success: true };
+      }),
+  }),
+
   // User management
   users: router({
     list: adminProcedure.query(async ({ ctx }) => {

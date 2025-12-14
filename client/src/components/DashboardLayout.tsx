@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { LocationSwitcher } from "./LocationSwitcher";
@@ -32,6 +32,8 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Building2, label: "Company Profile", path: "/company-profile" },
   { icon: MapPin, label: "Locations", path: "/locations" },
+  { icon: Heart, label: "Service Users", path: "/service-users" },
+  { icon: UserCheck, label: "Staff", path: "/staff" },
   { icon: ClipboardCheck, label: "Compliance", path: "/compliance" },
   { icon: ClipboardList, label: "Audits", path: "/audits" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits" },

@@ -1,0 +1,38 @@
+{
+  "query": "SELECT id, name FROM tenants",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, name FROM tenants",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Test Care Home"
+    },
+    {
+      "id": "30001",
+      "name": "Test Care Home"
+    },
+    {
+      "id": "30002",
+      "name": "Test Care Home"
+    },
+    {
+      "id": "30003",
+      "name": "Test Company"
+    },
+    {
+      "id": "30004",
+      "name": "Test Company"
+    },
+    {
+      "id": "30005",
+      "name": "Test Company"
+    },
+    {
+      "id": "30006",
+      "name": "Test Company"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\n1\tTest Care Home\n30001\tTest Care Home\n30002\tTest Care Home\n30003\tTest Company\n30004\tTest Company\n30005\tTest Company\n30006\tTest Company\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

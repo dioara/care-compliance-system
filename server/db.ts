@@ -8,12 +8,16 @@ import {
   roles,
   roleLocationPermissions,
   userRoles,
+  serviceUsers,
+  staffMembers,
   type InsertUser,
   type InsertTenant,
   type InsertLocation,
   type InsertRole,
   type InsertRoleLocationPermission,
   type InsertUserRole,
+  type InsertServiceUser,
+  type InsertStaffMember,
 } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -344,4 +348,100 @@ export async function canUserAccessLocation(userId: number, locationId: number) 
 export async function canUserWriteToLocation(userId: number, locationId: number) {
   const permission = await canUserAccessLocation(userId, locationId);
   return permission?.canWrite || false;
+}
+
+// ============================================================================
+// SERVICE USERS MANAGEMENT
+// ============================================================================
+
+export async function createServiceUser(data: InsertServiceUser) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(serviceUsers).values(data);
+  return result;
+}
+
+export async function getServiceUsersByLocation(locationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(serviceUsers).where(eq(serviceUsers.locationId, locationId));
+}
+
+export async function getServiceUsersByTenant(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(serviceUsers).where(eq(serviceUsers.tenantId, tenantId));
+}
+
+export async function getServiceUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(serviceUsers).where(eq(serviceUsers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateServiceUser(id: number, data: Partial<InsertServiceUser>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(serviceUsers).set(data).where(eq(serviceUsers.id, id));
+}
+
+export async function deleteServiceUser(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(serviceUsers).where(eq(serviceUsers.id, id));
+}
+
+// ============================================================================
+// STAFF MEMBERS MANAGEMENT
+// ============================================================================
+
+export async function createStaffMember(data: InsertStaffMember) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(staffMembers).values(data);
+  return result;
+}
+
+export async function getStaffMembersByLocation(locationId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(staffMembers).where(eq(staffMembers.locationId, locationId));
+}
+
+export async function getStaffMembersByTenant(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(staffMembers).where(eq(staffMembers.tenantId, tenantId));
+}
+
+export async function getStaffMemberById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(staffMembers).where(eq(staffMembers.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateStaffMember(id: number, data: Partial<InsertStaffMember>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(staffMembers).set(data).where(eq(staffMembers.id, id));
+}
+
+export async function deleteStaffMember(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.delete(staffMembers).where(eq(staffMembers.id, id));
 }

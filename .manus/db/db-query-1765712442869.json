@@ -1,0 +1,15 @@
+{
+  "query": "SELECT id, name, tenantId FROM locations WHERE tenantId = 30002",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, name, tenantId FROM locations WHERE tenantId = 30002",
+  "rows": [
+    {
+      "id": "30001",
+      "name": "Main Office",
+      "tenantId": "30002"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\ttenantId\n30001\tMain Office\t30002\n",
+  "stderr": "",
+  "execution_time_ms": 48
+}

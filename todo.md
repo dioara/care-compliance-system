@@ -249,3 +249,21 @@
 - [x] Verified locations.list endpoint exists and works correctly
 - [x] Return locations for user's tenant
 - [x] Test locations page loads correctly
+
+
+## Service Users & Staff Management with Location Filtering
+- [x] Add database helper functions for service users CRUD
+- [x] Add database helper functions for staff members CRUD
+- [x] Create tRPC routers for service users management
+- [x] Create tRPC routers for staff management
+- [x] Build Service Users page with list, create, edit, delete
+- [x] Default location to active location from LocationContext
+- [x] Filter service users list by active location
+- [x] Build Staff page with list, create, edit, delete
+- [x] Default location to active location from LocationContext
+- [x] Filter staff list by active location
+- [x] Add navigation links to Service Users and Staff pages
+- [x] Add seed data for testing (sample service users and staff)
+- [x] Test location filtering works correctly
+- [x] Test location defaulting in forms
+- [x] Commit database schema and seed data to GitHub
