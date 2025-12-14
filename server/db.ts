@@ -1,4 +1,4 @@
-import { eq, and, inArray, sql } from "drizzle-orm";
+import { eq, and, inArray, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import bcrypt from "bcryptjs";
 import {
@@ -14,6 +14,14 @@ import {
   complianceQuestions,
   complianceAssessments,
   supportingDocuments,
+  auditTypes,
+  auditTemplates,
+  auditTemplateSections,
+  auditTemplateQuestions,
+  auditInstances,
+  auditResponses,
+  auditActionPlans,
+  auditEvidence,
   type InsertUser,
   type InsertTenant,
   type InsertLocation,
@@ -728,3 +736,285 @@ export async function getDashboardStats(tenantId: number) {
     }
   };
 }
+
+// ============================================================================
+// AUDIT MANAGEMENT
+// ============================================================================
+
+export async function getAllAuditTypes() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(auditTypes).orderBy(auditTypes.auditCategory, auditTypes.auditName);
+}
+
+export async function getAuditTypeById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [auditType] = await db.select().from(auditTypes).where(eq(auditTypes.id, id));
+  return auditType || null;
+}
+
+export async function getAuditTemplateByAuditTypeId(auditTypeId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [template] = await db
+    .select()
+    .from(auditTemplates)
+    .where(and(eq(auditTemplates.auditTypeId, auditTypeId), eq(auditTemplates.isActive, true)));
+  return template || null;
+}
+
+export async function getAuditTemplateSections(templateId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(auditTemplateSections)
+    .where(eq(auditTemplateSections.auditTemplateId, templateId))
+    .orderBy(auditTemplateSections.displayOrder);
+}
+
+export async function getAuditTemplateQuestions(sectionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(auditTemplateQuestions)
+    .where(eq(auditTemplateQuestions.auditTemplateSectionId, sectionId))
+    .orderBy(auditTemplateQuestions.displayOrder);
+}
+
+export async function createAuditInstance(data: {
+  tenantId: number;
+  locationId: number;
+  auditTypeId: number;
+  auditTemplateId: number;
+  auditDate: Date;
+  auditorId: number;
+  auditorName?: string;
+  auditorRole?: string;
+  serviceUserId?: number;
+  staffMemberId?: number;
+  status?: 'in_progress' | 'completed' | 'reviewed' | 'archived';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(auditInstances).values({
+    ...data,
+    status: data.status || 'in_progress',
+  });
+  return result.insertId;
+}
+
+export async function getAuditInstanceById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const [instance] = await db
+    .select({
+      id: auditInstances.id,
+      auditTypeId: auditInstances.auditTypeId,
+      auditTypeName: auditTypes.auditName,
+      auditTemplateId: auditInstances.auditTemplateId,
+      locationId: auditInstances.locationId,
+      locationName: locations.name,
+      auditorId: auditInstances.auditorId,
+      auditorName: auditInstances.auditorName,
+      auditDate: auditInstances.auditDate,
+      completedAt: auditInstances.completedAt,
+      status: auditInstances.status,
+      overallScore: auditInstances.overallScore,
+      summary: auditInstances.summary,
+      recommendations: auditInstances.recommendations,
+      createdAt: auditInstances.createdAt,
+    })
+    .from(auditInstances)
+    .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+    .leftJoin(locations, eq(auditInstances.locationId, locations.id))
+    .where(eq(auditInstances.id, id));
+  return instance || null;
+}
+
+export async function getAuditInstancesByLocation(locationId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: auditInstances.id,
+      auditTypeId: auditInstances.auditTypeId,
+      auditTypeName: auditTypes.auditName,
+      recommendedFrequency: auditTypes.recommendedFrequency,
+      auditDate: auditInstances.auditDate,
+      completedAt: auditInstances.completedAt,
+      status: auditInstances.status,
+      overallScore: auditInstances.overallScore,
+      auditorName: auditInstances.auditorName,
+    })
+    .from(auditInstances)
+    .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+    .where(eq(auditInstances.locationId, locationId))
+    .orderBy(desc(auditInstances.auditDate))
+    .limit(limit);
+}
+
+export async function updateAuditInstanceStatus(
+  id: number,
+  status: 'in_progress' | 'completed' | 'reviewed' | 'archived',
+  completedAt?: Date,
+  overallScore?: number,
+  summary?: string,
+  recommendations?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(auditInstances)
+    .set({
+      status,
+      completedAt,
+      overallScore,
+      summary,
+      recommendations,
+    })
+    .where(eq(auditInstances.id, id));
+}
+
+export async function saveAuditResponse(data: {
+  auditInstanceId: number;
+  auditTemplateQuestionId: number;
+  response: string;
+  responseValue?: string;
+  observations?: string;
+  isCompliant?: boolean;
+  actionRequired?: string;
+  responsiblePersonId?: number;
+  targetDate?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if response already exists
+  const [existing] = await db
+    .select()
+    .from(auditResponses)
+    .where(
+      and(
+        eq(auditResponses.auditInstanceId, data.auditInstanceId),
+        eq(auditResponses.auditTemplateQuestionId, data.auditTemplateQuestionId)
+      )
+    );
+  
+  if (existing) {
+    // Update existing response
+    await db
+      .update(auditResponses)
+      .set(data)
+      .where(eq(auditResponses.id, existing.id));
+    return existing.id;
+  } else {
+    // Insert new response
+    const [result] = await db.insert(auditResponses).values(data);
+    return result.insertId;
+  }
+}
+
+export async function getAuditResponses(auditInstanceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(auditResponses)
+    .where(eq(auditResponses.auditInstanceId, auditInstanceId));
+}
+
+export async function createAuditActionPlan(data: {
+  tenantId: number;
+  locationId: number;
+  auditInstanceId: number;
+  auditResponseId?: number;
+  issueDescription: string;
+  auditOrigin?: string;
+  ragStatus?: 'red' | 'amber' | 'green';
+  responsiblePersonId: number;
+  responsiblePersonName?: string;
+  targetCompletionDate: Date;
+  actionTaken?: string;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(auditActionPlans).values({
+    ...data,
+    status: 'not_started',
+  });
+  return result.insertId;
+}
+
+export async function getAuditActionPlans(auditInstanceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: auditActionPlans.id,
+      issueDescription: auditActionPlans.issueDescription,
+      auditOrigin: auditActionPlans.auditOrigin,
+      ragStatus: auditActionPlans.ragStatus,
+      responsiblePersonId: auditActionPlans.responsiblePersonId,
+      responsiblePersonName: auditActionPlans.responsiblePersonName,
+      targetCompletionDate: auditActionPlans.targetCompletionDate,
+      actualCompletionDate: auditActionPlans.actualCompletionDate,
+      status: auditActionPlans.status,
+      actionTaken: auditActionPlans.actionTaken,
+      notes: auditActionPlans.notes,
+      createdAt: auditActionPlans.createdAt,
+    })
+    .from(auditActionPlans)
+    .where(eq(auditActionPlans.auditInstanceId, auditInstanceId))
+    .orderBy(desc(auditActionPlans.createdAt));
+}
+
+export async function updateAuditActionPlanStatus(
+  id: number,
+  status: 'not_started' | 'in_progress' | 'partially_completed' | 'completed',
+  actualCompletionDate?: Date,
+  actionTaken?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(auditActionPlans)
+    .set({ status, actualCompletionDate, actionTaken })
+    .where(eq(auditActionPlans.id, id));
+}
+
+export async function uploadAuditEvidence(data: {
+  tenantId: number;
+  auditInstanceId: number;
+  auditResponseId?: number;
+  evidenceType?: string;
+  fileKey: string;
+  fileUrl: string;
+  fileName: string;
+  fileSize?: number;
+  mimeType?: string;
+  description?: string;
+  uploadedById: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(auditEvidence).values({
+    ...data,
+    uploadedAt: new Date(),
+  });
+  return result.insertId;
+}
+
+export async function getAuditEvidence(auditInstanceId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(auditEvidence)
+    .where(eq(auditEvidence.auditInstanceId, auditInstanceId));
+}
+
+

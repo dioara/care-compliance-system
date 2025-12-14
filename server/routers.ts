@@ -417,6 +417,245 @@ export const appRouter = router({
       }),
   }),
 
+  // Audit management
+  audits: router({    
+    // Get all audit types
+    getAuditTypes: protectedProcedure.query(async () => {
+      return db.getAllAuditTypes();
+    }),
+
+    // Get audit type by ID
+    getAuditType: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditTypeById(input.id);
+      }),
+
+    // Get audit template for an audit type
+    getAuditTemplate: protectedProcedure
+      .input(z.object({ auditTypeId: z.number() }))
+      .query(async ({ input }) => {
+        const template = await db.getAuditTemplateByAuditTypeId(input.auditTypeId);
+        if (!template) return null;
+        
+        const sections = await db.getAuditTemplateSections(template.id);
+        const sectionsWithQuestions = await Promise.all(
+          sections.map(async (section) => {
+            const questions = await db.getAuditTemplateQuestions(section.id);
+            return { ...section, questions };
+          })
+        );
+        
+        return { ...template, sections: sectionsWithQuestions };
+      }),
+
+    // Create new audit instance
+    createAuditInstance: protectedProcedure
+      .input(
+        z.object({
+          auditTypeId: z.number(),
+          locationId: z.number(),
+          auditDate: z.date(),
+          serviceUserId: z.number().optional(),
+          staffMemberId: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const template = await db.getAuditTemplateByAuditTypeId(input.auditTypeId);
+        if (!template) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Audit template not found" });
+        }
+        
+        const instanceId = await db.createAuditInstance({
+          tenantId: ctx.user.tenantId,
+          locationId: input.locationId,
+          auditTypeId: input.auditTypeId,
+          auditTemplateId: template.id,
+          auditDate: input.auditDate,
+          auditorId: ctx.user.id,
+          auditorName: ctx.user.name || undefined,
+          auditorRole: ctx.user.role || undefined,
+          serviceUserId: input.serviceUserId,
+          staffMemberId: input.staffMemberId,
+          status: 'in_progress',
+        });
+        
+        return { id: instanceId };
+      }),
+
+    // Get audit instance by ID
+    getAuditInstance: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditInstanceById(input.id);
+      }),
+
+    // Get audit instances by location
+    getAuditInstancesByLocation: protectedProcedure
+      .input(z.object({ locationId: z.number(), limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.getAuditInstancesByLocation(input.locationId, input.limit);
+      }),
+
+    // Start audit (change status to in_progress)
+    startAudit: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.updateAuditInstanceStatus(input.id, 'in_progress');
+        return { success: true };
+      }),
+
+    // Complete audit
+    completeAudit: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          overallScore: z.number().optional(),
+          summary: z.string().optional(),
+          recommendations: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await db.updateAuditInstanceStatus(
+          input.id,
+          'completed',
+          new Date(),
+          input.overallScore,
+          input.summary,
+          input.recommendations
+        );
+        return { success: true };
+      }),
+
+    // Save audit response
+    saveResponse: protectedProcedure
+      .input(
+        z.object({
+          auditInstanceId: z.number(),
+          auditTemplateQuestionId: z.number(),
+          response: z.string(),
+          responseValue: z.string().optional(),
+          observations: z.string().optional(),
+          isCompliant: z.boolean().optional(),
+          actionRequired: z.string().optional(),
+          responsiblePersonId: z.number().optional(),
+          targetDate: z.date().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const responseId = await db.saveAuditResponse(input);
+        return { id: responseId };
+      }),
+
+    // Get audit responses
+    getResponses: protectedProcedure
+      .input(z.object({ auditInstanceId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditResponses(input.auditInstanceId);
+      }),
+
+    // Create action plan
+    createActionPlan: protectedProcedure
+      .input(
+        z.object({
+          tenantId: z.number(),
+          locationId: z.number(),
+          auditInstanceId: z.number(),
+          auditResponseId: z.number().optional(),
+          issueDescription: z.string(),
+          auditOrigin: z.string().optional(),
+          ragStatus: z.enum(['red', 'amber', 'green']).optional(),
+          responsiblePersonId: z.number(),
+          responsiblePersonName: z.string().optional(),
+          targetCompletionDate: z.date(),
+          actionTaken: z.string().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const actionPlanId = await db.createAuditActionPlan(input);
+        return { id: actionPlanId };
+      }),
+
+    // Get action plans
+    getActionPlans: protectedProcedure
+      .input(z.object({ auditInstanceId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditActionPlans(input.auditInstanceId);
+      }),
+
+    // Update action plan status
+    updateActionPlanStatus: protectedProcedure
+      .input(
+        z.object({
+          id: z.number(),
+          status: z.enum(['not_started', 'in_progress', 'partially_completed', 'completed']),
+          actualCompletionDate: z.date().optional(),
+          actionTaken: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await db.updateAuditActionPlanStatus(
+          input.id,
+          input.status,
+          input.actualCompletionDate,
+          input.actionTaken
+        );
+        return { success: true };
+      }),
+
+    // Upload evidence
+    uploadEvidence: protectedProcedure
+      .input(
+        z.object({
+          tenantId: z.number(),
+          auditInstanceId: z.number(),
+          auditResponseId: z.number().optional(),
+          evidenceType: z.string().optional(),
+          fileData: z.string(), // base64
+          fileName: z.string(),
+          mimeType: z.string(),
+          description: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Convert base64 to buffer
+        const buffer = Buffer.from(input.fileData.split(",")[1] || input.fileData, "base64");
+        
+        // Upload to S3
+        const fileKey = `audit-evidence/${input.tenantId}/${input.auditInstanceId}/${Date.now()}-${input.fileName}`;
+        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+        
+        // Save evidence record
+        const evidenceId = await db.uploadAuditEvidence({
+          tenantId: input.tenantId,
+          auditInstanceId: input.auditInstanceId,
+          auditResponseId: input.auditResponseId,
+          evidenceType: input.evidenceType,
+          fileKey,
+          fileUrl: url,
+          fileName: input.fileName,
+          fileSize: buffer.length,
+          mimeType: input.mimeType,
+          description: input.description,
+          uploadedById: ctx.user.id,
+        });
+        
+        return { id: evidenceId, url };
+      }),
+
+    // Get evidence
+    getEvidence: protectedProcedure
+      .input(z.object({ auditInstanceId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getAuditEvidence(input.auditInstanceId);
+      }),
+  }),
+
   // User management
   users: router({
     list: adminProcedure.query(async ({ ctx }) => {

@@ -360,3 +360,50 @@
 - [x] Replace hardcoded RAG status counts with real data
 - [x] Replace hardcoded overdue actions list with real data
 - [x] Test dashboard displays real data correctly (verified in browser)
+
+
+## Build Comprehensive Audit System
+- [x] Review uploaded audit documents (7 templates)
+- [ ] Extract audit structures and questions from each template
+- [x] Research CQC audit standards and requirements
+- [x] Identify all required audit types from intervention plan (40 audit types identified)
+- [x] Design database schema for audit system
+- [x] Create audit templates table
+- [x] Create audit template sections table
+- [x] Create audit template questions table
+- [x] Create audit instances table
+- [x] Create audit responses table
+- [x] Create audit evidence table
+- [x] Create audit action plans table
+- [x] Push schema changes to database
+- [ ] Build dynamic audit questionnaire forms
+- [ ] Implement audit scheduling and reminders
+- [ ] Integrate S3 evidence upload for audits
+- [ ] Link audit responses to Quality Monitoring section
+- [ ] Create audit dashboard showing scheduled vs completed
+- [ ] Add overdue audit alerts
+- [ ] Build audit report generation (PDF)
+- [ ] Test audit workflow end-to-end
+
+
+## Build Comprehensive Audit System
+- [x] Review uploaded audit documents (7 templates)
+- [x] Extract audit structures and questions from each template
+- [x] Research CQC audit standards and requirements
+- [x] Identify all required audit types from intervention plan (42 audit types identified)
+- [x] Design database schema for audit system (8 tables)
+- [x] Create audit templates table
+- [x] Create audit questions table
+- [x] Create audit responses table
+- [x] Create audit evidence/attachments table
+- [x] Populate 42 audit types with 822 questions
+- [x] Build audit database helper functions
+- [x] Create tRPC audit router with all endpoints
+- [x] Build Audits dashboard page (schedule audits, view history)
+- [ ] Create ConductAudit page (dynamic questionnaire)
+- [ ] Create AuditResults page (view completed audits)
+- [ ] Implement evidence upload UI with S3
+- [ ] Create action plans UI
+- [ ] Register audit routes in App.tsx
+- [ ] Test audit system end-to-end
+- [ ] Save checkpoint and push to GitHub

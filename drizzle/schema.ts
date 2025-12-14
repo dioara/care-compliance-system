@@ -418,3 +418,155 @@ export type AuditTrail = typeof auditTrail.$inferSelect;
 export type InsertAuditTrail = typeof auditTrail.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 export type InsertReport = typeof reports.$inferInsert;
+
+/**
+ * Audit templates - stores the structure of each audit type with questions
+ */
+export const auditTemplates = mysqlTable("auditTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  auditTypeId: int("auditTypeId").notNull(),
+  templateName: varchar("templateName", { length: 255 }).notNull(),
+  version: varchar("version", { length: 50 }).default("1.0").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Audit template sections - groups questions within an audit template
+ */
+export const auditTemplateSections = mysqlTable("auditTemplateSections", {
+  id: int("id").autoincrement().primaryKey(),
+  auditTemplateId: int("auditTemplateId").notNull(),
+  sectionNumber: int("sectionNumber").notNull(),
+  sectionTitle: varchar("sectionTitle", { length: 255 }).notNull(),
+  sectionDescription: text("sectionDescription"),
+  displayOrder: int("displayOrder").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
+ * Audit template questions - individual questions within audit sections
+ */
+export const auditTemplateQuestions = mysqlTable("auditTemplateQuestions", {
+  id: int("id").autoincrement().primaryKey(),
+  auditTemplateSectionId: int("auditTemplateSectionId").notNull(),
+  questionNumber: varchar("questionNumber", { length: 50 }).notNull(), // e.g., '1.1', '2.3'
+  questionText: text("questionText").notNull(),
+  questionType: mysqlEnum("questionType", ["yes_no", "pass_fail", "text", "number", "date", "multiple_choice", "checklist"]).notNull(),
+  options: text("options"), // JSON array for multiple_choice/checklist
+  isRequired: boolean("isRequired").default(true).notNull(),
+  guidance: text("guidance"),
+  displayOrder: int("displayOrder").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
+ * Audit instances - individual audit executions
+ */
+export const auditInstances = mysqlTable("auditInstances", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  locationId: int("locationId").notNull(),
+  auditTypeId: int("auditTypeId").notNull(),
+  auditTemplateId: int("auditTemplateId").notNull(),
+  auditScheduleId: int("auditScheduleId"),
+  auditDate: date("auditDate").notNull(),
+  auditTime: varchar("auditTime", { length: 10 }),
+  auditorId: int("auditorId").notNull(), // user who conducted the audit
+  auditorName: varchar("auditorName", { length: 255 }),
+  auditorRole: varchar("auditorRole", { length: 100 }),
+  serviceUserId: int("serviceUserId"), // if audit is for specific service user
+  staffMemberId: int("staffMemberId"), // if audit is for specific staff member
+  status: mysqlEnum("status", ["in_progress", "completed", "reviewed", "archived"]).default("in_progress").notNull(),
+  overallScore: int("overallScore"), // percentage or total score
+  complianceLevel: mysqlEnum("complianceLevel", ["compliant", "partially_compliant", "non_compliant"]),
+  ragStatus: mysqlEnum("ragStatus", ["red", "amber", "green"]),
+  summary: text("summary"),
+  recommendations: text("recommendations"),
+  completedAt: timestamp("completedAt"),
+  reviewedById: int("reviewedById"),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Audit responses - answers to audit template questions
+ */
+export const auditResponses = mysqlTable("auditResponses", {
+  id: int("id").autoincrement().primaryKey(),
+  auditInstanceId: int("auditInstanceId").notNull(),
+  auditTemplateQuestionId: int("auditTemplateQuestionId").notNull(),
+  response: text("response"), // stores the answer (yes/no, text, number, etc.)
+  responseValue: varchar("responseValue", { length: 50 }), // normalized value for scoring
+  observations: text("observations"), // additional notes for this question
+  isCompliant: boolean("isCompliant"),
+  actionRequired: text("actionRequired"),
+  responsiblePersonId: int("responsiblePersonId"),
+  targetDate: date("targetDate"),
+  completedDate: date("completedDate"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Audit evidence - documents/files uploaded as evidence for audit responses
+ */
+export const auditEvidence = mysqlTable("auditEvidence", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  auditInstanceId: int("auditInstanceId").notNull(),
+  auditResponseId: int("auditResponseId"), // can be null if evidence is for overall audit
+  evidenceType: varchar("evidenceType", { length: 100 }), // 'photo', 'document', 'certificate', etc.
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileUrl: text("fileUrl").notNull(),
+  fileKey: text("fileKey").notNull(),
+  fileSize: int("fileSize"),
+  mimeType: varchar("mimeType", { length: 100 }),
+  description: text("description"),
+  uploadedById: int("uploadedById").notNull(),
+  uploadedAt: timestamp("uploadedAt").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
+ * Audit action plans - tracks actions arising from audit findings
+ */
+export const auditActionPlans = mysqlTable("auditActionPlans", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  locationId: int("locationId").notNull(),
+  auditInstanceId: int("auditInstanceId").notNull(),
+  auditResponseId: int("auditResponseId"), // specific question that triggered action
+  issueNumber: int("issueNumber"), // for tracking in Master Audit Action Plan
+  issueDescription: text("issueDescription").notNull(),
+  auditOrigin: varchar("auditOrigin", { length: 255 }), // which audit this came from
+  ragStatus: mysqlEnum("ragStatus", ["red", "amber", "green"]).default("red").notNull(),
+  responsiblePersonId: int("responsiblePersonId").notNull(),
+  responsiblePersonName: varchar("responsiblePersonName", { length: 255 }),
+  targetCompletionDate: date("targetCompletionDate").notNull(),
+  actualCompletionDate: date("actualCompletionDate"),
+  status: mysqlEnum("status", ["not_started", "in_progress", "partially_completed", "completed"]).default("not_started").notNull(),
+  actionTaken: text("actionTaken"),
+  signedOffById: int("signedOffById"),
+  signedOffAt: timestamp("signedOffAt"),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InsertAuditTemplate = typeof auditTemplates.$inferInsert;
+export type SelectAuditTemplate = typeof auditTemplates.$inferSelect;
+export type InsertAuditTemplateSection = typeof auditTemplateSections.$inferInsert;
+export type SelectAuditTemplateSection = typeof auditTemplateSections.$inferSelect;
+export type InsertAuditTemplateQuestion = typeof auditTemplateQuestions.$inferInsert;
+export type SelectAuditTemplateQuestion = typeof auditTemplateQuestions.$inferSelect;
+export type InsertAuditInstance = typeof auditInstances.$inferInsert;
+export type SelectAuditInstance = typeof auditInstances.$inferSelect;
+export type InsertAuditResponse = typeof auditResponses.$inferInsert;
+export type SelectAuditResponse = typeof auditResponses.$inferSelect;
+export type InsertAuditEvidence = typeof auditEvidence.$inferInsert;
+export type SelectAuditEvidence = typeof auditEvidence.$inferSelect;
+export type InsertAuditActionPlan = typeof auditActionPlans.$inferInsert;
+export type SelectAuditActionPlan = typeof auditActionPlans.$inferSelect;
