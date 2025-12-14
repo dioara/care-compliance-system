@@ -63,15 +63,19 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      console.log("[LOGIN] Attempting login for:", input.email);
       const user = await db.getUserByEmail(input.email);
       if (!user) {
+        console.log("[LOGIN] User not found");
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
         });
       }
 
+      console.log("[LOGIN] User found:", user.email, "Has password:", !!user.password);
       const isValidPassword = await db.verifyPassword(input.password, user.password);
+      console.log("[LOGIN] Password valid:", isValidPassword);
       if (!isValidPassword) {
         throw new TRPCError({
           code: "UNAUTHORIZED",

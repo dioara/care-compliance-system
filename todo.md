@@ -226,3 +226,13 @@
 - [ ] Update all future data queries to filter by selected location
 - [ ] Test switching between locations
 - [ ] Test read-only vs read-write permissions
+
+
+## BUG: Authentication Failure with Correct Credentials
+- [ ] Debug why login fails with admin@testcarehome.com / admin123
+- [ ] Check if user exists in database
+- [ ] Check if password hash is correct
+- [ ] Add detailed logging to login endpoint
+- [ ] Test login flow end-to-end
+- [ ] Verify token generation and storage
+- [ ] Fix any issues preventing successful login

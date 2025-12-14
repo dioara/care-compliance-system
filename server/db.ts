@@ -98,12 +98,8 @@ export async function updateUserLastSignIn(userId: number) {
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
 
-export async function verifyPassword(email: string, password: string) {
-  const user = await getUserByEmail(email);
-  if (!user) return null;
-
-  const isValid = await bcrypt.compare(password, user.password);
-  return isValid ? user : null;
+export async function verifyPassword(password: string, hashedPassword: string) {
+  return await bcrypt.compare(password, hashedPassword);
 }
 
 // ============================================================================
