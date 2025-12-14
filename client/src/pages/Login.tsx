@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/hooks/useAuth";
 import { Building2, Loader2 } from "lucide-react";
 
 export default function Login() {
@@ -14,10 +15,17 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const utils = trpc.useUtils();
+  
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Login successful!");
-      setLocation("/");
+      // Invalidate and refetch auth state
+      await utils.auth.me.invalidate();
+      // Small delay to ensure cookie is set and query refetched
+      setTimeout(() => {
+        setLocation("/");
+      }, 200);
     },
     onError: (error) => {
       toast.error(error.message || "Login failed");

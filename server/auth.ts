@@ -94,14 +94,16 @@ export const authRouter = router({
         { expiresIn: "7d" }
       );
 
-      // Set cookie
+      // Set cookie with settings compatible with preview environment
       ctx.res.cookie("auth_token", token, {
         httpOnly: true,
-        secure: ctx.req.protocol === "https",
-        sameSite: "lax",
+        secure: true, // Always secure for HTTPS preview
+        sameSite: "none", // Required for cross-site cookies in preview
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: "/",
       });
+
+      console.log("[AUTH] Login successful for user:", user.email, "Token set in cookie");
 
       return {
         success: true,
