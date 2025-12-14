@@ -324,3 +324,11 @@
 - [x] Verify all 26 sections have questions (7 staff + 19 service user)
 - [x] Test question ordering displays correctly on both staff and service user pages
 - [x] Commit to GitHub
+
+
+## Renumber Questions to Match Section Numbers
+- [x] Update all questions to use section-based numbering (Section 1 → 1.1, 1.2, 1.3...)
+- [x] Replace Excel numbering (11.1, 11.2) with clean sequential numbering
+- [x] Update database with renumbered questions (233 questions renumbered)
+- [x] Test questions display with correct numbering (verified Section 1 shows 1.1-1.20)
+- [x] Commit to GitHub
