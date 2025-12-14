@@ -199,10 +199,16 @@ export const auditSchedules = mysqlTable("auditSchedules", {
   tenantId: int("tenantId").notNull(),
   locationId: int("locationId").notNull(),
   auditTypeId: int("auditTypeId").notNull(),
-  frequency: varchar("frequency", { length: 50 }).notNull(), // 'monthly', 'quarterly', 'annually'
+  frequency: varchar("frequency", { length: 50 }).notNull(), // 'daily', 'weekly', 'monthly', 'quarterly', 'annually'
+  dayOfMonth: int("dayOfMonth"), // for monthly (1-31)
+  monthOfYear: int("monthOfYear"), // for annually (1-12)
+  dayOfWeek: int("dayOfWeek"), // for weekly (0-6, 0=Sunday)
   lastAuditDate: date("lastAuditDate"),
   nextAuditDue: date("nextAuditDue"),
+  emailReminderDays: int("emailReminderDays").default(7), // days before due date to send reminder
+  lastReminderSent: date("lastReminderSent"),
   isActive: boolean("isActive").default(true).notNull(),
+  createdById: int("createdById"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -237,23 +243,68 @@ export const incidents = mysqlTable("incidents", {
   id: int("id").autoincrement().primaryKey(),
   tenantId: int("tenantId").notNull(),
   locationId: int("locationId").notNull(),
+  incidentNumber: varchar("incidentNumber", { length: 50 }).unique(),
   incidentDate: date("incidentDate").notNull(),
   incidentTime: varchar("incidentTime", { length: 10 }),
   incidentType: varchar("incidentType", { length: 100 }).notNull(),
+  severity: varchar("severity", { length: 50 }), // 'low', 'medium', 'high', 'critical'
   locationDescription: text("locationDescription"),
+  
+  // Affected persons
+  affectedPersonType: varchar("affectedPersonType", { length: 50 }), // 'service_user', 'staff', 'visitor', 'other'
   serviceUserId: int("serviceUserId"),
+  affectedStaffId: int("affectedStaffId"),
+  affectedPersonName: varchar("affectedPersonName", { length: 255 }),
   staffInvolved: text("staffInvolved"),
+  
+  // Description and actions
   description: text("description"),
   immediateActions: text("immediateActions"),
+  
+  // Witnesses
+  witnessStatements: text("witnessStatements"), // JSON array
+  
+  // Notifications
   reportedToCouncil: boolean("reportedToCouncil").default(false).notNull(),
+  councilNotifiedAt: timestamp("councilNotifiedAt"),
+  councilNotificationDetails: text("councilNotificationDetails"),
+  
   reportedToCqc: boolean("reportedToCqc").default(false).notNull(),
+  cqcNotifiedAt: timestamp("cqcNotifiedAt"),
+  cqcNotificationDetails: text("cqcNotificationDetails"),
+  
   reportedToIco: boolean("reportedToIco").default(false).notNull(),
+  icoNotifiedAt: timestamp("icoNotifiedAt"),
+  icoNotificationDetails: text("icoNotificationDetails"),
+  
+  reportedToPolice: boolean("reportedToPolice").default(false),
+  policeNotifiedAt: timestamp("policeNotifiedAt"),
+  policeNotificationDetails: text("policeNotificationDetails"),
+  
+  reportedToFamily: boolean("reportedToFamily").default(false),
+  familyNotifiedAt: timestamp("familyNotifiedAt"),
+  familyNotificationDetails: text("familyNotificationDetails"),
+  
+  // Investigation
+  investigationRequired: boolean("investigationRequired").default(false),
+  investigationNotes: text("investigationNotes"),
+  investigationCompletedAt: timestamp("investigationCompletedAt"),
+  
+  // Actions and follow-up
   actionRequired: text("actionRequired"),
   assignedToId: int("assignedToId"),
   targetCompletionDate: date("targetCompletionDate"),
   lessonsLearned: text("lessonsLearned"),
+  
+  // Status
+  status: varchar("status", { length: 50 }).default("open"), // 'open', 'under_investigation', 'resolved', 'closed'
+  
+  // Metadata
   incidentLogReference: varchar("incidentLogReference", { length: 100 }),
   reportedById: int("reportedById"),
+  reportedByName: varchar("reportedByName", { length: 255 }),
+  closedById: int("closedById"),
+  closedAt: timestamp("closedAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -570,3 +621,8 @@ export type InsertAuditEvidence = typeof auditEvidence.$inferInsert;
 export type SelectAuditEvidence = typeof auditEvidence.$inferSelect;
 export type InsertAuditActionPlan = typeof auditActionPlans.$inferInsert;
 export type SelectAuditActionPlan = typeof auditActionPlans.$inferSelect;
+
+export type InsertAuditSchedule = typeof auditSchedules.$inferInsert;
+export type SelectAuditSchedule = typeof auditSchedules.$inferSelect;
+export type InsertIncident = typeof incidents.$inferInsert;
+export type SelectIncident = typeof incidents.$inferSelect;

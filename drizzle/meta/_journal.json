@@ -43,6 +43,13 @@
       "when": 1765726155050,
       "tag": "0005_worthless_prima",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1765738916131,
+      "tag": "0006_vengeful_lizard",
+      "breakpoints": true
     }
   ]
 }

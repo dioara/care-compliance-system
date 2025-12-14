@@ -22,6 +22,7 @@ import {
   auditResponses,
   auditActionPlans,
   auditEvidence,
+  incidents,
   type InsertUser,
   type InsertTenant,
   type InsertLocation,
@@ -1041,3 +1042,336 @@ export async function getAuditEvidence(auditInstanceId: number) {
 }
 
 
+
+
+// ==================== INCIDENTS ====================
+
+export async function createIncident(data: {
+  tenantId: number;
+  locationId: number;
+  incidentNumber: string;
+  incidentDate: Date;
+  incidentTime?: string;
+  incidentType: string;
+  severity?: string;
+  locationDescription?: string;
+  affectedPersonType?: string;
+  serviceUserId?: number;
+  affectedStaffId?: number;
+  affectedPersonName?: string;
+  staffInvolved?: string;
+  description?: string;
+  immediateActions?: string;
+  witnessStatements?: string; // JSON string
+  reportedById: number;
+  reportedByName?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(incidents).values({
+    ...data,
+    status: "open",
+    createdAt: new Date(),
+  }).$returningId();
+  
+  return result;
+}
+
+export async function getIncidentsByLocation(locationId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(incidents)
+    .where(eq(incidents.locationId, locationId))
+    .orderBy(desc(incidents.incidentDate))
+    .limit(limit);
+}
+
+export async function getIncidentsByTenant(tenantId: number, limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(incidents)
+    .where(eq(incidents.tenantId, tenantId))
+    .orderBy(desc(incidents.incidentDate))
+    .limit(limit);
+}
+
+export async function getIncidentById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [incident] = await db
+    .select()
+    .from(incidents)
+    .where(eq(incidents.id, id));
+  
+  return incident;
+}
+
+export async function updateIncident(id: number, data: Partial<typeof incidents.$inferInsert>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(incidents)
+    .set({
+      ...data,
+      updatedAt: new Date(),
+    })
+    .where(eq(incidents.id, id));
+}
+
+export async function updateIncidentNotification(
+  id: number,
+  notificationType: 'cqc' | 'council' | 'ico' | 'police' | 'family',
+  details: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = new Date();
+  const updates: any = { updatedAt: now };
+  
+  switch (notificationType) {
+    case 'cqc':
+      updates.reportedToCqc = true;
+      updates.cqcNotifiedAt = now;
+      updates.cqcNotificationDetails = details;
+      break;
+    case 'council':
+      updates.reportedToCouncil = true;
+      updates.councilNotifiedAt = now;
+      updates.councilNotificationDetails = details;
+      break;
+    case 'ico':
+      updates.reportedToIco = true;
+      updates.icoNotifiedAt = now;
+      updates.icoNotificationDetails = details;
+      break;
+    case 'police':
+      updates.reportedToPolice = true;
+      updates.policeNotifiedAt = now;
+      updates.policeNotificationDetails = details;
+      break;
+    case 'family':
+      updates.reportedToFamily = true;
+      updates.familyNotifiedAt = now;
+      updates.familyNotificationDetails = details;
+      break;
+  }
+  
+  await db
+    .update(incidents)
+    .set(updates)
+    .where(eq(incidents.id, id));
+}
+
+export async function closeIncident(id: number, closedById: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(incidents)
+    .set({
+      status: "closed",
+      closedById,
+      closedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(incidents.id, id));
+}
+
+export async function getRecentIncidents(tenantId: number, days = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+  
+  const allIncidents = await db
+    .select()
+    .from(incidents)
+    .where(eq(incidents.tenantId, tenantId))
+    .orderBy(desc(incidents.incidentDate));
+  
+  return allIncidents.filter(i => {
+    const incidentDate = new Date(i.incidentDate);
+    return incidentDate >= cutoffDate;
+  });
+}
+
+
+// ==================== AUDIT ANALYTICS ====================
+
+export async function getAuditCompletionStats(tenantId: number, days = 90) {
+  const db = await getDb();
+  if (!db) return { total: 0, completed: 0, inProgress: 0, completionRate: 0 };
+  
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - days);
+  
+  const allInstances = await db
+    .select()
+    .from(auditInstances)
+    .where(eq(auditInstances.tenantId, tenantId));
+  
+  const recentInstances = allInstances.filter(i => {
+    const createdDate = new Date(i.createdAt);
+    return createdDate >= cutoffDate;
+  });
+  
+  const completed = recentInstances.filter(i => i.status === "completed" || i.status === "reviewed").length;
+  const inProgress = recentInstances.filter(i => i.status === "in_progress").length;
+  const total = recentInstances.length;
+  const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+  
+  return { total, completed, inProgress, completionRate };
+}
+
+export async function getAuditCompletionTrend(tenantId: number, months = 6) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const allInstances = await db
+    .select()
+    .from(auditInstances)
+    .where(eq(auditInstances.tenantId, tenantId))
+    .orderBy(auditInstances.createdAt);
+  
+  const trend: { month: string; completed: number; total: number }[] = [];
+  const now = new Date();
+  
+  for (let i = months - 1; i >= 0; i--) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthName = monthDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1);
+    
+    const monthInstances = allInstances.filter(inst => {
+      const instDate = new Date(inst.createdAt);
+      return instDate >= monthDate && instDate < nextMonth;
+    });
+    
+    const completed = monthInstances.filter(i => i.status === "completed" || i.status === "reviewed").length;
+    
+    trend.push({
+      month: monthName,
+      completed,
+      total: monthInstances.length,
+    });
+  }
+  
+  return trend;
+}
+
+export async function getNonComplianceAreas(tenantId: number, limit = 10) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  // Get audit instances for this tenant
+  const instances = await db
+    .select()
+    .from(auditInstances)
+    .where(eq(auditInstances.tenantId, tenantId));
+  
+  const instanceIds = instances.map(i => i.id);
+  if (instanceIds.length === 0) return [];
+  
+  // Get all responses for these instances
+  const allResponses = await db
+    .select()
+    .from(auditResponses);
+  
+  const responses = allResponses.filter(r => instanceIds.includes(r.auditInstanceId));
+  
+  // Group by question ID and count non-compliant responses
+  const questionStats: { [key: number]: { questionId: number; question: string; nonCompliantCount: number; totalCount: number } } = {};
+  
+  for (const response of responses) {
+    const key = response.auditTemplateQuestionId;
+    if (!questionStats[key]) {
+      questionStats[key] = {
+        questionId: key,
+        question: `Question ${key}`,
+        nonCompliantCount: 0,
+        totalCount: 0,
+      };
+    }
+    
+    questionStats[key].totalCount++;
+    if (response.isCompliant === false) {
+      questionStats[key].nonCompliantCount++;
+    }
+  }
+  
+  // Convert to array and sort by non-compliance rate
+  const areas = Object.values(questionStats)
+    .map(stat => ({
+      ...stat,
+      nonComplianceRate: stat.totalCount > 0 ? Math.round((stat.nonCompliantCount / stat.totalCount) * 100) : 0,
+    }))
+    .filter(stat => stat.nonCompliantCount > 0)
+    .sort((a, b) => b.nonComplianceRate - a.nonComplianceRate)
+    .slice(0, limit);
+  
+  return areas;
+}
+
+export async function getActionPlanStats(tenantId: number) {
+  const db = await getDb();
+  if (!db) return { total: 0, completed: 0, overdue: 0, inProgress: 0 };
+  
+  const allActions = await db
+    .select()
+    .from(auditActionPlans)
+    .where(eq(auditActionPlans.tenantId, tenantId));
+  
+  const total = allActions.length;
+  const completed = allActions.filter(a => a.status === "completed").length;
+  const inProgress = allActions.filter(a => a.status === "in_progress").length;
+  
+  const now = new Date();
+  const overdue = allActions.filter(a => {
+    if (a.status === "completed") return false;
+    if (!a.targetCompletionDate) return false;
+    return new Date(a.targetCompletionDate) < now;
+  }).length;
+  
+  return { total, completed, overdue, inProgress };
+}
+
+export async function getAuditsByType(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const instances = await db
+    .select()
+    .from(auditInstances)
+    .where(eq(auditInstances.tenantId, tenantId));
+  
+  const types: { [key: number]: { typeId: number; typeName: string; count: number; completed: number } } = {};
+  
+  for (const instance of instances) {
+    const key = instance.auditTypeId;
+    if (!types[key]) {
+      types[key] = {
+        typeId: key,
+        typeName: `Audit Type ${key}`,
+        count: 0,
+        completed: 0,
+      };
+    }
+    
+    types[key].count++;
+    if (instance.status === "completed" || instance.status === "reviewed") {
+      types[key].completed++;
+    }
+  }
+  
+  return Object.values(types).sort((a, b) => b.count - a.count);
+}

@@ -656,6 +656,157 @@ export const appRouter = router({
       }),
   }),
 
+  // Incidents
+  incidents: router({
+    // Create incident
+    create: protectedProcedure
+      .input(z.object({
+        locationId: z.number(),
+        incidentNumber: z.string(),
+        incidentDate: z.string(),
+        incidentTime: z.string().optional(),
+        incidentType: z.string(),
+        severity: z.string().optional(),
+        locationDescription: z.string().optional(),
+        affectedPersonType: z.string().optional(),
+        serviceUserId: z.number().optional(),
+        affectedStaffId: z.number().optional(),
+        affectedPersonName: z.string().optional(),
+        staffInvolved: z.string().optional(),
+        description: z.string().optional(),
+        immediateActions: z.string().optional(),
+        witnessStatements: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.tenantId) throw new Error("No tenant ID");
+        
+        const id = await db.createIncident({
+          tenantId: ctx.user.tenantId,
+          locationId: input.locationId,
+          incidentNumber: input.incidentNumber,
+          incidentDate: new Date(input.incidentDate),
+          incidentTime: input.incidentTime,
+          incidentType: input.incidentType,
+          severity: input.severity,
+          locationDescription: input.locationDescription,
+          affectedPersonType: input.affectedPersonType,
+          serviceUserId: input.serviceUserId,
+          affectedStaffId: input.affectedStaffId,
+          affectedPersonName: input.affectedPersonName,
+          staffInvolved: input.staffInvolved,
+          description: input.description,
+          immediateActions: input.immediateActions,
+          witnessStatements: input.witnessStatements,
+          reportedById: ctx.user.id,
+          reportedByName: ctx.user.name ?? undefined,
+        });
+        
+        return { id };
+      }),
+
+    // Get incidents by location
+    getByLocation: protectedProcedure
+      .input(z.object({ locationId: z.number(), limit: z.number().optional() }))
+      .query(async ({ input }) => {
+        return db.getIncidentsByLocation(input.locationId, input.limit);
+      }),
+
+    // Get incidents by tenant
+    getByTenant: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getIncidentsByTenant(ctx.user.tenantId, input.limit);
+      }),
+
+    // Get incident by ID
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db.getIncidentById(input.id);
+      }),
+
+    // Update incident
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        data: z.record(z.any()),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateIncident(input.id, input.data as any);
+        return { success: true };
+      }),
+
+    // Log notification
+    logNotification: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        notificationType: z.enum(['cqc', 'council', 'ico', 'police', 'family']),
+        details: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateIncidentNotification(input.id, input.notificationType, input.details);
+        return { success: true };
+      }),
+
+    // Close incident
+    close: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.closeIncident(input.id, ctx.user.id);
+        return { success: true };
+      }),
+
+    // Get recent incidents
+    getRecent: protectedProcedure
+      .input(z.object({ days: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getRecentIncidents(ctx.user.tenantId, input.days);
+      }),
+  }),
+
+  // Analytics
+  analytics: router({
+    // Audit completion stats
+    auditCompletion: protectedProcedure
+      .input(z.object({ days: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return { total: 0, completed: 0, inProgress: 0, completionRate: 0 };
+        return db.getAuditCompletionStats(ctx.user.tenantId, input.days);
+      }),
+
+    // Audit completion trend
+    auditTrend: protectedProcedure
+      .input(z.object({ months: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getAuditCompletionTrend(ctx.user.tenantId, input.months);
+      }),
+
+    // Non-compliance areas
+    nonComplianceAreas: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getNonComplianceAreas(ctx.user.tenantId, input.limit);
+      }),
+
+    // Action plan stats
+    actionPlanStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.tenantId) return { total: 0, completed: 0, overdue: 0, inProgress: 0 };
+        return db.getActionPlanStats(ctx.user.tenantId);
+      }),
+
+    // Audits by type
+    auditsByType: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getAuditsByType(ctx.user.tenantId);
+      }),
+  }),
+
   // User management
   users: router({
     list: adminProcedure.query(async ({ ctx }) => {

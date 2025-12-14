@@ -59,6 +59,13 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    
+    // Initialize cron job scheduler
+    import("../jobs/scheduler").then(({ initializeScheduler }) => {
+      initializeScheduler();
+    }).catch(error => {
+      console.error("Failed to initialize scheduler:", error);
+    });
   });
 }
 

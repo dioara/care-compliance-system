@@ -17,6 +17,7 @@ import Compliance from "./pages/Compliance";
 import ComplianceSection from "./pages/ComplianceSection";
 import PersonCompliance from "./pages/PersonCompliance";
 import Audits from "./pages/Audits";
+import Analytics from "./pages/Analytics";
 import ConductAudit from "./pages/ConductAudit";
 import AuditResults from "./pages/AuditResults";
 import AIAudits from "./pages/AIAudits";
@@ -88,6 +89,12 @@ function Router() {
       <Route path="/audits">
         <DashboardLayout>
           <Audits />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/analytics">
+        <DashboardLayout>
+          <Analytics />
         </DashboardLayout>
       </Route>
       
