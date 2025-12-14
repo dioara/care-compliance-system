@@ -347,6 +347,30 @@ export default function Staff() {
                   </div>
                 )}
                 
+                {/* Compliance Progress */}
+                {staffMember.complianceProgress && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Compliance Progress</span>
+                      <span className="font-medium">
+                        {staffMember.complianceProgress.completed}/{staffMember.complianceProgress.total} sections
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all ${
+                          staffMember.complianceProgress.percentage >= 80
+                            ? 'bg-green-500'
+                            : staffMember.complianceProgress.percentage >= 50
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
+                        }`}
+                        style={{ width: `${staffMember.complianceProgress.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
                 <div className="pt-3 border-t">
                   <Button
                     variant="outline"
@@ -354,7 +378,7 @@ export default function Staff() {
                     onClick={() => window.location.href = `/staff/${staffMember.id}/compliance`}
                   >
                     <ClipboardCheck className="mr-2 h-4 w-4" />
-                    View Compliance (7 sections)
+                    View Compliance ({staffMember.complianceProgress?.completed || 0}/{staffMember.complianceProgress?.total || 7} complete)
                   </Button>
                 </div>
               </CardContent>

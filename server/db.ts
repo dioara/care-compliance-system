@@ -586,3 +586,145 @@ export async function getOverdueActionsByLocation(locationId: number) {
       sql`${complianceAssessments.actualCompletionDate} IS NULL`
     ));
 }
+
+// Get compliance progress for a staff member
+export async function getStaffComplianceProgress(staffMemberId: number) {
+  const db = await getDb();
+  if (!db) return { completed: 0, total: 7, percentage: 0 };
+
+  // Get all staff sections (7 sections)
+  const staffSections = await db.select().from(complianceSections)
+    .where(and(
+      eq(complianceSections.sectionType, 'staff'),
+      eq(complianceSections.isActive, true)
+    ));
+
+  const totalSections = staffSections.length;
+
+  // Count completed sections (sections with at least one assessed question)
+  let completedSections = 0;
+  
+  for (const section of staffSections) {
+    const questions = await db.select().from(complianceQuestions)
+      .where(eq(complianceQuestions.sectionId, section.id));
+    
+    if (questions.length === 0) continue;
+    
+    // Check if any questions in this section have been assessed for this staff member
+    const assessments = await db.select().from(complianceAssessments)
+      .where(and(
+        eq(complianceAssessments.staffMemberId, staffMemberId),
+        sql`${complianceAssessments.questionId} IN (${sql.join(questions.map(q => sql`${q.id}`), sql`, `)})`
+      ))
+      .limit(1);
+    
+    if (assessments.length > 0) {
+      completedSections++;
+    }
+  }
+
+  return {
+    completed: completedSections,
+    total: totalSections,
+    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
+  };
+}
+
+// Get compliance progress for a service user
+export async function getServiceUserComplianceProgress(serviceUserId: number) {
+  const db = await getDb();
+  if (!db) return { completed: 0, total: 19, percentage: 0 };
+
+  // Get all service user sections (19 sections)
+  const serviceUserSections = await db.select().from(complianceSections)
+    .where(and(
+      eq(complianceSections.sectionType, 'service_user'),
+      eq(complianceSections.isActive, true)
+    ));
+
+  const totalSections = serviceUserSections.length;
+
+  // Count completed sections (sections with at least one assessed question)
+  let completedSections = 0;
+  
+  for (const section of serviceUserSections) {
+    const questions = await db.select().from(complianceQuestions)
+      .where(eq(complianceQuestions.sectionId, section.id));
+    
+    if (questions.length === 0) continue;
+    
+    // Check if any questions in this section have been assessed for this service user
+    const assessments = await db.select().from(complianceAssessments)
+      .where(and(
+        eq(complianceAssessments.serviceUserId, serviceUserId),
+        sql`${complianceAssessments.questionId} IN (${sql.join(questions.map(q => sql`${q.id}`), sql`, `)})`
+      ))
+      .limit(1);
+    
+    if (assessments.length > 0) {
+      completedSections++;
+    }
+  }
+
+  return {
+    completed: completedSections,
+    total: totalSections,
+    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
+  };
+}
+
+// Get dashboard statistics for a tenant
+export async function getDashboardStats(tenantId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  // Get all assessments for this tenant
+  const assessments = await db.select().from(complianceAssessments)
+    .where(eq(complianceAssessments.tenantId, tenantId));
+
+  const totalAssessments = assessments.length;
+  const compliantCount = assessments.filter(a => a.ragStatus === 'green').length;
+  const partialCount = assessments.filter(a => a.ragStatus === 'amber').length;
+  const nonCompliantCount = assessments.filter(a => a.ragStatus === 'red').length;
+
+  // Calculate overall compliance percentage
+  const overallCompliance = totalAssessments > 0 
+    ? Math.round((compliantCount / totalAssessments) * 100) 
+    : 0;
+
+  // Count overdue actions (red status with past target date and no completion date)
+  const today = new Date();
+  const overdueActions = assessments.filter(a => 
+    a.ragStatus === 'red' && 
+    a.targetCompletionDate && 
+    new Date(a.targetCompletionDate) < today &&
+    !a.actualCompletionDate
+  ).length;
+
+  // Count total sections
+  const sections = await db.select().from(complianceSections)
+    .where(eq(complianceSections.isActive, true));
+  const totalSections = sections.length;
+
+  // Calculate sections with at least one compliant assessment
+  const compliantSections = sections.filter(section => {
+    return assessments.some(a => 
+      a.ragStatus === 'green' && 
+      assessments.find(ass => ass.questionId)
+    );
+  }).length;
+
+  return {
+    overallCompliance,
+    compliantSections,
+    totalSections,
+    overdueActions,
+    upcomingAudits: 0, // Placeholder - will be implemented when audit system is built
+    recentIncidents: 0, // Placeholder - will be implemented when incident system is built
+    ragStatus: {
+      green: compliantCount,
+      amber: partialCount,
+      red: nonCompliantCount,
+    }
+  };
+}

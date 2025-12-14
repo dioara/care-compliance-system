@@ -315,6 +315,30 @@ export default function ServiceUsers() {
                   </div>
                 )}
                 
+                {/* Compliance Progress */}
+                {serviceUser.complianceProgress && (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Compliance Progress</span>
+                      <span className="font-medium">
+                        {serviceUser.complianceProgress.completed}/{serviceUser.complianceProgress.total} sections
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full transition-all ${
+                          serviceUser.complianceProgress.percentage >= 80
+                            ? 'bg-green-500'
+                            : serviceUser.complianceProgress.percentage >= 50
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
+                        }`}
+                        style={{ width: `${serviceUser.complianceProgress.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+                
                 <div className="pt-3 border-t">
                   <Button
                     variant="outline"
@@ -322,7 +346,7 @@ export default function ServiceUsers() {
                     onClick={() => window.location.href = `/service-users/${serviceUser.id}/compliance`}
                   >
                     <ClipboardCheck className="mr-2 h-4 w-4" />
-                    View Compliance (22 sections)
+                    View Compliance ({serviceUser.complianceProgress?.completed || 0}/{serviceUser.complianceProgress?.total || 19} complete)
                   </Button>
                 </div>
               </CardContent>

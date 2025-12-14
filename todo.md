@@ -341,3 +341,22 @@
 - [x] Update section descriptions to use British spelling
 - [x] Test changes across all pages
 - [x] Commit to GitHub (committed locally, will be synced via checkpoint)
+
+
+## Add Compliance Progress Indicators
+- [x] Create database function to calculate compliance progress per person
+- [x] Add progress indicator to Staff cards (X/7 sections complete)
+- [x] Add progress indicator to Service User cards (X/19 sections complete)
+- [x] Add color-coded progress bars to cards
+- [x] Update tRPC endpoints to include progress data
+- [x] Test progress indicators display correctly (verified in browser)
+
+## Remove Hardcoded Dashboard Data
+- [x] Create database functions for dashboard statistics
+- [x] Replace hardcoded overall compliance percentage with real data
+- [x] Replace hardcoded overdue actions count with real data
+- [x] Replace hardcoded upcoming audits count with real data (placeholder 0 until audit system built)
+- [x] Replace hardcoded recent incidents count with real data (placeholder 0 until incident system built)
+- [x] Replace hardcoded RAG status counts with real data
+- [x] Replace hardcoded overdue actions list with real data
+- [x] Test dashboard displays real data correctly (verified in browser)

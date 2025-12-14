@@ -12,6 +12,16 @@ export const appRouter = router({
   auth: authRouter,
   roles: rolesRouter,
 
+  // Dashboard statistics
+  dashboard: router({
+    getStats: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      return db.getDashboardStats(ctx.user.tenantId);
+    }),
+  }),
+
   // Company management
   company: router({
     getProfile: protectedProcedure.query(async ({ ctx }) => {
@@ -130,11 +140,26 @@ export const appRouter = router({
         
         // If locationId provided, filter by location
         if (input?.locationId) {
-          return db.getServiceUsersByLocation(input.locationId);
+          const users = await db.getServiceUsersByLocation(input.locationId);
+          // Add progress data to each service user
+          const usersWithProgress = await Promise.all(
+            users.map(async (user) => {
+              const progress = await db.getServiceUserComplianceProgress(user.id);
+              return { ...user, complianceProgress: progress };
+            })
+          );
+          return usersWithProgress;
         }
         
         // Otherwise return all for tenant
-        return db.getServiceUsersByTenant(ctx.user.tenantId);
+        const users = await db.getServiceUsersByTenant(ctx.user.tenantId);
+        const usersWithProgress = await Promise.all(
+          users.map(async (user) => {
+            const progress = await db.getServiceUserComplianceProgress(user.id);
+            return { ...user, complianceProgress: progress };
+          })
+        );
+        return usersWithProgress;
       }),
 
     create: protectedProcedure
@@ -201,11 +226,26 @@ export const appRouter = router({
         
         // If locationId provided, filter by location
         if (input?.locationId) {
-          return db.getStaffMembersByLocation(input.locationId);
+          const staff = await db.getStaffMembersByLocation(input.locationId);
+          // Add progress data to each staff member
+          const staffWithProgress = await Promise.all(
+            staff.map(async (member) => {
+              const progress = await db.getStaffComplianceProgress(member.id);
+              return { ...member, complianceProgress: progress };
+            })
+          );
+          return staffWithProgress;
         }
         
         // Otherwise return all for tenant
-        return db.getStaffMembersByTenant(ctx.user.tenantId);
+        const staff = await db.getStaffMembersByTenant(ctx.user.tenantId);
+        const staffWithProgress = await Promise.all(
+          staff.map(async (member) => {
+            const progress = await db.getStaffComplianceProgress(member.id);
+            return { ...member, complianceProgress: progress };
+          })
+        );
+        return staffWithProgress;
       }),
 
     create: protectedProcedure

@@ -17,21 +17,22 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { data: profile } = trpc.company.getProfile.useQuery();
   const { data: locations } = trpc.locations.list.useQuery();
+  const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery();
 
-  // Placeholder data - will be replaced with real data from compliance assessments
-  const stats = {
-    overallCompliance: 78,
-    compliantSections: 18,
-    totalSections: 29,
-    overdueActions: 5,
-    upcomingAudits: 3,
-    recentIncidents: 2,
+  // Use real data from database
+  const stats = dashboardStats || {
+    overallCompliance: 0,
+    compliantSections: 0,
+    totalSections: 0,
+    overdueActions: 0,
+    upcomingAudits: 0,
+    recentIncidents: 0,
   };
 
-  const ragStatus = {
-    green: 18,
-    amber: 7,
-    red: 4,
+  const ragStatus = dashboardStats?.ragStatus || {
+    green: 0,
+    amber: 0,
+    red: 0,
   };
 
   return (
