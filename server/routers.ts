@@ -3,12 +3,14 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, adminProcedure, router } from "./_core/trpc";
 import { systemRouter } from "./_core/systemRouter";
 import { authRouter } from "./auth";
+import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
 
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
+  roles: rolesRouter,
 
   // Company management
   company: router({

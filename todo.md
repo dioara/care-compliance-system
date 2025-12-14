@@ -153,3 +153,59 @@
 - [x] Update context to read token from Authorization header
 - [x] Test on mobile Safari, Chrome mobile, and desktop browsers
 - [x] Ensure token is sent with every API request via Authorization header
+
+
+## Role-Based Permission System
+- [x] Create roles table (id, tenantId, name, description)
+- [x] Create roleLocationPermissions table (roleId, locationId, canRead, canWrite)
+- [x] Create userRoles table (userId, roleId)
+- [x] Update user schema to add superAdmin boolean field
+- [x] Push database schema changes
+- [x] Create database functions for role management (CRUD)
+- [x] Create database functions for role-location permission management
+- [x] Create database functions for user-role assignment
+- [ ] Build super admin role management page
+- [ ] Add role creation/edit form with name and description
+- [ ] Add role location permissions UI (checkboxes for read/write per location)
+- [ ] Build user management page for super admin
+- [ ] Add user creation form with role assignment (multi-select)
+- [ ] Add user edit form to change assigned roles
+- [ ] Implement role-based location access resolution in context
+- [ ] Add permission checks in all mutations (canWrite check)
+- [ ] Update dashboard to show only accessible locations
+- [ ] Update service users list to filter by accessible locations
+- [ ] Update staff list to filter by accessible locations
+- [ ] Update compliance assessments to filter by accessible locations
+- [ ] Update audits to filter by accessible locations
+- [ ] Update incidents to filter by accessible locations
+- [ ] Test super admin can create roles with location permissions
+- [ ] Test super admin can assign users to roles
+- [ ] Test users can only see locations from their assigned roles
+- [ ] Test read-only role users cannot edit data
+- [ ] Test role permission changes affect all users with that role
+
+
+## RBAC Implementation Summary
+
+**Completed:**
+- Database schema with roles, roleLocationPermissions, userRoles tables
+- Super admin flag on users table
+- Complete database helper functions for role CRUD, permission management, user-role assignments
+- Permission resolution functions (getUserLocationPermissions, canUserAccessLocation, canUserWriteToLocation)
+- tRPC routers for role management with super admin middleware
+- Role-based location access aggregation (most permissive wins if user has multiple roles)
+
+**How it works:**
+1. Super admin creates roles (e.g., "North Region QO", "Location A Manager")
+2. Super admin assigns location permissions to each role (locationId + canRead + canWrite)
+3. Super admin assigns users to one or more roles
+4. System resolves user's effective permissions by aggregating all their roles' permissions
+5. If user has multiple roles with different permissions for same location, most permissive wins
+6. Super admins automatically have full read/write access to all locations
+
+**Next Steps:**
+- Build super admin UI for role management
+- Build role-location permission assignment UI
+- Build user management UI with role assignment
+- Implement location-based filtering in all data queries
+- Add permission checks in all mutations

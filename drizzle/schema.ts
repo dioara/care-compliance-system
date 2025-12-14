@@ -12,6 +12,7 @@ export const users = mysqlTable("users", {
   password: varchar("password", { length: 255 }).notNull(),
   name: text("name"),
   role: mysqlEnum("role", ["admin", "quality_officer", "manager", "staff"]).default("staff").notNull(),
+  superAdmin: boolean("superAdmin").default(false).notNull(),
   twoFaEnabled: int("twoFaEnabled", { mode: "boolean" }).default(false).notNull(),
   twoFaSecret: varchar("twoFaSecret", { length: 255 }),
   twoFaVerified: int("twoFaVerified", { mode: "boolean" }).default(false).notNull(),
@@ -340,6 +341,53 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Tenant = typeof tenants.$inferSelect;
 export type InsertTenant = typeof tenants.$inferInsert;
+
+/**
+ * Roles table
+ * Custom roles created by super admin with specific permissions
+ */
+export const roles = mysqlTable("roles", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Role = typeof roles.$inferSelect;
+export type InsertRole = typeof roles.$inferInsert;
+
+/**
+ * Role-Location Permissions table
+ * Defines which locations each role can access and permission level
+ */
+export const roleLocationPermissions = mysqlTable("role_location_permissions", {
+  id: int("id").autoincrement().primaryKey(),
+  roleId: int("roleId").notNull(),
+  locationId: int("locationId").notNull(),
+  canRead: boolean("canRead").default(true).notNull(),
+  canWrite: boolean("canWrite").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type RoleLocationPermission = typeof roleLocationPermissions.$inferSelect;
+export type InsertRoleLocationPermission = typeof roleLocationPermissions.$inferInsert;
+
+/**
+ * User-Roles table
+ * Many-to-many relationship between users and roles
+ */
+export const userRoles = mysqlTable("user_roles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  roleId: int("roleId").notNull(),
+  assignedAt: timestamp("assignedAt").defaultNow().notNull(),
+});
+
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = typeof userRoles.$inferInsert;
 export type Location = typeof locations.$inferSelect;
 export type InsertLocation = typeof locations.$inferInsert;
 export type ServiceUser = typeof serviceUsers.$inferSelect;

@@ -39,7 +39,7 @@ export const authRouter = router({
       });
 
       // Create user as admin of the company
-      const user = await db.createUser({
+      const userResult = await db.createUser({
         email: input.email,
         password: input.password,
         name: input.name,
@@ -49,7 +49,7 @@ export const authRouter = router({
 
       return {
         success: true,
-        userId: user.id,
+        userId: (userResult as any).insertId,
         tenantId: tenant.id,
       };
     }),
