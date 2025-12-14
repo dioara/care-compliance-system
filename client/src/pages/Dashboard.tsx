@@ -210,7 +210,7 @@ export default function Dashboard() {
                   <div>
                     <p className="font-medium">{location.name}</p>
                     <p className="text-sm text-muted-foreground">
-                      {location.numberOfServiceUsers || 0} service users • {location.numberOfStaff || 0} staff
+                      {location.serviceUserCount || 0} service users • {location.staffCount || 0} staff
                     </p>
                   </div>
                 </div>

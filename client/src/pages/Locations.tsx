@@ -312,14 +312,14 @@ export default function Locations() {
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">{location.numberOfServiceUsers || 0}</p>
+                      <p className="text-sm font-medium">{location.serviceUserCount || 0}</p>
                       <p className="text-xs text-muted-foreground">Service Users</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Building className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm font-medium">{location.numberOfStaff || 0}</p>
+                      <p className="text-sm font-medium">{location.staffCount || 0}</p>
                       <p className="text-xs text-muted-foreground">Staff</p>
                     </div>
                   </div>

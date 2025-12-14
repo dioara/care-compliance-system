@@ -34,7 +34,6 @@ const menuItems = [
   { icon: MapPin, label: "Locations", path: "/locations" },
   { icon: Heart, label: "Service Users", path: "/service-users" },
   { icon: UserCheck, label: "Staff", path: "/staff" },
-  { icon: ClipboardCheck, label: "Compliance", path: "/compliance" },
   { icon: ClipboardList, label: "Audits", path: "/audits" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits" },
   { icon: AlertTriangle, label: "Incidents", path: "/incidents" },

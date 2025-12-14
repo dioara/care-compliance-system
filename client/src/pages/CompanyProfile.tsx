@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Building2, Upload, Loader2 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
 export default function CompanyProfile() {
@@ -30,7 +30,7 @@ export default function CompanyProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Update form data when profile loads
-  useState(() => {
+  useEffect(() => {
     if (profile) {
       setFormData({
         name: profile.name || "",
@@ -43,7 +43,7 @@ export default function CompanyProfile() {
         cqcRating: profile.cqcRating || "",
       });
     }
-  });
+  }, [profile]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({

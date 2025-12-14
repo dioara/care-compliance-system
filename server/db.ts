@@ -161,7 +161,30 @@ export async function getLocationsByTenant(tenantId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(locations).where(eq(locations.tenantId, tenantId));
+  const locs = await db.select().from(locations).where(eq(locations.tenantId, tenantId));
+  
+  // Calculate staff and service user counts for each location
+  const locsWithCounts = await Promise.all(
+    locs.map(async (loc) => {
+      const staffCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(staffMembers)
+        .where(eq(staffMembers.locationId, loc.id));
+      
+      const serviceUserCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(serviceUsers)
+        .where(eq(serviceUsers.locationId, loc.id));
+      
+      return {
+        ...loc,
+        staffCount: Number(staffCount[0]?.count || 0),
+        serviceUserCount: Number(serviceUserCount[0]?.count || 0),
+      };
+    })
+  );
+  
+  return locsWithCounts;
 }
 
 export async function getLocationById(id: number) {

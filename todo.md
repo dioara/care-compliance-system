@@ -407,4 +407,27 @@
 - [x] Create action plans UI with assignment and due dates
 - [x] Register audit routes in App.tsx
 - [x] Test complete audit workflow end-to-end (Audits page loading, schedule dialog working)
+- [x] Save checkpoint and push to GitHub
+
+
+## Remove Redundant Compliance Tab
+- [x] Remove Compliance navigation item from DashboardLayout sidebar
+- [ ] Remove Compliance, ComplianceSection, PersonCompliance routes from App.tsx (keeping routes for direct access if needed)
+- [x] Keep compliance pages for potential future use but hide from navigation
+
+## Fix Company Profile Data Loading/Saving
+- [x] Debug why company profile data is not loading from database (found useState bug)
+- [x] Fix company profile form to populate fields from database (changed to useEffect)
+- [x] Ensure updates to company profile save to database correctly (already working)
+- [x] Fix auto-refresh issue causing data loss (fixed by useEffect dependency)
+
+## Auto-Calculate Location Counts
+- [x] Update database query to count staff per location
+- [x] Update database query to count service users per location
+- [x] Update Locations page to display calculated counts
+- [x] Update Dashboard location cards to show calculated counts
+- [x] Test location count calculations (verified: 5 service users, 7 staff)
+
+## Testing and Delivery
+- [x] Test all changes end-to-end (Compliance tab removed, Company Profile loading data, Location counts auto-calculated)
 - [ ] Save checkpoint and push to GitHub
