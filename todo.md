@@ -1232,3 +1232,9 @@
 - [x] Make non-closed incidents editable from detail view
 - [x] Widen incident detail modal
 - [x] Show comprehensive incident details in readable format
+
+## 2FA and Single Incident PDF
+- [x] Create 2FA Settings page with QR code scanning UI
+- [x] Add enable/disable 2FA functionality
+- [x] Add single incident PDF generation endpoint
+- [x] Update incident detail modal to use single PDF endpoint

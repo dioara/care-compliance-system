@@ -92,6 +92,16 @@ export default function Incidents() {
     },
   });
 
+  const generateSinglePDFMutation = trpc.incidents.generateSinglePDF.useMutation({
+    onSuccess: (data) => {
+      window.open(data.url, "_blank");
+      toast.success("Incident PDF generated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate PDF: ${error.message}`);
+    },
+  });
+
   // Form state - comprehensive incident form
   const [formData, setFormData] = useState({
     // Basic Information
@@ -1384,10 +1394,10 @@ export default function Incidents() {
                       <Button
                         variant="outline"
                         className="w-full justify-start"
-                        onClick={() => generatePDFMutation.mutate({})}
-                        disabled={generatePDFMutation.isPending}
+                        onClick={() => generateSinglePDFMutation.mutate({ incidentId: selectedIncident.id })}
+                        disabled={generateSinglePDFMutation.isPending}
                       >
-                        {generatePDFMutation.isPending ? (
+                        {generateSinglePDFMutation.isPending ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                           <Download className="mr-2 h-4 w-4" />

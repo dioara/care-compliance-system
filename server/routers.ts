@@ -1203,6 +1203,41 @@ export const appRouter = router({
         
         return { url, filename };
       }),
+
+    // Generate PDF report for a single incident
+    generateSinglePDF: protectedProcedure
+      .input(z.object({ incidentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        
+        const incident = await db.getIncidentById(input.incidentId);
+        if (!incident || incident.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Incident not found" });
+        }
+        
+        let locationName: string | undefined;
+        if (incident.locationId) {
+          const location = await db.getLocationById(incident.locationId);
+          locationName = location?.name;
+        }
+        
+        const { generateIncidentPDF } = await import("./services/incidentPdfService");
+        const pdfBuffer = await generateIncidentPDF({
+          incidents: [incident],
+          companyName: company.name,
+          companyLogo: company.logoUrl || undefined,
+          locationName,
+          generatedBy: ctx.user.name || ctx.user.email,
+        });
+        
+        const filename = `incident-${incident.incidentNumber}-${Date.now()}.pdf`;
+        const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
+        
+        return { url, filename };
+      }),
   }),
 
   // Analytics
