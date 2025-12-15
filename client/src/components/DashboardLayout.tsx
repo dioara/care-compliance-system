@@ -21,12 +21,42 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { LocationSwitcher } from "./LocationSwitcher";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { useTheme } from "@/contexts/ThemeContext";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { NotificationCenter } from "./NotificationCenter";
+import { OnboardingTour } from "./OnboardingTour";
+
+// Theme toggle component for dropdown menu
+function ThemeToggleItem() {
+  const { theme, toggleTheme, switchable } = useTheme();
+  
+  if (!switchable || !toggleTheme) return null;
+  
+  return (
+    <DropdownMenuItem
+      onClick={toggleTheme}
+      className="cursor-pointer"
+    >
+      {theme === "dark" ? (
+        <>
+          <Sun className="mr-2 h-4 w-4" />
+          <span>Light Mode</span>
+        </>
+      ) : (
+        <>
+          <Moon className="mr-2 h-4 w-4" />
+          <span>Dark Mode</span>
+        </>
+      )}
+    </DropdownMenuItem>
+  );
+}
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/", description: "Overview & metrics" },
@@ -278,7 +308,7 @@ function DashboardLayoutContent({
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem
                   onClick={() => setLocation("/settings")}
                   className="cursor-pointer"
@@ -286,6 +316,9 @@ function DashboardLayoutContent({
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <ThemeToggleItem />
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
@@ -320,15 +353,18 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
+            <NotificationCenter />
             <LocationSwitcher />
           </div>
         )}
         {!isMobile && (
-          <div className="flex border-b h-14 items-center justify-end bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+          <div className="flex border-b h-14 items-center justify-end gap-3 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+            <NotificationCenter />
             <LocationSwitcher />
           </div>
         )}
         <main className="flex-1 p-4">{children}</main>
+        <OnboardingTour />
       </SidebarInset>
     </>
   );

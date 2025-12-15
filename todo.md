@@ -1313,3 +1313,13 @@
 - [x] Polish Action Log page with improved visual design
 - [x] Add micro-interactions and hover effects throughout
 
+
+## Feature: Onboarding, Dark Mode & Notifications
+- [x] Add dark mode toggle in user dropdown menu
+- [x] Implement theme persistence in localStorage
+- [x] Build notification center dropdown in header
+- [x] Show alerts, audit reminders, and action deadlines in notifications
+- [x] Create onboarding tour component with step-by-step guidance
+- [x] Highlight key features: Dashboard, Audits, Staff, Service Users, Action Log
+- [x] Store onboarding completion status per user
+
