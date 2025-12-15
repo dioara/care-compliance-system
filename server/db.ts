@@ -734,14 +734,22 @@ export async function getDashboardStats(tenantId: number, locationId?: number) {
       .where(eq(complianceAssessments.tenantId, tenantId));
   }
 
-  const totalAssessments = assessments.length;
+  // Get all questions to calculate total required assessments
+  const allQuestions = await db.select().from(complianceQuestions);
+  const totalQuestions = allQuestions.length;
+
   const compliantCount = assessments.filter(a => a.ragStatus === 'green').length;
   const partialCount = assessments.filter(a => a.ragStatus === 'amber').length;
-  const nonCompliantCount = assessments.filter(a => a.ragStatus === 'red').length;
+  const assessedRedCount = assessments.filter(a => a.ragStatus === 'red').length;
+  
+  // Unassessed items are treated as non-compliant (red)
+  const unassessedCount = Math.max(0, totalQuestions - assessments.length);
+  const nonCompliantCount = assessedRedCount + unassessedCount;
 
-  // Calculate overall compliance percentage
-  const overallCompliance = totalAssessments > 0 
-    ? Math.round((compliantCount / totalAssessments) * 100) 
+  // Calculate overall compliance percentage based on total questions, not just assessed items
+  // Only green items are considered compliant
+  const overallCompliance = totalQuestions > 0 
+    ? Math.round((compliantCount / totalQuestions) * 100) 
     : 0;
 
   // Count overdue actions (red status with past target date and no completion date)
@@ -776,8 +784,9 @@ export async function getDashboardStats(tenantId: number, locationId?: number) {
     ragStatus: {
       green: compliantCount,
       amber: partialCount,
-      red: nonCompliantCount,
-    }
+      red: nonCompliantCount, // Includes unassessed items
+    },
+    unassessedCount, // Track how many items haven't been assessed yet
   };
 }
 

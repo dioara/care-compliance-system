@@ -6,6 +6,7 @@ import { authRouter } from "./auth";
 import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
+import { notifyOwner } from "./_core/notification";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -32,6 +33,126 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
         }
         return db.getDashboardStats(ctx.user.tenantId, input?.locationId);
+      }),
+  }),
+
+  // Compliance notifications
+  notifications: router({
+    // Check compliance and send alert if below threshold
+    checkComplianceAndNotify: protectedProcedure
+      .input(z.object({
+        threshold: z.number().min(0).max(100).default(80),
+        locationId: z.number().optional(),
+      }).optional())
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        
+        const threshold = input?.threshold ?? 80;
+        const stats = await db.getDashboardStats(ctx.user.tenantId, input?.locationId);
+        
+        if (!stats) {
+          return { sent: false, reason: "No stats available" };
+        }
+        
+        const alerts: string[] = [];
+        
+        // Check if compliance is below threshold
+        if (stats.overallCompliance < threshold) {
+          alerts.push(`Overall compliance (${stats.overallCompliance}%) is below the ${threshold}% threshold.`);
+        }
+        
+        // Check for overdue actions
+        if (stats.overdueActions > 0) {
+          alerts.push(`There are ${stats.overdueActions} overdue action items requiring attention.`);
+        }
+        
+        // Check for non-compliant (red) items
+        if (stats.ragStatus.red > 0) {
+          alerts.push(`${stats.ragStatus.red} items are marked as non-compliant (red status).`);
+        }
+        
+        if (alerts.length === 0) {
+          return { sent: false, reason: "Compliance is healthy, no alerts needed" };
+        }
+        
+        const tenant = await db.getTenantById(ctx.user.tenantId);
+        const locationName = input?.locationId 
+          ? (await db.getLocationById(input.locationId))?.name || "Unknown Location"
+          : "All Locations";
+        
+        const title = `⚠️ Compliance Alert - ${tenant?.name || "Your Care Home"}`;
+        const content = `**Location:** ${locationName}\n\n**Alerts:**\n${alerts.map(a => `- ${a}`).join("\n")}\n\n**Current Status:**\n- Overall Compliance: ${stats.overallCompliance}%\n- Compliant (Green): ${stats.ragStatus.green}\n- Partial (Amber): ${stats.ragStatus.amber}\n- Non-Compliant (Red): ${stats.ragStatus.red}\n\nPlease review and address these compliance issues promptly.`;
+        
+        const sent = await notifyOwner({ title, content });
+        
+        return { 
+          sent, 
+          alerts,
+          stats: {
+            compliance: stats.overallCompliance,
+            threshold,
+            overdueActions: stats.overdueActions,
+            ragStatus: stats.ragStatus
+          }
+        };
+      }),
+      
+    // Get compliance alert status without sending notification
+    getAlertStatus: protectedProcedure
+      .input(z.object({
+        threshold: z.number().min(0).max(100).default(80),
+        locationId: z.number().optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        
+        const threshold = input?.threshold ?? 80;
+        const stats = await db.getDashboardStats(ctx.user.tenantId, input?.locationId);
+        
+        if (!stats) {
+          return { hasAlerts: false, alerts: [] };
+        }
+        
+        const alerts: { type: string; message: string; severity: 'warning' | 'critical' }[] = [];
+        
+        if (stats.overallCompliance < threshold) {
+          alerts.push({
+            type: 'compliance_low',
+            message: `Overall compliance (${stats.overallCompliance}%) is below ${threshold}%`,
+            severity: stats.overallCompliance < 50 ? 'critical' : 'warning'
+          });
+        }
+        
+        if (stats.overdueActions > 0) {
+          alerts.push({
+            type: 'overdue_actions',
+            message: `${stats.overdueActions} overdue action items`,
+            severity: stats.overdueActions > 5 ? 'critical' : 'warning'
+          });
+        }
+        
+        if (stats.ragStatus.red > 0) {
+          alerts.push({
+            type: 'non_compliant',
+            message: `${stats.ragStatus.red} non-compliant items`,
+            severity: stats.ragStatus.red > 10 ? 'critical' : 'warning'
+          });
+        }
+        
+        return {
+          hasAlerts: alerts.length > 0,
+          alerts,
+          stats: {
+            compliance: stats.overallCompliance,
+            threshold,
+            overdueActions: stats.overdueActions,
+            ragStatus: stats.ragStatus
+          }
+        };
       }),
   }),
 

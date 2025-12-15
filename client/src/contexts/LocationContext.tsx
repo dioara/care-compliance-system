@@ -29,12 +29,23 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     { enabled: !!user }
   );
 
-  // Load saved location from localStorage on mount
+  // Load saved location from localStorage on mount and validate it's still accessible
   useEffect(() => {
+    if (permissions.length === 0) return;
+    
     const saved = localStorage.getItem("activeLocationId");
     if (saved) {
-      setActiveLocationIdState(parseInt(saved));
-    } else if (permissions.length > 0 && !activeLocationId) {
+      const savedId = parseInt(saved);
+      // Check if saved location is still accessible
+      const isAccessible = permissions.some(p => p.locationId === savedId);
+      if (isAccessible) {
+        setActiveLocationIdState(savedId);
+      } else {
+        // Saved location no longer accessible, fall back to first available
+        localStorage.removeItem("activeLocationId");
+        setActiveLocationIdState(permissions[0].locationId);
+      }
+    } else if (!activeLocationId) {
       // Auto-select first accessible location if none selected
       setActiveLocationIdState(permissions[0].locationId);
     }

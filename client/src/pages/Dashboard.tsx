@@ -13,8 +13,14 @@ import {
   Users,
   ClipboardCheck,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Bell,
+  X
 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -25,6 +31,35 @@ export default function Dashboard() {
   const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(
     activeLocationId ? { locationId: activeLocationId } : undefined
   );
+  
+  // Compliance alerts
+  const { data: alertStatus } = trpc.notifications.getAlertStatus.useQuery(
+    { threshold: 80, locationId: activeLocationId || undefined }
+  );
+  const sendNotification = trpc.notifications.checkComplianceAndNotify.useMutation();
+  const [alertDismissed, setAlertDismissed] = useState(false);
+  
+  const handleSendAlert = async () => {
+    try {
+      const result = await sendNotification.mutateAsync({
+        threshold: 80,
+        locationId: activeLocationId || undefined
+      });
+      if (result.sent) {
+        toast.success("Alert Sent", {
+          description: "Compliance alert notification has been sent to the owner.",
+        });
+      } else {
+        toast.info("No Alert Needed", {
+          description: result.reason || "Compliance is within acceptable levels.",
+        });
+      }
+    } catch (error) {
+      toast.error("Error", {
+        description: "Failed to send notification.",
+      });
+    }
+  };
 
   // Use real data from database
   const stats = dashboardStats || {
@@ -44,6 +79,44 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Compliance Alert Banner */}
+      {alertStatus?.hasAlerts && !alertDismissed && (
+        <Alert variant="destructive" className="relative">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle className="flex items-center justify-between">
+            <span>Compliance Alerts</span>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={handleSendAlert}
+                disabled={sendNotification.isPending}
+              >
+                <Bell className="h-4 w-4 mr-1" />
+                {sendNotification.isPending ? "Sending..." : "Send Alert"}
+              </Button>
+              <Button 
+                size="sm" 
+                variant="ghost"
+                onClick={() => setAlertDismissed(true)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </AlertTitle>
+          <AlertDescription>
+            <ul className="mt-2 space-y-1">
+              {alertStatus.alerts.map((alert, i) => (
+                <li key={i} className={`flex items-center gap-2 ${alert.severity === 'critical' ? 'font-semibold' : ''}`}>
+                  <span className={`w-2 h-2 rounded-full ${alert.severity === 'critical' ? 'bg-red-500' : 'bg-amber-500'}`} />
+                  {alert.message}
+                </li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+      
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">

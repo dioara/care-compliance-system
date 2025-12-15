@@ -1031,3 +1031,21 @@
 
 ### Dashboard Location Switcher
 - [x] Add location dropdown to Dashboard to allow switching between locations
+
+
+## New Features (December 15, 2025 - Session 3)
+
+### Compliance Calculation Fix
+- [x] Treat unassessed items as non-compliant (red) on dashboard
+- [x] Only count items as compliant if RAG status is explicitly green
+
+### Location Filter Persistence
+- [x] Save selected location to localStorage
+- [x] Restore selected location on page load
+- [x] Handle case when saved location is no longer accessible
+
+### Compliance Progress Notifications
+- [x] Add notification system for compliance alerts
+- [x] Send alerts when compliance drops below threshold (e.g., 80%)
+- [x] Send alerts for overdue action items
+- [ ] Add notification preferences in settings (future enhancement)
