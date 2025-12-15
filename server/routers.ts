@@ -1022,6 +1022,88 @@ export const appRouter = router({
         return { url, filename };
       }),
 
+    // Generate PDF report for completed audit
+    generateAuditReportPDF: protectedProcedure
+      .input(z.object({ auditInstanceId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Get audit instance
+        const auditInstance = await db.getAuditInstanceById(input.auditInstanceId);
+        if (!auditInstance) throw new TRPCError({ code: "NOT_FOUND", message: "Audit not found" });
+        
+        // Get company details
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        
+        // Get audit template with sections and questions
+        const template = await db.getAuditTemplateByAuditTypeId(auditInstance.auditTypeId);
+        if (!template) throw new TRPCError({ code: "NOT_FOUND", message: "Audit template not found" });
+        
+        const sections = await db.getAuditTemplateSections(template.id);
+        const sectionsWithQuestions = await Promise.all(
+          sections.map(async (section) => {
+            const questions = await db.getAuditTemplateQuestions(section.id);
+            return { ...section, questions };
+          })
+        );
+        
+        // Get all responses for this audit
+        const responses = await db.getAuditResponses(input.auditInstanceId);
+        
+        // Map responses to include question details
+        const mappedResponses = responses.map(r => {
+          // Find the question for this response
+          let questionNumber = "";
+          let questionText = "";
+          for (const section of sectionsWithQuestions) {
+            const question = section.questions.find(q => q.id === r.auditTemplateQuestionId);
+            if (question) {
+              questionNumber = question.questionNumber;
+              questionText = question.questionText;
+              break;
+            }
+          }
+          return {
+            questionId: r.auditTemplateQuestionId,
+            questionNumber,
+            questionText,
+            response: r.response,
+            observations: r.observations,
+            actionRequired: r.actionRequired,
+          };
+        });
+        
+        // Calculate completion rate
+        const totalQuestions = sectionsWithQuestions.reduce((sum, s) => sum + s.questions.length, 0);
+        const answeredQuestions = responses.length;
+        const completionRate = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
+        
+        // Generate PDF
+        const { generateAuditReportPDF } = await import("./services/auditReportPdfService");
+        const pdfBuffer = await generateAuditReportPDF({
+          auditId: auditInstance.id,
+          auditTypeName: auditInstance.auditTypeName || "Audit",
+          auditDate: auditInstance.auditDate,
+          locationName: auditInstance.locationName || "Unknown Location",
+          completionRate,
+          overallScore: auditInstance.overallScore || 0,
+          status: auditInstance.status,
+          conductedBy: ctx.user.name || ctx.user.email,
+          sections: sectionsWithQuestions,
+          responses: mappedResponses,
+          companyName: company.name,
+          companyLogo: company.logoUrl || undefined,
+          generatedBy: ctx.user.name || ctx.user.email,
+        });
+        
+        // Upload to S3
+        const filename = `audit-report-${auditInstance.id}-${Date.now()}.pdf`;
+        const { url } = await storagePut(`reports/audits/${filename}`, pdfBuffer, "application/pdf");
+        
+        return { url, filename };
+      }),
+
     // Get audit schedules
     getSchedules: protectedProcedure
       .input(z.object({ tenantId: z.number() }))

@@ -1291,3 +1291,12 @@
 - [x] Verified all 82 staff compliance questions now display (23.1-23.33, 24.1-24.8, 25.1-25.8, 26.1-26.9, 27.1-27.9, 28.1-28.7, 29.1-29.8)
 - [x] All questions including 23.7, 23.8, 23.9, 23.10, 23.11, 23.19, 23.20, 23.21, 23.22, 23.24 now visible
 
+
+
+## Feature: Audit PDF Export, Action Log Improvements
+- [x] Create PDF export endpoint for completed audits with all responses
+- [x] Design professional PDF layout with company branding, audit details, and all question responses
+- [x] Add "Add Action" button to Action Log page for creating new actions directly
+- [x] Create dialog/form for adding new actions from Action Log
+- [x] Remove "Add Action Plan" button from audit detail view (actions should flow from audit questions to Master Action Log)
+

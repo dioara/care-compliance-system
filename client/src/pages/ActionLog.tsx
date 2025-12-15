@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ClipboardList, Search, Filter, Download, CheckCircle2, Clock, AlertCircle, Calendar, User, FileText } from "lucide-react";
+import { ClipboardList, Search, Filter, Download, CheckCircle2, Clock, AlertCircle, Calendar, User, FileText, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -28,11 +28,61 @@ export default function ActionLog() {
   const [updateNotes, setUpdateNotes] = useState("");
   const [updateStatus, setUpdateStatus] = useState<string>("");
   const [updateCompletionDate, setUpdateCompletionDate] = useState<string>("");
+  
+  // Add action dialog state
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newAction, setNewAction] = useState({
+    issueDescription: "",
+    ragStatus: "amber" as "red" | "amber" | "green",
+    responsiblePersonId: 0,
+    targetCompletionDate: "",
+    locationId: 0,
+    notes: "",
+  });
 
   // Fetch all action plans across locations
   const { data: actionPlans, isLoading, refetch } = trpc.audits.getAllActionPlans.useQuery({
     locationId: filterLocation === "all" ? undefined : parseInt(filterLocation),
   });
+
+  // Fetch staff for assignment
+  const { data: staff = [] } = trpc.staff.list.useQuery();
+
+  const createActionMutation = trpc.audits.createActionPlan.useMutation({
+    onSuccess: () => {
+      toast.success("Action created successfully");
+      setIsAddDialogOpen(false);
+      setNewAction({
+        issueDescription: "",
+        ragStatus: "amber",
+        responsiblePersonId: 0,
+        targetCompletionDate: "",
+        locationId: 0,
+        notes: "",
+      });
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to create action: ${error.message}`);
+    },
+  });
+
+  const handleCreateAction = () => {
+    if (!user?.tenantId || !newAction.issueDescription || !newAction.locationId) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    createActionMutation.mutate({
+      tenantId: user.tenantId,
+      locationId: newAction.locationId,
+      issueDescription: newAction.issueDescription,
+      ragStatus: newAction.ragStatus,
+      responsiblePersonId: newAction.responsiblePersonId || user.id,
+      targetCompletionDate: newAction.targetCompletionDate ? new Date(newAction.targetCompletionDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      notes: newAction.notes,
+    });
+  };
 
   const generatePdfMutation = trpc.audits.generateActionLogPDF.useMutation({
     onSuccess: (data) => {
@@ -197,9 +247,13 @@ export default function ActionLog() {
             <Download className="h-4 w-4 mr-2" />
             CSV
           </Button>
-          <Button onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending}>
+          <Button variant="outline" onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending}>
             <FileText className="h-4 w-4 mr-2" />
-            {generatePdfMutation.isPending ? "Generating..." : "Download PDF"}
+            {generatePdfMutation.isPending ? "Generating..." : "PDF"}
+          </Button>
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Action
           </Button>
         </div>
       </div>
@@ -362,6 +416,116 @@ export default function ActionLog() {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Action Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Add New Action</DialogTitle>
+            <DialogDescription>
+              Create a new action item to track in the Master Action Log
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="issue">Issue Description *</Label>
+              <Textarea
+                id="issue"
+                placeholder="Describe the issue or action required..."
+                value={newAction.issueDescription}
+                onChange={(e) => setNewAction({ ...newAction, issueDescription: e.target.value })}
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Location *</Label>
+                <Select
+                  value={newAction.locationId ? newAction.locationId.toString() : ""}
+                  onValueChange={(value) => setNewAction({ ...newAction, locationId: parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations.map((loc) => (
+                      <SelectItem key={loc.id} value={loc.id.toString()}>
+                        {loc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Priority *</Label>
+                <Select
+                  value={newAction.ragStatus}
+                  onValueChange={(value: "red" | "amber" | "green") => setNewAction({ ...newAction, ragStatus: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="red">High Priority (Red)</SelectItem>
+                    <SelectItem value="amber">Medium (Amber)</SelectItem>
+                    <SelectItem value="green">Low (Green)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Assigned To</Label>
+                <Select
+                  value={newAction.responsiblePersonId ? newAction.responsiblePersonId.toString() : ""}
+                  onValueChange={(value) => setNewAction({ ...newAction, responsiblePersonId: parseInt(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select person" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {staff.map((person) => (
+                      <SelectItem key={person.id} value={person.id.toString()}>
+                        {person.firstName} {person.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Target Completion Date</Label>
+                <Input
+                  type="date"
+                  value={newAction.targetCompletionDate}
+                  onChange={(e) => setNewAction({ ...newAction, targetCompletionDate: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Notes</Label>
+              <Textarea
+                placeholder="Additional notes or context..."
+                value={newAction.notes}
+                onChange={(e) => setNewAction({ ...newAction, notes: e.target.value })}
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateAction} disabled={createActionMutation.isPending}>
+              {createActionMutation.isPending ? "Creating..." : "Create Action"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Update Dialog */}
       <Dialog open={isUpdateDialogOpen} onOpenChange={setIsUpdateDialogOpen}>

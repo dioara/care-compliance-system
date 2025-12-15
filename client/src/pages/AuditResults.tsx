@@ -67,6 +67,21 @@ export default function AuditResults() {
   // Fetch staff for action plan assignment
   const { data: staff } = trpc.staff.list.useQuery();
 
+  // PDF export mutation
+  const exportPdfMutation = trpc.audits.generateAuditReportPDF.useMutation({
+    onSuccess: (data) => {
+      window.open(data.url, "_blank");
+      toast.success("PDF report generated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate PDF: ${error.message}`);
+    },
+  });
+
+  const handleExportPDF = () => {
+    exportPdfMutation.mutate({ auditInstanceId: auditId });
+  };
+
   const createActionPlanMutation = trpc.audits.createActionPlan.useMutation({
     onSuccess: () => {
       toast.success("Action plan created successfully");
@@ -217,9 +232,13 @@ export default function AuditResults() {
           {auditInstance.status === "in_progress" && (
             <Button onClick={() => setLocation(`/audits/${auditId}`)}>Continue Audit</Button>
           )}
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            onClick={handleExportPDF}
+            disabled={exportPdfMutation.isPending}
+          >
             <Download className="h-4 w-4 mr-2" />
-            Export Report
+            {exportPdfMutation.isPending ? "Generating..." : "Export Report"}
           </Button>
         </div>
       </div>
@@ -330,113 +349,7 @@ export default function AuditResults() {
         {/* Action Plans Tab */}
         <TabsContent value="actions" className="space-y-4">
           <div className="flex justify-between items-center">
-            <p className="text-sm text-muted-foreground">Track and manage actions arising from audit findings</p>
-            <Dialog open={isActionPlanDialogOpen} onOpenChange={setIsActionPlanDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Action Plan
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
-                <DialogHeader>
-                  <DialogTitle>Create Action Plan</DialogTitle>
-                  <DialogDescription>Add a new action plan to address audit findings</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="issue">Issue Description *</Label>
-                    <Textarea
-                      id="issue"
-                      placeholder="Describe the issue or finding..."
-                      value={actionPlanData.issueDescription}
-                      onChange={(e) => setActionPlanData({ ...actionPlanData, issueDescription: e.target.value })}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="rag">RAG Status *</Label>
-                      <Select
-                        value={actionPlanData.ragStatus}
-                        onValueChange={(value: "red" | "amber" | "green") =>
-                          setActionPlanData({ ...actionPlanData, ragStatus: value })
-                        }
-                      >
-                        <SelectTrigger id="rag">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="red">Red - Critical</SelectItem>
-                          <SelectItem value="amber">Amber - Moderate</SelectItem>
-                          <SelectItem value="green">Green - Low</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="responsible">Responsible Person *</Label>
-                      <Select
-                        value={actionPlanData.responsiblePersonId.toString()}
-                        onValueChange={(value) =>
-                          setActionPlanData({ ...actionPlanData, responsiblePersonId: parseInt(value) })
-                        }
-                      >
-                        <SelectTrigger id="responsible">
-                          <SelectValue placeholder="Select person" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {staff?.map((person) => (
-                            <SelectItem key={person.id} value={person.id.toString()}>
-                              {person.firstName} {person.lastName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Target Completion Date *</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {format(actionPlanData.targetCompletionDate, "PPP")}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={actionPlanData.targetCompletionDate}
-                          onSelect={(date) => date && setActionPlanData({ ...actionPlanData, targetCompletionDate: date })}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="notes">Notes (Optional)</Label>
-                    <Textarea
-                      id="notes"
-                      placeholder="Additional notes..."
-                      value={actionPlanData.notes}
-                      onChange={(e) => setActionPlanData({ ...actionPlanData, notes: e.target.value })}
-                      rows={2}
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsActionPlanDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleCreateActionPlan} disabled={createActionPlanMutation.isPending}>
-                    {createActionPlanMutation.isPending ? "Creating..." : "Create Action Plan"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <p className="text-sm text-muted-foreground">Actions from audit findings flow automatically to the Master Action Log</p>
           </div>
 
           {loadingActionPlans ? (
