@@ -6,7 +6,6 @@ import { authRouter } from "./auth";
 import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
-import { notifyOwner } from "./_core/notification";
 import { sendComplianceAlertEmail } from "./_core/email";
 
 // Super admin middleware - only allows super admins to access
@@ -86,10 +85,7 @@ export const appRouter = router({
         const title = `⚠️ Compliance Alert - ${tenant?.name || "Your Care Home"}`;
         const content = `**Location:** ${locationName}\n\n**Alerts:**\n${alerts.map(a => `- ${a}`).join("\n")}\n\n**Current Status:**\n- Overall Compliance: ${stats.overallCompliance}%\n- Compliant (Green): ${stats.ragStatus.green}\n- Partial (Amber): ${stats.ragStatus.amber}\n- Non-Compliant (Red): ${stats.ragStatus.red}\n\nPlease review and address these compliance issues promptly.`;
         
-        // Send in-app notification to owner
-        const notificationSent = await notifyOwner({ title, content });
-        
-        // Also send email notification if user has an email
+        // Send email notification via SendGrid
         let emailSent = false;
         if (ctx.user.email) {
           emailSent = await sendComplianceAlertEmail(
@@ -107,8 +103,7 @@ export const appRouter = router({
         }
         
         return { 
-          sent: notificationSent || emailSent,
-          notificationSent,
+          sent: emailSent,
           emailSent,
           alerts,
           stats: {
