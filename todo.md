@@ -983,3 +983,10 @@
 - [x] Fixed by using trpcUtils.roles.getPermissions.fetch() instead
 - [x] Tested: Permissions now correctly display when opening dialog
 - [x] Tested: New permissions save and display correctly on re-open
+
+
+## Move Company Profile & Locations to Administration Section
+- [x] Move Company Profile navigation item under Administration section
+- [x] Move Locations navigation item under Administration section
+- [x] Make both items only visible to super admins
+- [x] Test navigation changes

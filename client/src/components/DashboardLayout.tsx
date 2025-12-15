@@ -30,8 +30,6 @@ import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Building2, label: "Company Profile", path: "/company-profile" },
-  { icon: MapPin, label: "Locations", path: "/locations" },
   { icon: Heart, label: "Service Users", path: "/service-users" },
   { icon: UserCheck, label: "Staff", path: "/staff" },
   { icon: ClipboardList, label: "Audits", path: "/audits" },
@@ -43,6 +41,8 @@ const menuItems = [
 
 // Admin-only menu items (shown only to super admins)
 const adminMenuItems = [
+  { icon: Building2, label: "Company Profile", path: "/company-profile" },
+  { icon: MapPin, label: "Locations", path: "/locations" },
   { icon: Shield, label: "Role Management", path: "/role-management" },
   { icon: UserCog, label: "User Management", path: "/user-management" },
 ];
