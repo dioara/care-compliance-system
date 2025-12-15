@@ -1378,3 +1378,14 @@
 - [x] Show price preview before confirming changes
 - [x] Handle both upgrades (add licenses) and downgrades (remove licenses)
 - [x] Validate downgrade doesn't remove more licenses than unassigned
+
+
+## Feature: Free 1-Month Trial System
+- [x] Auto-create 5 free trial licenses when new company signs up
+- [x] Add trial status fields to tenant subscription (isTrial, trialEndsAt)
+- [x] All trial licenses share same expiration date (30 days from signup)
+- [x] Prorate charges when 6th+ license added during trial
+- [x] Create trial notification banner showing days remaining
+- [x] Show trial status in Subscription Management page
+- [x] Handle trial expiration (restrict access if no payment method)
+- [x] Fix yearly pricing calculation in Stripe checkout

@@ -57,7 +57,71 @@ async function getOrCreateStripeCustomer(tenantId: number, email: string, name: 
   return customer.id;
 }
 
+// Start free trial for a tenant (called during signup)
+export async function startFreeTrial(tenantId: number): Promise<void> {
+  const db = await requireDb();
+  const trialEndsAt = new Date();
+  trialEndsAt.setDate(trialEndsAt.getDate() + 30); // 30 days trial
+
+  // Check if subscription already exists
+  const [existing] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, tenantId));
+  
+  if (existing) {
+    // Update existing to trial
+    await db.update(tenantSubscriptions).set({
+      isTrial: true,
+      trialEndsAt,
+      trialLicensesCount: 5,
+      licensesCount: 5,
+      status: "trialing",
+    }).where(eq(tenantSubscriptions.tenantId, tenantId));
+  } else {
+    // Create new trial subscription
+    await db.insert(tenantSubscriptions).values({
+      tenantId,
+      isTrial: true,
+      trialEndsAt,
+      trialLicensesCount: 5,
+      licensesCount: 5,
+      status: "trialing",
+    });
+  }
+
+  // Create 5 unassigned trial licenses
+  const licenseValues = Array.from({ length: 5 }, () => ({
+    tenantId,
+    isActive: true,
+  }));
+  await db.insert(userLicenses).values(licenseValues);
+}
+
 export const subscriptionRouter = router({
+  // Get trial status for current tenant
+  getTrialStatus: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) return null;
+    const db = await requireDb();
+
+    const [subscription] = await db
+      .select()
+      .from(tenantSubscriptions)
+      .where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+    if (!subscription || !subscription.isTrial) return null;
+
+    const now = new Date();
+    const trialEndsAt = subscription.trialEndsAt ? new Date(subscription.trialEndsAt) : null;
+    const daysRemaining = trialEndsAt ? Math.max(0, Math.ceil((trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : 0;
+    const isExpired = trialEndsAt ? now > trialEndsAt : false;
+
+    return {
+      isTrial: subscription.isTrial,
+      trialEndsAt: subscription.trialEndsAt,
+      trialLicensesCount: subscription.trialLicensesCount,
+      daysRemaining,
+      isExpired,
+    };
+  }),
+
   getSubscription: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user?.tenantId) {
       throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
@@ -111,12 +175,21 @@ export const subscriptionRouter = router({
       if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
 
       const customerId = await getOrCreateStripeCustomer(ctx.user.tenantId, ctx.user.email, ctx.user.name || "Care Compliance Customer");
-      const pricePerLicense = calculatePricePerLicense(input.quantity, input.billingInterval);
+      
+      // Calculate the correct unit amount for Stripe
+      // For monthly: price per license per month
+      // For annual: price per license per month × 12 (annual total)
+      const monthlyPricePerLicense = calculatePricePerLicense(input.quantity, input.billingInterval);
       const interval = input.billingInterval === "annual" ? "year" : "month";
+      
+      // For annual billing, multiply by 12 to get the yearly amount per license
+      const unitAmount = input.billingInterval === "annual" 
+        ? monthlyPricePerLicense * 12 
+        : monthlyPricePerLicense;
 
       const price = await stripe.prices.create({
         currency: PRICING_CONFIG.currency,
-        unit_amount: pricePerLicense,
+        unit_amount: unitAmount,
         recurring: { interval },
         product_data: {
           name: `Care Compliance License (${input.quantity} ${input.quantity === 1 ? 'license' : 'licenses'})`,

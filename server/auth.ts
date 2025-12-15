@@ -3,6 +3,7 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import jwt from "jsonwebtoken";
+import { startFreeTrial } from "./subscription";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
@@ -56,6 +57,9 @@ export const authRouter = router({
         role: "admin",
         superAdmin: true, // First user is super admin
       });
+
+      // Start free trial for the new company
+      await startFreeTrial(tenant.id);
 
       return {
         success: true,

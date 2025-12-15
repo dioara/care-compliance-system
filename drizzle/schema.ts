@@ -874,7 +874,9 @@ export const tenantSubscriptions = mysqlTable("tenantSubscriptions", {
   currentPeriodStart: timestamp("currentPeriodStart"),
   currentPeriodEnd: timestamp("currentPeriodEnd"),
   // Trial period
+  isTrial: boolean("isTrial").default(false).notNull(),
   trialEndsAt: timestamp("trialEndsAt"),
+  trialLicensesCount: int("trialLicensesCount").default(0).notNull(),
   // Cancellation
   cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false).notNull(),
   canceledAt: timestamp("canceledAt"),

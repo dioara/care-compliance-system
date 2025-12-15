@@ -31,6 +31,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { NotificationCenter } from "./NotificationCenter";
 import { OnboardingTour } from "./OnboardingTour";
+import { TrialBanner } from "./TrialBanner";
 
 // Theme toggle component for dropdown menu
 function ThemeToggleItem() {
@@ -342,6 +343,7 @@ function DashboardLayoutContent({
       </div>
 
       <SidebarInset>
+        <TrialBanner />
         {isMobile && (
           <div className="flex border-b h-14 items-center justify-between bg-background/95 px-2 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
             <div className="flex items-center gap-2">
