@@ -34,6 +34,8 @@ import DataPrivacy from "./pages/DataPrivacy";
 import RoleManagement from "./pages/RoleManagement";
 import UserManagement from "./pages/UserManagement";
 import TermsOfService from "./pages/TermsOfService";
+import Settings from "./pages/Settings";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function Router() {
   return (
@@ -59,12 +61,23 @@ function Router() {
         </DashboardLayout>
       </Route>
       
-      <Route path="/service-users">
+      <Route path="/terms-of-service">
         <DashboardLayout>
-          <ServiceUsers />
+          <TermsOfService />
         </DashboardLayout>
       </Route>
       
+      <Route path="/settings">
+        <DashboardLayout>
+          <Settings />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/admin-dashboard">
+        <DashboardLayout>
+          <AdminDashboard />
+        </DashboardLayout>
+      </Route>  
       <Route path="/staff">
         <DashboardLayout>
           <Staff />

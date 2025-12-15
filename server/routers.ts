@@ -35,6 +35,16 @@ export const appRouter = router({
       }),
   }),
 
+  // Admin dashboard (super admin only)
+  admin: router({
+    getStats: superAdminProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      return db.getAdminDashboardStats(ctx.user.tenantId);
+    }),
+  }),
+
   // Company management
   company: router({
     getProfile: protectedProcedure.query(async ({ ctx }) => {

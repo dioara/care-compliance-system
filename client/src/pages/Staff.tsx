@@ -5,19 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck } from "lucide-react";
+import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck, Filter, Lock } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useLocation as useRouter } from "wouter";
 
 export default function Staff() {
-  const { activeLocationId, canWrite } = useLocation();
+  const { activeLocationId, canWrite, permissions } = useLocation();
+  const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
   
-  // Fetch staff filtered by active location
+  // Use filter location if set, otherwise use active location
+  const effectiveLocationId = filterLocationId || activeLocationId;
+  
+  // Fetch staff filtered by effective location
   const { data: staff, isLoading, refetch } = trpc.staff.list.useQuery(
-    { locationId: activeLocationId || undefined },
-    { enabled: !!activeLocationId }
+    { locationId: effectiveLocationId || undefined },
+    { enabled: !!effectiveLocationId }
   );
   
   const createStaff = trpc.staff.create.useMutation();
@@ -181,6 +186,11 @@ export default function Staff() {
     );
   }
 
+  // Get accessible locations for filter dropdown
+  const accessibleLocations = locations.filter(loc =>
+    permissions.some(p => p.locationId === loc.id)
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -190,9 +200,43 @@ export default function Staff() {
             Manage staff members for the selected location. Track employment details and DBS certificates.
           </p>
         </div>
+      </div>
+      
+      {/* Location Filter */}
+      {accessibleLocations.length > 1 && (
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Filter by location:</span>
+          <Select
+            value={filterLocationId?.toString() || "all"}
+            onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="All accessible locations" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Current location</SelectItem>
+              {accessibleLocations.map((location) => (
+                <SelectItem key={location.id} value={location.id.toString()}>
+                  {location.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        {!canWrite && (
+          <Badge variant="secondary" className="text-amber-600 bg-amber-50 border-amber-200">
+            <Lock className="h-3 w-3 mr-1" />
+            Read Only Access
+          </Badge>
+        )}
+        <div className="flex-1" />
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button disabled={!canWrite}>
+            <Button disabled={!canWrite} title={!canWrite ? "You have read-only access to this location" : undefined}>
               <Plus className="mr-2 h-4 w-4" />
               Add Staff Member
             </Button>

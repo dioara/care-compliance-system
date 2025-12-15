@@ -1833,6 +1833,35 @@ export async function updateUser(userId: number, data: Partial<{
   return await db.update(users).set(data).where(eq(users.id, userId));
 }
 
+// Update user profile (name only)
+export async function updateUserProfile(userId: number, data: { name: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(users).set({ name: data.name }).where(eq(users.id, userId));
+  return { success: true };
+}
+
+// Update user password
+export async function updateUserPassword(userId: number, currentPassword: string, newPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get user to verify current password
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  if (!user.length) throw new Error("User not found");
+  
+  // Verify current password
+  const isValid = await bcrypt.compare(currentPassword, user[0].password);
+  if (!isValid) throw new Error("Current password is incorrect");
+  
+  // Hash new password and update
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await db.update(users).set({ password: hashedPassword }).where(eq(users.id, userId));
+  
+  return { success: true };
+}
+
 // Delete user
 export async function deleteUser(userId: number) {
   const db = await getDb();
@@ -1842,4 +1871,106 @@ export async function deleteUser(userId: number) {
   await db.delete(userRoles).where(eq(userRoles.userId, userId));
   // Delete the user
   return await db.delete(users).where(eq(users.id, userId));
+}
+
+
+// ============================================
+// Admin Dashboard Statistics
+// ============================================
+
+export async function getAdminDashboardStats(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get total users count
+  const usersResult = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(users)
+    .where(eq(users.tenantId, tenantId));
+  const totalUsers = usersResult[0]?.count || 0;
+  
+  // Get users by role
+  const usersByRole = await db.select({
+    role: users.role,
+    count: sql<number>`COUNT(*)`
+  })
+    .from(users)
+    .where(eq(users.tenantId, tenantId))
+    .groupBy(users.role);
+  
+  // Get super admin count
+  const superAdminResult = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(users)
+    .where(and(eq(users.tenantId, tenantId), eq(users.superAdmin, true)));
+  const superAdminCount = superAdminResult[0]?.count || 0;
+  
+  // Get recent signups (last 7 days)
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const recentSignupsResult = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(users)
+    .where(and(
+      eq(users.tenantId, tenantId),
+      sql`${users.createdAt} >= ${sevenDaysAgo}`
+    ));
+  const recentSignups = recentSignupsResult[0]?.count || 0;
+  
+  // Get roles count
+  const rolesResult = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(roles)
+    .where(eq(roles.tenantId, tenantId));
+  const totalRoles = rolesResult[0]?.count || 0;
+  
+  // Get locations count
+  const locationsResult = await db.select({ count: sql<number>`COUNT(*)` })
+    .from(locations)
+    .where(eq(locations.tenantId, tenantId));
+  const totalLocations = locationsResult[0]?.count || 0;
+  
+  // Get recent user activity (last 10 logins)
+  const recentActivity = await db.select({
+    id: users.id,
+    name: users.name,
+    email: users.email,
+    lastSignedIn: users.lastSignedIn,
+  })
+    .from(users)
+    .where(and(
+      eq(users.tenantId, tenantId),
+      sql`${users.lastSignedIn} IS NOT NULL`
+    ))
+    .orderBy(desc(users.lastSignedIn))
+    .limit(10);
+  
+  // Get all roles with user counts
+  const rolesWithUserCounts = await db.select({
+    id: roles.id,
+    name: roles.name,
+    description: roles.description,
+  })
+    .from(roles)
+    .where(eq(roles.tenantId, tenantId));
+  
+  // For each role, count users
+  const rolesWithCounts = await Promise.all(
+    rolesWithUserCounts.map(async (role) => {
+      const countResult = await db.select({ count: sql<number>`COUNT(*)` })
+        .from(userRoles)
+        .where(eq(userRoles.roleId, role.id));
+      return {
+        ...role,
+        userCount: countResult[0]?.count || 0,
+      };
+    })
+  );
+  
+  return {
+    totalUsers,
+    usersByRole,
+    superAdminCount,
+    recentSignups,
+    totalRoles,
+    totalLocations,
+    recentActivity,
+    rolesWithCounts,
+  };
 }

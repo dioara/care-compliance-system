@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import jwt from "jsonwebtoken";
 
@@ -138,4 +138,52 @@ export const authRouter = router({
     });
     return { success: true };
   }),
+
+  // Update profile (name)
+  updateProfile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().min(1, "Name is required"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+      await db.updateUserProfile(ctx.user.id, { name: input.name });
+      return { success: true };
+    }),
+
+  // Update password
+  updatePassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: z.string().min(8, "New password must be at least 8 characters"),
+        confirmPassword: z.string(),
+      }).refine((data) => data.newPassword === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Not authenticated",
+        });
+      }
+      try {
+        await db.updateUserPassword(ctx.user.id, input.currentPassword, input.newPassword);
+        return { success: true };
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: error.message || "Failed to update password",
+        });
+      }
+    }),
 });

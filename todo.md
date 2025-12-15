@@ -990,3 +990,32 @@
 - [x] Move Locations navigation item under Administration section
 - [x] Make both items only visible to super admins
 - [x] Test navigation changes
+
+
+## New Features Request (December 15, 2025)
+
+### Location Filter on Lists
+- [x] Add location filter dropdown to Staff list page
+- [x] Add location filter dropdown to Service Users list page
+- [x] Filter should show all accessible locations for the user
+- [ ] Remember selected filter in session/localStorage
+
+### User Settings Page
+- [x] Create /settings route for regular users
+- [x] Add profile update form (name)
+- [x] Add password change form (current password, new password, confirm)
+- [x] Add settings link to user dropdown menu
+- [x] Create tRPC endpoints for profile and password updates
+
+### Read-Only Indicators
+- [x] Show "Read Only" badge on LocationSwitcher for read-only locations
+- [x] Disable edit/delete buttons when user has read-only access
+- [x] Show visual indicator on cards/lists for read-only locations
+
+### Admin Dashboard
+- [x] Create /admin-dashboard route (super admin only)
+- [x] Show total users count and recent signups
+- [x] Show roles overview with user counts per role
+- [x] Show location access summary
+- [x] Show recent user activity (logins, actions)
+- [x] Add system health indicators
