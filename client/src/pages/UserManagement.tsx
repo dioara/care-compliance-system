@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, Users, Loader2, Mail, User, Key, ShieldCheck, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Shield, Users, Loader2, Mail, User, Key, ShieldCheck, ShieldAlert, CheckCircle2, XCircle, Ticket, TicketX } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function UserManagement() {
@@ -21,6 +21,9 @@ export default function UserManagement() {
   const updateUser = trpc.users.update.useMutation();
   const deleteUser = trpc.users.delete.useMutation();
   const assignRoles = trpc.roles.assignUserRoles.useMutation();
+  const assignLicense = trpc.subscription.assignLicenseToUser.useMutation();
+  const unassignLicense = trpc.subscription.unassignLicenseFromUser.useMutation();
+  const { data: subscription } = trpc.subscription.getSubscription.useQuery();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -388,6 +391,49 @@ export default function UserManagement() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
+                          {/* License assign/unassign buttons */}
+                          {!user.superAdmin && !user.hasLicense && subscription?.licenseStats?.unassigned > 0 && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-green-600 border-green-300 hover:bg-green-50"
+                              onClick={async () => {
+                                try {
+                                  await assignLicense.mutateAsync({ userId: user.id });
+                                  toast.success("License assigned successfully");
+                                  refetchUsers();
+                                  trpcUtils.subscription.getSubscription.invalidate();
+                                } catch (error: any) {
+                                  toast.error(error.message || "Failed to assign license");
+                                }
+                              }}
+                              disabled={assignLicense.isPending}
+                            >
+                              <Ticket className="mr-1 h-3 w-3" />
+                              Assign License
+                            </Button>
+                          )}
+                          {!user.superAdmin && user.hasLicense && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                              onClick={async () => {
+                                try {
+                                  await unassignLicense.mutateAsync({ userId: user.id });
+                                  toast.success("License unassigned successfully");
+                                  refetchUsers();
+                                  trpcUtils.subscription.getSubscription.invalidate();
+                                } catch (error: any) {
+                                  toast.error(error.message || "Failed to unassign license");
+                                }
+                              }}
+                              disabled={unassignLicense.isPending}
+                            >
+                              <TicketX className="mr-1 h-3 w-3" />
+                              Unassign
+                            </Button>
+                          )}
                           {!user.superAdmin && (
                             <Button
                               variant="outline"

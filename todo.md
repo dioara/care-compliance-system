@@ -1356,3 +1356,16 @@
 - [x] Create LicenseGate component for restricted access
 - [ ] Test Stripe integration end-to-end
 - [ ] Add license assignment/unassignment functionality
+
+
+## Feature: License Assignment & Billing Enhancements
+- [x] Add license assign button in User Management for unlicensed users
+- [x] Add license unassign button in User Management for licensed users
+- [x] Create backend endpoints for license assignment/unassignment
+- [x] Add billing history section to Subscription Management page
+- [x] Fetch and display past invoices from Stripe
+- [x] Show invoice date, amount, status, and download link
+- [x] Create license expiration notification service
+- [x] Send email notification 7 days before license expiration
+- [x] Send email notification 1 day before license expiration
+- [x] Send email notification on expiration day

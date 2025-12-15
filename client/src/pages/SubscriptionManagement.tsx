@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { 
   CreditCard, Users, Plus, Minus, AlertTriangle, CheckCircle2, 
-  Clock, XCircle, ExternalLink, RefreshCw, UserPlus, UserMinus
+  Clock, XCircle, ExternalLink, RefreshCw, UserPlus, UserMinus, Receipt, Download, FileText
 } from "lucide-react";
 
 export default function SubscriptionManagement() {
@@ -30,6 +30,7 @@ export default function SubscriptionManagement() {
   const { data: pricing } = trpc.subscription.getPricing.useQuery({ quantity, billingInterval });
   const { data: licenses, refetch: refetchLicenses } = trpc.subscription.getLicenses.useQuery();
   const { data: usersWithoutLicenses } = trpc.subscription.getUsersWithoutLicenses.useQuery();
+  const { data: billingHistory = [] } = trpc.subscription.getBillingHistory.useQuery();
 
   const createCheckout = trpc.subscription.createCheckoutSession.useMutation({
     onSuccess: (data) => {
@@ -427,6 +428,102 @@ export default function SubscriptionManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Billing History Card */}
+      {subscription?.stripeCustomerId && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5" />
+              Billing History
+            </CardTitle>
+            <CardDescription>View your past invoices and payment history</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Invoice</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {billingHistory.map((invoice: any) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        {invoice.number || invoice.id.slice(-8)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(invoice.date).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      £{(invoice.amount / 100).toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      {invoice.status === 'paid' && (
+                        <Badge className="bg-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Paid</Badge>
+                      )}
+                      {invoice.status === 'open' && (
+                        <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" />Open</Badge>
+                      )}
+                      {invoice.status === 'draft' && (
+                        <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Draft</Badge>
+                      )}
+                      {invoice.status === 'uncollectible' && (
+                        <Badge className="bg-red-500"><XCircle className="h-3 w-3 mr-1" />Uncollectible</Badge>
+                      )}
+                      {invoice.status === 'void' && (
+                        <Badge variant="outline"><XCircle className="h-3 w-3 mr-1" />Void</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        {invoice.pdfUrl && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(invoice.pdfUrl, '_blank')}
+                          >
+                            <Download className="h-4 w-4 mr-1" />
+                            PDF
+                          </Button>
+                        )}
+                        {invoice.hostedUrl && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(invoice.hostedUrl, '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {billingHistory.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                      No invoices found
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Assign License Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>

@@ -8,6 +8,7 @@ import { getDb } from "./db";
 import { tenantSubscriptions, userLicenses, users } from "../drizzle/schema";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import { calculateTotalPrice, calculatePricePerLicense, formatPrice, PRICING_CONFIG } from "./stripe/products";
+import { checkExpiringSubscriptions } from "./services/licenseExpirationService";
 
 const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
   apiVersion: "2025-01-27.acacia",
@@ -291,5 +292,101 @@ export const subscriptionRouter = router({
     const origin = ctx.req.headers.origin || "https://care-compliance.manus.space";
     const session = await stripe.billingPortal.sessions.create({ customer: subscription.stripeCustomerId, return_url: `${origin}/admin/subscription` });
     return { url: session.url };
+  }),
+
+  // Get billing history (invoices)
+  getBillingHistory: adminProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    const db = await requireDb();
+
+    const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+    if (!subscription?.stripeCustomerId) return [];
+
+    try {
+      const invoices = await stripe.invoices.list({
+        customer: subscription.stripeCustomerId,
+        limit: 24,
+      });
+
+      return invoices.data.map((invoice: any) => ({
+        id: invoice.id,
+        number: invoice.number,
+        date: invoice.created * 1000,
+        dueDate: invoice.due_date ? invoice.due_date * 1000 : null,
+        amount: invoice.amount_due,
+        amountPaid: invoice.amount_paid,
+        currency: invoice.currency,
+        status: invoice.status,
+        pdfUrl: invoice.invoice_pdf,
+        hostedUrl: invoice.hosted_invoice_url,
+        description: invoice.description || `Invoice ${invoice.number}`,
+      }));
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      return [];
+    }
+  }),
+
+  // Assign license to user by user ID (finds available license automatically)
+  assignLicenseToUser: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      // Check if user already has a license
+      const [existingLicense] = await db.select().from(userLicenses)
+        .where(and(
+          eq(userLicenses.tenantId, ctx.user.tenantId),
+          eq(userLicenses.userId, input.userId),
+          eq(userLicenses.isActive, true)
+        ));
+      if (existingLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "User already has a license assigned" });
+
+      // Find an available unassigned license
+      const [availableLicense] = await db.select().from(userLicenses)
+        .where(and(
+          eq(userLicenses.tenantId, ctx.user.tenantId),
+          isNull(userLicenses.userId),
+          eq(userLicenses.isActive, true)
+        ));
+      if (!availableLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "No available licenses. Please purchase more licenses." });
+
+      // Assign the license
+      await db.update(userLicenses)
+        .set({ userId: input.userId, assignedAt: new Date(), assignedById: ctx.user.id })
+        .where(eq(userLicenses.id, availableLicense.id));
+
+      return { success: true, licenseId: availableLicense.id };
+    }),
+
+  // Unassign license from user by user ID
+  unassignLicenseFromUser: adminProcedure
+    .input(z.object({ userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      // Find the user's license
+      const [license] = await db.select().from(userLicenses)
+        .where(and(
+          eq(userLicenses.tenantId, ctx.user.tenantId),
+          eq(userLicenses.userId, input.userId),
+          eq(userLicenses.isActive, true)
+        ));
+      if (!license) throw new TRPCError({ code: "BAD_REQUEST", message: "User does not have a license assigned" });
+
+      // Unassign the license
+      await db.update(userLicenses)
+        .set({ userId: null, assignedAt: null, assignedById: null })
+        .where(eq(userLicenses.id, license.id));
+
+      return { success: true };
+    }),
+
+  // Trigger license expiration check (for admin/system use)
+  triggerExpirationCheck: adminProcedure.mutation(async () => {
+    await checkExpiringSubscriptions();
+    return { success: true, message: "Expiration check completed" };
   }),
 });
