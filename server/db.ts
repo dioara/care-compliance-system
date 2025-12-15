@@ -1285,6 +1285,38 @@ export async function getAuditResponses(auditInstanceId: number) {
     .where(eq(auditResponses.auditInstanceId, auditInstanceId));
 }
 
+// Create action plan from incident follow-up
+export async function createActionPlanFromIncident(data: {
+  tenantId: number;
+  locationId: number;
+  incidentId: number;
+  incidentNumber: string;
+  issueDescription: string;
+  responsiblePersonId?: number;
+  responsiblePersonName?: string;
+  targetCompletionDate: Date;
+  ragStatus?: 'red' | 'amber' | 'green';
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Use auditInstanceId = 0 to indicate this is from an incident, not an audit
+  const [result] = await db.insert(auditActionPlans).values({
+    tenantId: data.tenantId,
+    locationId: data.locationId,
+    auditInstanceId: 0, // 0 indicates incident-sourced action
+    issueDescription: data.issueDescription,
+    auditOrigin: `Incident: ${data.incidentNumber}`,
+    ragStatus: data.ragStatus || 'amber',
+    responsiblePersonId: data.responsiblePersonId || 0,
+    responsiblePersonName: data.responsiblePersonName || 'Unassigned',
+    targetCompletionDate: data.targetCompletionDate,
+    status: 'not_started',
+    notes: `Auto-generated from incident ${data.incidentNumber}`,
+  });
+  return result.insertId;
+}
+
 export async function createAuditActionPlan(data: {
   tenantId: number;
   locationId: number;

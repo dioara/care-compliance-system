@@ -1217,6 +1217,46 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    // Add follow-up action to master action log
+    addFollowUpAction: protectedProcedure
+      .input(z.object({
+        incidentId: z.number(),
+        incidentNumber: z.string(),
+        locationId: z.number(),
+        actionDescription: z.string(),
+        assignedToId: z.number().optional(),
+        targetDate: z.string(),
+        severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Get staff name if assigned
+        let responsiblePersonName = 'Unassigned';
+        if (input.assignedToId) {
+          const staff = await db.getStaffMemberById(input.assignedToId);
+          if (staff) responsiblePersonName = staff.name;
+        }
+        
+        // Map severity to RAG status
+        const ragStatus = input.severity === 'critical' || input.severity === 'high' ? 'red' 
+          : input.severity === 'medium' ? 'amber' : 'green';
+        
+        const actionId = await db.createActionPlanFromIncident({
+          tenantId: ctx.user.tenantId,
+          locationId: input.locationId,
+          incidentId: input.incidentId,
+          incidentNumber: input.incidentNumber,
+          issueDescription: input.actionDescription,
+          responsiblePersonId: input.assignedToId,
+          responsiblePersonName,
+          targetCompletionDate: new Date(input.targetDate),
+          ragStatus,
+        });
+        
+        return { success: true, actionId };
+      }),
+
     // Close incident
     close: protectedProcedure
       .input(z.object({ id: z.number() }))

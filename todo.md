@@ -1276,3 +1276,7 @@
 
 ## Bug Fixes
 - [x] Fix audit service type filtering not working
+
+## Incident Action Log Sync
+- [x] Auto-add incident follow-up actions to master action log
+- [x] Link action log items back to source incident

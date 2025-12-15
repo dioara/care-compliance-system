@@ -48,6 +48,12 @@ export default function Incidents() {
   const [activeTab, setActiveTab] = useState("all");
   const [formStep, setFormStep] = useState(1);
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
+  const [showFollowUpDialog, setShowFollowUpDialog] = useState(false);
+  const [followUpData, setFollowUpData] = useState({
+    actionDescription: "",
+    assignedToId: "",
+    targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Default 7 days
+  });
 
   // Fetch data
   const { data: incidents = [], refetch } = trpc.incidents.getByTenant.useQuery({ limit: 100 });
@@ -100,6 +106,21 @@ export default function Incidents() {
     },
     onError: (error) => {
       toast.error(`Failed to generate PDF: ${error.message}`);
+    },
+  });
+
+  const addFollowUpMutation = trpc.incidents.addFollowUpAction.useMutation({
+    onSuccess: () => {
+      toast.success("Follow-up action added to Master Action Log");
+      setShowFollowUpDialog(false);
+      setFollowUpData({
+        actionDescription: "",
+        assignedToId: "",
+        targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      });
+    },
+    onError: (error) => {
+      toast.error(`Failed to add follow-up action: ${error.message}`);
     },
   });
 
@@ -1351,6 +1372,32 @@ export default function Incidents() {
                     </CardContent>
                   </Card>
 
+                  {/* Follow-up Actions to Action Log */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4" />
+                        Follow-up Actions
+                      </CardTitle>
+                      <CardDescription className="text-xs">Add actions to the Master Action Log</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {selectedIncident.status !== 'closed' && (
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          onClick={() => setShowFollowUpDialog(true)}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Follow-up Action
+                        </Button>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Follow-up actions will appear in the Master Action Log for tracking and completion.
+                      </p>
+                    </CardContent>
+                  </Card>
+
                   {/* Quick Actions */}
                   <Card>
                     <CardHeader className="pb-3">
@@ -1435,6 +1482,86 @@ export default function Incidents() {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Follow-up Action Dialog */}
+      <Dialog open={showFollowUpDialog} onOpenChange={setShowFollowUpDialog}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardList className="h-5 w-5" />
+              Add Follow-up Action
+            </DialogTitle>
+            <DialogDescription>
+              This action will be added to the Master Action Log for tracking and completion.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Action Description *</Label>
+              <Textarea
+                placeholder="Describe the follow-up action required..."
+                value={followUpData.actionDescription}
+                onChange={(e) => setFollowUpData({ ...followUpData, actionDescription: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Assign To</Label>
+              <Select
+                value={followUpData.assignedToId}
+                onValueChange={(value) => setFollowUpData({ ...followUpData, assignedToId: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select staff member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {staff.map((s: any) => (
+                    <SelectItem key={s.id} value={String(s.id)}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Target Completion Date *</Label>
+              <Input
+                type="date"
+                value={followUpData.targetDate}
+                onChange={(e) => setFollowUpData({ ...followUpData, targetDate: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowFollowUpDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (!followUpData.actionDescription || !followUpData.targetDate) {
+                  toast.error("Please fill in required fields");
+                  return;
+                }
+                addFollowUpMutation.mutate({
+                  incidentId: selectedIncident.id,
+                  incidentNumber: selectedIncident.incidentNumber,
+                  locationId: selectedIncident.locationId,
+                  actionDescription: followUpData.actionDescription,
+                  assignedToId: followUpData.assignedToId ? parseInt(followUpData.assignedToId) : undefined,
+                  targetDate: followUpData.targetDate,
+                  severity: selectedIncident.severity,
+                });
+              }}
+              disabled={addFollowUpMutation.isPending}
+            >
+              {addFollowUpMutation.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="mr-2 h-4 w-4" />
+              )}
+              Add to Action Log
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
