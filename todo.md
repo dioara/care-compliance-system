@@ -1268,3 +1268,8 @@
 
 ## Audit Service Type Filter
 - [x] Add care service type filter (Domiciliary Care, Supported Living, Residential, All)
+
+## Audit Multiple Service Types
+- [x] Change serviceType from enum to JSON array for multiple types
+- [x] Update filter logic to handle multiple service types
+- [x] Assign appropriate service types to existing audits

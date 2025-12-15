@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE auditTypes SET serviceTypes = '[\"residential\", \"nursing\"]' WHERE auditName IN (\n  'Falls Prevention Audit',\n  'Tissue Viability (Pressure Ulcer Prevention) Audit',\n  'Dependency Tool/Staffing Levels Audit',\n  'Water Safety (Legionella) Audit',\n  'Nutrition and Hydration Audit',\n  'End of Life Care Audit',\n  'Dementia Care Audit',\n  'Continence Care Audit',\n  'Night Audit',\n  'Dining Experience Audit',\n  'Resident Engagement Audit',\n  'Activities and Wellbeing Audit',\n  'Bedroom and Environment Audit'\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE auditTypes SET serviceTypes = '[\"residential\", \"nursing\"]' WHERE auditName IN (\n  'Falls Prevention Audit',\n  'Tissue Viability (Pressure Ulcer Prevention) Audit',\n  'Dependency Tool/Staffing Levels Audit',\n  'Water Safety (Legionella) Audit',\n  'Nutrition and Hydration Audit',\n  'End of Life Care Audit',\n  'Dementia Care Audit',\n  'Continence Care Audit',\n  'Night Audit',\n  'Dining Experience Audit',\n  'Resident Engagement Audit',\n  'Activities and Wellbeing Audit',\n  'Bedroom and Environment Audit'\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 58
+}

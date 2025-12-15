@@ -1,0 +1,278 @@
+{
+  "query": "SELECT id, auditName FROM auditTypes;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, auditName FROM auditTypes;",
+  "rows": [
+    {
+      "id": "1",
+      "auditName": "Care Plan Audit"
+    },
+    {
+      "id": "2",
+      "auditName": "Medication Audit"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit"
+    },
+    {
+      "id": "4",
+      "auditName": "Staff File Audit"
+    },
+    {
+      "id": "5",
+      "auditName": "Infection Control Audit"
+    },
+    {
+      "id": "6",
+      "auditName": "Health & Safety Audit"
+    },
+    {
+      "id": "7",
+      "auditName": "Safeguarding Audit"
+    },
+    {
+      "id": "8",
+      "auditName": "Dignity Audit"
+    },
+    {
+      "id": "9",
+      "auditName": "Finance Audit"
+    },
+    {
+      "id": "10",
+      "auditName": "Complaints Audit"
+    },
+    {
+      "id": "11",
+      "auditName": "Missed and Late Calls"
+    },
+    {
+      "id": "12",
+      "auditName": "Weight Analysis"
+    },
+    {
+      "id": "13",
+      "auditName": "Skin Integrity"
+    },
+    {
+      "id": "14",
+      "auditName": "Kitchen/Catering"
+    },
+    {
+      "id": "15",
+      "auditName": "Dining Experience"
+    },
+    {
+      "id": "16",
+      "auditName": "Manager Walkabout"
+    },
+    {
+      "id": "17",
+      "auditName": "Night Visits"
+    },
+    {
+      "id": "18",
+      "auditName": "Call Bell Analysis"
+    },
+    {
+      "id": "19",
+      "auditName": "Senior Manager QA"
+    },
+    {
+      "id": "20",
+      "auditName": "NMC Checks"
+    },
+    {
+      "id": "21",
+      "auditName": "Driving License & Insurance Checks"
+    },
+    {
+      "id": "22",
+      "auditName": "Safe Contents"
+    },
+    {
+      "id": "23",
+      "auditName": "First Aid Box"
+    },
+    {
+      "id": "24",
+      "auditName": "Body Fluid Spillage Kits"
+    },
+    {
+      "id": "25",
+      "auditName": "Burns Kit"
+    },
+    {
+      "id": "30001",
+      "auditName": "Infection Prevention and Control (IPC) Audit"
+    },
+    {
+      "id": "30002",
+      "auditName": "Medication Management Audit"
+    },
+    {
+      "id": "30003",
+      "auditName": "Fire Safety Audit"
+    },
+    {
+      "id": "30004",
+      "auditName": "Accidents and Incidents Audit"
+    },
+    {
+      "id": "30005",
+      "auditName": "Falls Prevention Audit"
+    },
+    {
+      "id": "30006",
+      "auditName": "First Aid Equipment Audit"
+    },
+    {
+      "id": "30007",
+      "auditName": "Water Safety (Legionella) Audit"
+    },
+    {
+      "id": "30008",
+      "auditName": "Care Plan Audit"
+    },
+    {
+      "id": "30009",
+      "auditName": "Care Records Audit"
+    },
+    {
+      "id": "30010",
+      "auditName": "Tissue Viability (Pressure Ulcer Prevention) Audit"
+    },
+    {
+      "id": "30011",
+      "auditName": "Dependency Tool/Staffing Levels Audit"
+    },
+    {
+      "id": "30012",
+      "auditName": "Maintenance Audit"
+    },
+    {
+      "id": "30013",
+      "auditName": "Wound Care Audit"
+    },
+    {
+      "id": "30014",
+      "auditName": "Restraint and Restrictive Practice Audit"
+    },
+    {
+      "id": "30015",
+      "auditName": "Resident Finances Audit"
+    },
+    {
+      "id": "30016",
+      "auditName": "Kitchen Hygiene Audit"
+    },
+    {
+      "id": "30017",
+      "auditName": "Cleanliness and Housekeeping Audit"
+    },
+    {
+      "id": "30018",
+      "auditName": "Health and Safety Audit"
+    },
+    {
+      "id": "30019",
+      "auditName": "Bed Rails Safety Audit"
+    },
+    {
+      "id": "30020",
+      "auditName": "Moving and Handling Audit"
+    },
+    {
+      "id": "30021",
+      "auditName": "Specialist Equipment Maintenance Audit"
+    },
+    {
+      "id": "30022",
+      "auditName": "Dignity and Respect Audit"
+    },
+    {
+      "id": "30023",
+      "auditName": "Activities and Social Engagement Audit"
+    },
+    {
+      "id": "30024",
+      "auditName": "End-of-Life Care Audit"
+    },
+    {
+      "id": "30025",
+      "auditName": "Continence Management Audit"
+    },
+    {
+      "id": "30026",
+      "auditName": "Staff File Audit"
+    },
+    {
+      "id": "30027",
+      "auditName": "Training and Competency Audit"
+    },
+    {
+      "id": "30028",
+      "auditName": "Safeguarding Audit"
+    },
+    {
+      "id": "30029",
+      "auditName": "Staff Supervision and Appraisal Audit"
+    },
+    {
+      "id": "30030",
+      "auditName": "Recruitment and Induction Audit"
+    },
+    {
+      "id": "30031",
+      "auditName": "Security and Access Control Audit"
+    },
+    {
+      "id": "30032",
+      "auditName": "Environmental Risk Assessment Audit"
+    },
+    {
+      "id": "30033",
+      "auditName": "Quality Assurance/Governance Audit"
+    },
+    {
+      "id": "30034",
+      "auditName": "Compliments and Complaints Audit"
+    },
+    {
+      "id": "30035",
+      "auditName": "Mental Capacity Act (MCA) and DoLS Audit"
+    },
+    {
+      "id": "30036",
+      "auditName": "Diabetes Management Audit"
+    },
+    {
+      "id": "30037",
+      "auditName": "Dementia Care Audit"
+    },
+    {
+      "id": "30038",
+      "auditName": "Communication and Language Support Audit"
+    },
+    {
+      "id": "30039",
+      "auditName": "Nutrition and Mealtimes Audit"
+    },
+    {
+      "id": "30040",
+      "auditName": "LOLER Equipment Testing Audit"
+    },
+    {
+      "id": "30041",
+      "auditName": "Contingency Planning Audit"
+    },
+    {
+      "id": "30042",
+      "auditName": "Data Protection/Confidentiality Audit"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\n1\tCare Plan Audit\n2\tMedication Audit\n3\tDaily Notes Audit\n4\tStaff File Audit\n5\tInfection Control Audit\n6\tHealth & Safety Audit\n7\tSafeguarding Audit\n8\tDignity Audit\n9\tFinance Audit\n10\tComplaints Audit\n11\tMissed and Late Calls\n12\tWeight Analysis\n13\tSkin Integrity\n14\tKitchen/Catering\n15\tDining Experience\n16\tManager Walkabout\n17\tNight Visits\n18\tCall Bell Analysis\n19\tSenior Manager QA\n20\tNMC Checks\n21\tDriving License & Insurance Checks\n22\tSafe Contents\n23\tFirst Aid Box\n24\tBody Fluid Spillage Kits\n25\tBurns Kit\n30001\tInfection Prevention and Control (IPC) Audit\n30002\tMedication Management Audit\n30003\tFire Safety Audit\n30004\tAccidents and Incidents Audit\n30005\tFalls Prevention Audit\n30006\tFirst Aid Equipment Audit\n30007\tWater Safety (Legionella) Audit\n30008\tCare Plan Audit\n30009\tCare Records Audit\n30010\tTissue Viability (Pressure Ulcer Prevention) Audit\n30011\tDependency Tool/Staffing Levels Audit\n30012\tMaintenance Audit\n30013\tWound Care Audit\n30014\tRestraint and Restrictive Practice Audit\n30015\tResident Finances Audit\n30016\tKitchen Hygiene Audit\n30017\tCleanliness and Housekeeping Audit\n30018\tHealth and Safety Audit\n30019\tBed Rails Safety Audit\n30020\tMoving and Handling Audit\n30021\tSpecialist Equipment Maintenance Audit\n30022\tDignity and Respect Audit\n30023\tActivities and Social Engagement Audit\n30024\tEnd-of-Life Care Audit\n30025\tContinence Management Audit\n30026\tStaff File Audit\n30027\tTraining and Competency Audit\n30028\tSafeguarding Audit\n30029\tStaff Supervision and Appraisal Audit\n30030\tRecruitment and Induction Audit\n30031\tSecurity and Access Control Audit\n30032\tEnvironmental Risk Assessment Audit\n30033\tQuality Assurance/Governance Audit\n30034\tCompliments and Complaints Audit\n30035\tMental Capacity Act (MCA) and DoLS Audit\n30036\tDiabetes Management Audit\n30037\tDementia Care Audit\n30038\tCommunication and Language Support Audit\n30039\tNutrition and Mealtimes Audit\n30040\tLOLER Equipment Testing Audit\n30041\tContingency Planning Audit\n30042\tData Protection/Confidentiality Audit\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

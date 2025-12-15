@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE auditTypes SET serviceTypes = '[\"supported_living\"]' WHERE auditName IN (\n  'Independence Skills Audit',\n  'Community Access Audit',\n  'Tenancy Support Audit'\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE auditTypes SET serviceTypes = '[\"supported_living\"]' WHERE auditName IN (\n  'Independence Skills Audit',\n  'Community Access Audit',\n  'Tenancy Support Audit'\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

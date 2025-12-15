@@ -267,7 +267,7 @@ export const auditTypes = mysqlTable("auditTypes", {
   auditName: varchar("auditName", { length: 255 }).notNull(),
   auditCategory: varchar("auditCategory", { length: 100 }).notNull(), // 'mandatory_monthly', 'quarterly', 'operational'
   targetType: mysqlEnum("targetType", ["general", "staff", "serviceUser"]).default("general").notNull(), // Who the audit applies to
-  serviceType: mysqlEnum("serviceType", ["all", "domiciliary_care", "supported_living", "residential", "nursing"]).default("all").notNull(), // Which care service type this audit applies to
+  serviceTypes: text("serviceTypes"), // JSON array of service types: all, domiciliary_care, supported_living, residential, nursing
   description: text("description"),
   tooltip: text("tooltip"),
   processSteps: text("processSteps"), // JSON array stored as text

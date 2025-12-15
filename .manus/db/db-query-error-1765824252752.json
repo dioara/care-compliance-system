@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE auditTypes ADD COLUMN serviceTypes TEXT NOT NULL DEFAULT '[\"all\"]';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute ALTER TABLE auditTypes ADD COLUMN serviceTypes TEXT NOT NULL DEFAULT '[\"all\"]';",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1101 (42000) at line 1: BLOB/TEXT/JSON column 'serviceTypes' can't have a default value"
+  ]
+}

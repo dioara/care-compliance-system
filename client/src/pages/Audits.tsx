@@ -75,7 +75,11 @@ export default function Audits() {
   const filteredAuditTypes = auditTypes?.filter(
     (type) => {
       const categoryMatch = selectedCategory === "all" || type.auditCategory === selectedCategory;
-      const serviceTypeMatch = selectedServiceType === "all" || type.serviceType === selectedServiceType || type.serviceType === "all";
+      // Parse serviceTypes JSON array, default to ["all"] if not set
+      const typeServiceTypes: string[] = type.serviceTypes ? JSON.parse(type.serviceTypes) : ["all"];
+      const serviceTypeMatch = selectedServiceType === "all" || 
+        typeServiceTypes.includes("all") || 
+        typeServiceTypes.includes(selectedServiceType);
       return categoryMatch && serviceTypeMatch;
     }
   );
@@ -360,11 +364,19 @@ export default function Audits() {
                         <Badge className={getCategoryBadgeColor(auditType.auditCategory)}>
                           {auditType.recommendedFrequency || auditType.auditCategory}
                         </Badge>
-                        {auditType.serviceType && auditType.serviceType !== 'all' && (
-                          <Badge variant="outline" className="text-xs">
-                            {auditType.serviceType.replace(/_/g, ' ')}
-                          </Badge>
-                        )}
+                        {(() => {
+                          const serviceTypes: string[] = auditType.serviceTypes ? JSON.parse(auditType.serviceTypes) : ["all"];
+                          if (serviceTypes.length === 1 && serviceTypes[0] === "all") return null;
+                          return (
+                            <div className="flex flex-wrap gap-1 justify-end">
+                              {serviceTypes.map((st: string) => (
+                                <Badge key={st} variant="outline" className="text-xs">
+                                  {st.replace(/_/g, ' ')}
+                                </Badge>
+                              ))}
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                     <CardTitle className="mt-4">{auditType.auditName}</CardTitle>
