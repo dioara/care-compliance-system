@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, Users, Loader2, Mail, User, Key, ShieldCheck, ShieldAlert } from "lucide-react";
+import { Plus, Pencil, Trash2, Shield, Users, Loader2, Mail, User, Key, ShieldCheck, ShieldAlert, CheckCircle2, XCircle } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function UserManagement() {
@@ -322,6 +322,7 @@ export default function UserManagement() {
                     <TableHead>User</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Access Level</TableHead>
+                    <TableHead>License</TableHead>
                     <TableHead>Last Login</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -358,6 +359,24 @@ export default function UserManagement() {
                           <Badge variant="secondary">
                             <Shield className="h-3 w-3 mr-1" />
                             Standard User
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {user.superAdmin ? (
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Admin Access
+                          </Badge>
+                        ) : user.hasLicense ? (
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Licensed
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-orange-600 border-orange-300">
+                            <XCircle className="h-3 w-3 mr-1" />
+                            No License
                           </Badge>
                         )}
                       </TableCell>

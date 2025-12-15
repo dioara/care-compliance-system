@@ -853,3 +853,53 @@ export type InsertEmailRecipient = typeof emailRecipients.$inferInsert;
 export type SelectEmailRecipient = typeof emailRecipients.$inferSelect;
 export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
 export type SelectEmailTemplate = typeof emailTemplates.$inferSelect;
+
+
+/**
+ * Tenant Subscriptions - tracks Stripe subscription for each tenant
+ * Follows minimal schema principle - only stores Stripe IDs, not duplicate data
+ */
+export const tenantSubscriptions = mysqlTable("tenantSubscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull().unique(),
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
+  // Cache subscription status for performance (updated via webhook)
+  status: mysqlEnum("status", ["active", "past_due", "canceled", "unpaid", "trialing", "incomplete"]).default("incomplete").notNull(),
+  // License count purchased
+  licensesCount: int("licensesCount").default(0).notNull(),
+  // Billing interval
+  billingInterval: mysqlEnum("billingInterval", ["monthly", "annual"]).default("monthly").notNull(),
+  // Current period dates (cached for display, updated via webhook)
+  currentPeriodStart: timestamp("currentPeriodStart"),
+  currentPeriodEnd: timestamp("currentPeriodEnd"),
+  // Trial period
+  trialEndsAt: timestamp("trialEndsAt"),
+  // Cancellation
+  cancelAtPeriodEnd: boolean("cancelAtPeriodEnd").default(false).notNull(),
+  canceledAt: timestamp("canceledAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * User Licenses - tracks license assignment to individual users
+ */
+export const userLicenses = mysqlTable("userLicenses", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  userId: int("userId"), // null if license is purchased but not assigned
+  assignedAt: timestamp("assignedAt"),
+  assignedById: int("assignedById"),
+  // License status
+  isActive: boolean("isActive").default(true).notNull(),
+  deactivatedAt: timestamp("deactivatedAt"),
+  deactivatedById: int("deactivatedById"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InsertTenantSubscription = typeof tenantSubscriptions.$inferInsert;
+export type SelectTenantSubscription = typeof tenantSubscriptions.$inferSelect;
+export type InsertUserLicense = typeof userLicenses.$inferInsert;
+export type SelectUserLicense = typeof userLicenses.$inferSelect;

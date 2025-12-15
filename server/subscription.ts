@@ -1,0 +1,295 @@
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { protectedProcedure, adminProcedure, router } from "./_core/trpc";
+// @ts-ignore
+import Stripe from "stripe";
+import { ENV } from "./_core/env";
+import { getDb } from "./db";
+import { tenantSubscriptions, userLicenses, users } from "../drizzle/schema";
+import { eq, and, isNull, sql } from "drizzle-orm";
+import { calculateTotalPrice, calculatePricePerLicense, formatPrice, PRICING_CONFIG } from "./stripe/products";
+
+const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-01-27.acacia",
+});
+
+// Helper to get database connection
+async function requireDb() {
+  const db = await getDb();
+  if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+  return db;
+}
+
+// Helper to get or create Stripe customer
+async function getOrCreateStripeCustomer(tenantId: number, email: string, name: string): Promise<string> {
+  const db = await requireDb();
+  
+  const [subscription] = await db
+    .select()
+    .from(tenantSubscriptions)
+    .where(eq(tenantSubscriptions.tenantId, tenantId));
+
+  if (subscription?.stripeCustomerId) {
+    return subscription.stripeCustomerId;
+  }
+
+  const customer = await stripe.customers.create({
+    email,
+    name,
+    metadata: { tenantId: tenantId.toString() },
+  });
+
+  if (subscription) {
+    await db
+      .update(tenantSubscriptions)
+      .set({ stripeCustomerId: customer.id })
+      .where(eq(tenantSubscriptions.tenantId, tenantId));
+  } else {
+    await db.insert(tenantSubscriptions).values({
+      tenantId,
+      stripeCustomerId: customer.id,
+      status: "incomplete",
+      licensesCount: 0,
+    });
+  }
+
+  return customer.id;
+}
+
+export const subscriptionRouter = router({
+  getSubscription: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    }
+    const db = await requireDb();
+
+    const [subscription] = await db
+      .select()
+      .from(tenantSubscriptions)
+      .where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+    if (!subscription) return null;
+
+    const [licenseStats] = await db
+      .select({
+        total: sql<number>`COUNT(*)`,
+        assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
+        unassigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NULL THEN 1 ELSE 0 END)`,
+      })
+      .from(userLicenses)
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+
+    return {
+      ...subscription,
+      licenseStats: {
+        total: Number(licenseStats?.total || 0),
+        assigned: Number(licenseStats?.assigned || 0),
+        unassigned: Number(licenseStats?.unassigned || 0),
+      },
+    };
+  }),
+
+  getPricing: protectedProcedure
+    .input(z.object({ quantity: z.number().min(1), billingInterval: z.enum(["monthly", "annual"]) }))
+    .query(({ input }) => {
+      const pricing = calculateTotalPrice(input.quantity, input.billingInterval);
+      return {
+        ...pricing,
+        pricePerLicenseFormatted: formatPrice(pricing.pricePerLicense),
+        totalMonthlyFormatted: formatPrice(pricing.totalMonthly),
+        totalBillingFormatted: formatPrice(pricing.totalBilling),
+        savingsFormatted: formatPrice(pricing.savings),
+        basePriceFormatted: formatPrice(PRICING_CONFIG.basePricePerLicense),
+        tiers: PRICING_CONFIG.tiers,
+      };
+    }),
+
+  createCheckoutSession: adminProcedure
+    .input(z.object({ quantity: z.number().min(1), billingInterval: z.enum(["monthly", "annual"]) }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+
+      const customerId = await getOrCreateStripeCustomer(ctx.user.tenantId, ctx.user.email, ctx.user.name || "Care Compliance Customer");
+      const pricePerLicense = calculatePricePerLicense(input.quantity, input.billingInterval);
+      const interval = input.billingInterval === "annual" ? "year" : "month";
+
+      const price = await stripe.prices.create({
+        currency: PRICING_CONFIG.currency,
+        unit_amount: pricePerLicense,
+        recurring: { interval },
+        product_data: {
+          name: `Care Compliance License (${input.quantity} ${input.quantity === 1 ? 'license' : 'licenses'})`,
+          metadata: { tenantId: ctx.user.tenantId.toString(), quantity: input.quantity.toString(), billingInterval: input.billingInterval },
+        },
+      });
+
+      const origin = ctx.req.headers.origin || "https://care-compliance.manus.space";
+
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        mode: "subscription",
+        allow_promotion_codes: true,
+        line_items: [{ price: price.id, quantity: input.quantity }],
+        success_url: `${origin}/admin/subscription?success=true`,
+        cancel_url: `${origin}/admin/subscription?canceled=true`,
+        client_reference_id: ctx.user.id.toString(),
+        metadata: {
+          user_id: ctx.user.id.toString(),
+          tenant_id: ctx.user.tenantId.toString(),
+          customer_email: ctx.user.email,
+          customer_name: ctx.user.name || "",
+          quantity: input.quantity.toString(),
+          billing_interval: input.billingInterval,
+        },
+      });
+
+      return { url: session.url };
+    }),
+
+  addLicenses: adminProcedure
+    .input(z.object({ additionalLicenses: z.number().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+      if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active subscription found" });
+
+      const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+      const currentQuantity = stripeSubscription.items.data[0]?.quantity || 0;
+      const newQuantity = currentQuantity + input.additionalLicenses;
+
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        items: [{ id: stripeSubscription.items.data[0].id, quantity: newQuantity }],
+        proration_behavior: "create_prorations",
+      });
+
+      const newLicenses = Array.from({ length: input.additionalLicenses }, () => ({ tenantId: ctx.user.tenantId!, isActive: true }));
+      await db.insert(userLicenses).values(newLicenses);
+      await db.update(tenantSubscriptions).set({ licensesCount: newQuantity }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+      return { success: true, newQuantity };
+    }),
+
+  cancelSubscription: adminProcedure
+    .input(z.object({ cancelImmediately: z.boolean().default(false) }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+      if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active subscription found" });
+
+      if (input.cancelImmediately) {
+        await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+      } else {
+        await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: true });
+      }
+
+      await db.update(tenantSubscriptions).set({
+        cancelAtPeriodEnd: !input.cancelImmediately,
+        canceledAt: input.cancelImmediately ? new Date() : null,
+        status: input.cancelImmediately ? "canceled" : subscription.status,
+      }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+      return { success: true };
+    }),
+
+  reactivateSubscription: adminProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    const db = await requireDb();
+
+    const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+    if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No subscription found" });
+
+    await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: false });
+    await db.update(tenantSubscriptions).set({ cancelAtPeriodEnd: false }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+    return { success: true };
+  }),
+
+  getLicenses: adminProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    const db = await requireDb();
+
+    return db
+      .select({
+        id: userLicenses.id,
+        userId: userLicenses.userId,
+        assignedAt: userLicenses.assignedAt,
+        isActive: userLicenses.isActive,
+        userName: users.name,
+        userEmail: users.email,
+      })
+      .from(userLicenses)
+      .leftJoin(users, eq(userLicenses.userId, users.id))
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+  }),
+
+  assignLicense: adminProcedure
+    .input(z.object({ licenseId: z.number(), userId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      const [existingLicense] = await db.select().from(userLicenses)
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, input.userId), eq(userLicenses.isActive, true)));
+      if (existingLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "User already has a license assigned" });
+
+      const [license] = await db.select().from(userLicenses)
+        .where(and(eq(userLicenses.id, input.licenseId), eq(userLicenses.tenantId, ctx.user.tenantId), isNull(userLicenses.userId), eq(userLicenses.isActive, true)));
+      if (!license) throw new TRPCError({ code: "BAD_REQUEST", message: "License not available" });
+
+      await db.update(userLicenses).set({ userId: input.userId, assignedAt: new Date(), assignedById: ctx.user.id }).where(eq(userLicenses.id, input.licenseId));
+      return { success: true };
+    }),
+
+  unassignLicense: adminProcedure
+    .input(z.object({ licenseId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      await db.update(userLicenses).set({ userId: null, assignedAt: null, assignedById: null })
+        .where(and(eq(userLicenses.id, input.licenseId), eq(userLicenses.tenantId, ctx.user.tenantId)));
+      return { success: true };
+    }),
+
+  checkUserLicense: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) return { hasLicense: false, reason: "No company associated" };
+    if (ctx.user.role === "admin" || ctx.user.superAdmin) return { hasLicense: true, reason: "Admin access" };
+    
+    const db = await requireDb();
+    const [license] = await db.select().from(userLicenses)
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, ctx.user.id), eq(userLicenses.isActive, true)));
+
+    if (license) return { hasLicense: true, reason: "License assigned" };
+    return { hasLicense: false, reason: "No license assigned. Please contact your administrator to assign a license to your account." };
+  }),
+
+  getUsersWithoutLicenses: adminProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    const db = await requireDb();
+
+    const allUsers = await db.select({ id: users.id, name: users.name, email: users.email, role: users.role })
+      .from(users).where(eq(users.tenantId, ctx.user.tenantId));
+
+    const usersWithLicenses = await db.select({ userId: userLicenses.userId }).from(userLicenses)
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true), sql`${userLicenses.userId} IS NOT NULL`));
+
+    const licensedUserIds = new Set(usersWithLicenses.map((l: { userId: number | null }) => l.userId));
+    return allUsers.filter((u: { id: number; role: string | null }) => !licensedUserIds.has(u.id) && u.role !== "admin");
+  }),
+
+  getBillingPortalUrl: adminProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+    const db = await requireDb();
+
+    const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+    if (!subscription?.stripeCustomerId) throw new TRPCError({ code: "BAD_REQUEST", message: "No customer found" });
+
+    const origin = ctx.req.headers.origin || "https://care-compliance.manus.space";
+    const session = await stripe.billingPortal.sessions.create({ customer: subscription.stripeCustomerId, return_url: `${origin}/admin/subscription` });
+    return { url: session.url };
+  }),
+});

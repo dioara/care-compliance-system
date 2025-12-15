@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { LocationSwitcher } from "./LocationSwitcher";
@@ -77,6 +77,7 @@ const adminMenuItems = [
   { icon: MapPin, label: "Locations", path: "/locations" },
   { icon: Shield, label: "Role Management", path: "/role-management" },
   { icon: UserCog, label: "User Management", path: "/user-management" },
+  { icon: CreditCard, label: "Subscription", path: "/admin/subscription" },
   { icon: Mail, label: "Email Settings", path: "/email-settings" },
 ];
 

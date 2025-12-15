@@ -7,6 +7,7 @@ import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
+import { subscriptionRouter } from "./subscription";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -23,6 +24,7 @@ export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
   roles: rolesRouter,
+  subscription: subscriptionRouter,
 
   // Dashboard statistics
   dashboard: router({
@@ -2096,6 +2098,9 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
+
+  // Subscription and license management
+  subscription: subscriptionRouter,
 });
 
 export type AppRouter = typeof appRouter;

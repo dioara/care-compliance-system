@@ -1323,3 +1323,36 @@
 - [x] Highlight key features: Dashboard, Audits, Staff, Service Users, Action Log
 - [x] Store onboarding completion status per user
 
+
+## Feature: Subscription & License Management System
+- [ ] Set up Stripe integration for payment processing
+- [ ] Create database schema for subscriptions (tenantSubscriptions table)
+- [ ] Create database schema for licenses (licenses table with assignment tracking)
+- [ ] Define tiered pricing: £70/license/month, discounts for 6-10 and 11+ users
+- [ ] Implement monthly and annual billing options with annual discount
+- [ ] Build subscription management backend APIs (create, update, cancel subscription)
+- [ ] Build license purchase and assignment APIs
+- [ ] Create Subscription Management admin page with pricing tiers display
+- [ ] Add license purchase flow with Stripe checkout
+- [ ] Update User Management page with license assignment functionality
+- [ ] Track assigned vs unassigned licenses
+- [ ] Implement license check middleware/hook for user access control
+- [ ] Restrict unlicensed users to dashboard-only view
+- [ ] Show "contact admin for license" message for unlicensed users
+- [ ] Disable all action buttons for unlicensed users except dashboard viewing
+
+
+
+## Feature: Subscription & License Management
+- [x] Set up Stripe integration for payment processing
+- [x] Create database schema for subscriptions and licenses (tenantSubscriptions, userLicenses)
+- [x] Implement tiered pricing: £70/license/month, discounts for 6-10 (10%), 11-20 (15%), 21+ (20%)
+- [x] Add annual billing option with 15% additional discount
+- [x] Build subscription management backend APIs
+- [x] Create Subscription Management admin page
+- [x] Implement license purchase flow via Stripe Checkout
+- [x] Add license column to User Management table
+- [x] Implement license check for non-admin users
+- [x] Create LicenseGate component for restricted access
+- [ ] Test Stripe integration end-to-end
+- [ ] Add license assignment/unassignment functionality

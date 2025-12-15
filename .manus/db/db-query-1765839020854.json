@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `tenantSubscriptions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL UNIQUE,\n  `stripeCustomerId` varchar(255),\n  `stripeSubscriptionId` varchar(255),\n  `status` enum('active','past_due','canceled','unpaid','trialing','incomplete') NOT NULL DEFAULT 'incomplete',\n  `licensesCount` int NOT NULL DEFAULT 0,\n  `billingInterval` enum('monthly','annual') NOT NULL DEFAULT 'monthly',\n  `currentPeriodStart` timestamp,\n  `currentPeriodEnd` timestamp,\n  `trialEndsAt` timestamp,\n  `cancelAtPeriodEnd` boolean NOT NULL DEFAULT false,\n  `canceledAt` timestamp,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `tenantSubscriptions_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `tenantSubscriptions` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL UNIQUE,\n  `stripeCustomerId` varchar(255),\n  `stripeSubscriptionId` varchar(255),\n  `status` enum('active','past_due','canceled','unpaid','trialing','incomplete') NOT NULL DEFAULT 'incomplete',\n  `licensesCount` int NOT NULL DEFAULT 0,\n  `billingInterval` enum('monthly','annual') NOT NULL DEFAULT 'monthly',\n  `currentPeriodStart` timestamp,\n  `currentPeriodEnd` timestamp,\n  `trialEndsAt` timestamp,\n  `cancelAtPeriodEnd` boolean NOT NULL DEFAULT false,\n  `canceledAt` timestamp,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `tenantSubscriptions_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 356
+}
