@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE auditTypes SET targetType = 'serviceUser' WHERE auditName IN ('Care Plan Audit', 'Daily Notes Audit', 'Medication Audit', 'Risk Assessment Audit', 'Personal Care Audit', 'Weight Analysis', 'Skin Integrity', 'Dignity Audit', 'Safeguarding Audit', 'Falls Prevention Audit', 'Pressure Care Audit', 'Oral Health Audit', 'Moving and Handling Audit', 'Activities and Social Engagement Audit', 'End-of-Life Care Audit', 'Continence Management Audit', 'Mental Capacity Act (MCA) and DoLS Audit', 'Diabetes Management Audit', 'Dementia Care Audit', 'Communication and Language Support Audit', 'Nutrition and Mealtimes Audit')",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE auditTypes SET targetType = 'serviceUser' WHERE auditName IN ('Care Plan Audit', 'Daily Notes Audit', 'Medication Audit', 'Risk Assessment Audit', 'Personal Care Audit', 'Weight Analysis', 'Skin Integrity', 'Dignity Audit', 'Safeguarding Audit', 'Falls Prevention Audit', 'Pressure Care Audit', 'Oral Health Audit', 'Moving and Handling Audit', 'Activities and Social Engagement Audit', 'End-of-Life Care Audit', 'Continence Management Audit', 'Mental Capacity Act (MCA) and DoLS Audit', 'Diabetes Management Audit', 'Dementia Care Audit', 'Communication and Language Support Audit', 'Nutrition and Mealtimes Audit')",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

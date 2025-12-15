@@ -21,15 +21,28 @@ export default function Audits() {
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedAuditType, setSelectedAuditType] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
+  const [selectedStaffMember, setSelectedStaffMember] = useState<number | null>(null);
+  const [selectedServiceUser, setSelectedServiceUser] = useState<number | null>(null);
   const [auditDate, setAuditDate] = useState<Date>(new Date());
 
   // Fetch data
   const { data: auditTypes, isLoading: loadingTypes } = trpc.audits.getAuditTypes.useQuery();
   const { data: locations, isLoading: loadingLocations } = trpc.locations.list.useQuery();
+  const { data: staffMembers } = trpc.staff.list.useQuery(
+    { locationId: selectedLocation || undefined },
+    { enabled: !!selectedLocation }
+  );
+  const { data: serviceUsers } = trpc.serviceUsers.list.useQuery(
+    { locationId: selectedLocation || undefined },
+    { enabled: !!selectedLocation }
+  );
   const { data: auditInstances, isLoading: loadingInstances } = trpc.audits.getAuditInstancesByLocation.useQuery(
     { locationId: selectedLocation || 0, limit: 50 },
     { enabled: !!selectedLocation }
   );
+
+  // Get the selected audit type details
+  const selectedAuditTypeDetails = auditTypes?.find(t => t.id === selectedAuditType);
 
   const createAuditMutation = trpc.audits.createAuditInstance.useMutation({
     onSuccess: (data) => {
@@ -52,6 +65,8 @@ export default function Audits() {
       auditTypeId: selectedAuditType,
       locationId: selectedLocation,
       auditDate: auditDate,
+      staffMemberId: selectedAuditTypeDetails?.targetType === 'staff' ? selectedStaffMember : undefined,
+      serviceUserId: selectedAuditTypeDetails?.targetType === 'serviceUser' ? selectedServiceUser : undefined,
     });
   };
 
@@ -168,6 +183,50 @@ export default function Audits() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Staff Member Selection - only show for staff-specific audits */}
+              {selectedAuditTypeDetails?.targetType === 'staff' && selectedLocation && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Staff Member</label>
+                  <Select
+                    value={selectedStaffMember?.toString()}
+                    onValueChange={(value) => setSelectedStaffMember(parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select staff member" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {staffMembers?.map((staff) => (
+                        <SelectItem key={staff.id} value={staff.id.toString()}>
+                          {staff.name} - {staff.role}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Service User Selection - only show for service user-specific audits */}
+              {selectedAuditTypeDetails?.targetType === 'serviceUser' && selectedLocation && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Service User</label>
+                  <Select
+                    value={selectedServiceUser?.toString()}
+                    onValueChange={(value) => setSelectedServiceUser(parseInt(value))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select service user" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {serviceUsers?.map((su) => (
+                        <SelectItem key={su.id} value={su.id.toString()}>
+                          {su.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Audit Date</label>

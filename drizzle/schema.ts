@@ -215,6 +215,7 @@ export const auditTypes = mysqlTable("auditTypes", {
   id: int("id").autoincrement().primaryKey(),
   auditName: varchar("auditName", { length: 255 }).notNull(),
   auditCategory: varchar("auditCategory", { length: 100 }).notNull(), // 'mandatory_monthly', 'quarterly', 'operational'
+  targetType: mysqlEnum("targetType", ["general", "staff", "serviceUser"]).default("general").notNull(), // Who the audit applies to
   description: text("description"),
   tooltip: text("tooltip"),
   processSteps: text("processSteps"), // JSON array stored as text

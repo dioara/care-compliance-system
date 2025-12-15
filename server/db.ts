@@ -1082,6 +1082,33 @@ export async function getAuditActionPlans(auditInstanceId: number) {
     .orderBy(desc(auditActionPlans.createdAt));
 }
 
+export async function getAllActionPlans(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: auditActionPlans.id,
+      issueNumber: auditActionPlans.issueNumber,
+      issueDescription: auditActionPlans.issueDescription,
+      auditOrigin: auditActionPlans.auditOrigin,
+      ragStatus: auditActionPlans.ragStatus,
+      responsiblePersonId: auditActionPlans.responsiblePersonId,
+      responsiblePersonName: auditActionPlans.responsiblePersonName,
+      targetCompletionDate: auditActionPlans.targetCompletionDate,
+      actualCompletionDate: auditActionPlans.actualCompletionDate,
+      status: auditActionPlans.status,
+      actionTaken: auditActionPlans.actionTaken,
+      notes: auditActionPlans.notes,
+      locationId: auditActionPlans.locationId,
+      locationName: locations.name,
+      createdAt: auditActionPlans.createdAt,
+    })
+    .from(auditActionPlans)
+    .leftJoin(locations, eq(auditActionPlans.locationId, locations.id))
+    .where(eq(auditActionPlans.tenantId, tenantId))
+    .orderBy(desc(auditActionPlans.createdAt));
+}
+
 export async function updateAuditActionPlanStatus(
   id: number,
   status: 'not_started' | 'in_progress' | 'partially_completed' | 'completed',

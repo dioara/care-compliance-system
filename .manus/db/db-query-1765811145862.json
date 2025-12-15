@@ -1,0 +1,412 @@
+{
+  "query": "SELECT id, auditName, auditCategory, description FROM auditTypes ORDER BY auditCategory, auditName",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, auditName, auditCategory, description FROM auditTypes ORDER BY auditCategory, auditName",
+  "rows": [
+    {
+      "id": "30041",
+      "auditName": "Contingency Planning Audit",
+      "auditCategory": "annual",
+      "description": "Annual review of emergency plans, business continuity, disaster recovery, and communication protocols"
+    },
+    {
+      "id": "30042",
+      "auditName": "Data Protection/Confidentiality Audit",
+      "auditCategory": "annual",
+      "description": "Annual GDPR compliance audit including record storage, access controls, data breach procedures, and staff training"
+    },
+    {
+      "id": "30040",
+      "auditName": "LOLER Equipment Testing Audit",
+      "auditCategory": "annual",
+      "description": "Annual Lifting Operations and Lifting Equipment Regulations testing and certification"
+    },
+    {
+      "id": "30004",
+      "auditName": "Accidents and Incidents Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Review of incident logging, investigation, action plans, trend analysis, and safeguarding referrals"
+    },
+    {
+      "id": "30008",
+      "auditName": "Care Plan Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Review of person-centred care plans, regular updates, consent documentation, and risk assessments"
+    },
+    {
+      "id": "1",
+      "auditName": "Care Plan Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "AI-powered quality audit of care plans to assess person-centredness, comprehensiveness, and CQC compliance"
+    },
+    {
+      "id": "30009",
+      "auditName": "Care Records Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Audit of daily notes quality, timeliness, secure storage, confidentiality, and record accuracy"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "AI-powered quality audit of staff daily notes to assess detail, person-centredness, and professionalism"
+    },
+    {
+      "id": "30011",
+      "auditName": "Dependency Tool/Staffing Levels Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly review of resident acuity assessments, staffing ratios, rota planning, and skill mix"
+    },
+    {
+      "id": "30005",
+      "auditName": "Falls Prevention Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Audit of fall risk assessments, sensor use, post-fall reviews, environmental hazards, and mobility aids"
+    },
+    {
+      "id": "30003",
+      "auditName": "Fire Safety Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly fire safety checks including drills, equipment servicing, evacuation plans, and staff training"
+    },
+    {
+      "id": "30006",
+      "auditName": "First Aid Equipment Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly check of first aid box contents, expiry dates, accessibility, and staff awareness"
+    },
+    {
+      "id": "5",
+      "auditName": "Infection Control Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Audit of infection prevention and control practices"
+    },
+    {
+      "id": "30001",
+      "auditName": "Infection Prevention and Control (IPC) Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Comprehensive audit of infection control practices including hand hygiene, PPE use, cleaning protocols, and waste disposal"
+    },
+    {
+      "id": "30012",
+      "auditName": "Maintenance Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly review of maintenance logs, contractor records, response times, and outstanding repairs"
+    },
+    {
+      "id": "2",
+      "auditName": "Medication Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Comprehensive audit of medication administration records, storage, and procedures"
+    },
+    {
+      "id": "30002",
+      "auditName": "Medication Management Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Audit of medication administration records, storage, controlled drugs, PRN protocols, and staff competency"
+    },
+    {
+      "id": "30015",
+      "auditName": "Resident Finances Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly audit of resident finance management, contracts, receipts, and reconciliation (if applicable)"
+    },
+    {
+      "id": "30014",
+      "auditName": "Restraint and Restrictive Practice Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly review of restraint documentation, least restrictive options, and staff training"
+    },
+    {
+      "id": "4",
+      "auditName": "Staff File Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Audit of staff personnel files for compliance with recruitment and training requirements"
+    },
+    {
+      "id": "30010",
+      "auditName": "Tissue Viability (Pressure Ulcer Prevention) Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly audit of skin assessments, pressure-relieving equipment, repositioning, and wound care"
+    },
+    {
+      "id": "30007",
+      "auditName": "Water Safety (Legionella) Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly water temperature checks, flushing regimes, risk assessments, and maintenance records"
+    },
+    {
+      "id": "30013",
+      "auditName": "Wound Care Audit",
+      "auditCategory": "mandatory_monthly",
+      "description": "Monthly audit of wound assessment, treatment plans, dressing stock, and healing progress"
+    },
+    {
+      "id": "24",
+      "auditName": "Body Fluid Spillage Kits",
+      "auditCategory": "operational",
+      "description": "Audit of body fluid spillage kit availability and contents"
+    },
+    {
+      "id": "25",
+      "auditName": "Burns Kit",
+      "auditCategory": "operational",
+      "description": "Audit of burns kit availability and contents"
+    },
+    {
+      "id": "18",
+      "auditName": "Call Bell Analysis",
+      "auditCategory": "operational",
+      "description": "Analysis of call bell response times and patterns"
+    },
+    {
+      "id": "30017",
+      "auditName": "Cleanliness and Housekeeping Audit",
+      "auditCategory": "operational",
+      "description": "Weekly audit of cleaning schedules, dust control, odour management, and environmental standards"
+    },
+    {
+      "id": "15",
+      "auditName": "Dining Experience",
+      "auditCategory": "operational",
+      "description": "Audit of mealtime experience, choice, and quality"
+    },
+    {
+      "id": "21",
+      "auditName": "Driving License & Insurance Checks",
+      "auditCategory": "operational",
+      "description": "Checks of staff driving licences and business insurance"
+    },
+    {
+      "id": "23",
+      "auditName": "First Aid Box",
+      "auditCategory": "operational",
+      "description": "Audit of first aid box contents and expiry dates"
+    },
+    {
+      "id": "30016",
+      "auditName": "Kitchen Hygiene Audit",
+      "auditCategory": "operational",
+      "description": "Weekly audit of food safety protocols, temperature records, cleanliness, and food hygiene ratings"
+    },
+    {
+      "id": "14",
+      "auditName": "Kitchen/Catering",
+      "auditCategory": "operational",
+      "description": "Audit of kitchen hygiene, food safety, and catering standards"
+    },
+    {
+      "id": "16",
+      "auditName": "Manager Walkabout",
+      "auditCategory": "operational",
+      "description": "Regular manager walkabout to observe practice and environment"
+    },
+    {
+      "id": "11",
+      "auditName": "Missed and Late Calls",
+      "auditCategory": "operational",
+      "description": "Audit of missed and late care visits (domiciliary care)"
+    },
+    {
+      "id": "17",
+      "auditName": "Night Visits",
+      "auditCategory": "operational",
+      "description": "Night-time audit of care practices and staffing"
+    },
+    {
+      "id": "20",
+      "auditName": "NMC Checks",
+      "auditCategory": "operational",
+      "description": "Nursing and Midwifery Council registration checks for nurses"
+    },
+    {
+      "id": "22",
+      "auditName": "Safe Contents",
+      "auditCategory": "operational",
+      "description": "Audit of safe contents and security"
+    },
+    {
+      "id": "19",
+      "auditName": "Senior Manager QA",
+      "auditCategory": "operational",
+      "description": "Senior management quality assurance visit and audit"
+    },
+    {
+      "id": "13",
+      "auditName": "Skin Integrity",
+      "auditCategory": "operational",
+      "description": "Audit of pressure care and skin integrity management"
+    },
+    {
+      "id": "12",
+      "auditName": "Weight Analysis",
+      "auditCategory": "operational",
+      "description": "Monitoring and analysis of service user weight changes"
+    },
+    {
+      "id": "30023",
+      "auditName": "Activities and Social Engagement Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of activity schedules, resident participation, preferences, and meaningful engagement"
+    },
+    {
+      "id": "30019",
+      "auditName": "Bed Rails Safety Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of bed rail risk assessments, safe installation, and alternative options"
+    },
+    {
+      "id": "30038",
+      "auditName": "Communication and Language Support Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of communication needs assessments, interpreter services, assistive technology, and accessible information"
+    },
+    {
+      "id": "10",
+      "auditName": "Complaints Audit",
+      "auditCategory": "quarterly",
+      "description": "Audit of complaints handling and learning from feedback"
+    },
+    {
+      "id": "30034",
+      "auditName": "Compliments and Complaints Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of logging, tracking, response times, learning outcomes, and satisfaction trends"
+    },
+    {
+      "id": "30025",
+      "auditName": "Continence Management Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of continence assessments, appropriate aids, dignity in care, and skin integrity"
+    },
+    {
+      "id": "30037",
+      "auditName": "Dementia Care Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of person-centred approaches, environmental adaptations, staff training, and family engagement"
+    },
+    {
+      "id": "30036",
+      "auditName": "Diabetes Management Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of blood glucose monitoring, dietary management, medication, foot care, and emergency protocols"
+    },
+    {
+      "id": "30022",
+      "auditName": "Dignity and Respect Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly observation of privacy during care, autonomy, choice, and communication approaches"
+    },
+    {
+      "id": "8",
+      "auditName": "Dignity Audit",
+      "auditCategory": "quarterly",
+      "description": "Audit of dignity in care practices and service user experience"
+    },
+    {
+      "id": "30024",
+      "auditName": "End-of-Life Care Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of anticipatory care plans, palliative care training, family support, and symptom management"
+    },
+    {
+      "id": "30032",
+      "auditName": "Environmental Risk Assessment Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of building safety, accessibility, lighting, heating, outdoor spaces, and furniture"
+    },
+    {
+      "id": "9",
+      "auditName": "Finance Audit",
+      "auditCategory": "quarterly",
+      "description": "Audit of service user finances and financial management"
+    },
+    {
+      "id": "6",
+      "auditName": "Health & Safety Audit",
+      "auditCategory": "quarterly",
+      "description": "Comprehensive health and safety audit of premises and practices"
+    },
+    {
+      "id": "30018",
+      "auditName": "Health and Safety Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of risk assessments, COSHH compliance, emergency procedures, and staff training"
+    },
+    {
+      "id": "30035",
+      "auditName": "Mental Capacity Act (MCA) and DoLS Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of capacity assessments, best interest decisions, DoLS authorisations, and staff understanding"
+    },
+    {
+      "id": "30020",
+      "auditName": "Moving and Handling Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of training records, equipment audits, incident reports, and safe practices"
+    },
+    {
+      "id": "30039",
+      "auditName": "Nutrition and Mealtimes Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of dietary assessments, mealtime observations, hydration monitoring, and dignity support"
+    },
+    {
+      "id": "30033",
+      "auditName": "Quality Assurance/Governance Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of internal audit cycle, action plan completion, quality improvement, and performance indicators"
+    },
+    {
+      "id": "30030",
+      "auditName": "Recruitment and Induction Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of onboarding checklists, shadowing records, competency assessments, and probation reviews"
+    },
+    {
+      "id": "30028",
+      "auditName": "Safeguarding Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of incident logs, referral records, staff awareness, whistleblowing, and DoLS authorisations"
+    },
+    {
+      "id": "7",
+      "auditName": "Safeguarding Audit",
+      "auditCategory": "quarterly",
+      "description": "Audit of safeguarding practices, reporting, and staff awareness"
+    },
+    {
+      "id": "30031",
+      "auditName": "Security and Access Control Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of door codes, visitor logs, CCTV policies, and missing person procedures"
+    },
+    {
+      "id": "30021",
+      "auditName": "Specialist Equipment Maintenance Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of hoists, lifts, medical devices, service records, and LOLER compliance"
+    },
+    {
+      "id": "30026",
+      "auditName": "Staff File Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly audit of DBS checks, references, qualifications, contracts, and professional registration"
+    },
+    {
+      "id": "30029",
+      "auditName": "Staff Supervision and Appraisal Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of supervision frequency, performance reviews, development plans, and support needs"
+    },
+    {
+      "id": "30027",
+      "auditName": "Training and Competency Audit",
+      "auditCategory": "quarterly",
+      "description": "Quarterly review of mandatory training completion, specialist training, competency assessments, and induction records"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\tauditCategory\tdescription\n30041\tContingency Planning Audit\tannual\tAnnual review of emergency plans, business continuity, disaster recovery, and communication protocols\n30042\tData Protection/Confidentiality Audit\tannual\tAnnual GDPR compliance audit including record storage, access controls, data breach procedures, and staff training\n30040\tLOLER Equipment Testing Audit\tannual\tAnnual Lifting Operations and Lifting Equipment Regulations testing and certification\n30004\tAccidents and Incidents Audit\tmandatory_monthly\tReview of incident logging, investigation, action plans, trend analysis, and safeguarding referrals\n30008\tCare Plan Audit\tmandatory_monthly\tReview of person-centred care plans, regular updates, consent documentation, and risk assessments\n1\tCare Plan Audit\tmandatory_monthly\tAI-powered quality audit of care plans to assess person-centredness, comprehensiveness, and CQC compliance\n30009\tCare Records Audit\tmandatory_monthly\tAudit of daily notes quality, timeliness, secure storage, confidentiality, and record accuracy\n3\tDaily Notes Audit\tmandatory_monthly\tAI-powered quality audit of staff daily notes to assess detail, person-centredness, and professionalism\n30011\tDependency Tool/Staffing Levels Audit\tmandatory_monthly\tMonthly review of resident acuity assessments, staffing ratios, rota planning, and skill mix\n30005\tFalls Prevention Audit\tmandatory_monthly\tAudit of fall risk assessments, sensor use, post-fall reviews, environmental hazards, and mobility aids\n30003\tFire Safety Audit\tmandatory_monthly\tMonthly fire safety checks including drills, equipment servicing, evacuation plans, and staff training\n30006\tFirst Aid Equipment Audit\tmandatory_monthly\tMonthly check of first aid box contents, expiry dates, accessibility, and staff awareness\n5\tInfection Control Audit\tmandatory_monthly\tAudit of infection prevention and control practices\n30001\tInfection Prevention and Control (IPC) Audit\tmandatory_monthly\tComprehensive audit of infection control practices including hand hygiene, PPE use, cleaning protocols, and waste disposal\n30012\tMaintenance Audit\tmandatory_monthly\tMonthly review of maintenance logs, contractor records, response times, and outstanding repairs\n2\tMedication Audit\tmandatory_monthly\tComprehensive audit of medication administration records, storage, and procedures\n30002\tMedication Management Audit\tmandatory_monthly\tAudit of medication administration records, storage, controlled drugs, PRN protocols, and staff competency\n30015\tResident Finances Audit\tmandatory_monthly\tMonthly audit of resident finance management, contracts, receipts, and reconciliation (if applicable)\n30014\tRestraint and Restrictive Practice Audit\tmandatory_monthly\tMonthly review of restraint documentation, least restrictive options, and staff training\n4\tStaff File Audit\tmandatory_monthly\tAudit of staff personnel files for compliance with recruitment and training requirements\n30010\tTissue Viability (Pressure Ulcer Prevention) Audit\tmandatory_monthly\tMonthly audit of skin assessments, pressure-relieving equipment, repositioning, and wound care\n30007\tWater Safety (Legionella) Audit\tmandatory_monthly\tMonthly water temperature checks, flushing regimes, risk assessments, and maintenance records\n30013\tWound Care Audit\tmandatory_monthly\tMonthly audit of wound assessment, treatment plans, dressing stock, and healing progress\n24\tBody Fluid Spillage Kits\toperational\tAudit of body fluid spillage kit availability and contents\n25\tBurns Kit\toperational\tAudit of burns kit availability and contents\n18\tCall Bell Analysis\toperational\tAnalysis of call bell response times and patterns\n30017\tCleanliness and Housekeeping Audit\toperational\tWeekly audit of cleaning schedules, dust control, odour management, and environmental standards\n15\tDining Experience\toperational\tAudit of mealtime experience, choice, and quality\n21\tDriving License & Insurance Checks\toperational\tChecks of staff driving licences and business insurance\n23\tFirst Aid Box\toperational\tAudit of first aid box contents and expiry dates\n30016\tKitchen Hygiene Audit\toperational\tWeekly audit of food safety protocols, temperature records, cleanliness, and food hygiene ratings\n14\tKitchen/Catering\toperational\tAudit of kitchen hygiene, food safety, and catering standards\n16\tManager Walkabout\toperational\tRegular manager walkabout to observe practice and environment\n11\tMissed and Late Calls\toperational\tAudit of missed and late care visits (domiciliary care)\n17\tNight Visits\toperational\tNight-time audit of care practices and staffing\n20\tNMC Checks\toperational\tNursing and Midwifery Council registration checks for nurses\n22\tSafe Contents\toperational\tAudit of safe contents and security\n19\tSenior Manager QA\toperational\tSenior management quality assurance visit and audit\n13\tSkin Integrity\toperational\tAudit of pressure care and skin integrity management\n12\tWeight Analysis\toperational\tMonitoring and analysis of service user weight changes\n30023\tActivities and Social Engagement Audit\tquarterly\tQuarterly review of activity schedules, resident participation, preferences, and meaningful engagement\n30019\tBed Rails Safety Audit\tquarterly\tQuarterly audit of bed rail risk assessments, safe installation, and alternative options\n30038\tCommunication and Language Support Audit\tquarterly\tQuarterly review of communication needs assessments, interpreter services, assistive technology, and accessible information\n10\tComplaints Audit\tquarterly\tAudit of complaints handling and learning from feedback\n30034\tCompliments and Complaints Audit\tquarterly\tQuarterly audit of logging, tracking, response times, learning outcomes, and satisfaction trends\n30025\tContinence Management Audit\tquarterly\tQuarterly review of continence assessments, appropriate aids, dignity in care, and skin integrity\n30037\tDementia Care Audit\tquarterly\tQuarterly audit of person-centred approaches, environmental adaptations, staff training, and family engagement\n30036\tDiabetes Management Audit\tquarterly\tQuarterly review of blood glucose monitoring, dietary management, medication, foot care, and emergency protocols\n30022\tDignity and Respect Audit\tquarterly\tQuarterly observation of privacy during care, autonomy, choice, and communication approaches\n8\tDignity Audit\tquarterly\tAudit of dignity in care practices and service user experience\n30024\tEnd-of-Life Care Audit\tquarterly\tQuarterly audit of anticipatory care plans, palliative care training, family support, and symptom management\n30032\tEnvironmental Risk Assessment Audit\tquarterly\tQuarterly audit of building safety, accessibility, lighting, heating, outdoor spaces, and furniture\n9\tFinance Audit\tquarterly\tAudit of service user finances and financial management\n6\tHealth & Safety Audit\tquarterly\tComprehensive health and safety audit of premises and practices\n30018\tHealth and Safety Audit\tquarterly\tQuarterly review of risk assessments, COSHH compliance, emergency procedures, and staff training\n30035\tMental Capacity Act (MCA) and DoLS Audit\tquarterly\tQuarterly audit of capacity assessments, best interest decisions, DoLS authorisations, and staff understanding\n30020\tMoving and Handling Audit\tquarterly\tQuarterly review of training records, equipment audits, incident reports, and safe practices\n30039\tNutrition and Mealtimes Audit\tquarterly\tQuarterly audit of dietary assessments, mealtime observations, hydration monitoring, and dignity support\n30033\tQuality Assurance/Governance Audit\tquarterly\tQuarterly review of internal audit cycle, action plan completion, quality improvement, and performance indicators\n30030\tRecruitment and Induction Audit\tquarterly\tQuarterly audit of onboarding checklists, shadowing records, competency assessments, and probation reviews\n30028\tSafeguarding Audit\tquarterly\tQuarterly audit of incident logs, referral records, staff awareness, whistleblowing, and DoLS authorisations\n7\tSafeguarding Audit\tquarterly\tAudit of safeguarding practices, reporting, and staff awareness\n30031\tSecurity and Access Control Audit\tquarterly\tQuarterly review of door codes, visitor logs, CCTV policies, and missing person procedures\n30021\tSpecialist Equipment Maintenance Audit\tquarterly\tQuarterly audit of hoists, lifts, medical devices, service records, and LOLER compliance\n30026\tStaff File Audit\tquarterly\tQuarterly audit of DBS checks, references, qualifications, contracts, and professional registration\n30029\tStaff Supervision and Appraisal Audit\tquarterly\tQuarterly review of supervision frequency, performance reviews, development plans, and support needs\n30027\tTraining and Competency Audit\tquarterly\tQuarterly review of mandatory training completion, specialist training, competency assessments, and induction records\n",
+  "stderr": "",
+  "execution_time_ms": 1660
+}

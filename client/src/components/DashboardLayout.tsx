@@ -37,6 +37,7 @@ const menuItems = [
   { icon: AlertTriangle, label: "Incidents", path: "/incidents" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: FileText, label: "Reports", path: "/reports" },
+  { icon: ClipboardCheck, label: "Action Log", path: "/action-log" },
 ];
 
 // Admin-only menu items (shown only to super admins)

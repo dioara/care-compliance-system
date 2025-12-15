@@ -1058,3 +1058,54 @@
 - [x] Create email service helper
 - [x] Integrate email with compliance notifications
 - [x] Test email sending
+
+
+## Audit System Enhancement (December 15, 2025)
+
+### Audit Type Classification
+- [ ] Classify audits as general, staff-specific, or service-user-specific
+- [ ] Add auditType field to audit templates (general, staff, serviceUser)
+- [ ] Update audit creation to require staff/service user selection based on type
+
+### Action Items on Audit Points
+- [ ] Add action items table linked to audit responses
+- [ ] Each action has: description, assignedTo, dueDate, status
+- [ ] Actions auto-populate audit action plan when marked complete
+- [ ] Allow manual addition of extra actions
+
+### Master Action Log
+- [ ] Create central action log page showing all actions from all audits
+- [ ] Add filtering by status, location, audit type, assignee
+- [ ] Allow status updates (pending, in progress, completed, overdue)
+- [ ] Add downloadable report functionality
+
+### Future: Email Enhancements (Deferred)
+- [ ] Add email recipient settings for compliance alerts
+- [ ] Add scheduled daily/weekly compliance reports
+- [ ] Add email templates management page
+
+
+## Audit System Enhancement (December 15, 2025 - Session 4)
+
+### Audit Type Classification
+- [x] Classify audits as general, staff-specific, or service-user-specific
+- [x] Add targetType field to auditTypes table
+- [x] Update existing audit types with correct targetType
+
+### Audit Creation Flow
+- [x] Show staff selection dropdown for staff-specific audits
+- [x] Show service user selection dropdown for service-user-specific audits
+- [x] Save selected staff/service user with audit instance
+
+### Action Items on Audit Points
+- [x] Add action items section to each audit question
+- [x] Allow assigning actions to staff members
+- [x] Set target completion dates for actions
+- [x] Auto-populate action plan when audit is completed
+
+### Master Action Log
+- [x] Create /action-log page accessible from navigation
+- [x] Display all actions from all audits across locations
+- [x] Filter by location, status, priority, search
+- [x] Allow status updates (not started, in progress, completed)
+- [x] Download as CSV report

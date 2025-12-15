@@ -11,7 +11,9 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Save, CheckCircle2, Upload, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, CheckCircle2, Upload, AlertCircle, Plus, X, User, Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -22,6 +24,8 @@ export default function ConductAudit() {
   const auditId = parseInt(id || "0");
 
   const [responses, setResponses] = useState<Record<number, { response: string; observations?: string; isCompliant?: boolean }>>({});
+  const [actionItems, setActionItems] = useState<Record<number, Array<{ description: string; assignedToId: number | null; targetDate: string }>>>({});
+  const [expandedActions, setExpandedActions] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
   // Fetch audit instance
@@ -40,6 +44,12 @@ export default function ConductAudit() {
   const { data: existingResponses, isLoading: loadingResponses } = trpc.audits.getResponses.useQuery(
     { auditInstanceId: auditId },
     { enabled: !!auditId }
+  );
+
+  // Fetch staff members for action assignment
+  const { data: staffMembers } = trpc.staff.list.useQuery(
+    { locationId: auditInstance?.locationId },
+    { enabled: !!auditInstance?.locationId }
   );
 
   // Load existing responses into state
@@ -101,8 +111,48 @@ export default function ConductAudit() {
     }, 1000);
   };
 
-  const handleCompleteAudit = () => {
-    if (!auditTemplate) return;
+  // Save action items mutation
+  const saveActionItemsMutation = trpc.audits.saveActionItems.useMutation();
+
+  const handleCompleteAudit = async () => {
+    if (!auditTemplate || !auditInstance) return;
+
+    // First, save all action items
+    const allActionItems: Array<{
+      auditResponseId: number;
+      questionId: number;
+      description: string;
+      assignedToId: number | null;
+      targetDate: string;
+    }> = [];
+
+    Object.entries(actionItems).forEach(([questionId, items]) => {
+      items.forEach((item) => {
+        if (item.description.trim()) {
+          allActionItems.push({
+            auditResponseId: 0, // Will be resolved on server
+            questionId: parseInt(questionId),
+            description: item.description,
+            assignedToId: item.assignedToId,
+            targetDate: item.targetDate,
+          });
+        }
+      });
+    });
+
+    // Save action items if any
+    if (allActionItems.length > 0) {
+      try {
+        await saveActionItemsMutation.mutateAsync({
+          auditInstanceId: auditId,
+          locationId: auditInstance.locationId,
+          actionItems: allActionItems,
+        });
+      } catch (error) {
+        toast.error("Failed to save action items");
+        return;
+      }
+    }
 
     const totalQuestions = auditTemplate.sections.reduce((sum, section) => sum + section.questions.length, 0);
     const answeredQuestions = Object.keys(responses).length;
@@ -337,6 +387,123 @@ export default function ConductAudit() {
                           <span className="text-green-600 font-medium">Response saved</span>
                         </div>
                       )}
+
+                      {/* Action Items Section */}
+                      <Collapsible
+                        open={expandedActions[question.id]}
+                        onOpenChange={(open) => setExpandedActions(prev => ({ ...prev, [question.id]: open }))}
+                      >
+                        <CollapsibleTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-full justify-between mt-4">
+                            <span className="flex items-center gap-2">
+                              <Plus className="h-4 w-4" />
+                              Action Items ({actionItems[question.id]?.length || 0})
+                            </span>
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-4 space-y-4">
+                          {/* Existing action items */}
+                          {actionItems[question.id]?.map((action, index) => (
+                            <div key={index} className="border rounded-lg p-4 space-y-3 bg-muted/30">
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium">Action {index + 1}</span>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => {
+                                    setActionItems(prev => ({
+                                      ...prev,
+                                      [question.id]: prev[question.id]?.filter((_, i) => i !== index) || []
+                                    }));
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Description</Label>
+                                <Textarea
+                                  placeholder="Describe the action required..."
+                                  value={action.description}
+                                  onChange={(e) => {
+                                    setActionItems(prev => ({
+                                      ...prev,
+                                      [question.id]: prev[question.id]?.map((a, i) =>
+                                        i === index ? { ...a, description: e.target.value } : a
+                                      ) || []
+                                    }));
+                                  }}
+                                  rows={2}
+                                />
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <Label className="flex items-center gap-2">
+                                    <User className="h-4 w-4" /> Assign To
+                                  </Label>
+                                  <Select
+                                    value={action.assignedToId?.toString() || ""}
+                                    onValueChange={(value) => {
+                                      setActionItems(prev => ({
+                                        ...prev,
+                                        [question.id]: prev[question.id]?.map((a, i) =>
+                                          i === index ? { ...a, assignedToId: parseInt(value) } : a
+                                        ) || []
+                                      }));
+                                    }}
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select staff member" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {staffMembers?.map((staff) => (
+                                        <SelectItem key={staff.id} value={staff.id.toString()}>
+                                          {staff.name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-2">
+                                  <Label className="flex items-center gap-2">
+                                    <Calendar className="h-4 w-4" /> Target Date
+                                  </Label>
+                                  <Input
+                                    type="date"
+                                    value={action.targetDate}
+                                    onChange={(e) => {
+                                      setActionItems(prev => ({
+                                        ...prev,
+                                        [question.id]: prev[question.id]?.map((a, i) =>
+                                          i === index ? { ...a, targetDate: e.target.value } : a
+                                        ) || []
+                                      }));
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                          {/* Add new action button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setActionItems(prev => ({
+                                ...prev,
+                                [question.id]: [
+                                  ...(prev[question.id] || []),
+                                  { description: "", assignedToId: null, targetDate: "" }
+                                ]
+                              }));
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Action Item
+                          </Button>
+                        </CollapsibleContent>
+                      </Collapsible>
                     </CardContent>
                   </Card>
                 ))}

@@ -774,6 +774,56 @@ export const appRouter = router({
         return { id: actionPlanId };
       }),
 
+    // Save multiple action items from audit questions
+    saveActionItems: protectedProcedure
+      .input(
+        z.object({
+          auditInstanceId: z.number(),
+          locationId: z.number(),
+          actionItems: z.array(
+            z.object({
+              questionId: z.number(),
+              description: z.string(),
+              assignedToId: z.number().nullable(),
+              targetDate: z.string(),
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+        // Get audit instance to get audit type name
+        const auditInstance = await db.getAuditInstanceById(input.auditInstanceId);
+        if (!auditInstance) throw new TRPCError({ code: "NOT_FOUND", message: "Audit instance not found" });
+
+        // Create action plan entries for each action item
+        for (const item of input.actionItems) {
+          // Get staff name for responsible person
+          let responsiblePersonName = "Unassigned";
+          if (item.assignedToId) {
+            const staff = await db.getStaffMemberById(item.assignedToId);
+            if (staff) responsiblePersonName = staff.name;
+          }
+
+          await db.createAuditActionPlan({
+            tenantId: ctx.user.tenantId,
+            locationId: input.locationId,
+            auditInstanceId: input.auditInstanceId,
+            auditResponseId: null,
+            issueDescription: item.description,
+            auditOrigin: auditInstance.auditTypeName || "Audit",
+            ragStatus: "amber",
+            responsiblePersonId: item.assignedToId || ctx.user.id,
+            responsiblePersonName,
+            targetCompletionDate: item.targetDate ? new Date(item.targetDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            status: "not_started",
+          });
+        }
+
+        return { success: true, count: input.actionItems.length };
+      }),
+
     // Get action plans
     getActionPlans: protectedProcedure
       .input(z.object({ auditInstanceId: z.number() }))
@@ -799,6 +849,18 @@ export const appRouter = router({
           input.actionTaken
         );
         return { success: true };
+      }),
+
+    // Get all action plans across locations (for master action log)
+    getAllActionPlans: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number().optional(),
+        })
+      )
+      .query(async ({ ctx }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        return db.getAllActionPlans(ctx.user.tenantId);
       }),
 
     // Get audit schedules

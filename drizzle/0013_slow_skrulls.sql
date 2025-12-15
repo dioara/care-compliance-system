@@ -1,0 +1,1 @@
+ALTER TABLE `auditTypes` ADD `targetType` enum('general','staff','serviceUser') DEFAULT 'general' NOT NULL;
