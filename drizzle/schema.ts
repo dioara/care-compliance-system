@@ -726,9 +726,57 @@ export const dataExportRequests = mysqlTable("dataExportRequests", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+/**
+ * Email Recipients - Additional recipients for compliance alerts and notifications
+ */
+export const emailRecipients = mysqlTable("emailRecipients", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  email: varchar("email", { length: 320 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  recipientType: mysqlEnum("recipientType", ["manager", "cqc_contact", "owner", "external", "other"]).default("other").notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  receiveComplianceAlerts: boolean("receiveComplianceAlerts").default(true).notNull(),
+  receiveAuditReminders: boolean("receiveAuditReminders").default(true).notNull(),
+  receiveIncidentAlerts: boolean("receiveIncidentAlerts").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Email Templates - Customizable email templates for different notification types
+ */
+export const emailTemplates = mysqlTable("emailTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  templateType: mysqlEnum("templateType", [
+    "compliance_alert",
+    "audit_reminder",
+    "audit_overdue",
+    "incident_alert",
+    "weekly_summary",
+    "monthly_report"
+  ]).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 500 }).notNull(),
+  bodyHtml: text("bodyHtml").notNull(),
+  bodyText: text("bodyText"), // Plain text fallback
+  headerColor: varchar("headerColor", { length: 7 }).default("#1e40af"), // Hex color
+  logoUrl: text("logoUrl"), // Custom logo for this template
+  footerText: text("footerText"),
+  isDefault: boolean("isDefault").default(false).notNull(),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type InsertAiAuditSchedule = typeof aiAuditSchedules.$inferInsert;
 export type SelectAiAuditSchedule = typeof aiAuditSchedules.$inferSelect;
 export type InsertUserConsent = typeof userConsents.$inferInsert;
 export type SelectUserConsent = typeof userConsents.$inferSelect;
 export type InsertDataExportRequest = typeof dataExportRequests.$inferInsert;
 export type SelectDataExportRequest = typeof dataExportRequests.$inferSelect;
+export type InsertEmailRecipient = typeof emailRecipients.$inferInsert;
+export type SelectEmailRecipient = typeof emailRecipients.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+export type SelectEmailTemplate = typeof emailTemplates.$inferSelect;

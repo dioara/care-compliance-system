@@ -1109,3 +1109,39 @@
 - [x] Filter by location, status, priority, search
 - [x] Allow status updates (not started, in progress, completed)
 - [x] Download as CSV report
+
+
+## Email Settings & Templates (December 15, 2025 - Session 5)
+
+### Email Recipient Settings
+- [ ] Create emailRecipients table (id, tenantId, email, name, role, isActive)
+- [ ] Create tRPC endpoints for recipient CRUD
+- [ ] Build recipient management UI in admin settings
+- [ ] Allow adding/removing email recipients
+- [ ] Support recipient roles (manager, CQC contact, etc.)
+
+### Email Templates Management
+- [ ] Create emailTemplates table (id, tenantId, templateType, subject, bodyHtml, variables)
+- [ ] Create default templates for compliance alerts, audit reminders, etc.
+- [ ] Create tRPC endpoints for template CRUD
+- [ ] Build template editor UI with variable placeholders
+- [ ] Support company branding (logo, colors) in templates
+- [ ] Preview template before saving
+
+### Integration
+- [ ] Update sendComplianceAlert to use configured recipients
+- [ ] Update email sending to use custom templates
+- [ ] Add template variable substitution ({{companyName}}, {{locationName}}, etc.)
+
+
+## Email Settings & Templates Management (December 15, 2025)
+- [x] Create emailRecipients table in database
+- [x] Create emailTemplates table in database
+- [x] Add CRUD endpoints for email recipients
+- [x] Add CRUD endpoints for email templates
+- [x] Build Email Settings page with recipient management
+- [x] Build template editor UI with preview
+- [x] Support template variables (companyName, locationName, complianceRate, etc.)
+- [x] Update compliance notification to send to all configured recipients
+- [x] Use custom templates when available
+- [x] Add Email Settings to admin navigation

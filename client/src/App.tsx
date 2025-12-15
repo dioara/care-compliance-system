@@ -37,6 +37,7 @@ import TermsOfService from "./pages/TermsOfService";
 import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/AdminDashboard";
 import ActionLog from "./pages/ActionLog";
+import EmailSettings from "./pages/EmailSettings";
 
 function Router() {
   return (
@@ -130,6 +131,11 @@ function Router() {
       <Route path="/action-log">
         <DashboardLayout>
           <ActionLog />
+        </DashboardLayout>
+      </Route>
+      <Route path="/email-settings">
+        <DashboardLayout>
+          <EmailSettings />
         </DashboardLayout>
       </Route>
 

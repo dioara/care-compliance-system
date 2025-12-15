@@ -30,6 +30,8 @@ import {
   aiAuditSchedules,
   userConsents,
   dataExportRequests,
+  emailRecipients,
+  emailTemplates,
   type InsertUser,
   type InsertAiAudit,
   type InsertAiAuditSchedule,
@@ -42,6 +44,8 @@ import {
   type InsertUserRole,
   type InsertServiceUser,
   type InsertStaffMember,
+  type InsertEmailRecipient,
+  type InsertEmailTemplate,
 } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2009,4 +2013,205 @@ export async function getAdminDashboardStats(tenantId: number) {
     recentActivity,
     rolesWithCounts,
   };
+}
+
+
+// ============================================
+// Email Recipients Management
+// ============================================
+
+export async function getEmailRecipients(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(emailRecipients)
+    .where(eq(emailRecipients.tenantId, tenantId))
+    .orderBy(emailRecipients.name);
+}
+
+export async function getActiveEmailRecipients(tenantId: number, alertType?: 'compliance' | 'audit' | 'incident') {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const recipients = await db.select().from(emailRecipients)
+    .where(and(
+      eq(emailRecipients.tenantId, tenantId),
+      eq(emailRecipients.isActive, true)
+    ));
+  
+  // Filter by alert type if specified
+  if (alertType === 'compliance') {
+    return recipients.filter(r => r.receiveComplianceAlerts);
+  } else if (alertType === 'audit') {
+    return recipients.filter(r => r.receiveAuditReminders);
+  } else if (alertType === 'incident') {
+    return recipients.filter(r => r.receiveIncidentAlerts);
+  }
+  
+  return recipients;
+}
+
+export async function createEmailRecipient(data: InsertEmailRecipient) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(emailRecipients).values(data);
+  return { id: Number((result as any)[0].insertId), ...data };
+}
+
+export async function updateEmailRecipient(id: number, tenantId: number, data: Partial<InsertEmailRecipient>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(emailRecipients)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(emailRecipients.id, id), eq(emailRecipients.tenantId, tenantId)));
+}
+
+export async function deleteEmailRecipient(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(emailRecipients)
+    .where(and(eq(emailRecipients.id, id), eq(emailRecipients.tenantId, tenantId)));
+}
+
+// ============================================
+// Email Templates Management
+// ============================================
+
+export async function getEmailTemplates(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(emailTemplates)
+    .where(eq(emailTemplates.tenantId, tenantId))
+    .orderBy(emailTemplates.templateType);
+}
+
+export async function getEmailTemplateByType(tenantId: number, templateType: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const results = await db.select().from(emailTemplates)
+    .where(and(
+      eq(emailTemplates.tenantId, tenantId),
+      eq(emailTemplates.templateType, templateType as any),
+      eq(emailTemplates.isActive, true)
+    ))
+    .orderBy(desc(emailTemplates.isDefault))
+    .limit(1);
+  
+  return results[0] || null;
+}
+
+export async function createEmailTemplate(data: InsertEmailTemplate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(emailTemplates).values(data);
+  return { id: Number((result as any)[0].insertId), ...data };
+}
+
+export async function updateEmailTemplate(id: number, tenantId: number, data: Partial<InsertEmailTemplate>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(emailTemplates)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(emailTemplates.id, id), eq(emailTemplates.tenantId, tenantId)));
+}
+
+export async function deleteEmailTemplate(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(emailTemplates)
+    .where(and(eq(emailTemplates.id, id), eq(emailTemplates.tenantId, tenantId)));
+}
+
+// Create default templates for a tenant
+export async function createDefaultEmailTemplates(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const defaultTemplates = [
+    {
+      tenantId,
+      templateType: 'compliance_alert' as const,
+      name: 'Compliance Alert',
+      subject: '⚠️ Compliance Alert - {{companyName}}',
+      bodyHtml: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: {{headerColor}}; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Compliance Alert</h1>
+          </div>
+          <div style="padding: 20px; background: #f9fafb;">
+            <p>Dear {{recipientName}},</p>
+            <p>This is an automated compliance alert for <strong>{{companyName}}</strong>.</p>
+            <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
+              <h3 style="margin-top: 0; color: #dc2626;">Alert Summary</h3>
+              <p><strong>Location:</strong> {{locationName}}</p>
+              <p><strong>Compliance Rate:</strong> {{complianceRate}}%</p>
+              <p><strong>Non-Compliant Items:</strong> {{nonCompliantCount}}</p>
+              <p><strong>Overdue Actions:</strong> {{overdueCount}}</p>
+            </div>
+            <p>Please log in to the system to review and address these issues.</p>
+            <p style="color: #6b7280; font-size: 12px;">{{footerText}}</p>
+          </div>
+        </div>
+      `,
+      isDefault: true,
+      isActive: true,
+    },
+    {
+      tenantId,
+      templateType: 'audit_reminder' as const,
+      name: 'Audit Reminder',
+      subject: '📋 Audit Reminder - {{auditType}} Due Soon',
+      bodyHtml: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: {{headerColor}}; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Audit Reminder</h1>
+          </div>
+          <div style="padding: 20px; background: #f9fafb;">
+            <p>Dear {{recipientName}},</p>
+            <p>This is a reminder that an audit is due soon.</p>
+            <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0;">
+              <p><strong>Audit Type:</strong> {{auditType}}</p>
+              <p><strong>Location:</strong> {{locationName}}</p>
+              <p><strong>Due Date:</strong> {{dueDate}}</p>
+            </div>
+            <p>Please ensure this audit is completed on time.</p>
+            <p style="color: #6b7280; font-size: 12px;">{{footerText}}</p>
+          </div>
+        </div>
+      `,
+      isDefault: true,
+      isActive: true,
+    },
+    {
+      tenantId,
+      templateType: 'incident_alert' as const,
+      name: 'Incident Alert',
+      subject: '🚨 Incident Reported - {{incidentType}}',
+      bodyHtml: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #dc2626; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0;">Incident Alert</h1>
+          </div>
+          <div style="padding: 20px; background: #f9fafb;">
+            <p>Dear {{recipientName}},</p>
+            <p>A new incident has been reported that requires your attention.</p>
+            <div style="background: white; border-radius: 8px; padding: 15px; margin: 15px 0; border-left: 4px solid #dc2626;">
+              <p><strong>Incident Type:</strong> {{incidentType}}</p>
+              <p><strong>Location:</strong> {{locationName}}</p>
+              <p><strong>Date:</strong> {{incidentDate}}</p>
+              <p><strong>Severity:</strong> {{severity}}</p>
+            </div>
+            <p>Please log in to review the full incident details and take appropriate action.</p>
+            <p style="color: #6b7280; font-size: 12px;">{{footerText}}</p>
+          </div>
+        </div>
+      `,
+      isDefault: true,
+      isActive: true,
+    },
+  ];
+  
+  for (const template of defaultTemplates) {
+    await db.insert(emailTemplates).values(template);
+  }
 }

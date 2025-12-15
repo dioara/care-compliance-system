@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `emailTemplates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `templateType` enum('compliance_alert','audit_reminder','audit_overdue','incident_alert','weekly_summary','monthly_report') NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `subject` varchar(500) NOT NULL,\n  `bodyHtml` text NOT NULL,\n  `bodyText` text,\n  `headerColor` varchar(7) DEFAULT '#1e40af',\n  `logoUrl` text,\n  `footerText` text,\n  `isDefault` boolean NOT NULL DEFAULT false,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `emailTemplates_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `emailTemplates` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `templateType` enum('compliance_alert','audit_reminder','audit_overdue','incident_alert','weekly_summary','monthly_report') NOT NULL,\n  `name` varchar(255) NOT NULL,\n  `subject` varchar(500) NOT NULL,\n  `bodyHtml` text NOT NULL,\n  `bodyText` text,\n  `headerColor` varchar(7) DEFAULT '#1e40af',\n  `logoUrl` text,\n  `footerText` text,\n  `isDefault` boolean NOT NULL DEFAULT false,\n  `isActive` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `emailTemplates_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 165
+}

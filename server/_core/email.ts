@@ -184,6 +184,110 @@ Care Compliance Management System
 }
 
 /**
+ * Send email to multiple recipients
+ */
+export async function sendEmailToMultiple(
+  recipients: string[],
+  subject: string,
+  text: string,
+  html?: string
+): Promise<{ sent: number; failed: number }> {
+  let sent = 0;
+  let failed = 0;
+
+  for (const to of recipients) {
+    const success = await sendEmail({ to, subject, text, html });
+    if (success) {
+      sent++;
+    } else {
+      failed++;
+    }
+  }
+
+  return { sent, failed };
+}
+
+/**
+ * Replace template variables with actual values
+ */
+export function processTemplate(
+  template: string,
+  variables: Record<string, string | number>
+): string {
+  let result = template;
+  for (const [key, value] of Object.entries(variables)) {
+    result = result.replace(new RegExp(`\\{\\{${key}\\}\\}`, 'g'), String(value));
+  }
+  return result;
+}
+
+/**
+ * Send compliance alert to all configured recipients
+ */
+export async function sendComplianceAlertToRecipients(
+  recipients: Array<{ email: string; name?: string }>,
+  companyName: string,
+  locationName: string,
+  alerts: string[],
+  stats: {
+    compliance: number;
+    threshold: number;
+    overdueActions: number;
+    ragStatus: { green: number; amber: number; red: number };
+  },
+  customTemplate?: {
+    subject: string;
+    bodyHtml: string;
+    headerColor?: string;
+    footerText?: string;
+  }
+): Promise<{ sent: number; failed: number }> {
+  let sent = 0;
+  let failed = 0;
+
+  for (const recipient of recipients) {
+    let success: boolean;
+    
+    if (customTemplate) {
+      // Use custom template
+      const variables = {
+        companyName,
+        locationName,
+        recipientName: recipient.name || 'Team',
+        complianceRate: stats.compliance,
+        nonCompliantCount: stats.ragStatus.red,
+        overdueCount: stats.overdueActions,
+        headerColor: customTemplate.headerColor || '#dc2626',
+        footerText: customTemplate.footerText || 'Care Compliance Management System',
+      };
+      
+      const subject = processTemplate(customTemplate.subject, variables);
+      const html = processTemplate(customTemplate.bodyHtml, variables);
+      const text = `Compliance Alert for ${companyName} - ${locationName}. Compliance: ${stats.compliance}%`;
+      
+      success = await sendEmail({ to: recipient.email, subject, text, html });
+    } else {
+      // Use default template
+      success = await sendComplianceAlertEmail(
+        recipient.email,
+        companyName,
+        locationName,
+        alerts,
+        stats
+      );
+    }
+    
+    if (success) {
+      sent++;
+    } else {
+      failed++;
+    }
+  }
+
+  return { sent, failed };
+}
+
+/**
  * Validate SendGrid configuration by checking API key format
  */
 export function validateSendGridConfig(): { valid: boolean; error?: string } {

@@ -6,7 +6,7 @@ import { authRouter } from "./auth";
 import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
-import { sendComplianceAlertEmail } from "./_core/email";
+import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -85,26 +85,53 @@ export const appRouter = router({
         const title = `⚠️ Compliance Alert - ${tenant?.name || "Your Care Home"}`;
         const content = `**Location:** ${locationName}\n\n**Alerts:**\n${alerts.map(a => `- ${a}`).join("\n")}\n\n**Current Status:**\n- Overall Compliance: ${stats.overallCompliance}%\n- Compliant (Green): ${stats.ragStatus.green}\n- Partial (Amber): ${stats.ragStatus.amber}\n- Non-Compliant (Red): ${stats.ragStatus.red}\n\nPlease review and address these compliance issues promptly.`;
         
-        // Send email notification via SendGrid
-        let emailSent = false;
+        // Get configured email recipients
+        const configuredRecipients = await db.getActiveEmailRecipients(ctx.user.tenantId, 'compliance');
+        
+        // Get custom template if available
+        const customTemplate = await db.getEmailTemplateByType(ctx.user.tenantId, 'compliance_alert');
+        
+        // Build recipient list - include configured recipients plus current user
+        const recipients: Array<{ email: string; name?: string }> = [];
+        
+        // Add current user
         if (ctx.user.email) {
-          emailSent = await sendComplianceAlertEmail(
-            ctx.user.email,
-            tenant?.name || "Your Care Home",
-            locationName,
-            alerts,
-            {
-              compliance: stats.overallCompliance,
-              threshold,
-              overdueActions: stats.overdueActions,
-              ragStatus: stats.ragStatus
-            }
-          );
+          recipients.push({ email: ctx.user.email, name: ctx.user.name || undefined });
         }
         
+        // Add configured recipients (avoid duplicates)
+        for (const r of configuredRecipients) {
+          if (!recipients.some(existing => existing.email === r.email)) {
+            recipients.push({ email: r.email, name: r.name || undefined });
+          }
+        }
+        
+        // Send to all recipients
+        const emailResult = await sendComplianceAlertToRecipients(
+          recipients,
+          tenant?.name || "Your Care Home",
+          locationName,
+          alerts,
+          {
+            compliance: stats.overallCompliance,
+            threshold,
+            overdueActions: stats.overdueActions,
+            ragStatus: stats.ragStatus
+          },
+          customTemplate ? {
+            subject: customTemplate.subject,
+            bodyHtml: customTemplate.bodyHtml,
+            headerColor: customTemplate.headerColor || undefined,
+            footerText: customTemplate.footerText || undefined,
+          } : undefined
+        );
+        
         return { 
-          sent: emailSent,
-          emailSent,
+          sent: emailResult.sent > 0,
+          emailSent: emailResult.sent > 0,
+          emailsSent: emailResult.sent,
+          emailsFailed: emailResult.failed,
+          recipientCount: recipients.length,
           alerts,
           stats: {
             compliance: stats.overallCompliance,
@@ -1515,6 +1542,143 @@ export const appRouter = router({
           });
         }
       }),
+  }),
+
+  // Email Settings Management
+  emailSettings: router({
+    // Get all email recipients
+    getRecipients: superAdminProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      return db.getEmailRecipients(ctx.user.tenantId);
+    }),
+
+    // Create email recipient
+    createRecipient: superAdminProcedure
+      .input(z.object({
+        email: z.string().email(),
+        name: z.string().optional(),
+        recipientType: z.enum(["manager", "cqc_contact", "owner", "external", "other"]).default("other"),
+        receiveComplianceAlerts: z.boolean().default(true),
+        receiveAuditReminders: z.boolean().default(true),
+        receiveIncidentAlerts: z.boolean().default(true),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.createEmailRecipient({
+          tenantId: ctx.user.tenantId,
+          ...input,
+        });
+      }),
+
+    // Update email recipient
+    updateRecipient: superAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        email: z.string().email().optional(),
+        name: z.string().optional(),
+        recipientType: z.enum(["manager", "cqc_contact", "owner", "external", "other"]).optional(),
+        isActive: z.boolean().optional(),
+        receiveComplianceAlerts: z.boolean().optional(),
+        receiveAuditReminders: z.boolean().optional(),
+        receiveIncidentAlerts: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        const { id, ...data } = input;
+        await db.updateEmailRecipient(id, ctx.user.tenantId, data);
+        return { success: true };
+      }),
+
+    // Delete email recipient
+    deleteRecipient: superAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        await db.deleteEmailRecipient(input.id, ctx.user.tenantId);
+        return { success: true };
+      }),
+
+    // Get all email templates
+    getTemplates: superAdminProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      return db.getEmailTemplates(ctx.user.tenantId);
+    }),
+
+    // Create email template
+    createTemplate: superAdminProcedure
+      .input(z.object({
+        templateType: z.enum(["compliance_alert", "audit_reminder", "audit_overdue", "incident_alert", "weekly_summary", "monthly_report"]),
+        name: z.string(),
+        subject: z.string(),
+        bodyHtml: z.string(),
+        bodyText: z.string().optional(),
+        headerColor: z.string().optional(),
+        logoUrl: z.string().optional(),
+        footerText: z.string().optional(),
+        isDefault: z.boolean().default(false),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.createEmailTemplate({
+          tenantId: ctx.user.tenantId,
+          ...input,
+        });
+      }),
+
+    // Update email template
+    updateTemplate: superAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        subject: z.string().optional(),
+        bodyHtml: z.string().optional(),
+        bodyText: z.string().optional(),
+        headerColor: z.string().optional(),
+        logoUrl: z.string().optional(),
+        footerText: z.string().optional(),
+        isDefault: z.boolean().optional(),
+        isActive: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        const { id, ...data } = input;
+        await db.updateEmailTemplate(id, ctx.user.tenantId, data);
+        return { success: true };
+      }),
+
+    // Delete email template
+    deleteTemplate: superAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        await db.deleteEmailTemplate(input.id, ctx.user.tenantId);
+        return { success: true };
+      }),
+
+    // Initialize default templates
+    initializeDefaults: superAdminProcedure.mutation(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      await db.createDefaultEmailTemplates(ctx.user.tenantId);
+      return { success: true };
+    }),
   }),
 });
 

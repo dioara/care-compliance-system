@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `emailRecipients` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `name` varchar(255),\n  `recipientType` enum('manager','cqc_contact','owner','external','other') NOT NULL DEFAULT 'other',\n  `isActive` boolean NOT NULL DEFAULT true,\n  `receiveComplianceAlerts` boolean NOT NULL DEFAULT true,\n  `receiveAuditReminders` boolean NOT NULL DEFAULT true,\n  `receiveIncidentAlerts` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `emailRecipients_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `emailRecipients` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `tenantId` int NOT NULL,\n  `email` varchar(320) NOT NULL,\n  `name` varchar(255),\n  `recipientType` enum('manager','cqc_contact','owner','external','other') NOT NULL DEFAULT 'other',\n  `isActive` boolean NOT NULL DEFAULT true,\n  `receiveComplianceAlerts` boolean NOT NULL DEFAULT true,\n  `receiveAuditReminders` boolean NOT NULL DEFAULT true,\n  `receiveIncidentAlerts` boolean NOT NULL DEFAULT true,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  CONSTRAINT `emailRecipients_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 199
+}
