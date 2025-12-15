@@ -39,6 +39,7 @@ export const tenants = mysqlTable("tenants", {
   cqcInspectionDate: date("cqcInspectionDate"),
   cqcRating: varchar("cqcRating", { length: 50 }),
   specialisms: text("specialisms"), // JSON array stored as text
+  openaiApiKey: varchar("openaiApiKey", { length: 255 }), // Customer's OpenAI API key for AI features
   isSuspended: boolean("isSuspended").default(false).notNull(),
   suspensionDate: date("suspensionDate"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -360,6 +361,7 @@ export const aiAudits = mysqlTable("aiAudits", {
   recommendations: text("recommendations"),
   examples: text("examples"),
   cqcComplianceNotes: text("cqcComplianceNotes"),
+  anonymizationReport: text("anonymizationReport"), // Record of names/PII redacted for audit trail
   processedAt: timestamp("processedAt"),
   requestedById: int("requestedById"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

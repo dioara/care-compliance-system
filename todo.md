@@ -697,4 +697,28 @@
 - [x] Fix question numbering display issue (fixed frontend sorting logic to parse as integers)
 - [x] Test fixes in browser to verify correct display (confirmed working - sequential numbering)
 - [x] Push complete system to GitHub with all data and schema (pushed to dioara/care-compliance-system)
-- [ ] Save checkpoint after fixes complete
+- [x] Save checkpoint after fixes complete (checkpoint bf59e8c4)
+
+## OpenAI API Key & Document Anonymization (User Request)
+- [x] Review current AI features implementation (AI Audits, care plan review)
+- [x] Add OpenAI API key field to company profile settings (tenants.openaiApiKey)
+- [x] Add help text explaining how to get an OpenAI API key (with link to OpenAI platform)
+- [x] Verify document anonymization is in place (full names → initials) - server/utils/anonymize.ts
+- [x] Verify PII removal from AI feedback reports (phone, email, NHS numbers, addresses redacted)
+- [x] Ensure documents are NOT stored on server (only anonymized feedback stored in aiAudits table)
+- [x] Document supported file formats (text paste only - no file upload, customer pastes document text)
+- [ ] Add PDF export for anonymized feedback reports (placeholder button added)
+- [ ] Test end-to-end flow with customer's API key
+
+### Architecture Summary
+- Base subscription (£70/month): Compliance management system
+- AI features: Customer provides their own OpenAI API key
+- Document flow: Customer pastes text → System anonymizes → Sends to OpenAI via customer's API key → Stores only anonymized feedback
+- Privacy: Original documents never stored, only anonymized AI feedback saved
+- Files created:
+  - server/utils/anonymize.ts - Document anonymization utility
+  - server/services/openaiService.ts - OpenAI integration service
+  - client/src/pages/AIAudits.tsx - Full AI audit interface
+  - Updated drizzle/schema.ts - Added openaiApiKey to tenants
+  - Updated server/routers.ts - Added aiAudits router with submitAudit, getHistory, getById
+  - Updated server/db.ts - Added AI audit database functions

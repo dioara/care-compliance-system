@@ -85,6 +85,20 @@
       "when": 1765752884986,
       "tag": "0011_magenta_morlun",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1765788348271,
+      "tag": "0012_stiff_stone_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1765788796333,
+      "tag": "0013_stiff_jack_power",
+      "breakpoints": true
     }
   ]
 }

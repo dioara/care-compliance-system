@@ -1,0 +1,1 @@
+ALTER TABLE `aiAudits` ADD `anonymizationReport` text;

@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Building2, Upload, Loader2 } from "lucide-react";
+import { Building2, Upload, Loader2, Key, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -28,7 +29,10 @@ export default function CompanyProfile() {
     serviceType: "",
     careSettingType: "",
     cqcRating: "",
+    openaiApiKey: "",
   });
+
+  const [showApiKey, setShowApiKey] = useState(false);
 
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +50,7 @@ export default function CompanyProfile() {
         serviceType: profile.serviceType || "",
         careSettingType: profile.careSettingType || "",
         cqcRating: profile.cqcRating || "",
+        openaiApiKey: profile.openaiApiKey || "",
       });
     }
   }, [profile]);
@@ -345,6 +350,100 @@ export default function CompanyProfile() {
           </CardContent>
         </Card>
       </div>
+
+      {/* OpenAI API Key Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Key className="h-5 w-5" />
+            AI Features Configuration
+          </CardTitle>
+          <CardDescription>
+            Enable AI-powered care plan and daily notes auditing by providing your OpenAI API key.
+            Your documents are processed securely and never stored on our servers.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertDescription className="text-sm">
+              <strong>Why do I need an OpenAI API key?</strong>
+              <p className="mt-2">
+                AI features like care plan auditing and daily notes analysis use OpenAI's GPT-4 model.
+                By using your own API key, you maintain full control over costs and data processing.
+                Documents are anonymised before analysis and only the feedback is stored.
+              </p>
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-2">
+            <Label htmlFor="openaiApiKey">OpenAI API Key</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  id="openaiApiKey"
+                  name="openaiApiKey"
+                  type={showApiKey ? "text" : "password"}
+                  value={formData.openaiApiKey}
+                  onChange={handleInputChange}
+                  placeholder="sk-..."
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                >
+                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your API key is encrypted and stored securely. It is only used for AI audit features.
+            </p>
+          </div>
+
+          <div className="rounded-lg border p-4 bg-muted/50 space-y-3">
+            <h4 className="font-semibold text-sm">How to get an OpenAI API Key:</h4>
+            <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
+              <li>Go to <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">platform.openai.com <ExternalLink className="h-3 w-3" /></a> and create an account (or sign in)</li>
+              <li>Navigate to <strong>API Keys</strong> in the left sidebar</li>
+              <li>Click <strong>"Create new secret key"</strong> and give it a name (e.g., "Care Compliance")</li>
+              <li>Copy the key (starts with <code className="bg-muted px-1 rounded">sk-</code>) and paste it above</li>
+              <li>Add credit to your OpenAI account (pay-as-you-go billing)</li>
+            </ol>
+            <p className="text-xs text-muted-foreground mt-2">
+              <strong>Estimated costs:</strong> Analysing a typical care plan costs approximately £0.02-£0.05.
+              Monthly usage for a care home typically ranges from £5-£20 depending on volume.
+            </p>
+          </div>
+
+          <div className="flex justify-end">
+            <Button 
+              onClick={async () => {
+                try {
+                  await updateProfile.mutateAsync(formData);
+                  toast.success("API key saved successfully");
+                  refetch();
+                } catch (error) {
+                  toast.error("Failed to save API key");
+                }
+              }}
+              disabled={updateProfile.isPending}
+            >
+              {updateProfile.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save API Key"
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

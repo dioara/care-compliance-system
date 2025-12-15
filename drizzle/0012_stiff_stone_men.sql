@@ -1,0 +1,1 @@
+ALTER TABLE `tenants` ADD `openaiApiKey` varchar(255);

@@ -26,7 +26,9 @@ import {
   incidents,
   assessmentTemplates,
   templateQuestions,
+  aiAudits,
   type InsertUser,
+  type InsertAiAudit,
   type InsertTenant,
   type InsertLocation,
   type InsertRole,
@@ -1559,4 +1561,47 @@ export async function getActionPlansForReport(
     .leftJoin(locations, eq(auditActionPlans.locationId, locations.id))
     .leftJoin(auditInstances, eq(auditActionPlans.auditInstanceId, auditInstances.id))
     .where(and(...conditions));
+}
+
+// ============================================================================
+// AI AUDITS
+// ============================================================================
+
+export async function createAiAudit(data: Omit<InsertAiAudit, "id" | "createdAt" | "updatedAt">) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  const result = await db.insert(aiAudits).values(data);
+  return Number(result[0].insertId);
+}
+
+export async function updateAiAudit(id: number, data: Partial<InsertAiAudit>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not initialized");
+
+  await db.update(aiAudits).set(data).where(eq(aiAudits.id, id));
+}
+
+export async function getAiAuditById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [audit] = await db
+    .select()
+    .from(aiAudits)
+    .where(eq(aiAudits.id, id));
+
+  return audit;
+}
+
+export async function getAiAuditsByTenant(tenantId: number, limit = 50) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(aiAudits)
+    .where(eq(aiAudits.tenantId, tenantId))
+    .orderBy(desc(aiAudits.createdAt))
+    .limit(limit);
 }

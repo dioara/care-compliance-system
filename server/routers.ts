@@ -37,10 +37,14 @@ export const appRouter = router({
           name: z.string().optional(),
           address: z.string().optional(),
           telephone: z.string().optional(),
-          email: z.string().email().optional(),
+          email: z.string().email().optional().or(z.literal("")),
           website: z.string().optional(),
           managerName: z.string().optional(),
-          careSettingType: z.enum(["residential", "nursing", "domiciliary", "supported_living"]).optional(),
+          managerTitle: z.string().optional(),
+          serviceType: z.string().optional(),
+          careSettingType: z.enum(["residential", "nursing", "domiciliary", "supported_living"]).optional().or(z.literal("")),
+          cqcRating: z.string().optional(),
+          openaiApiKey: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -48,7 +52,14 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
         }
 
-        await db.updateTenant(ctx.user.tenantId, input);
+        // Clean up empty strings for enum fields
+        const cleanedInput = {
+          ...input,
+          careSettingType: input.careSettingType === "" ? undefined : input.careSettingType,
+          email: input.email === "" ? undefined : input.email,
+        };
+
+        await db.updateTenant(ctx.user.tenantId, cleanedInput);
         return { success: true };
       }),
 
@@ -898,6 +909,155 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.updateUserRole(input.userId, input.role);
         return { success: true };
+      }),
+  }),
+
+  // AI Audits
+  aiAudits: router({
+    // Get tenant's OpenAI API key status
+    getApiKeyStatus: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      const tenant = await db.getTenantById(ctx.user.tenantId);
+      return {
+        hasApiKey: !!tenant?.openaiApiKey,
+        keyPreview: tenant?.openaiApiKey ? `sk-...${tenant.openaiApiKey.slice(-4)}` : null,
+      };
+    }),
+
+    // Validate OpenAI API key
+    validateApiKey: protectedProcedure
+      .input(z.object({ apiKey: z.string() }))
+      .mutation(async ({ input }) => {
+        const { validateApiKey } = await import("./services/openaiService");
+        const isValid = await validateApiKey(input.apiKey);
+        return { isValid };
+      }),
+
+    // Submit document for AI audit
+    submitAudit: protectedProcedure
+      .input(
+        z.object({
+          auditType: z.enum(["care_plan", "daily_notes"]),
+          documentText: z.string().min(100, "Document must be at least 100 characters"),
+          documentName: z.string().optional(),
+          customNames: z.array(z.string()).optional(), // Additional names to anonymize
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+
+        // Get tenant's OpenAI API key
+        const tenant = await db.getTenantById(ctx.user.tenantId);
+        if (!tenant?.openaiApiKey) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "Please configure your OpenAI API key in Company Profile to use AI audits",
+          });
+        }
+
+        // Anonymize the document
+        const { anonymizeDocument, createAnonymizationReport } = await import("./utils/anonymize");
+        const { anonymizedText, redactionSummary } = anonymizeDocument(input.documentText, {
+          customNames: input.customNames,
+        });
+        const anonymizationReport = createAnonymizationReport(input.documentText.length, redactionSummary);
+
+        // Create audit record with pending status
+        const auditId = await db.createAiAudit({
+          tenantId: ctx.user.tenantId,
+          locationId: ctx.user.locationId || 1,
+          auditType: input.auditType,
+          documentName: input.documentName || `${input.auditType}_${Date.now()}`,
+          status: "processing",
+          anonymizationReport,
+          requestedById: ctx.user.id,
+        });
+
+        // Process with OpenAI
+        try {
+          const { analyzeCarePlan, analyzeDailyNotes } = await import("./services/openaiService");
+          
+          let result;
+          if (input.auditType === "care_plan") {
+            result = await analyzeCarePlan(anonymizedText, tenant.openaiApiKey);
+          } else {
+            result = await analyzeDailyNotes(anonymizedText, tenant.openaiApiKey);
+          }
+
+          // Update audit with results
+          await db.updateAiAudit(auditId, {
+            status: "completed",
+            score: result.score,
+            strengths: JSON.stringify(result.strengths),
+            areasForImprovement: JSON.stringify(result.areasForImprovement),
+            recommendations: JSON.stringify(result.recommendations),
+            examples: JSON.stringify(result.examples),
+            cqcComplianceNotes: 'cqcComplianceNotes' in result ? result.cqcComplianceNotes : ('professionalismNotes' in result ? result.professionalismNotes : ''),
+            processedAt: new Date(),
+          });
+
+          return {
+            success: true,
+            auditId,
+            result: {
+              score: result.score,
+              strengths: result.strengths,
+              areasForImprovement: result.areasForImprovement,
+              recommendations: result.recommendations,
+              examples: result.examples,
+              cqcComplianceNotes: 'cqcComplianceNotes' in result ? result.cqcComplianceNotes : ('professionalismNotes' in result ? result.professionalismNotes : ''),
+            },
+            anonymizationSummary: {
+              namesRedacted: redactionSummary.namesRedacted,
+              piiRedacted: Object.values(redactionSummary.piiRedacted).reduce((a, b) => a + b, 0),
+            },
+          };
+        } catch (error) {
+          // Update audit with failed status
+          await db.updateAiAudit(auditId, {
+            status: "failed",
+            cqcComplianceNotes: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Failed to process document",
+          });
+        }
+      }),
+
+    // Get audit history
+    getHistory: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getAiAuditsByTenant(ctx.user.tenantId, input.limit || 50);
+      }),
+
+    // Get single audit by ID
+    getById: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        const audit = await db.getAiAuditById(input.id);
+        if (!audit || audit.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Audit not found" });
+        }
+        return {
+          ...audit,
+          strengths: audit.strengths ? JSON.parse(audit.strengths) : [],
+          areasForImprovement: audit.areasForImprovement ? JSON.parse(audit.areasForImprovement) : [],
+          recommendations: audit.recommendations ? JSON.parse(audit.recommendations) : [],
+          examples: audit.examples ? JSON.parse(audit.examples) : [],
+        };
       }),
   }),
 });
