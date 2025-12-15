@@ -1809,3 +1809,28 @@ export async function getAiAuditScoreTrends(tenantId: number, startDate: Date, e
     ))
     .orderBy(aiAudits.createdAt);
 }
+
+
+// Update user
+export async function updateUser(userId: number, data: Partial<{
+  name: string;
+  email: string;
+  password: string;
+  superAdmin: boolean;
+}>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.update(users).set(data).where(eq(users.id, userId));
+}
+
+// Delete user
+export async function deleteUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete user roles first
+  await db.delete(userRoles).where(eq(userRoles.userId, userId));
+  // Delete the user
+  return await db.delete(users).where(eq(users.id, userId));
+}

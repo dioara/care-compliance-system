@@ -870,3 +870,73 @@
 - /audit-comparison - Audit comparison reports with trend charts
 - /privacy-policy - Comprehensive GDPR-compliant privacy policy
 - /data-privacy - Data privacy settings for users to exercise GDPR rights
+
+
+## RBAC Frontend & Location-Based Filtering (User Request)
+
+### Staff Schema Updates
+- [ ] Add employmentType field to staff table (permanent_sponsored, permanent_not_sponsored, agency)
+- [ ] Remove employment type questions from compliance questionnaire
+- [ ] Make employmentType determine which additional compliance questions show
+- [ ] Default all existing staff to Main Office location
+- [ ] Default all existing service users to Main Office location
+
+### Role Management UI (Super Admin)
+- [ ] Create RoleManagement.tsx page
+- [ ] List all roles with edit/delete buttons
+- [ ] Create role form with name and description
+- [ ] Add location permissions grid (checkboxes for read/write per location)
+- [ ] Save role with location permissions
+- [ ] Add navigation link for super admin only
+
+### User Management UI (Super Admin)
+- [ ] Create UserManagement.tsx page
+- [ ] List all users with edit/delete buttons
+- [ ] Create user form with email, name, password
+- [ ] Add role assignment (multi-select dropdown)
+- [ ] Show user's effective location permissions
+- [ ] Add navigation link for super admin only
+
+### Location-Based Data Filtering
+- [ ] Update Staff page to filter by selected location
+- [ ] Update Service Users page to filter by selected location
+- [ ] Update Dashboard to show data for selected location only
+- [ ] Update Compliance pages to filter by location
+- [ ] Update Incidents page to filter by location
+- [ ] Update Audits page to filter by location
+- [ ] Show only locations user has access to in location switcher
+
+### Signup Flow Updates
+- [ ] Verify signup creates default "Main Office" location
+- [ ] First user is super admin with full access
+- [ ] Location selector in all create forms (staff, service users)
+- [ ] Only show locations user has access to in forms
+
+### Testing
+- [ ] Test super admin can create roles with location permissions
+- [ ] Test super admin can assign users to roles
+- [ ] Test users only see data from their accessible locations
+- [ ] Test read-only users cannot edit data
+- [ ] Push to GitHub
+
+
+## RBAC Frontend & Location-Based Filtering - COMPLETED (Dec 15, 2025)
+- [x] Build Role Management UI for super admin (RoleManagement.tsx)
+  - Create roles with name and description
+  - Assign location permissions (read-only or read-write)
+  - View and edit existing roles
+- [x] Build User Management UI for super admin (UserManagement.tsx)
+  - View all users in organisation
+  - Create new users with email, name, password
+  - Assign roles to users
+  - Edit user details and role assignments
+- [x] Add navigation links for admin pages
+  - "ADMINISTRATION" section in sidebar (visible only to super admins)
+  - Role Management link with shield icon
+  - User Management link with user-cog icon
+- [x] Move employment type to staff record (employmentType field in staffMembers schema)
+  - permanent_sponsored, permanent_not_sponsored, agency options
+- [x] Default all staff/service users to Main Office location (verified - all have locations)
+- [x] Location filtering already implemented via LocationSwitcher component
+- [ ] Update signup flow to create default location (already done in previous work)
+- [ ] Ensure location selection on record creation (already done - defaults to active location)

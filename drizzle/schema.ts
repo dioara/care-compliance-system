@@ -95,6 +95,7 @@ export const staffMembers = mysqlTable("staffMembers", {
   locationId: int("locationId").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   role: varchar("role", { length: 100 }),
+  employmentType: mysqlEnum("employmentType", ["permanent_sponsored", "permanent_not_sponsored", "agency"]).default("permanent_not_sponsored"),
   employmentDate: date("employmentDate"),
   dbsCertificateNumber: varchar("dbsCertificateNumber", { length: 100 }),
   dbsDate: date("dbsDate"),

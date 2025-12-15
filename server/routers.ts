@@ -7,6 +7,17 @@ import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
 
+// Super admin middleware - only allows super admins to access
+const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  if (!ctx.user.superAdmin) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Only super admins can perform this action",
+    });
+  }
+  return next({ ctx });
+});
+
 export const appRouter = router({
   system: systemRouter,
   auth: authRouter,
@@ -894,10 +905,69 @@ export const appRouter = router({
 
   // User management
   users: router({
-    list: adminProcedure.query(async ({ ctx }) => {
+    list: superAdminProcedure.query(async ({ ctx }) => {
       if (!ctx.user?.tenantId) return [];
       return db.getUsersByTenant(ctx.user.tenantId);
     }),
+
+    create: superAdminProcedure
+      .input(
+        z.object({
+          name: z.string().min(1),
+          email: z.string().email(),
+          password: z.string().min(6),
+          superAdmin: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No tenant" });
+        }
+        // Check if email already exists
+        const existing = await db.getUserByEmail(input.email);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "Email already exists" });
+        }
+        // createUser already hashes the password internally
+        const result = await db.createUser({
+          tenantId: ctx.user.tenantId,
+          name: input.name,
+          email: input.email,
+          password: input.password,
+          superAdmin: input.superAdmin || false,
+        });
+        return { success: true, userId: (result as any).insertId };
+      }),
+
+    update: superAdminProcedure
+      .input(
+        z.object({
+          userId: z.number(),
+          name: z.string().optional(),
+          email: z.string().email().optional(),
+          password: z.string().min(6).optional(),
+          superAdmin: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const updates: any = {};
+        if (input.name) updates.name = input.name;
+        if (input.email) updates.email = input.email;
+        if (input.superAdmin !== undefined) updates.superAdmin = input.superAdmin;
+        if (input.password) {
+          const bcrypt = await import("bcryptjs");
+          updates.password = await bcrypt.hash(input.password, 10);
+        }
+        await db.updateUser(input.userId, updates);
+        return { success: true };
+      }),
+
+    delete: superAdminProcedure
+      .input(z.object({ userId: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteUser(input.userId);
+        return { success: true };
+      }),
 
     updateRole: adminProcedure
       .input(

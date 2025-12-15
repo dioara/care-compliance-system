@@ -31,6 +31,8 @@ import AuditScheduling from "./pages/AuditScheduling";
 import AuditComparison from "./pages/AuditComparison";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DataPrivacy from "./pages/DataPrivacy";
+import RoleManagement from "./pages/RoleManagement";
+import UserManagement from "./pages/UserManagement";
 
 function Router() {
   return (
@@ -161,6 +163,18 @@ function Router() {
       <Route path="/data-privacy">
         <DashboardLayout>
           <DataPrivacy />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/role-management">
+        <DashboardLayout>
+          <RoleManagement />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/user-management">
+        <DashboardLayout>
+          <UserManagement />
         </DashboardLayout>
       </Route>
       

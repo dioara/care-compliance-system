@@ -1,0 +1,1 @@
+ALTER TABLE `staffMembers` ADD `employmentType` enum('permanent_sponsored','permanent_not_sponsored','agency') DEFAULT 'permanent_not_sponsored';
