@@ -1265,3 +1265,6 @@
 - [x] Implement discharge workflow with automatic date and status
 - [x] Add re-admission tracking to service user history
 - [x] Add service user history UI with timeline display
+
+## Audit Service Type Filter
+- [x] Add care service type filter (Domiciliary Care, Supported Living, Residential, All)

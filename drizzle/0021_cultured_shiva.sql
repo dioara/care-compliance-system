@@ -1,0 +1,1 @@
+ALTER TABLE `auditTypes` ADD `serviceType` enum('all','domiciliary_care','supported_living','residential','nursing') DEFAULT 'all' NOT NULL;

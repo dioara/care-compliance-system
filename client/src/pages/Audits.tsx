@@ -18,6 +18,7 @@ export default function Audits() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedServiceType, setSelectedServiceType] = useState<string>("all");
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedAuditType, setSelectedAuditType] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<number | null>(null);
@@ -70,9 +71,13 @@ export default function Audits() {
     });
   };
 
-  // Filter audit types by category
+  // Filter audit types by category and service type
   const filteredAuditTypes = auditTypes?.filter(
-    (type) => selectedCategory === "all" || type.auditCategory === selectedCategory
+    (type) => {
+      const categoryMatch = selectedCategory === "all" || type.auditCategory === selectedCategory;
+      const serviceTypeMatch = selectedServiceType === "all" || type.serviceType === selectedServiceType || type.serviceType === "all";
+      return categoryMatch && serviceTypeMatch;
+    }
   );
 
   // Group audit types by category
@@ -293,6 +298,46 @@ export default function Audits() {
             </Button>
           </div>
 
+          {/* Service Type Filter */}
+          <div className="flex gap-2 flex-wrap items-center">
+            <span className="text-sm font-medium text-muted-foreground mr-2">Service Type:</span>
+            <Button
+              variant={selectedServiceType === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedServiceType("all")}
+            >
+              All Services
+            </Button>
+            <Button
+              variant={selectedServiceType === "domiciliary_care" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedServiceType("domiciliary_care")}
+            >
+              Domiciliary Care
+            </Button>
+            <Button
+              variant={selectedServiceType === "supported_living" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedServiceType("supported_living")}
+            >
+              Supported Living
+            </Button>
+            <Button
+              variant={selectedServiceType === "residential" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedServiceType("residential")}
+            >
+              Residential
+            </Button>
+            <Button
+              variant={selectedServiceType === "nursing" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedServiceType("nursing")}
+            >
+              Nursing
+            </Button>
+          </div>
+
           {loadingTypes ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
@@ -311,9 +356,16 @@ export default function Audits() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <ClipboardList className="h-8 w-8 text-primary" />
-                      <Badge className={getCategoryBadgeColor(auditType.auditCategory)}>
-                        {auditType.recommendedFrequency || auditType.auditCategory}
-                      </Badge>
+                      <div className="flex flex-col gap-1 items-end">
+                        <Badge className={getCategoryBadgeColor(auditType.auditCategory)}>
+                          {auditType.recommendedFrequency || auditType.auditCategory}
+                        </Badge>
+                        {auditType.serviceType && auditType.serviceType !== 'all' && (
+                          <Badge variant="outline" className="text-xs">
+                            {auditType.serviceType.replace(/_/g, ' ')}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                     <CardTitle className="mt-4">{auditType.auditName}</CardTitle>
                     <CardDescription className="line-clamp-2">{auditType.description}</CardDescription>
