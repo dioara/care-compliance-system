@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ClipboardList, Search, Filter, Download, CheckCircle2, Clock, AlertCircle, Calendar, User } from "lucide-react";
+import { ClipboardList, Search, Filter, Download, CheckCircle2, Clock, AlertCircle, Calendar, User, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -33,6 +33,25 @@ export default function ActionLog() {
   const { data: actionPlans, isLoading, refetch } = trpc.audits.getAllActionPlans.useQuery({
     locationId: filterLocation === "all" ? undefined : parseInt(filterLocation),
   });
+
+  const generatePdfMutation = trpc.audits.generateActionLogPDF.useMutation({
+    onSuccess: (data) => {
+      // Open PDF in new tab
+      window.open(data.url, "_blank");
+      toast.success("PDF report generated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate PDF: ${error.message}`);
+    },
+  });
+
+  const handleDownloadPDF = () => {
+    generatePdfMutation.mutate({
+      locationId: filterLocation === "all" ? undefined : parseInt(filterLocation),
+      filterStatus: filterStatus,
+      filterRag: filterRag,
+    });
+  };
 
   const updateActionMutation = trpc.audits.updateActionPlanStatus.useMutation({
     onSuccess: () => {
@@ -173,10 +192,16 @@ export default function ActionLog() {
             Track and manage all action items from audits across your organization
           </p>
         </div>
-        <Button onClick={handleDownloadCSV}>
-          <Download className="h-4 w-4 mr-2" />
-          Download CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleDownloadCSV}>
+            <Download className="h-4 w-4 mr-2" />
+            CSV
+          </Button>
+          <Button onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending}>
+            <FileText className="h-4 w-4 mr-2" />
+            {generatePdfMutation.isPending ? "Generating..." : "Download PDF"}
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

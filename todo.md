@@ -1150,3 +1150,11 @@
 ## BUG: Action Log Issues (December 15, 2025)
 - [x] Add completion date field to Update Action dialog
 - [x] Add issue number column to CSV export (uses ACT-{id} format)
+
+
+## PDF Export for Action Log (December 15, 2025)
+- [x] Create PDF generation endpoint with company branding
+- [x] Include company logo, name, and location details
+- [x] Use landscape orientation for table display
+- [x] Add professional styling with colors and formatting
+- [x] Add PDF download button to Action Log page

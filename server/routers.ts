@@ -890,6 +890,60 @@ export const appRouter = router({
         return db.getAllActionPlans(ctx.user.tenantId);
       }),
 
+    // Generate PDF report for action log
+    generateActionLogPDF: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number().optional(),
+          filterStatus: z.string().optional(),
+          filterRag: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Get company details
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        
+        // Get location name if filtered
+        let locationName: string | undefined;
+        if (input.locationId) {
+          const location = await db.getLocationById(input.locationId);
+          locationName = location?.name;
+        }
+        
+        // Get all action plans
+        let actions = await db.getAllActionPlans(ctx.user.tenantId);
+        
+        // Apply filters
+        if (input.locationId) {
+          actions = actions.filter(a => a.locationId === input.locationId);
+        }
+        if (input.filterStatus && input.filterStatus !== "all") {
+          actions = actions.filter(a => a.status === input.filterStatus);
+        }
+        if (input.filterRag && input.filterRag !== "all") {
+          actions = actions.filter(a => a.ragStatus === input.filterRag);
+        }
+        
+        // Generate PDF
+        const { generateActionLogPDF } = await import("./services/actionLogPdfService");
+        const pdfBuffer = await generateActionLogPDF({
+          actions,
+          companyName: company.name,
+          companyLogo: company.logo || undefined,
+          locationName,
+          generatedBy: ctx.user.name || ctx.user.email,
+        });
+        
+        // Upload to S3
+        const filename = `action-log-${Date.now()}.pdf`;
+        const { url } = await storagePut(`reports/action-logs/${filename}`, pdfBuffer, "application/pdf");
+        
+        return { url, filename };
+      }),
+
     // Get audit schedules
     getSchedules: protectedProcedure
       .input(z.object({ tenantId: z.number() }))
