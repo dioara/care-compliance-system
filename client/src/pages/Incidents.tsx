@@ -1089,7 +1089,7 @@ export default function Incidents() {
 
       {/* Incident Detail Dialog - Enhanced with full width, notification tracking, and edit capability */}
       <Dialog open={!!selectedIncident} onOpenChange={(open) => !open && setSelectedIncident(null)}>
-        <DialogContent className="max-w-[98vw] w-full max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
           {selectedIncident && (
             <>
               <DialogHeader className="pb-4 border-b">
