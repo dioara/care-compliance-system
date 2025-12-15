@@ -1,22 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText, Download, Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
+import { 
+  AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText, Download, Loader2,
+  User, MapPin, Calendar, AlertCircle, Shield, Phone, Mail, Building, 
+  Stethoscope, ClipboardList, Users, Eye, ChevronRight, Activity
+} from "lucide-react";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
+import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
+
+// Incident types with icons and descriptions
+const INCIDENT_TYPES = [
+  { value: "fall", label: "Fall", description: "Slips, trips, and falls", icon: "🚶" },
+  { value: "medication_error", label: "Medication Error", description: "Administration or dispensing errors", icon: "💊" },
+  { value: "safeguarding", label: "Safeguarding Concern", description: "Abuse, neglect, or exploitation", icon: "🛡️" },
+  { value: "pressure_ulcer", label: "Pressure Ulcer", description: "New or deteriorating pressure injuries", icon: "🩹" },
+  { value: "infection", label: "Infection", description: "Healthcare-associated infections", icon: "🦠" },
+  { value: "challenging_behaviour", label: "Challenging Behaviour", description: "Aggression or self-harm", icon: "⚠️" },
+  { value: "missing_person", label: "Missing Person", description: "Absconding or unexplained absence", icon: "🔍" },
+  { value: "equipment_failure", label: "Equipment Failure", description: "Medical device or equipment issues", icon: "🔧" },
+  { value: "near_miss", label: "Near Miss", description: "Potential incident that was prevented", icon: "🎯" },
+  { value: "complaint", label: "Complaint", description: "Formal complaint received", icon: "📝" },
+  { value: "death", label: "Death", description: "Expected or unexpected death", icon: "🕊️" },
+  { value: "other", label: "Other", description: "Other incident type", icon: "📋" },
+];
+
+const SEVERITY_LEVELS = [
+  { value: "low", label: "Low", color: "bg-blue-500", description: "Minor impact, no harm" },
+  { value: "medium", label: "Medium", color: "bg-yellow-500", description: "Moderate impact, minor harm" },
+  { value: "high", label: "High", color: "bg-orange-500", description: "Significant impact, serious harm" },
+  { value: "critical", label: "Critical", color: "bg-red-500", description: "Severe impact, life-threatening" },
+];
 
 export default function Incidents() {
-  const [, setLocation] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [selectedIncident, setSelectedIncident] = useState<number | null>(null);
+  const [selectedIncident, setSelectedIncident] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("all");
+  const [formStep, setFormStep] = useState(1);
 
   // Fetch data
   const { data: incidents = [], refetch } = trpc.incidents.getByTenant.useQuery({ limit: 100 });
@@ -29,6 +59,7 @@ export default function Incidents() {
     onSuccess: () => {
       toast.success("Incident reported successfully");
       setIsCreateDialogOpen(false);
+      resetForm();
       refetch();
     },
     onError: (error) => {
@@ -46,6 +77,7 @@ export default function Incidents() {
   const closeMutation = trpc.incidents.close.useMutation({
     onSuccess: () => {
       toast.success("Incident closed");
+      setSelectedIncident(null);
       refetch();
     },
   });
@@ -60,29 +92,119 @@ export default function Incidents() {
     },
   });
 
-  // Form state
+  // Form state - comprehensive incident form
   const [formData, setFormData] = useState({
+    // Basic Information
     locationId: "",
     incidentNumber: `INC-${Date.now()}`,
     incidentDate: new Date().toISOString().split('T')[0],
     incidentTime: new Date().toTimeString().slice(0, 5),
     incidentType: "",
     severity: "",
+    
+    // Location Details
     locationDescription: "",
+    exactLocation: "",
+    
+    // Affected Person
     affectedPersonType: "",
     serviceUserId: "",
     affectedStaffId: "",
     affectedPersonName: "",
-    staffInvolved: "",
+    affectedPersonDob: "",
+    affectedPersonContact: "",
+    
+    // Incident Details (rich text)
     description: "",
+    antecedents: "", // What happened before
     immediateActions: "",
+    
+    // Injuries & Treatment
+    injuriesDescription: "",
+    injurySeverity: "",
+    firstAidGiven: false,
+    firstAidDetails: "",
+    medicalAttentionRequired: false,
+    medicalAttentionDetails: "",
+    hospitalAttendance: false,
+    hospitalName: "",
+    
+    // Witnesses
+    witnessesPresent: false,
     witnessStatements: "",
+    
+    // Staff Involvement
+    staffInvolved: "",
+    staffOnDuty: "",
+    reportedBy: "",
+    
+    // Notifications
+    familyNotified: false,
+    familyNotificationDetails: "",
+    gpNotified: false,
+    gpNotificationDetails: "",
+    
+    // Risk Assessment
+    riskAssessmentRequired: false,
+    riskAssessmentNotes: "",
+    
+    // Follow-up Actions
+    followUpRequired: false,
+    followUpActions: "",
+    preventativeMeasures: "",
+    lessonsLearned: "",
   });
+
+  const resetForm = () => {
+    setFormData({
+      locationId: "",
+      incidentNumber: `INC-${Date.now()}`,
+      incidentDate: new Date().toISOString().split('T')[0],
+      incidentTime: new Date().toTimeString().slice(0, 5),
+      incidentType: "",
+      severity: "",
+      locationDescription: "",
+      exactLocation: "",
+      affectedPersonType: "",
+      serviceUserId: "",
+      affectedStaffId: "",
+      affectedPersonName: "",
+      affectedPersonDob: "",
+      affectedPersonContact: "",
+      description: "",
+      antecedents: "",
+      immediateActions: "",
+      injuriesDescription: "",
+      injurySeverity: "",
+      firstAidGiven: false,
+      firstAidDetails: "",
+      medicalAttentionRequired: false,
+      medicalAttentionDetails: "",
+      hospitalAttendance: false,
+      hospitalName: "",
+      witnessesPresent: false,
+      witnessStatements: "",
+      staffInvolved: "",
+      staffOnDuty: "",
+      reportedBy: "",
+      familyNotified: false,
+      familyNotificationDetails: "",
+      gpNotified: false,
+      gpNotificationDetails: "",
+      riskAssessmentRequired: false,
+      riskAssessmentNotes: "",
+      followUpRequired: false,
+      followUpActions: "",
+      preventativeMeasures: "",
+      lessonsLearned: "",
+    });
+    setFormStep(1);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.locationId || !formData.incidentType) {
+    if (!formData.locationId || !formData.incidentType || !formData.severity) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -93,7 +215,7 @@ export default function Incidents() {
       incidentDate: formData.incidentDate,
       incidentTime: formData.incidentTime,
       incidentType: formData.incidentType,
-      severity: formData.severity || undefined,
+      severity: formData.severity,
       locationDescription: formData.locationDescription || undefined,
       affectedPersonType: formData.affectedPersonType || undefined,
       serviceUserId: formData.serviceUserId ? parseInt(formData.serviceUserId) : undefined,
@@ -108,361 +230,954 @@ export default function Incidents() {
 
   // Statistics
   const totalIncidents = incidents.length;
-  const openIncidents = incidents.filter(i => i.status === "open" || i.status === "under_investigation").length;
-  const cqcNotified = incidents.filter(i => i.reportedToCqc).length;
-  const criticalIncidents = incidents.filter(i => i.severity === "critical" || i.severity === "high").length;
+  const openIncidents = incidents.filter((i: any) => i.status === "open" || i.status === "under_investigation").length;
+  const cqcNotified = incidents.filter((i: any) => i.reportedToCqc).length;
+  const criticalIncidents = incidents.filter((i: any) => i.severity === "critical" || i.severity === "high").length;
+  const thisMonthIncidents = incidents.filter((i: any) => {
+    const date = new Date(i.incidentDate);
+    const now = new Date();
+    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+  }).length;
 
   const getSeverityColor = (severity: string | null) => {
     switch (severity) {
-      case "critical": return "bg-red-500";
-      case "high": return "bg-orange-500";
-      case "medium": return "bg-yellow-500";
-      case "low": return "bg-blue-500";
-      default: return "bg-gray-500";
+      case "critical": return "bg-red-500 text-white";
+      case "high": return "bg-orange-500 text-white";
+      case "medium": return "bg-yellow-500 text-black";
+      case "low": return "bg-blue-500 text-white";
+      default: return "bg-gray-500 text-white";
     }
   };
 
-  const getStatusIcon = (status: string | null) => {
+  const getStatusBadge = (status: string | null) => {
     switch (status) {
-      case "open": return <Clock className="h-4 w-4" />;
-      case "under_investigation": return <AlertTriangle className="h-4 w-4" />;
-      case "resolved": return <CheckCircle className="h-4 w-4" />;
-      case "closed": return <XCircle className="h-4 w-4" />;
-      default: return <FileText className="h-4 w-4" />;
+      case "open": return <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50"><Clock className="h-3 w-3 mr-1" />Open</Badge>;
+      case "under_investigation": return <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50"><AlertTriangle className="h-3 w-3 mr-1" />Investigating</Badge>;
+      case "resolved": return <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
+      case "closed": return <Badge variant="outline" className="border-gray-500 text-gray-600 bg-gray-50"><XCircle className="h-3 w-3 mr-1" />Closed</Badge>;
+      default: return <Badge variant="outline"><FileText className="h-3 w-3 mr-1" />Unknown</Badge>;
     }
   };
+
+  const filteredIncidents = activeTab === "all" 
+    ? incidents 
+    : incidents.filter((i: any) => i.status === activeTab);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Incident Reporting</h1>
-          <p className="text-muted-foreground mt-2">
-            Log and track incidents with automatic categorisation and regulatory reporting
+          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            Incident Reporting
+          </h1>
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Log and track incidents with comprehensive documentation, automatic categorisation, and regulatory reporting compliance.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button
             variant="outline"
             onClick={() => generatePDFMutation.mutate({})}
             disabled={generatePDFMutation.isPending}
+            className="shadow-sm"
           >
             {generatePDFMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Download className="mr-2 h-4 w-4" />
             )}
-            Download PDF
+            Export Report
           </Button>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="shadow-md hover:shadow-lg transition-shadow">
                 <Plus className="mr-2 h-4 w-4" />
                 Report Incident
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Report New Incident</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="incidentNumber">Incident Number *</Label>
-                  <Input
-                    id="incidentNumber"
-                    value={formData.incidentNumber}
-                    onChange={(e) => setFormData({ ...formData, incidentNumber: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="location">Location *</Label>
-                  <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {locations.map((loc: any) => (
-                        <SelectItem key={loc.id} value={loc.id.toString()}>{loc.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader className="pb-4 border-b">
+                <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
+                  <AlertTriangle className="h-6 w-6 text-orange-500" />
+                  Report New Incident
+                </DialogTitle>
+                <DialogDescription>
+                  Complete this form to document an incident. All fields marked with * are required.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Progress Steps */}
+              <div className="flex items-center justify-center py-4">
+                {[1, 2, 3, 4].map((step) => (
+                  <div key={step} className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => setFormStep(step)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                        formStep >= step 
+                          ? 'bg-primary text-primary-foreground shadow-md' 
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {step}
+                    </button>
+                    {step < 4 && (
+                      <div className={`w-16 h-1 mx-2 rounded ${formStep > step ? 'bg-primary' : 'bg-muted'}`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-center gap-8 text-sm text-muted-foreground mb-6">
+                <span className={formStep === 1 ? 'text-primary font-medium' : ''}>Basic Info</span>
+                <span className={formStep === 2 ? 'text-primary font-medium' : ''}>Details</span>
+                <span className={formStep === 3 ? 'text-primary font-medium' : ''}>Injuries</span>
+                <span className={formStep === 4 ? 'text-primary font-medium' : ''}>Follow-up</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="incidentDate">Date *</Label>
-                  <Input
-                    id="incidentDate"
-                    type="date"
-                    value={formData.incidentDate}
-                    onChange={(e) => setFormData({ ...formData, incidentDate: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="incidentTime">Time</Label>
-                  <Input
-                    id="incidentTime"
-                    type="time"
-                    value={formData.incidentTime}
-                    onChange={(e) => setFormData({ ...formData, incidentTime: e.target.value })}
-                  />
-                </div>
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Step 1: Basic Information */}
+                {formStep === 1 && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Incident Number */}
+                      <div className="space-y-2">
+                        <Label htmlFor="incidentNumber" className="text-sm font-medium">
+                          Incident Reference *
+                        </Label>
+                        <Input
+                          id="incidentNumber"
+                          value={formData.incidentNumber}
+                          onChange={(e) => setFormData({ ...formData, incidentNumber: e.target.value })}
+                          className="h-11"
+                          required
+                        />
+                      </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="incidentType">Incident Type *</Label>
-                  <Select value={formData.incidentType} onValueChange={(value) => setFormData({ ...formData, incidentType: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="accident">Accident</SelectItem>
-                      <SelectItem value="near_miss">Near Miss</SelectItem>
-                      <SelectItem value="safeguarding">Safeguarding</SelectItem>
-                      <SelectItem value="medication_error">Medication Error</SelectItem>
-                      <SelectItem value="fall">Fall</SelectItem>
-                      <SelectItem value="pressure_ulcer">Pressure Ulcer</SelectItem>
-                      <SelectItem value="complaint">Complaint</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="severity">Severity</Label>
-                  <Select value={formData.severity} onValueChange={(value) => setFormData({ ...formData, severity: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select severity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="critical">Critical</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+                      {/* Location */}
+                      <div className="space-y-2">
+                        <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          Location *
+                        </Label>
+                        <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
+                          <SelectTrigger className="h-11">
+                            <SelectValue placeholder="Select location" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {locations.map((loc: any) => (
+                              <SelectItem key={loc.id} value={loc.id.toString()}>{loc.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-              <div>
-                <Label htmlFor="locationDescription">Location Description</Label>
-                <Input
-                  id="locationDescription"
-                  placeholder="e.g., Main hallway, Room 12"
-                  value={formData.locationDescription}
-                  onChange={(e) => setFormData({ ...formData, locationDescription: e.target.value })}
-                />
-              </div>
+                      {/* Date */}
+                      <div className="space-y-2">
+                        <Label htmlFor="incidentDate" className="text-sm font-medium flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Date of Incident *
+                        </Label>
+                        <Input
+                          id="incidentDate"
+                          type="date"
+                          value={formData.incidentDate}
+                          onChange={(e) => setFormData({ ...formData, incidentDate: e.target.value })}
+                          className="h-11"
+                          required
+                        />
+                      </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="affectedPersonType">Affected Person Type</Label>
-                  <Select value={formData.affectedPersonType} onValueChange={(value) => setFormData({ ...formData, affectedPersonType: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="service_user">Service User</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
-                      <SelectItem value="visitor">Visitor</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {formData.affectedPersonType === "service_user" && (
-                  <div>
-                    <Label htmlFor="serviceUserId">Service User</Label>
-                    <Select value={formData.serviceUserId} onValueChange={(value) => setFormData({ ...formData, serviceUserId: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select service user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {serviceUsers.map((su: any) => (
-                          <SelectItem key={su.id} value={su.id.toString()}>{su.name}</SelectItem>
+                      {/* Time */}
+                      <div className="space-y-2">
+                        <Label htmlFor="incidentTime" className="text-sm font-medium flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Time of Incident
+                        </Label>
+                        <Input
+                          id="incidentTime"
+                          type="time"
+                          value={formData.incidentTime}
+                          onChange={(e) => setFormData({ ...formData, incidentTime: e.target.value })}
+                          className="h-11"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Incident Type Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Incident Type *</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {INCIDENT_TYPES.map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, incidentType: type.value })}
+                            className={`p-4 rounded-xl border-2 text-left transition-all hover:shadow-md ${
+                              formData.incidentType === type.value
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <span className="text-2xl">{type.icon}</span>
+                            <div className="mt-2 font-medium text-sm">{type.label}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{type.description}</div>
+                          </button>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-                {formData.affectedPersonType === "staff" && (
-                  <div>
-                    <Label htmlFor="affectedStaffId">Staff Member</Label>
-                    <Select value={formData.affectedStaffId} onValueChange={(value) => setFormData({ ...formData, affectedStaffId: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select staff member" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {staff.map((s: any) => (
-                          <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
+                      </div>
+                    </div>
+
+                    {/* Severity Selection */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Severity Level *</Label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {SEVERITY_LEVELS.map((level) => (
+                          <button
+                            key={level.value}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, severity: level.value })}
+                            className={`p-4 rounded-xl border-2 text-center transition-all hover:shadow-md ${
+                              formData.severity === level.value
+                                ? 'border-primary shadow-md'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <div className={`w-4 h-4 rounded-full ${level.color} mx-auto mb-2`} />
+                            <div className="font-medium text-sm">{level.label}</div>
+                            <div className="text-xs text-muted-foreground mt-1">{level.description}</div>
+                          </button>
                         ))}
-                      </SelectContent>
-                    </Select>
+                      </div>
+                    </div>
+
+                    {/* Exact Location */}
+                    <div className="space-y-2">
+                      <Label htmlFor="locationDescription" className="text-sm font-medium flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Exact Location of Incident
+                      </Label>
+                      <Input
+                        id="locationDescription"
+                        placeholder="e.g., Room 12, Main hallway near reception, Garden area"
+                        value={formData.locationDescription}
+                        onChange={(e) => setFormData({ ...formData, locationDescription: e.target.value })}
+                        className="h-11"
+                      />
+                    </div>
                   </div>
                 )}
-                {(formData.affectedPersonType === "visitor" || formData.affectedPersonType === "other") && (
-                  <div>
-                    <Label htmlFor="affectedPersonName">Person Name</Label>
-                    <Input
-                      id="affectedPersonName"
-                      value={formData.affectedPersonName}
-                      onChange={(e) => setFormData({ ...formData, affectedPersonName: e.target.value })}
-                    />
+
+                {/* Step 2: Incident Details */}
+                {formStep === 2 && (
+                  <div className="space-y-6">
+                    {/* Affected Person */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <User className="h-5 w-5" />
+                          Affected Person
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label>Person Type</Label>
+                            <Select value={formData.affectedPersonType} onValueChange={(value) => setFormData({ ...formData, affectedPersonType: value, serviceUserId: "", affectedStaffId: "", affectedPersonName: "" })}>
+                              <SelectTrigger className="h-11">
+                                <SelectValue placeholder="Select type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="service_user">Service User</SelectItem>
+                                <SelectItem value="staff">Staff Member</SelectItem>
+                                <SelectItem value="visitor">Visitor</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {formData.affectedPersonType === "service_user" && (
+                            <div className="space-y-2">
+                              <Label>Service User</Label>
+                              <Select value={formData.serviceUserId} onValueChange={(value) => setFormData({ ...formData, serviceUserId: value })}>
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Select service user" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {serviceUsers.map((su: any) => (
+                                    <SelectItem key={su.id} value={su.id.toString()}>{su.name}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          {formData.affectedPersonType === "staff" && (
+                            <div className="space-y-2">
+                              <Label>Staff Member</Label>
+                              <Select value={formData.affectedStaffId} onValueChange={(value) => setFormData({ ...formData, affectedStaffId: value })}>
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Select staff member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {staff.map((s: any) => (
+                                    <SelectItem key={s.id} value={s.id.toString()}>{s.name}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+
+                          {(formData.affectedPersonType === "visitor" || formData.affectedPersonType === "other") && (
+                            <div className="space-y-2">
+                              <Label>Person Name</Label>
+                              <Input
+                                value={formData.affectedPersonName}
+                                onChange={(e) => setFormData({ ...formData, affectedPersonName: e.target.value })}
+                                placeholder="Enter full name"
+                                className="h-11"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Incident Description */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        What Happened? *
+                      </Label>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Provide a detailed, factual account of the incident. Include who was involved, what happened, and the sequence of events.
+                      </p>
+                      <RichTextEditor
+                        value={formData.description}
+                        onChange={(value) => setFormData({ ...formData, description: value })}
+                        placeholder="Describe the incident in detail..."
+                        minHeight="180px"
+                      />
+                    </div>
+
+                    {/* Antecedents */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Events Leading Up to Incident
+                      </Label>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        What was happening before the incident? Any contributing factors or warning signs?
+                      </p>
+                      <RichTextEditor
+                        value={formData.antecedents}
+                        onChange={(value) => setFormData({ ...formData, antecedents: value })}
+                        placeholder="Describe what happened before the incident..."
+                        minHeight="120px"
+                      />
+                    </div>
+
+                    {/* Immediate Actions */}
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">
+                        Immediate Actions Taken
+                      </Label>
+                      <RichTextEditor
+                        value={formData.immediateActions}
+                        onChange={(value) => setFormData({ ...formData, immediateActions: value })}
+                        placeholder="What actions were taken immediately after the incident?"
+                        minHeight="120px"
+                      />
+                    </div>
+
+                    {/* Staff Involved */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Staff Involved
+                        </Label>
+                        <Textarea
+                          value={formData.staffInvolved}
+                          onChange={(e) => setFormData({ ...formData, staffInvolved: e.target.value })}
+                          placeholder="List staff members involved or present"
+                          rows={3}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">
+                          Reported By
+                        </Label>
+                        <Input
+                          value={formData.reportedBy}
+                          onChange={(e) => setFormData({ ...formData, reportedBy: e.target.value })}
+                          placeholder="Name of person reporting"
+                          className="h-11"
+                        />
+                      </div>
+                    </div>
                   </div>
                 )}
-              </div>
 
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe what happened..."
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                />
-              </div>
+                {/* Step 3: Injuries & Treatment */}
+                {formStep === 3 && (
+                  <div className="space-y-6">
+                    {/* Injuries */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Stethoscope className="h-5 w-5" />
+                          Injuries & Medical Treatment
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Description of Injuries</Label>
+                          <RichTextEditor
+                            value={formData.injuriesDescription}
+                            onChange={(value) => setFormData({ ...formData, injuriesDescription: value })}
+                            placeholder="Describe any injuries sustained (or state 'No injuries')"
+                            minHeight="100px"
+                          />
+                        </div>
 
-              <div>
-                <Label htmlFor="immediateActions">Immediate Actions Taken</Label>
-                <Textarea
-                  id="immediateActions"
-                  placeholder="What actions were taken immediately?"
-                  value={formData.immediateActions}
-                  onChange={(e) => setFormData({ ...formData, immediateActions: e.target.value })}
-                  rows={3}
-                />
-              </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                            <div>
+                              <Label className="font-medium">First Aid Given</Label>
+                              <p className="text-xs text-muted-foreground">Was first aid administered?</p>
+                            </div>
+                            <Switch
+                              checked={formData.firstAidGiven}
+                              onCheckedChange={(checked) => setFormData({ ...formData, firstAidGiven: checked })}
+                            />
+                          </div>
 
-              <div>
-                <Label htmlFor="witnessStatements">Witness Statements (JSON format)</Label>
-                <Textarea
-                  id="witnessStatements"
-                  placeholder='[{"name": "John Doe", "statement": "I saw..."}]'
-                  value={formData.witnessStatements}
-                  onChange={(e) => setFormData({ ...formData, witnessStatements: e.target.value })}
-                  rows={3}
-                />
-              </div>
+                          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                            <div>
+                              <Label className="font-medium">Medical Attention</Label>
+                              <p className="text-xs text-muted-foreground">Required medical attention?</p>
+                            </div>
+                            <Switch
+                              checked={formData.medicalAttentionRequired}
+                              onCheckedChange={(checked) => setFormData({ ...formData, medicalAttentionRequired: checked })}
+                            />
+                          </div>
 
-              <div>
-                <Label htmlFor="staffInvolved">Staff Involved</Label>
-                <Textarea
-                  id="staffInvolved"
-                  placeholder="List staff members involved"
-                  value={formData.staffInvolved}
-                  onChange={(e) => setFormData({ ...formData, staffInvolved: e.target.value })}
-                  rows={2}
-                />
-              </div>
+                          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                            <div>
+                              <Label className="font-medium">Hospital Visit</Label>
+                              <p className="text-xs text-muted-foreground">Attended hospital?</p>
+                            </div>
+                            <Switch
+                              checked={formData.hospitalAttendance}
+                              onCheckedChange={(checked) => setFormData({ ...formData, hospitalAttendance: checked })}
+                            />
+                          </div>
+                        </div>
 
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? "Submitting..." : "Submit Incident"}
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+                        {formData.firstAidGiven && (
+                          <div className="space-y-2">
+                            <Label>First Aid Details</Label>
+                            <Textarea
+                              value={formData.firstAidDetails}
+                              onChange={(e) => setFormData({ ...formData, firstAidDetails: e.target.value })}
+                              placeholder="Describe first aid treatment given"
+                              rows={2}
+                            />
+                          </div>
+                        )}
+
+                        {formData.hospitalAttendance && (
+                          <div className="space-y-2">
+                            <Label>Hospital Name</Label>
+                            <Input
+                              value={formData.hospitalName}
+                              onChange={(e) => setFormData({ ...formData, hospitalName: e.target.value })}
+                              placeholder="Name of hospital attended"
+                              className="h-11"
+                            />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Witnesses */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Eye className="h-5 w-5" />
+                          Witnesses
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                          <div>
+                            <Label className="font-medium">Witnesses Present</Label>
+                            <p className="text-xs text-muted-foreground">Were there any witnesses to the incident?</p>
+                          </div>
+                          <Switch
+                            checked={formData.witnessesPresent}
+                            onCheckedChange={(checked) => setFormData({ ...formData, witnessesPresent: checked })}
+                          />
+                        </div>
+
+                        {formData.witnessesPresent && (
+                          <div className="space-y-2">
+                            <Label>Witness Statements</Label>
+                            <RichTextEditor
+                              value={formData.witnessStatements}
+                              onChange={(value) => setFormData({ ...formData, witnessStatements: value })}
+                              placeholder="Record witness names and their statements"
+                              minHeight="150px"
+                            />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Step 4: Follow-up & Notifications */}
+                {formStep === 4 && (
+                  <div className="space-y-6">
+                    {/* Notifications */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Phone className="h-5 w-5" />
+                          Notifications Made
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                            <div>
+                              <Label className="font-medium">Family/Next of Kin</Label>
+                              <p className="text-xs text-muted-foreground">Has family been notified?</p>
+                            </div>
+                            <Switch
+                              checked={formData.familyNotified}
+                              onCheckedChange={(checked) => setFormData({ ...formData, familyNotified: checked })}
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                            <div>
+                              <Label className="font-medium">GP/Doctor</Label>
+                              <p className="text-xs text-muted-foreground">Has GP been notified?</p>
+                            </div>
+                            <Switch
+                              checked={formData.gpNotified}
+                              onCheckedChange={(checked) => setFormData({ ...formData, gpNotified: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        {formData.familyNotified && (
+                          <div className="space-y-2">
+                            <Label>Family Notification Details</Label>
+                            <Textarea
+                              value={formData.familyNotificationDetails}
+                              onChange={(e) => setFormData({ ...formData, familyNotificationDetails: e.target.value })}
+                              placeholder="Who was contacted, when, and what was discussed"
+                              rows={2}
+                            />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Risk Assessment */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Shield className="h-5 w-5" />
+                          Risk Assessment
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+                          <div>
+                            <Label className="font-medium">Risk Assessment Required</Label>
+                            <p className="text-xs text-muted-foreground">Does this incident require a risk assessment review?</p>
+                          </div>
+                          <Switch
+                            checked={formData.riskAssessmentRequired}
+                            onCheckedChange={(checked) => setFormData({ ...formData, riskAssessmentRequired: checked })}
+                          />
+                        </div>
+
+                        {formData.riskAssessmentRequired && (
+                          <div className="space-y-2">
+                            <Label>Risk Assessment Notes</Label>
+                            <Textarea
+                              value={formData.riskAssessmentNotes}
+                              onChange={(e) => setFormData({ ...formData, riskAssessmentNotes: e.target.value })}
+                              placeholder="Notes for risk assessment review"
+                              rows={3}
+                            />
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Follow-up Actions */}
+                    <Card className="border-2">
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <ClipboardList className="h-5 w-5" />
+                          Follow-up Actions
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Preventative Measures</Label>
+                          <RichTextEditor
+                            value={formData.preventativeMeasures}
+                            onChange={(value) => setFormData({ ...formData, preventativeMeasures: value })}
+                            placeholder="What measures can be taken to prevent recurrence?"
+                            minHeight="100px"
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Lessons Learned</Label>
+                          <RichTextEditor
+                            value={formData.lessonsLearned}
+                            onChange={(value) => setFormData({ ...formData, lessonsLearned: value })}
+                            placeholder="Key learnings from this incident"
+                            minHeight="100px"
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => formStep > 1 ? setFormStep(formStep - 1) : setIsCreateDialogOpen(false)}
+                  >
+                    {formStep > 1 ? "Previous" : "Cancel"}
+                  </Button>
+                  
+                  {formStep < 4 ? (
+                    <Button
+                      type="button"
+                      onClick={() => setFormStep(formStep + 1)}
+                    >
+                      Next
+                      <ChevronRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button type="submit" disabled={createMutation.isPending} className="min-w-[150px]">
+                      {createMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Submit Incident
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Statistics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+      {/* Statistics Cards */}
+      <div className="grid gap-4 md:grid-cols-5">
+        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Incidents</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-slate-600">Total Incidents</CardTitle>
+            <div className="p-2 bg-slate-200 rounded-lg">
+              <Activity className="h-4 w-4 text-slate-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalIncidents}</div>
-            <p className="text-xs text-muted-foreground mt-1">All time</p>
+            <div className="text-3xl font-bold text-slate-900">{totalIncidents}</div>
+            <p className="text-xs text-slate-500 mt-1">All time records</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Open Incidents</CardTitle>
-            <Clock className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-orange-700">Open</CardTitle>
+            <div className="p-2 bg-orange-200 rounded-lg">
+              <Clock className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{openIncidents}</div>
-            <p className="text-xs text-muted-foreground mt-1">Requiring attention</p>
+            <div className="text-3xl font-bold text-orange-900">{openIncidents}</div>
+            <p className="text-xs text-orange-600 mt-1">Requiring attention</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CQC Notified</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <CardTitle className="text-sm font-medium text-red-700">Critical/High</CardTitle>
+            <div className="p-2 bg-red-200 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{cqcNotified}</div>
-            <p className="text-xs text-muted-foreground mt-1">Regulatory reports</p>
+            <div className="text-3xl font-bold text-red-900">{criticalIncidents}</div>
+            <p className="text-xs text-red-600 mt-1">High priority</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical/High</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <CardTitle className="text-sm font-medium text-blue-700">This Month</CardTitle>
+            <div className="p-2 bg-blue-200 rounded-lg">
+              <Calendar className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{criticalIncidents}</div>
-            <p className="text-xs text-muted-foreground mt-1">High priority</p>
+            <div className="text-3xl font-bold text-blue-900">{thisMonthIncidents}</div>
+            <p className="text-xs text-blue-600 mt-1">Current month</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-purple-700">CQC Notified</CardTitle>
+            <div className="p-2 bg-purple-200 rounded-lg">
+              <Shield className="h-4 w-4 text-purple-600" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-purple-900">{cqcNotified}</div>
+            <p className="text-xs text-purple-600 mt-1">Regulatory reports</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Incidents List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Incidents</CardTitle>
+      <Card className="shadow-sm">
+        <CardHeader className="border-b bg-muted/30">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <CardTitle className="text-xl">Incident Records</CardTitle>
+              <CardDescription>View and manage all reported incidents</CardDescription>
+            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="bg-background border">
+                <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                  All
+                </TabsTrigger>
+                <TabsTrigger value="open" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+                  Open
+                </TabsTrigger>
+                <TabsTrigger value="under_investigation" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                  Investigating
+                </TabsTrigger>
+                <TabsTrigger value="closed" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">
+                  Closed
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {incidents.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No incidents reported yet</p>
-            ) : (
-              incidents.map((incident: any) => (
-                <div key={incident.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => setSelectedIncident(incident.id)}>
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold">{incident.incidentNumber}</span>
-                        <Badge variant="outline" className={`${getSeverityColor(incident.severity)} text-white`}>
+        <CardContent className="p-0">
+          {filteredIncidents.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <h3 className="text-lg font-medium text-muted-foreground">No incidents found</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                {activeTab === "all" ? "No incidents have been reported yet" : `No ${activeTab.replace("_", " ")} incidents`}
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {filteredIncidents.map((incident: any) => (
+                <div 
+                  key={incident.id} 
+                  className="p-5 hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => setSelectedIncident(incident)}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="font-semibold text-lg">{incident.incidentNumber}</span>
+                        <Badge className={getSeverityColor(incident.severity)}>
                           {incident.severity || "Unknown"}
                         </Badge>
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          {getStatusIcon(incident.status)}
-                          {incident.status || "Open"}
-                        </Badge>
+                        {getStatusBadge(incident.status)}
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {incident.incidentType} • {new Date(incident.incidentDate).toLocaleDateString()} {incident.incidentTime && `at ${incident.incidentTime}`}
+                      <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3.5 w-3.5" />
+                          {new Date(incident.incidentDate).toLocaleDateString('en-GB', { 
+                            day: 'numeric', 
+                            month: 'short', 
+                            year: 'numeric' 
+                          })}
+                          {incident.incidentTime && ` at ${incident.incidentTime}`}
+                        </span>
+                        <span className="capitalize flex items-center gap-1">
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          {incident.incidentType?.replace(/_/g, ' ')}
+                        </span>
+                      </div>
+                      <p className="text-sm mt-2 line-clamp-2">
+                        {incident.description ? (
+                          <span dangerouslySetInnerHTML={{ __html: incident.description.replace(/<[^>]*>/g, ' ').substring(0, 200) }} />
+                        ) : (
+                          <span className="text-muted-foreground italic">No description provided</span>
+                        )}
                       </p>
-                      <p className="text-sm">{incident.description || "No description provided"}</p>
-                      <div className="flex gap-2 mt-2">
-                        {incident.reportedToCqc && <Badge variant="secondary">CQC Notified</Badge>}
-                        {incident.reportedToCouncil && <Badge variant="secondary">Council Notified</Badge>}
-                        {incident.reportedToIco && <Badge variant="secondary">ICO Notified</Badge>}
-                        {incident.reportedToPolice && <Badge variant="secondary">Police Notified</Badge>}
-                        {incident.reportedToFamily && <Badge variant="secondary">Family Notified</Badge>}
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        {incident.reportedToCqc && <Badge variant="secondary" className="text-xs">CQC Notified</Badge>}
+                        {incident.reportedToCouncil && <Badge variant="secondary" className="text-xs">Council Notified</Badge>}
+                        {incident.reportedToPolice && <Badge variant="secondary" className="text-xs">Police Notified</Badge>}
+                        {incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
                       </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Incident Detail Dialog */}
+      <Dialog open={!!selectedIncident} onOpenChange={(open) => !open && setSelectedIncident(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          {selectedIncident && (
+            <>
+              <DialogHeader className="pb-4 border-b">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <DialogTitle className="text-2xl font-semibold">
+                      {selectedIncident.incidentNumber}
+                    </DialogTitle>
+                    <DialogDescription className="mt-1">
+                      Reported on {new Date(selectedIncident.incidentDate).toLocaleDateString('en-GB', { 
+                        weekday: 'long',
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric' 
+                      })}
+                    </DialogDescription>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge className={getSeverityColor(selectedIncident.severity)}>
+                      {selectedIncident.severity}
+                    </Badge>
+                    {getStatusBadge(selectedIncident.status)}
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-6 py-4">
+                {/* Incident Type */}
+                <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                  <div className="text-3xl">
+                    {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.icon || "📋"}
+                  </div>
+                  <div>
+                    <div className="font-medium capitalize">
+                      {selectedIncident.incidentType?.replace(/_/g, ' ')}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.description}
                     </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+
+                {/* Description */}
+                {selectedIncident.description && (
+                  <div>
+                    <h4 className="font-medium mb-2">Description</h4>
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <RichTextDisplay content={selectedIncident.description} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Immediate Actions */}
+                {selectedIncident.immediateActions && (
+                  <div>
+                    <h4 className="font-medium mb-2">Immediate Actions Taken</h4>
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <RichTextDisplay content={selectedIncident.immediateActions} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Notifications */}
+                <div>
+                  <h4 className="font-medium mb-3">Notifications</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {[
+                      { key: 'reportedToCqc', label: 'CQC', icon: Shield },
+                      { key: 'reportedToCouncil', label: 'Council', icon: Building },
+                      { key: 'reportedToPolice', label: 'Police', icon: Shield },
+                      { key: 'reportedToFamily', label: 'Family', icon: Users },
+                      { key: 'reportedToIco', label: 'ICO', icon: Mail },
+                    ].map(({ key, label, icon: Icon }) => (
+                      <div 
+                        key={key}
+                        className={`p-3 rounded-lg border flex items-center gap-2 ${
+                          selectedIncident[key] 
+                            ? 'bg-green-50 border-green-200 text-green-700' 
+                            : 'bg-muted/30 text-muted-foreground'
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span className="text-sm font-medium">{label}</span>
+                        {selectedIncident[key] && <CheckCircle className="h-4 w-4 ml-auto" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4 border-t">
+                  {selectedIncident.status !== 'closed' && (
+                    <Button
+                      variant="outline"
+                      onClick={() => closeMutation.mutate({ id: selectedIncident.id })}
+                      disabled={closeMutation.isPending}
+                    >
+                      {closeMutation.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <XCircle className="mr-2 h-4 w-4" />
+                      )}
+                      Close Incident
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => generatePDFMutation.mutate({ incidentId: selectedIncident.id })}
+                    disabled={generatePDFMutation.isPending}
+                  >
+                    {generatePDFMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="mr-2 h-4 w-4" />
+                    )}
+                    Download PDF
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

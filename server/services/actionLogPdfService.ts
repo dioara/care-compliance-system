@@ -7,16 +7,16 @@ import PDFDocument from "pdfkit";
 
 interface ActionItem {
   id: number;
-  issueNumber?: string;
+  issueNumber?: number | null;
   issueDescription: string;
-  auditOrigin?: string;
-  locationName?: string;
+  auditOrigin?: string | null;
+  locationName?: string | null;
   ragStatus: string;
-  responsiblePersonName?: string;
-  targetCompletionDate: Date | string;
+  responsiblePersonName?: string | null;
+  targetCompletionDate: Date | string | null;
   status: string;
-  actionTaken?: string;
-  actualCompletionDate?: Date | string;
+  actionTaken?: string | null;
+  actualCompletionDate?: Date | string | null;
 }
 
 interface ActionLogReportData {
@@ -260,7 +260,7 @@ function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], content
 
       switch (col.key) {
         case "issueNumber":
-          value = action.issueNumber || `ACT-${action.id}`;
+          value = action.issueNumber ? String(action.issueNumber) : `ACT-${action.id}`;
           doc.font("Helvetica-Bold");
           break;
         case "issueDescription":

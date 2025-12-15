@@ -7,18 +7,21 @@ import PDFDocument from "pdfkit";
 
 interface IncidentItem {
   id: number;
-  title: string;
-  description: string;
+  incidentNumber: string | null;
+  incidentType: string;
+  description: string | null;
   incidentDate: Date | string;
-  reportedDate: Date | string;
-  severity: string;
-  status: string;
-  locationName?: string;
-  reportedByName?: string;
-  serviceUserName?: string;
-  staffMemberName?: string;
-  actionTaken?: string;
-  outcome?: string;
+  incidentTime: string | null;
+  severity: string | null;
+  status: string | null;
+  locationDescription?: string | null;
+  affectedPersonType?: string | null;
+  affectedPersonName?: string | null;
+  immediateActions?: string | null;
+  reportedToCqc?: boolean | null;
+  reportedToCouncil?: boolean | null;
+  reportedToPolice?: boolean | null;
+  reportedToFamily?: boolean | null;
 }
 
 interface IncidentReportData {
@@ -122,7 +125,7 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
       const total = data.incidents.length;
       const critical = data.incidents.filter(i => i.severity === "critical").length;
       const high = data.incidents.filter(i => i.severity === "high").length;
-      const open = data.incidents.filter(i => i.status === "open" || i.status === "investigating").length;
+      const open = data.incidents.filter(i => i.status === "open" || i.status === "under_investigation").length;
       const resolved = data.incidents.filter(i => i.status === "resolved" || i.status === "closed").length;
 
       const boxWidth = (contentWidth - 40) / 5;
@@ -140,15 +143,14 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
 
       // Table
       const columns = [
-        { header: "ID", width: 40, key: "id" },
+        { header: "Reference", width: 70, key: "incidentNumber" },
         { header: "Date", width: 70, key: "incidentDate" },
-        { header: "Title", width: 150, key: "title" },
-        { header: "Location", width: 80, key: "locationName" },
+        { header: "Type", width: 90, key: "incidentType" },
+        { header: "Location", width: 100, key: "locationDescription" },
         { header: "Severity", width: 60, key: "severity" },
-        { header: "Status", width: 70, key: "status" },
-        { header: "Reported By", width: 90, key: "reportedByName" },
-        { header: "Person Involved", width: 100, key: "personInvolved" },
-        { header: "Action Taken", width: 110, key: "actionTaken" },
+        { header: "Status", width: 80, key: "status" },
+        { header: "Affected Person", width: 100, key: "affectedPersonName" },
+        { header: "Description", width: 200, key: "description" },
       ];
 
       const tableTop = doc.y;
@@ -194,46 +196,44 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
           let textColor = COLORS.text;
 
           switch (col.key) {
-            case "id":
-              value = `INC-${incident.id}`;
+            case "incidentNumber":
+              value = incident.incidentNumber || `INC-${incident.id}`;
               doc.font("Helvetica-Bold");
               break;
             case "incidentDate":
               value = incident.incidentDate ? new Date(incident.incidentDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "";
               doc.font("Helvetica");
               break;
-            case "title":
-              value = incident.title || "";
-              if (value.length > 35) value = value.substring(0, 32) + "...";
+            case "incidentType":
+              value = (incident.incidentType || "").replace(/_/g, " ");
+              value = value.charAt(0).toUpperCase() + value.slice(1);
               doc.font("Helvetica");
               break;
-            case "locationName":
-              value = incident.locationName || "";
+            case "locationDescription":
+              value = incident.locationDescription || "";
+              if (value.length > 20) value = value.substring(0, 17) + "...";
               doc.font("Helvetica");
               break;
             case "severity":
               const severityMap: Record<string, string> = { critical: "Critical", high: "High", medium: "Medium", low: "Low" };
-              value = severityMap[incident.severity] || incident.severity;
+              value = severityMap[incident.severity || ""] || incident.severity || "";
               textColor = incident.severity === "critical" ? COLORS.danger : incident.severity === "high" ? COLORS.warning : COLORS.text;
               doc.font("Helvetica-Bold");
               break;
             case "status":
-              const statusMap: Record<string, string> = { open: "Open", investigating: "Investigating", resolved: "Resolved", closed: "Closed" };
-              value = statusMap[incident.status] || incident.status;
+              const statusMap: Record<string, string> = { open: "Open", under_investigation: "Investigating", resolved: "Resolved", closed: "Closed" };
+              value = statusMap[incident.status || ""] || incident.status || "";
               textColor = incident.status === "resolved" || incident.status === "closed" ? COLORS.success : "#7c3aed";
               doc.font("Helvetica-Bold");
               break;
-            case "reportedByName":
-              value = incident.reportedByName || "";
+            case "affectedPersonName":
+              value = incident.affectedPersonName || "";
               doc.font("Helvetica");
               break;
-            case "personInvolved":
-              value = incident.serviceUserName || incident.staffMemberName || "";
-              doc.font("Helvetica");
-              break;
-            case "actionTaken":
-              value = incident.actionTaken || "";
-              if (value.length > 25) value = value.substring(0, 22) + "...";
+            case "description":
+              // Strip HTML tags from rich text
+              value = (incident.description || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+              if (value.length > 50) value = value.substring(0, 47) + "...";
               doc.font("Helvetica");
               break;
             default:

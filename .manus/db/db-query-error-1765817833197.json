@@ -1,0 +1,8 @@
+{
+  "query": "ALTER TABLE users ADD COLUMN openId VARCHAR(255) UNIQUE, ADD COLUMN loginMethod VARCHAR(50);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute ALTER TABLE users ADD COLUMN openId VARCHAR(255) UNIQUE, ADD COLUMN loginMethod VARCHAR(50);",
+  "returncode": 1,
+  "logs": [
+    "ERROR 8200 (HY000) at line 1: unsupported add column 'openid' constraint UNIQUE KEY when altering 'mF7Zux5nFuxUoJfuPYEPAJ.users'"
+  ]
+}

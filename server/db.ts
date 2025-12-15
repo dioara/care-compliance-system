@@ -90,7 +90,8 @@ export async function createUser(data: {
     twoFaVerified: false,
   });
 
-  return result;
+  // Return result with insertId
+  return { insertId: (result as any)[0]?.insertId ?? (result as any).insertId };
 }
 
 export async function getUserByEmail(email: string) {
@@ -134,6 +135,49 @@ export async function verifyPassword(password: string, hashedPassword: string) {
   return await bcrypt.compare(password, hashedPassword);
 }
 
+export async function getUserByOpenId(openId: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function upsertUser(data: {
+  openId: string;
+  name?: string | null;
+  email?: string | null;
+  loginMethod?: string | null;
+  lastSignedIn?: Date;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if user exists
+  const existingUser = await getUserByOpenId(data.openId);
+  
+  if (existingUser) {
+    // Update existing user
+    await db.update(users).set({
+      name: data.name ?? existingUser.name,
+      loginMethod: data.loginMethod ?? existingUser.loginMethod,
+      lastSignedIn: data.lastSignedIn ?? new Date(),
+    }).where(eq(users.openId, data.openId));
+    return existingUser;
+  } else {
+    // Create new user
+    const email = data.email || `${data.openId}@oauth.local`;
+    await db.insert(users).values({
+      openId: data.openId,
+      email: email,
+      name: data.name,
+      loginMethod: data.loginMethod,
+      lastSignedIn: data.lastSignedIn ?? new Date(),
+    });
+    return await getUserByOpenId(data.openId);
+  }
+}
+
 // ============================================================================
 // TENANT MANAGEMENT
 // ============================================================================
@@ -143,7 +187,8 @@ export async function createTenant(data: InsertTenant) {
   if (!db) throw new Error("Database not available");
 
   const result = await db.insert(tenants).values(data);
-  return result;
+  // Return with id for MySQL
+  return { id: (result as any)[0]?.insertId ?? (result as any).insertId };
 }
 
 export async function getTenantById(id: number) {
@@ -1236,7 +1281,7 @@ export async function getIncidentById(id: number) {
   return incident;
 }
 
-export async function updateIncident(id: number, data: Partial<typeof incidents.$inferInsert>) {
+export async function updateIncident(id: number, tenantId: number, data: Partial<typeof incidents.$inferInsert>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
@@ -1246,7 +1291,7 @@ export async function updateIncident(id: number, data: Partial<typeof incidents.
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(incidents.id, id));
+    .where(and(eq(incidents.id, id), eq(incidents.tenantId, tenantId)));
 }
 
 export async function updateIncidentNotification(

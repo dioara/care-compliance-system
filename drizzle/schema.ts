@@ -6,16 +6,18 @@ import { relations } from "drizzle-orm";
  */
 export const users = mysqlTable("users", {
   id: int("id").autoincrement().primaryKey(),
+  openId: varchar("openId", { length: 255 }),
   tenantId: int("tenantId"),
   locationId: int("locationId"),
   email: varchar("email", { length: 320 }).notNull().unique(),
-  password: varchar("password", { length: 255 }).notNull(),
+  password: varchar("password", { length: 255 }).notNull().default(""),
   name: text("name"),
+  loginMethod: varchar("loginMethod", { length: 50 }),
   role: mysqlEnum("role", ["admin", "quality_officer", "manager", "staff"]).default("staff").notNull(),
   superAdmin: boolean("superAdmin").default(false).notNull(),
-  twoFaEnabled: int("twoFaEnabled", { mode: "boolean" }).default(false).notNull(),
+  twoFaEnabled: boolean("twoFaEnabled").default(false).notNull(),
   twoFaSecret: varchar("twoFaSecret", { length: 255 }),
-  twoFaVerified: int("twoFaVerified", { mode: "boolean" }).default(false).notNull(),
+  twoFaVerified: boolean("twoFaVerified").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
@@ -658,10 +660,6 @@ export type SelectAuditEvidence = typeof auditEvidence.$inferSelect;
 export type InsertAuditActionPlan = typeof auditActionPlans.$inferInsert;
 export type SelectAuditActionPlan = typeof auditActionPlans.$inferSelect;
 
-export type InsertAuditSchedule = typeof auditSchedules.$inferInsert;
-export type SelectAuditSchedule = typeof auditSchedules.$inferSelect;
-export type InsertIncident = typeof incidents.$inferInsert;
-export type SelectIncident = typeof incidents.$inferSelect;
 
 /**
  * AI Audit Schedules - recurring schedules for care plan and daily notes audits

@@ -9,7 +9,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function Settings() {
-  const { user, refetch } = useAuth();
+  const { user, refresh } = useAuth();
   const trpcUtils = trpc.useUtils();
   
   // Profile form state

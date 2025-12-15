@@ -59,7 +59,7 @@ export const authRouter = router({
 
       return {
         success: true,
-        userId: (userResult as any).insertId,
+        userId: userResult.insertId,
         tenantId: tenant.id,
       };
     }),

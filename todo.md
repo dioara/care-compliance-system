@@ -1168,3 +1168,42 @@
 - [x] Add company logo support to PDF header
 - [x] Add PDF export to audit reports (logo support added)
 - [x] Add PDF export to incident reports
+
+
+## Incident Form Redesign & UI Polish (December 15, 2025)
+### Incident Form Redesign
+- [ ] Add comprehensive incident fields (body map, injury details, contributing factors, etc.)
+- [ ] Implement rich text editor for large text fields
+- [ ] Redesign form layout with professional sections and visual hierarchy
+- [ ] Add witness statement management (add/remove witnesses)
+- [ ] Add file upload for supporting evidence
+
+### Incident Audit Integration
+- [ ] Auto-trigger incident/accident audit when incident is reported
+- [ ] Link audit to specific incident
+- [ ] Show audit status on incident card
+- [ ] Prevent closing incident until audit is complete
+
+### UI Design Polish
+- [ ] Improve overall visual design to be more professional
+- [ ] Better typography and spacing
+- [ ] More polished form controls and inputs
+- [ ] Consistent card and section styling
+
+
+## Comprehensive UI/UX Redesign
+- [ ] Create RichTextEditor component with Tiptap
+- [ ] Update global styles for professional look
+- [ ] Redesign Incident form with comprehensive fields
+- [ ] Add incident audit auto-triggering
+- [ ] Polish Dashboard design
+- [ ] Polish Staff page design
+- [ ] Polish Service Users page design
+- [ ] Polish Audits page design
+- [ ] Polish overall navigation and layout
+
+
+## Login Page Redesign
+- [x] Redesign login page with professional modern look
+- [x] Use custom icons and polished design elements
+- [x] Add visual branding and professional layout

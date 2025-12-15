@@ -1120,8 +1120,9 @@ export const appRouter = router({
         id: z.number(),
         data: z.record(z.any()),
       }))
-      .mutation(async ({ input }) => {
-        await db.updateIncident(input.id, input.data as any);
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        await db.updateIncident(input.id, ctx.user.tenantId, input.data as any);
         return { success: true };
       }),
 
