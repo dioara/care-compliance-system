@@ -753,3 +753,120 @@
 - [x] Add user email to AI audit submission (notifyEmail field in submitFromFile)
 - [x] Send notification when audit processing completes (via notifyOwner helper)
 - [x] Test email delivery (integrated with built-in notification system)
+
+
+## Audit Scheduling & Reminders (User Request)
+
+### Database Schema
+- [ ] Create auditSchedules table (id, tenantId, serviceUserId, auditType, frequency, nextDueDate, lastCompletedDate, notifyEmail, isActive)
+- [ ] Add frequency enum (weekly, fortnightly, monthly, quarterly, annually)
+- [ ] Push schema changes to database
+
+### Backend
+- [ ] Create database helper functions for audit schedules CRUD
+- [ ] Create tRPC procedures for schedule management
+- [ ] Create procedure to check overdue schedules
+- [ ] Create procedure to send reminder notifications
+
+### Frontend
+- [ ] Build audit scheduling page with list of schedules
+- [ ] Add create/edit schedule form
+- [ ] Show upcoming and overdue audits
+- [ ] Add quick actions to complete scheduled audits
+- [ ] Integrate with AI Audits page
+
+
+## Audit Comparison Reports (User Request)
+
+### Backend
+- [ ] Create procedure to get audit history for a service user
+- [ ] Calculate score trends over time
+- [ ] Identify persistent issues across audits
+- [ ] Generate comparison data for charts
+
+### Frontend
+- [ ] Build audit comparison page
+- [ ] Add line chart showing score trends over time
+- [ ] Add bar chart comparing strengths/weaknesses
+- [ ] Show persistent issues highlighted
+- [ ] Add date range filter
+- [ ] Add export comparison report as PDF
+
+
+## GDPR Compliance (User Request)
+
+### Privacy Policy & Legal Pages
+- [ ] Create comprehensive privacy policy page
+- [ ] Explain what data is collected and why
+- [ ] Explain how AI processing works (customer's OpenAI API)
+- [ ] Explain data retention periods
+- [ ] Explain third-party data sharing (none except customer's OpenAI)
+- [ ] Create terms of service page
+- [ ] Create cookie policy page
+
+### Consent Management
+- [ ] Add consent checkboxes during registration
+- [ ] Store consent timestamps in database
+- [ ] Add consent management in user settings
+- [ ] Allow users to withdraw consent
+
+### Data Subject Rights (GDPR Articles 15-22)
+- [ ] Right to access - export all personal data
+- [ ] Right to rectification - edit personal data
+- [ ] Right to erasure - delete account and all data
+- [ ] Right to data portability - download data in JSON/CSV
+- [ ] Add data export feature in user settings
+- [ ] Add account deletion feature with confirmation
+
+### Data Protection
+- [ ] Ensure all PII is encrypted at rest
+- [ ] Add audit trail for data access
+- [ ] Implement data retention policy (auto-delete old data)
+- [ ] Add privacy notice in footer
+- [ ] Add cookie consent banner
+
+
+
+## Audit Scheduling & Reminders - COMPLETED
+- [x] Add aiAuditSchedules table to database schema
+- [x] Create scheduling UI for recurring audit reminders (AuditScheduling.tsx)
+- [x] Support weekly, monthly, quarterly frequencies
+- [x] Link schedules to specific service users
+- [x] Send email notifications when audits are due (via notifyOwner)
+- [x] Location-based filtering for schedules
+
+## Audit Comparison Reports - COMPLETED
+- [x] Create audit comparison page (AuditComparison.tsx)
+- [x] Build trend chart showing scores over time (Score Timeline)
+- [x] Calculate improvement metrics (Average Score, Trend, Compliance Rate)
+- [x] Show persistent issues across audits (Common Areas for Improvement)
+- [x] Filter by date range and audit type
+- [x] View details for each audit
+- [x] Color-coded score indicators (Excellent 8-10, Good 6-7, Needs Improvement 1-5)
+
+## GDPR Compliance - COMPLETED
+- [x] Create comprehensive Privacy Policy page (PrivacyPolicy.tsx)
+  - Introduction with Data Controller info and ICO registration
+  - Information We Collect (Account, Service User, Staff, AI Audit, Technical data)
+  - How We Use Your Information (Lawful bases: Contract, Legitimate Interests, Legal Obligation, Consent)
+  - AI Processing & Data Protection (customer's own API key, anonymisation process)
+  - Data Sharing & Third Parties (Cloud providers, OpenAI, Payment processors)
+  - Data Retention periods (Account 2yr, Compliance 7yr, AI 3yr, Logs 12mo)
+  - Your Rights Under GDPR (Access, Rectification, Erasure, Restrict, Portability, Object)
+  - International Data Transfers (SCCs, Adequacy decisions)
+  - Contact Information (privacy@, dpo@ emails, ICO link)
+- [x] Add Data Privacy Settings page for users (DataPrivacy.tsx)
+  - Your Privacy at a Glance (Data Encrypted, GDPR Compliant, AI Anonymisation)
+  - Communication Preferences with toggle switches (Marketing, Updates, Reminders, Analytics)
+  - Export Your Data (Right of Access) - Download button
+  - Request Data Export - For new export requests
+  - Delete Your Account (Right to Erasure) - Request button with warning
+  - Links to Privacy Policy, Terms of Service, ICO Website
+- [x] Database tables for user consent tracking and data export requests
+- [x] Database functions for consent management and data export workflow
+
+## New Routes Added
+- /audit-scheduling - Audit scheduling with recurring reminders
+- /audit-comparison - Audit comparison reports with trend charts
+- /privacy-policy - Comprehensive GDPR-compliant privacy policy
+- /data-privacy - Data privacy settings for users to exercise GDPR rights

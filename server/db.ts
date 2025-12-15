@@ -27,8 +27,14 @@ import {
   assessmentTemplates,
   templateQuestions,
   aiAudits,
+  aiAuditSchedules,
+  userConsents,
+  dataExportRequests,
   type InsertUser,
   type InsertAiAudit,
+  type InsertAiAuditSchedule,
+  type InsertUserConsent,
+  type InsertDataExportRequest,
   type InsertTenant,
   type InsertLocation,
   type InsertRole,
@@ -1604,4 +1610,202 @@ export async function getAiAuditsByTenant(tenantId: number, limit = 50) {
     .where(eq(aiAudits.tenantId, tenantId))
     .orderBy(desc(aiAudits.createdAt))
     .limit(limit);
+}
+
+
+// ============================================
+// AI Audit Schedules
+// ============================================
+
+
+export async function createAiAuditSchedule(data: InsertAiAuditSchedule) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(aiAuditSchedules).values(data);
+  return { id: Number((result as any)[0].insertId), ...data };
+}
+
+export async function getAiAuditSchedulesByTenant(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(aiAuditSchedules).where(eq(aiAuditSchedules.tenantId, tenantId)).orderBy(aiAuditSchedules.nextDueDate);
+}
+
+export async function getAiAuditSchedulesByLocation(tenantId: number, locationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(aiAuditSchedules)
+    .where(and(eq(aiAuditSchedules.tenantId, tenantId), eq(aiAuditSchedules.locationId, locationId)))
+    .orderBy(aiAuditSchedules.nextDueDate);
+}
+
+export async function getAiAuditScheduleById(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const results = await db.select().from(aiAuditSchedules)
+    .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
+  return results[0] || null;
+}
+
+export async function updateAiAuditSchedule(id: number, tenantId: number, data: Partial<InsertAiAuditSchedule>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(aiAuditSchedules)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
+  return getAiAuditScheduleById(id, tenantId);
+}
+
+export async function deleteAiAuditSchedule(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(aiAuditSchedules)
+    .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
+}
+
+export async function getOverdueAiAuditSchedules(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const today = new Date().toISOString().split('T')[0];
+  return db.select().from(aiAuditSchedules)
+    .where(and(
+      eq(aiAuditSchedules.tenantId, tenantId),
+      eq(aiAuditSchedules.isActive, true),
+      sql`${aiAuditSchedules.nextDueDate} <= ${today}`
+    ))
+    .orderBy(aiAuditSchedules.nextDueDate);
+}
+
+export async function getUpcomingAiAuditSchedules(tenantId: number, daysAhead: number = 7) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const today = new Date();
+  const futureDate = new Date(today);
+  futureDate.setDate(futureDate.getDate() + daysAhead);
+  const futureDateStr = futureDate.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split('T')[0];
+  
+  return db.select().from(aiAuditSchedules)
+    .where(and(
+      eq(aiAuditSchedules.tenantId, tenantId),
+      eq(aiAuditSchedules.isActive, true),
+      sql`${aiAuditSchedules.nextDueDate} > ${todayStr}`,
+      sql`${aiAuditSchedules.nextDueDate} <= ${futureDateStr}`
+    ))
+    .orderBy(aiAuditSchedules.nextDueDate);
+}
+
+// ============================================
+// User Consents (GDPR)
+// ============================================
+
+export async function createUserConsent(data: InsertUserConsent) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(userConsents).values(data);
+  return { id: Number((result as any)[0].insertId), ...data };
+}
+
+export async function getUserConsents(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(userConsents)
+    .where(eq(userConsents.userId, userId))
+    .orderBy(userConsents.consentType);
+}
+
+export async function getUserConsentByType(userId: number, consentType: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const results = await db.select().from(userConsents)
+    .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
+  return results[0] || null;
+}
+
+export async function updateUserConsent(id: number, userId: number, data: Partial<InsertUserConsent>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(userConsents)
+    .set({ ...data, updatedAt: new Date() })
+    .where(and(eq(userConsents.id, id), eq(userConsents.userId, userId)));
+}
+
+export async function withdrawUserConsent(userId: number, consentType: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(userConsents)
+    .set({ consentGiven: false, withdrawnAt: new Date(), updatedAt: new Date() })
+    .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
+}
+
+// ============================================
+// Data Export Requests (GDPR)
+// ============================================
+
+export async function createDataExportRequest(data: InsertDataExportRequest) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(dataExportRequests).values(data);
+  return { id: Number((result as any)[0].insertId), ...data };
+}
+
+export async function getDataExportRequestsByUser(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(dataExportRequests)
+    .where(eq(dataExportRequests.userId, userId))
+    .orderBy(desc(dataExportRequests.createdAt));
+}
+
+export async function getDataExportRequestById(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const results = await db.select().from(dataExportRequests)
+    .where(and(eq(dataExportRequests.id, id), eq(dataExportRequests.userId, userId)));
+  return results[0] || null;
+}
+
+export async function updateDataExportRequest(id: number, data: Partial<InsertDataExportRequest>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(dataExportRequests)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(dataExportRequests.id, id));
+}
+
+// ============================================
+// AI Audit Comparison Data
+// ============================================
+
+export async function getAiAuditHistoryForServiceUser(tenantId: number, serviceUserId: number, auditType?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(aiAudits)
+    .where(and(
+      eq(aiAudits.tenantId, tenantId),
+      eq(aiAudits.status, "completed")
+    ))
+    .orderBy(desc(aiAudits.createdAt));
+}
+
+export async function getAiAuditScoreTrends(tenantId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+  
+  return db.select({
+    id: aiAudits.id,
+    auditType: aiAudits.auditType,
+    score: aiAudits.score,
+    documentName: aiAudits.documentName,
+    createdAt: aiAudits.createdAt,
+  }).from(aiAudits)
+    .where(and(
+      eq(aiAudits.tenantId, tenantId),
+      eq(aiAudits.status, "completed"),
+      sql`DATE(${aiAudits.createdAt}) >= ${startStr}`,
+      sql`DATE(${aiAudits.createdAt}) <= ${endStr}`
+    ))
+    .orderBy(aiAudits.createdAt);
 }

@@ -27,6 +27,10 @@ import Incidents from "./pages/Incidents";
 import Reports from "./pages/Reports";
 import ServiceUsers from "./pages/ServiceUsers";
 import Staff from "./pages/Staff";
+import AuditScheduling from "./pages/AuditScheduling";
+import AuditComparison from "./pages/AuditComparison";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DataPrivacy from "./pages/DataPrivacy";
 
 function Router() {
   return (
@@ -133,6 +137,30 @@ function Router() {
       <Route path="/incidents">
         <DashboardLayout>
           <Incidents />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/audit-scheduling">
+        <DashboardLayout>
+          <AuditScheduling />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/audit-comparison">
+        <DashboardLayout>
+          <AuditComparison />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/privacy-policy">
+        <DashboardLayout>
+          <PrivacyPolicy />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/data-privacy">
+        <DashboardLayout>
+          <DataPrivacy />
         </DashboardLayout>
       </Route>
       

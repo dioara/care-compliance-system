@@ -660,3 +660,73 @@ export type InsertAuditSchedule = typeof auditSchedules.$inferInsert;
 export type SelectAuditSchedule = typeof auditSchedules.$inferSelect;
 export type InsertIncident = typeof incidents.$inferInsert;
 export type SelectIncident = typeof incidents.$inferSelect;
+
+/**
+ * AI Audit Schedules - recurring schedules for care plan and daily notes audits
+ */
+export const aiAuditSchedules = mysqlTable("aiAuditSchedules", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  locationId: int("locationId").notNull(),
+  serviceUserId: int("serviceUserId"), // null for location-wide schedules
+  auditType: mysqlEnum("auditType", ["care_plan", "daily_notes"]).notNull(),
+  scheduleName: varchar("scheduleName", { length: 255 }).notNull(),
+  frequency: mysqlEnum("frequency", ["weekly", "fortnightly", "monthly", "quarterly", "annually"]).notNull(),
+  dayOfWeek: int("dayOfWeek"), // 0-6 for weekly (0=Sunday)
+  dayOfMonth: int("dayOfMonth"), // 1-31 for monthly
+  monthOfYear: int("monthOfYear"), // 1-12 for annually
+  nextDueDate: date("nextDueDate").notNull(),
+  lastCompletedDate: date("lastCompletedDate"),
+  lastAiAuditId: int("lastAiAuditId"), // reference to last completed AI audit
+  notifyEmail: varchar("notifyEmail", { length: 255 }),
+  reminderDaysBefore: int("reminderDaysBefore").default(3),
+  lastReminderSent: date("lastReminderSent"),
+  isActive: boolean("isActive").default(true).notNull(),
+  createdById: int("createdById"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * User consent records for GDPR compliance
+ */
+export const userConsents = mysqlTable("userConsents", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  consentType: mysqlEnum("consentType", ["terms_of_service", "privacy_policy", "data_processing", "marketing_emails", "ai_processing"]).notNull(),
+  consentGiven: boolean("consentGiven").default(false).notNull(),
+  consentVersion: varchar("consentVersion", { length: 50 }).notNull(), // e.g., "1.0", "2.0"
+  ipAddress: varchar("ipAddress", { length: 45 }), // IPv6 compatible
+  userAgent: text("userAgent"),
+  consentedAt: timestamp("consentedAt"),
+  withdrawnAt: timestamp("withdrawnAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/**
+ * Data export requests for GDPR right to data portability
+ */
+export const dataExportRequests = mysqlTable("dataExportRequests", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  requestType: mysqlEnum("requestType", ["data_export", "account_deletion"]).notNull(),
+  status: mysqlEnum("status", ["pending", "processing", "completed", "failed"]).default("pending").notNull(),
+  exportFormat: mysqlEnum("exportFormat", ["json", "csv"]).default("json"),
+  exportFileUrl: text("exportFileUrl"),
+  exportFileKey: text("exportFileKey"),
+  completedAt: timestamp("completedAt"),
+  expiresAt: timestamp("expiresAt"), // export files expire after 7 days
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InsertAiAuditSchedule = typeof aiAuditSchedules.$inferInsert;
+export type SelectAiAuditSchedule = typeof aiAuditSchedules.$inferSelect;
+export type InsertUserConsent = typeof userConsents.$inferInsert;
+export type SelectUserConsent = typeof userConsents.$inferSelect;
+export type InsertDataExportRequest = typeof dataExportRequests.$inferInsert;
+export type SelectDataExportRequest = typeof dataExportRequests.$inferSelect;
