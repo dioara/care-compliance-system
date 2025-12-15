@@ -1019,3 +1019,15 @@
 - [x] Show location access summary
 - [x] Show recent user activity (logins, actions)
 - [x] Add system health indicators
+
+
+## BUGS Reported (December 15, 2025)
+
+### Staff Compliance Issue
+- [x] Fix "Staff member not found" error when starting compliance for newly created staff
+
+### Service User Tab 404
+- [x] Fix 404 error when clicking on Service User tab - missing /service-users route added
+
+### Dashboard Location Switcher
+- [x] Add location dropdown to Dashboard to allow switching between locations

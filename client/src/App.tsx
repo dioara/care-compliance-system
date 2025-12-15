@@ -84,6 +84,12 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      <Route path="/service-users">
+        <DashboardLayout>
+          <ServiceUsers />
+        </DashboardLayout>
+      </Route>
+      
       <Route path="/compliance">
         <DashboardLayout>
           <Compliance />

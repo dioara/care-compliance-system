@@ -1,6 +1,7 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 import { useLocation as useLocationContext } from "@/contexts/LocationContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { 
@@ -18,7 +19,7 @@ import {
 export default function Dashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
-  const { activeLocationId } = useLocationContext();
+  const { activeLocationId, setActiveLocationId, accessibleLocations } = useLocationContext();
   const { data: profile } = trpc.company.getProfile.useQuery();
   const { data: locations } = trpc.locations.list.useQuery();
   const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(
@@ -56,6 +57,27 @@ export default function Dashboard() {
             </span>
           )}
         </p>
+        {/* Location Filter */}
+        {accessibleLocations && accessibleLocations.length > 1 && (
+          <div className="flex items-center gap-2 mt-3">
+            <span className="text-sm text-muted-foreground">Filter by location:</span>
+            <Select
+              value={activeLocationId?.toString() || ""}
+              onValueChange={(value) => setActiveLocationId(parseInt(value))}
+            >
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                {accessibleLocations.map((loc) => (
+                  <SelectItem key={loc.id} value={loc.id.toString()}>
+                    {loc.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* Key Metrics */}

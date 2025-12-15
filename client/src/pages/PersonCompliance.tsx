@@ -25,14 +25,14 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
   const { user } = useAuth();
   const [, setLocation] = useRouter();
 
-  // Fetch person details
+  // Fetch person details - fetch all staff/service users without location filter to find the person
   const { data: person, isLoading: personLoading } = personType === "staff"
-    ? trpc.staff.list.useQuery({ locationId: activeLocationId || 0 }, { 
-        enabled: !!activeLocationId,
+    ? trpc.staff.list.useQuery({}, { 
+        enabled: true,
         select: (data) => data.find(s => s.id === personId)
       })
-    : trpc.serviceUsers.list.useQuery({ locationId: activeLocationId || 0 }, {
-        enabled: !!activeLocationId,
+    : trpc.serviceUsers.list.useQuery({}, {
+        enabled: true,
         select: (data) => data.find(s => s.id === personId)
       });
 
