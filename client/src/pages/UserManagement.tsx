@@ -29,6 +29,9 @@ export default function UserManagement() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", superAdmin: false });
   const [createRoleIds, setCreateRoleIds] = useState<number[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
+  
+  const trpcUtils = trpc.useUtils();
 
   // Check if user is super admin
   if (!currentUser?.superAdmin) {
@@ -139,14 +142,22 @@ export default function UserManagement() {
 
   const openRolesDialog = async (user: any) => {
     setSelectedUser(user);
-    // Fetch user's current roles
-    try {
-      const userRoles = await trpc.roles.getUserRoles.query({ userId: user.id });
-      setSelectedRoleIds(userRoles.map((r: any) => r.roleId));
-    } catch (error) {
-      setSelectedRoleIds([]);
-    }
+    setIsLoadingRoles(true);
+    setSelectedRoleIds([]);
     setIsRolesOpen(true);
+    
+    // Fetch user's current roles using the utils
+    try {
+      const userRoles = await trpcUtils.roles.getUserRoles.fetch({ userId: user.id });
+      if (userRoles && Array.isArray(userRoles)) {
+        setSelectedRoleIds(userRoles.map((r: any) => r.roleId));
+      }
+    } catch (error) {
+      console.error('Error fetching user roles:', error);
+      setSelectedRoleIds([]);
+    } finally {
+      setIsLoadingRoles(false);
+    }
   };
 
   const toggleRole = (roleId: number) => {
@@ -474,7 +485,12 @@ export default function UserManagement() {
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
-              {roles.length === 0 ? (
+              {isLoadingRoles ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Loading roles...</span>
+                </div>
+              ) : roles.length === 0 ? (
                 <div className="text-center py-4 text-muted-foreground">
                   <ShieldAlert className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   <p>No roles created yet</p>

@@ -1238,3 +1238,6 @@
 - [x] Add enable/disable 2FA functionality
 - [x] Add single incident PDF generation endpoint
 - [x] Update incident detail modal to use single PDF endpoint
+
+## Bug Fixes
+- [x] Fix user roles not showing as checked when reopening Roles dialog
