@@ -479,8 +479,10 @@ export const appRouter = router({
       .input(
         z.object({
           id: z.number(),
+          locationId: z.number().optional(),
           name: z.string().optional(),
           role: z.string().optional(),
+          employmentType: z.enum(["permanent_sponsored", "permanent_not_sponsored", "agency"]).optional(),
           employmentDate: z.string().optional(),
           dbsCertificateNumber: z.string().optional(),
           dbsDate: z.string().optional(),

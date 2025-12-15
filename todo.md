@@ -1241,3 +1241,4 @@
 
 ## Bug Fixes
 - [x] Fix user roles not showing as checked when reopening Roles dialog
+- [x] Fix staff employment type not persisting after save
