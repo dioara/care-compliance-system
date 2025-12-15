@@ -172,6 +172,163 @@ export const subscriptionRouter = router({
       return { success: true, newQuantity };
     }),
 
+  // Modify license count (upgrade or downgrade)
+  modifyLicenseCount: adminProcedure
+    .input(z.object({ newQuantity: z.number().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+      if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active subscription found" });
+
+      // Get current license stats
+      const [licenseStats] = await db
+        .select({
+          total: sql<number>`COUNT(*)`,
+          assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
+        })
+        .from(userLicenses)
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+
+      const currentTotal = Number(licenseStats?.total || 0);
+      const assignedCount = Number(licenseStats?.assigned || 0);
+
+      // Validate downgrade doesn't remove assigned licenses
+      if (input.newQuantity < assignedCount) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `Cannot reduce to ${input.newQuantity} licenses. You have ${assignedCount} licenses currently assigned to users. Please unassign some licenses first.`
+        });
+      }
+
+      // Update Stripe subscription
+      const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+      await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+        items: [{ id: stripeSubscription.items.data[0].id, quantity: input.newQuantity }],
+        proration_behavior: "create_prorations",
+      });
+
+      // Handle license records
+      if (input.newQuantity > currentTotal) {
+        // Upgrading: add new licenses
+        const licensesToAdd = input.newQuantity - currentTotal;
+        const newLicenses = Array.from({ length: licensesToAdd }, () => ({ tenantId: ctx.user.tenantId!, isActive: true }));
+        await db.insert(userLicenses).values(newLicenses);
+      } else if (input.newQuantity < currentTotal) {
+        // Downgrading: remove unassigned licenses
+        const licensesToRemove = currentTotal - input.newQuantity;
+        const unassignedLicenses = await db
+          .select({ id: userLicenses.id })
+          .from(userLicenses)
+          .where(and(
+            eq(userLicenses.tenantId, ctx.user.tenantId),
+            eq(userLicenses.isActive, true),
+            isNull(userLicenses.userId)
+          ))
+          .limit(licensesToRemove);
+
+        for (const license of unassignedLicenses) {
+          await db.update(userLicenses)
+            .set({ isActive: false })
+            .where(eq(userLicenses.id, license.id));
+        }
+      }
+
+      // Update subscription record
+      await db.update(tenantSubscriptions)
+        .set({ licensesCount: input.newQuantity })
+        .where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+
+      return { 
+        success: true, 
+        previousQuantity: currentTotal,
+        newQuantity: input.newQuantity,
+        change: input.newQuantity - currentTotal
+      };
+    }),
+
+  // Preview price change for modifying license count
+  previewPriceChange: adminProcedure
+    .input(z.object({ newQuantity: z.number().min(1) }))
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      const db = await requireDb();
+
+      const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+      if (!subscription?.stripeSubscriptionId) {
+        return { available: false, message: "No active subscription" };
+      }
+
+      // Get current license stats
+      const [licenseStats] = await db
+        .select({
+          total: sql<number>`COUNT(*)`,
+          assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
+        })
+        .from(userLicenses)
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+
+      const currentTotal = Number(licenseStats?.total || 0);
+      const assignedCount = Number(licenseStats?.assigned || 0);
+
+      // Check if downgrade is valid
+      if (input.newQuantity < assignedCount) {
+        return {
+          available: false,
+          message: `Cannot reduce to ${input.newQuantity} licenses. ${assignedCount} are currently assigned.`,
+          currentQuantity: currentTotal,
+          assignedCount,
+        };
+      }
+
+      try {
+        // Get Stripe preview
+        const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+        const currentPriceId = stripeSubscription.items.data[0]?.price?.id;
+        
+        if (!currentPriceId) {
+          return { available: false, message: "Unable to retrieve current pricing" };
+        }
+
+        // Create invoice preview
+        const preview = await stripe.invoices.createPreview({
+          customer: subscription.stripeCustomerId!,
+          subscription: subscription.stripeSubscriptionId,
+          subscription_details: {
+            items: [{
+              id: stripeSubscription.items.data[0].id,
+              quantity: input.newQuantity,
+            }],
+            proration_behavior: "create_prorations",
+          },
+        });
+
+        const change = input.newQuantity - currentTotal;
+        const isUpgrade = change > 0;
+
+        return {
+          available: true,
+          currentQuantity: currentTotal,
+          newQuantity: input.newQuantity,
+          change,
+          isUpgrade,
+          assignedCount,
+          proratedAmount: preview.amount_due,
+          proratedAmountFormatted: `£${(preview.amount_due / 100).toFixed(2)}`,
+          nextBillingDate: stripeSubscription.current_period_end * 1000,
+        };
+      } catch (error: any) {
+        console.error("Error previewing price change:", error);
+        return {
+          available: false,
+          message: "Unable to preview price change",
+          currentQuantity: currentTotal,
+          assignedCount,
+        };
+      }
+    }),
+
   cancelSubscription: adminProcedure
     .input(z.object({ cancelImmediately: z.boolean().default(false) }))
     .mutation(async ({ ctx, input }) => {

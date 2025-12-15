@@ -1369,3 +1369,12 @@
 - [x] Send email notification 7 days before license expiration
 - [x] Send email notification 1 day before license expiration
 - [x] Send email notification on expiration day
+
+
+## Feature: Subscription Upgrade/Downgrade Flow
+- [x] Add backend endpoint to modify subscription license quantity
+- [x] Handle Stripe subscription item quantity updates with proration
+- [x] Add UI section for changing license count in Subscription Management
+- [x] Show price preview before confirming changes
+- [x] Handle both upgrades (add licenses) and downgrades (remove licenses)
+- [x] Validate downgrade doesn't remove more licenses than unassigned

@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { 
   CreditCard, Users, Plus, Minus, AlertTriangle, CheckCircle2, 
-  Clock, XCircle, ExternalLink, RefreshCw, UserPlus, UserMinus, Receipt, Download, FileText
+  Clock, XCircle, ExternalLink, RefreshCw, UserPlus, UserMinus, Receipt, Download, FileText, ArrowUpDown, TrendingUp, TrendingDown
 } from "lucide-react";
 
 export default function SubscriptionManagement() {
@@ -25,12 +25,18 @@ export default function SubscriptionManagement() {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedLicenseId, setSelectedLicenseId] = useState<number | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [showModifyDialog, setShowModifyDialog] = useState(false);
+  const [newLicenseCount, setNewLicenseCount] = useState(1);
 
   const { data: subscription, refetch: refetchSubscription } = trpc.subscription.getSubscription.useQuery();
   const { data: pricing } = trpc.subscription.getPricing.useQuery({ quantity, billingInterval });
   const { data: licenses, refetch: refetchLicenses } = trpc.subscription.getLicenses.useQuery();
   const { data: usersWithoutLicenses } = trpc.subscription.getUsersWithoutLicenses.useQuery();
   const { data: billingHistory = [] } = trpc.subscription.getBillingHistory.useQuery();
+  const { data: pricePreview, isLoading: previewLoading } = trpc.subscription.previewPriceChange.useQuery(
+    { newQuantity: newLicenseCount },
+    { enabled: showModifyDialog && newLicenseCount > 0 }
+  );
 
   const createCheckout = trpc.subscription.createCheckoutSession.useMutation({
     onSuccess: (data) => {
@@ -50,6 +56,19 @@ export default function SubscriptionManagement() {
       refetchSubscription();
       refetchLicenses();
       setShowAddLicensesDialog(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const modifyLicensesMutation = trpc.subscription.modifyLicenseCount.useMutation({
+    onSuccess: (data) => {
+      const changeText = data.change > 0 ? `Added ${data.change}` : `Removed ${Math.abs(data.change)}`;
+      toast.success(`${changeText} license${Math.abs(data.change) !== 1 ? 's' : ''}. New total: ${data.newQuantity}`);
+      refetchSubscription();
+      refetchLicenses();
+      setShowModifyDialog(false);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -201,7 +220,14 @@ export default function SubscriptionManagement() {
             )}
 
             <div className="mt-4 flex gap-2">
-              <Button onClick={() => setShowAddLicensesDialog(true)}>
+              <Button onClick={() => {
+                setNewLicenseCount(subscription.licensesCount || 1);
+                setShowModifyDialog(true);
+              }}>
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                Modify Licenses
+              </Button>
+              <Button variant="outline" onClick={() => setShowAddLicensesDialog(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Licenses
               </Button>
@@ -524,6 +550,109 @@ export default function SubscriptionManagement() {
           </CardContent>
         </Card>
       )}
+
+      {/* Modify Licenses Dialog */}
+      <Dialog open={showModifyDialog} onOpenChange={setShowModifyDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowUpDown className="h-5 w-5" />
+              Modify License Count
+            </DialogTitle>
+            <DialogDescription>
+              Upgrade or downgrade your subscription by changing the number of licenses.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="text-sm font-medium">Number of Licenses</label>
+              <div className="flex items-center gap-3 mt-2">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => setNewLicenseCount(Math.max(1, newLicenseCount - 1))}
+                  disabled={newLicenseCount <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-16 text-center text-2xl font-bold">{newLicenseCount}</span>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => setNewLicenseCount(newLicenseCount + 1)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {pricePreview && pricePreview.available && (
+              <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Current licenses</span>
+                  <span className="font-medium">{pricePreview.currentQuantity}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">New total</span>
+                  <span className="font-medium">{pricePreview.newQuantity}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Change</span>
+                  <span className={`font-medium flex items-center gap-1 ${pricePreview.isUpgrade ? 'text-green-600' : 'text-orange-600'}`}>
+                    {pricePreview.isUpgrade ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {pricePreview.change > 0 ? '+' : ''}{pricePreview.change}
+                  </span>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Prorated charge</span>
+                  <span className="font-bold text-lg">{pricePreview.proratedAmountFormatted}</span>
+                </div>
+                {pricePreview.nextBillingDate && (
+                  <p className="text-xs text-muted-foreground">
+                    Next billing: {new Date(pricePreview.nextBillingDate).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {pricePreview && !pricePreview.available && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600 flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  {pricePreview.message}
+                </p>
+                {pricePreview.assignedCount !== undefined && (
+                  <p className="text-xs text-red-500 mt-1">
+                    You have {pricePreview.assignedCount} licenses assigned. Unassign some first to downgrade.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {previewLoading && (
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-sm text-muted-foreground">Calculating price...</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModifyDialog(false)}>Cancel</Button>
+            <Button 
+              onClick={() => modifyLicensesMutation.mutate({ newQuantity: newLicenseCount })}
+              disabled={
+                modifyLicensesMutation.isPending || 
+                previewLoading || 
+                !pricePreview?.available ||
+                newLicenseCount === (pricePreview?.currentQuantity || 0)
+              }
+            >
+              {modifyLicensesMutation.isPending ? "Updating..." : 
+                pricePreview?.isUpgrade ? "Upgrade" : "Downgrade"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Assign License Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
