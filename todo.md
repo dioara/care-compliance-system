@@ -940,3 +940,32 @@
 - [x] Location filtering already implemented via LocationSwitcher component
 - [ ] Update signup flow to create default location (already done in previous work)
 - [ ] Ensure location selection on record creation (already done - defaults to active location)
+
+
+## BUG FIXES: Forms & Dashboard (User Request - Dec 15, 2025)
+- [ ] Fix User Management - add role selection when creating users (currently errors without role)
+- [ ] Add location field to Staff create/edit forms
+- [ ] Add employment type field to Staff create/edit forms (permanent-sponsored, permanent-not sponsored, agency)
+- [ ] Add location field to Service User create/edit forms
+- [ ] Implement location-based dashboard filtering (metrics filter by selected location)
+- [ ] Create Terms of Service page (£70/month subscription, acceptable use, liability, cancellation)
+
+
+## Session: December 15, 2024 - Form Fixes and Location Filtering
+
+### Completed Tasks:
+- [x] Fix User Management form - Added role selection dropdown to prevent errors when creating users
+- [x] Update Staff forms - Added location dropdown and employment type dropdown (permanent-sponsored, permanent-not-sponsored, agency)
+- [x] Update Service User forms - Added location dropdown
+- [x] Implement Dashboard location filtering - Dashboard now filters all metrics by selected location
+- [x] Create Terms of Service page - Complete with £70/month subscription terms, acceptable use policy, liability limitations, and cancellation policies
+- [x] Add Terms of Service route to App.tsx
+
+### Technical Changes:
+- UserManagement.tsx: Added role selection dropdown with validation (requires at least one role or super admin)
+- Staff.tsx: Added locationId and employmentType fields to create/edit forms
+- ServiceUsers.tsx: Added locationId field to create/edit forms
+- Dashboard.tsx: Now uses LocationContext to filter stats by activeLocationId
+- server/db.ts: Updated getDashboardStats to accept optional locationId parameter
+- server/routers.ts: Updated dashboard.getStats to accept locationId input
+- Created TermsOfService.tsx page with comprehensive legal terms

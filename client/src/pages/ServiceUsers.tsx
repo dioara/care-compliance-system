@@ -34,7 +34,11 @@ export default function ServiceUsers() {
     carePackageType: "",
     admissionDate: "",
     supportNeeds: "",
+    locationId: activeLocationId || 0,
   });
+
+  // Fetch locations for dropdown
+  const { data: locations = [] } = trpc.locations.list.useQuery();
 
   const resetForm = () => {
     setFormData({
@@ -43,6 +47,7 @@ export default function ServiceUsers() {
       carePackageType: "",
       admissionDate: "",
       supportNeeds: "",
+      locationId: activeLocationId || 0,
     });
   };
 
@@ -68,8 +73,12 @@ export default function ServiceUsers() {
 
     try {
       await createServiceUser.mutateAsync({
-        locationId: activeLocationId,
-        ...formData,
+        locationId: formData.locationId || activeLocationId,
+        name: formData.name,
+        dateOfBirth: formData.dateOfBirth,
+        carePackageType: formData.carePackageType,
+        admissionDate: formData.admissionDate,
+        supportNeeds: formData.supportNeeds,
       });
       toast.success("Service user added successfully");
       setIsCreateOpen(false);
@@ -88,6 +97,7 @@ export default function ServiceUsers() {
       carePackageType: serviceUser.carePackageType || "",
       admissionDate: serviceUser.admissionDate ? new Date(serviceUser.admissionDate).toISOString().split('T')[0] : "",
       supportNeeds: serviceUser.supportNeeds || "",
+      locationId: serviceUser.locationId || activeLocationId || 0,
     });
     setIsEditOpen(true);
   };
@@ -105,7 +115,12 @@ export default function ServiceUsers() {
     try {
       await updateServiceUser.mutateAsync({
         id: editingServiceUser.id,
-        ...formData,
+        locationId: formData.locationId,
+        name: formData.name,
+        dateOfBirth: formData.dateOfBirth,
+        carePackageType: formData.carePackageType,
+        admissionDate: formData.admissionDate,
+        supportNeeds: formData.supportNeeds,
       });
       toast.success("Service user updated successfully");
       setIsEditOpen(false);
@@ -201,6 +216,22 @@ export default function ServiceUsers() {
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="create-locationId">Location *</Label>
+                    <select
+                      id="create-locationId"
+                      name="locationId"
+                      value={formData.locationId}
+                      onChange={(e) => setFormData(prev => ({ ...prev, locationId: parseInt(e.target.value) }))}
+                      className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      {locations.map((loc: any) => (
+                        <option key={loc.id} value={loc.id}>{loc.name}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">
@@ -403,6 +434,22 @@ export default function ServiceUsers() {
                     value={formData.dateOfBirth}
                     onChange={handleInputChange}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-locationId">Location *</Label>
+                  <select
+                    id="edit-locationId"
+                    name="locationId"
+                    value={formData.locationId}
+                    onChange={(e) => setFormData(prev => ({ ...prev, locationId: parseInt(e.target.value) }))}
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required
+                  >
+                    {locations.map((loc: any) => (
+                      <option key={loc.id} value={loc.id}>{loc.name}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="space-y-2">

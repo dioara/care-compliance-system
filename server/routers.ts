@@ -25,12 +25,14 @@ export const appRouter = router({
 
   // Dashboard statistics
   dashboard: router({
-    getStats: protectedProcedure.query(async ({ ctx }) => {
-      if (!ctx.user?.tenantId) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
-      }
-      return db.getDashboardStats(ctx.user.tenantId);
-    }),
+    getStats: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getDashboardStats(ctx.user.tenantId, input?.locationId);
+      }),
   }),
 
   // Company management

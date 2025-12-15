@@ -27,6 +27,7 @@ export default function UserManagement() {
   const [isRolesOpen, setIsRolesOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [formData, setFormData] = useState({ name: "", email: "", password: "", superAdmin: false });
+  const [createRoleIds, setCreateRoleIds] = useState<number[]>([]);
   const [selectedRoleIds, setSelectedRoleIds] = useState<number[]>([]);
 
   // Check if user is super admin
@@ -52,18 +53,27 @@ export default function UserManagement() {
 
   const resetForm = () => {
     setFormData({ name: "", email: "", password: "", superAdmin: false });
+    setCreateRoleIds([]);
     setSelectedUser(null);
   };
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.superAdmin && createRoleIds.length === 0) {
+      toast.error("Please select at least one role or make the user a Super Admin");
+      return;
+    }
     try {
-      await createUser.mutateAsync({
+      const newUser = await createUser.mutateAsync({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         superAdmin: formData.superAdmin,
       });
+      // Assign roles if any selected
+      if (createRoleIds.length > 0 && newUser?.id) {
+        await assignRoles.mutateAsync({ userId: newUser.id, roleIds: createRoleIds });
+      }
       toast.success("User created successfully");
       setIsCreateOpen(false);
       resetForm();
@@ -71,6 +81,14 @@ export default function UserManagement() {
     } catch (error: any) {
       toast.error(error.message || "Failed to create user");
     }
+  };
+
+  const toggleCreateRole = (roleId: number) => {
+    setCreateRoleIds(prev => 
+      prev.includes(roleId) 
+        ? prev.filter(id => id !== roleId)
+        : [...prev, roleId]
+    );
   };
 
   const handleEdit = (user: any) => {
@@ -216,12 +234,40 @@ export default function UserManagement() {
                     <Checkbox
                       id="superAdmin"
                       checked={formData.superAdmin}
-                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, superAdmin: !!checked }))}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({ ...prev, superAdmin: !!checked }));
+                        if (checked) setCreateRoleIds([]);
+                      }}
                     />
                     <Label htmlFor="superAdmin" className="text-sm font-normal">
                       Make this user a Super Admin (full access to all locations and settings)
                     </Label>
                   </div>
+                  {!formData.superAdmin && (
+                    <div className="space-y-2 pt-2">
+                      <Label>Assign Roles *</Label>
+                      <p className="text-xs text-muted-foreground">Select at least one role to grant location access</p>
+                      {roles.length === 0 ? (
+                        <p className="text-sm text-amber-600">No roles created yet. Create roles in Role Management first.</p>
+                      ) : (
+                        <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                          {roles.map((role: any) => (
+                            <div key={role.id} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`create-role-${role.id}`}
+                                checked={createRoleIds.includes(role.id)}
+                                onCheckedChange={() => toggleCreateRole(role.id)}
+                              />
+                              <Label htmlFor={`create-role-${role.id}`} className="text-sm font-normal cursor-pointer">
+                                {role.name}
+                                {role.description && <span className="text-muted-foreground"> - {role.description}</span>}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>

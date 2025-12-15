@@ -31,16 +31,23 @@ export default function Staff() {
   const [formData, setFormData] = useState({
     name: "",
     role: "",
+    employmentType: "permanent_not_sponsored" as "permanent_sponsored" | "permanent_not_sponsored" | "agency",
+    locationId: activeLocationId || 0,
     employmentDate: "",
     dbsCertificateNumber: "",
     dbsDate: "",
     isActive: true,
   });
 
+  // Fetch locations for dropdown
+  const { data: locations = [] } = trpc.locations.list.useQuery();
+
   const resetForm = () => {
     setFormData({
       name: "",
       role: "",
+      employmentType: "permanent_not_sponsored",
+      locationId: activeLocationId || 0,
       employmentDate: "",
       dbsCertificateNumber: "",
       dbsDate: "",
@@ -71,8 +78,14 @@ export default function Staff() {
 
     try {
       await createStaff.mutateAsync({
-        locationId: activeLocationId,
-        ...formData,
+        locationId: formData.locationId || activeLocationId,
+        name: formData.name,
+        role: formData.role,
+        employmentType: formData.employmentType,
+        employmentDate: formData.employmentDate,
+        dbsCertificateNumber: formData.dbsCertificateNumber,
+        dbsDate: formData.dbsDate,
+        isActive: formData.isActive,
       });
       toast.success("Staff member added successfully");
       setIsCreateOpen(false);
@@ -88,6 +101,8 @@ export default function Staff() {
     setFormData({
       name: staffMember.name || "",
       role: staffMember.role || "",
+      employmentType: staffMember.employmentType || "permanent_not_sponsored",
+      locationId: staffMember.locationId || activeLocationId || 0,
       employmentDate: staffMember.employmentDate ? new Date(staffMember.employmentDate).toISOString().split('T')[0] : "",
       dbsCertificateNumber: staffMember.dbsCertificateNumber || "",
       dbsDate: staffMember.dbsDate ? new Date(staffMember.dbsDate).toISOString().split('T')[0] : "",
@@ -109,7 +124,14 @@ export default function Staff() {
     try {
       await updateStaff.mutateAsync({
         id: editingStaff.id,
-        ...formData,
+        locationId: formData.locationId,
+        name: formData.name,
+        role: formData.role,
+        employmentType: formData.employmentType,
+        employmentDate: formData.employmentDate,
+        dbsCertificateNumber: formData.dbsCertificateNumber,
+        dbsDate: formData.dbsDate,
+        isActive: formData.isActive,
       });
       toast.success("Staff member updated successfully");
       setIsEditOpen(false);
@@ -205,6 +227,38 @@ export default function Staff() {
                       onChange={handleInputChange}
                       placeholder="e.g., Care Assistant, Nurse"
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="create-locationId">Location *</Label>
+                    <select
+                      id="create-locationId"
+                      name="locationId"
+                      value={formData.locationId}
+                      onChange={(e) => setFormData(prev => ({ ...prev, locationId: parseInt(e.target.value) }))}
+                      className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      {locations.map((loc: any) => (
+                        <option key={loc.id} value={loc.id}>{loc.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="create-employmentType">Employment Type *</Label>
+                    <select
+                      id="create-employmentType"
+                      name="employmentType"
+                      value={formData.employmentType}
+                      onChange={(e) => setFormData(prev => ({ ...prev, employmentType: e.target.value as any }))}
+                      className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="permanent_not_sponsored">Permanent - Not Sponsored</option>
+                      <option value="permanent_sponsored">Permanent - Sponsored</option>
+                      <option value="agency">Agency</option>
+                    </select>
                   </div>
 
                   <div className="space-y-2">
@@ -434,6 +488,38 @@ export default function Staff() {
                     value={formData.role}
                     onChange={handleInputChange}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-locationId">Location *</Label>
+                  <select
+                    id="edit-locationId"
+                    name="locationId"
+                    value={formData.locationId}
+                    onChange={(e) => setFormData(prev => ({ ...prev, locationId: parseInt(e.target.value) }))}
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required
+                  >
+                    {locations.map((loc: any) => (
+                      <option key={loc.id} value={loc.id}>{loc.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-employmentType">Employment Type *</Label>
+                  <select
+                    id="edit-employmentType"
+                    name="employmentType"
+                    value={formData.employmentType}
+                    onChange={(e) => setFormData(prev => ({ ...prev, employmentType: e.target.value as any }))}
+                    className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    required
+                  >
+                    <option value="permanent_not_sponsored">Permanent - Not Sponsored</option>
+                    <option value="permanent_sponsored">Permanent - Sponsored</option>
+                    <option value="agency">Agency</option>
+                  </select>
                 </div>
 
                 <div className="space-y-2">

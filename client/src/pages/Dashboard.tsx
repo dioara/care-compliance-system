@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
+import { useLocation as useLocationContext } from "@/contexts/LocationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { 
@@ -17,9 +18,12 @@ import {
 export default function Dashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+  const { activeLocationId } = useLocationContext();
   const { data: profile } = trpc.company.getProfile.useQuery();
   const { data: locations } = trpc.locations.list.useQuery();
-  const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery();
+  const { data: dashboardStats, isLoading: statsLoading } = trpc.dashboard.getStats.useQuery(
+    activeLocationId ? { locationId: activeLocationId } : undefined
+  );
 
   // Use real data from database
   const stats = dashboardStats || {
@@ -46,6 +50,11 @@ export default function Dashboard() {
         </h1>
         <p className="text-muted-foreground mt-2">
           {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
+          {activeLocationId && locations && (
+            <span className="ml-2 text-sm bg-primary/10 text-primary px-2 py-0.5 rounded">
+              Filtered by: {locations.find(l => l.id === activeLocationId)?.name || 'Selected Location'}
+            </span>
+          )}
         </p>
       </div>
 

@@ -716,14 +716,23 @@ export async function getServiceUserComplianceProgress(serviceUserId: number) {
   };
 }
 
-// Get dashboard statistics for a tenant
-export async function getDashboardStats(tenantId: number) {
+// Get dashboard statistics for a tenant, optionally filtered by location
+export async function getDashboardStats(tenantId: number, locationId?: number) {
   const db = await getDb();
   if (!db) return null;
 
-  // Get all assessments for this tenant
-  const assessments = await db.select().from(complianceAssessments)
-    .where(eq(complianceAssessments.tenantId, tenantId));
+  // Get all assessments for this tenant, optionally filtered by location
+  let assessments;
+  if (locationId) {
+    assessments = await db.select().from(complianceAssessments)
+      .where(and(
+        eq(complianceAssessments.tenantId, tenantId),
+        eq(complianceAssessments.locationId, locationId)
+      ));
+  } else {
+    assessments = await db.select().from(complianceAssessments)
+      .where(eq(complianceAssessments.tenantId, tenantId));
+  }
 
   const totalAssessments = assessments.length;
   const compliantCount = assessments.filter(a => a.ragStatus === 'green').length;

@@ -33,6 +33,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DataPrivacy from "./pages/DataPrivacy";
 import RoleManagement from "./pages/RoleManagement";
 import UserManagement from "./pages/UserManagement";
+import TermsOfService from "./pages/TermsOfService";
 
 function Router() {
   return (
@@ -165,6 +166,8 @@ function Router() {
           <DataPrivacy />
         </DashboardLayout>
       </Route>
+      
+      <Route path="/terms-of-service" component={TermsOfService} />
       
       <Route path="/role-management">
         <DashboardLayout>
