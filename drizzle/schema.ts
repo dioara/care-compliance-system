@@ -122,6 +122,38 @@ export const staffMembers = mysqlTable("staffMembers", {
 });
 
 /**
+ * Staff history table - tracks changes to staff records for audit purposes
+ */
+export const staffHistory = mysqlTable("staffHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  staffId: int("staffId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  changeType: varchar("changeType", { length: 50 }).notNull(), // 'employment_type', 'status', 'role', 'location'
+  previousValue: varchar("previousValue", { length: 255 }),
+  newValue: varchar("newValue", { length: 255 }),
+  changedBy: int("changedBy"), // userId who made the change
+  changedByName: varchar("changedByName", { length: 255 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
+ * Service user history table - tracks changes to service user records for audit purposes
+ */
+export const serviceUserHistory = mysqlTable("serviceUserHistory", {
+  id: int("id").autoincrement().primaryKey(),
+  serviceUserId: int("serviceUserId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  changeType: varchar("changeType", { length: 50 }).notNull(), // 'status', 'care_package', 'location', 'admission'
+  previousValue: varchar("previousValue", { length: 255 }),
+  newValue: varchar("newValue", { length: 255 }),
+  changedBy: int("changedBy"), // userId who made the change
+  changedByName: varchar("changedByName", { length: 255 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+/**
  * Compliance sections (22 service user sections + 7 staff sections)
  */
 export const complianceSections = mysqlTable("complianceSections", {
@@ -463,6 +495,27 @@ export type Role = typeof roles.$inferSelect;
 export type InsertRole = typeof roles.$inferInsert;
 
 /**
+ * Staff invitation tokens table
+ * Used to invite staff members to create accounts and associate with company
+ */
+export const staffInvitationTokens = mysqlTable("staffInvitationTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId").notNull(),
+  staffId: int("staffId"), // Optional - link to existing staff record
+  email: varchar("email", { length: 255 }).notNull(),
+  name: varchar("name", { length: 255 }),
+  token: varchar("token", { length: 255 }).notNull(),
+  roleIds: text("roleIds"), // JSON array of role IDs to assign
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdBy: int("createdBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type StaffInvitationToken = typeof staffInvitationTokens.$inferSelect;
+export type InsertStaffInvitationToken = typeof staffInvitationTokens.$inferInsert;
+
+/**
  * Role-Location Permissions table
  * Defines which locations each role can access and permission level
  */
@@ -522,6 +575,10 @@ export type AuditTrail = typeof auditTrail.$inferSelect;
 export type InsertAuditTrail = typeof auditTrail.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 export type InsertReport = typeof reports.$inferInsert;
+export type StaffHistory = typeof staffHistory.$inferSelect;
+export type InsertStaffHistory = typeof staffHistory.$inferInsert;
+export type ServiceUserHistory = typeof serviceUserHistory.$inferSelect;
+export type InsertServiceUserHistory = typeof serviceUserHistory.$inferInsert;
 
 /**
  * Audit templates - stores the structure of each audit type with questions

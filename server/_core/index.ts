@@ -35,6 +35,102 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // Cookie parser for auth tokens
   app.use(cookieParser());
+  // Staff invitation validation endpoint
+  app.get("/api/auth/validate-invitation", async (req, res) => {
+    try {
+      const token = req.query.token as string;
+      if (!token) {
+        return res.json({ valid: false, message: "No token provided" });
+      }
+
+      const { getStaffInvitationByToken, getTenantById } = await import("../db");
+      const invitation = await getStaffInvitationByToken(token);
+
+      if (!invitation) {
+        return res.json({ valid: false, message: "Invalid invitation" });
+      }
+
+      if (invitation.usedAt) {
+        return res.json({ valid: false, message: "This invitation has already been used" });
+      }
+
+      if (new Date(invitation.expiresAt) < new Date()) {
+        return res.json({ valid: false, message: "This invitation has expired" });
+      }
+
+      const tenant = await getTenantById(invitation.tenantId);
+
+      return res.json({
+        valid: true,
+        invitation: {
+          email: invitation.email,
+          name: invitation.name,
+          companyName: tenant?.name || "Unknown Company",
+        },
+      });
+    } catch (error) {
+      console.error("Error validating invitation:", error);
+      return res.json({ valid: false, message: "Failed to validate invitation" });
+    }
+  });
+
+  // Staff invitation acceptance endpoint
+  app.post("/api/auth/accept-invitation", async (req, res) => {
+    try {
+      const { token, name, password } = req.body;
+
+      if (!token || !name || !password) {
+        return res.json({ success: false, message: "Missing required fields" });
+      }
+
+      const { getStaffInvitationByToken, markInvitationUsed, createUser, setUserRoles } = await import("../db");
+      const invitation = await getStaffInvitationByToken(token);
+
+      if (!invitation) {
+        return res.json({ success: false, message: "Invalid invitation" });
+      }
+
+      if (invitation.usedAt) {
+        return res.json({ success: false, message: "This invitation has already been used" });
+      }
+
+      if (new Date(invitation.expiresAt) < new Date()) {
+        return res.json({ success: false, message: "This invitation has expired" });
+      }
+
+      // Create the user account
+      const result = await createUser({
+        tenantId: invitation.tenantId,
+        email: invitation.email,
+        name,
+        password,
+        superAdmin: false,
+      });
+
+      const userId = (result as any).insertId;
+
+      // Assign roles if specified
+      if (invitation.roleIds) {
+        try {
+          const roleIds = JSON.parse(invitation.roleIds);
+          if (Array.isArray(roleIds) && roleIds.length > 0) {
+            await setUserRoles(userId, roleIds);
+          }
+        } catch (e) {
+          console.error("Error parsing role IDs:", e);
+        }
+      }
+
+      // Mark invitation as used
+      await markInvitationUsed(token);
+
+      return res.json({ success: true, message: "Account created successfully" });
+    } catch (error: any) {
+      console.error("Error accepting invitation:", error);
+      return res.json({ success: false, message: error.message || "Failed to create account" });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",

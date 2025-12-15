@@ -40,6 +40,7 @@ import Settings from "./pages/Settings";
 import AdminDashboard from "./pages/AdminDashboard";
 import ActionLog from "./pages/ActionLog";
 import EmailSettings from "./pages/EmailSettings";
+import AcceptInvitation from "./pages/AcceptInvitation";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/accept-invitation" component={AcceptInvitation} />
       
       <Route path="/">
         <DashboardLayout>

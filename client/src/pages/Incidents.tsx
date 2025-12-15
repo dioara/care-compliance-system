@@ -47,6 +47,7 @@ export default function Incidents() {
   const [selectedIncident, setSelectedIncident] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [formStep, setFormStep] = useState(1);
+  const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
 
   // Fetch data
   const { data: incidents = [], refetch } = trpc.incidents.getByTenant.useQuery({ limit: 100 });
@@ -269,9 +270,12 @@ export default function Incidents() {
     }
   };
 
-  const filteredIncidents = activeTab === "all" 
-    ? incidents 
-    : incidents.filter((i: any) => i.status === activeTab);
+  // Apply both status and location filters
+  const filteredIncidents = incidents.filter((i: any) => {
+    const statusMatch = activeTab === "all" || i.status === activeTab;
+    const locationMatch = !filterLocationId || i.locationId === filterLocationId;
+    return statusMatch && locationMatch;
+  });
 
   return (
     <div className="space-y-8">
@@ -978,22 +982,43 @@ export default function Incidents() {
               <CardTitle className="text-xl">Incident Records</CardTitle>
               <CardDescription>View and manage all reported incidents</CardDescription>
             </div>
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="bg-background border">
-                <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-                  All
-                </TabsTrigger>
-                <TabsTrigger value="open" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
-                  Open
-                </TabsTrigger>
-                <TabsTrigger value="under_investigation" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  Investigating
-                </TabsTrigger>
-                <TabsTrigger value="closed" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">
-                  Closed
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <div className="flex items-center gap-4">
+              {/* Location Filter */}
+              <Select
+                value={filterLocationId?.toString() || "all"}
+                onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <SelectValue placeholder="All Locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map((location: any) => (
+                    <SelectItem key={location.id} value={location.id.toString()}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="bg-background border">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                    All
+                  </TabsTrigger>
+                  <TabsTrigger value="open" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">
+                    Open
+                  </TabsTrigger>
+                  <TabsTrigger value="under_investigation" className="data-[state=active]:bg-blue-500 data-[state=active]:text-white">
+                    Investigating
+                  </TabsTrigger>
+                  <TabsTrigger value="closed" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">
+                    Closed
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-0">

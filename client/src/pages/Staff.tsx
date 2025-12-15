@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck, Filter, Lock } from "lucide-react";
+import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck, Filter, Lock, History, Mail, Send } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -28,10 +28,23 @@ export default function Staff() {
   const createStaff = trpc.staff.create.useMutation();
   const updateStaff = trpc.staff.update.useMutation();
   const deleteStaff = trpc.staff.delete.useMutation();
+  const addHistory = trpc.staff.addHistory.useMutation();
+  const sendInvitation = trpc.users.sendInvitation.useMutation();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<any>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyStaffId, setHistoryStaffId] = useState<number | null>(null);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteStaff, setInviteStaff] = useState<any>(null);
+
+  // Fetch history when dialog is open
+  const { data: staffHistory, isLoading: historyLoading } = trpc.staff.getHistory.useQuery(
+    { staffId: historyStaffId! },
+    { enabled: !!historyStaffId && isHistoryOpen }
+  );
 
   const [formData, setFormData] = useState({
     name: "",
@@ -127,6 +140,36 @@ export default function Staff() {
     }
 
     try {
+      // Track employment type changes
+      if (editingStaff.employmentType !== formData.employmentType) {
+        await addHistory.mutateAsync({
+          staffId: editingStaff.id,
+          changeType: "Employment Type Changed",
+          previousValue: editingStaff.employmentType || "Not set",
+          newValue: formData.employmentType,
+        });
+      }
+
+      // Track role changes
+      if (editingStaff.role !== formData.role) {
+        await addHistory.mutateAsync({
+          staffId: editingStaff.id,
+          changeType: "Role Changed",
+          previousValue: editingStaff.role || "Not set",
+          newValue: formData.role,
+        });
+      }
+
+      // Track active status changes
+      if (editingStaff.isActive !== formData.isActive) {
+        await addHistory.mutateAsync({
+          staffId: editingStaff.id,
+          changeType: formData.isActive ? "Reactivated" : "Deactivated",
+          previousValue: editingStaff.isActive ? "Active" : "Inactive",
+          newValue: formData.isActive ? "Active" : "Inactive",
+        });
+      }
+
       await updateStaff.mutateAsync({
         id: editingStaff.id,
         locationId: formData.locationId,
@@ -146,6 +189,36 @@ export default function Staff() {
     } catch (error) {
       toast.error("Failed to update staff member");
     }
+  };
+
+  const handleSendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail || !inviteStaff) return;
+
+    try {
+      await sendInvitation.mutateAsync({
+        email: inviteEmail,
+        name: inviteStaff.name,
+        staffId: inviteStaff.id,
+      });
+      toast.success("Invitation email sent successfully!");
+      setIsInviteOpen(false);
+      setInviteEmail("");
+      setInviteStaff(null);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send invitation");
+    }
+  };
+
+  const openHistory = (staffMember: any) => {
+    setHistoryStaffId(staffMember.id);
+    setIsHistoryOpen(true);
+  };
+
+  const openInvite = (staffMember: any) => {
+    setInviteStaff(staffMember);
+    setInviteEmail("");
+    setIsInviteOpen(true);
   };
 
   const handleDelete = async (id: number) => {
@@ -402,12 +475,30 @@ export default function Staff() {
                       <CardDescription>{staffMember.role}</CardDescription>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openHistory(staffMember)}
+                      title="View History"
+                    >
+                      <History className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openInvite(staffMember)}
+                      title="Send Account Invitation"
+                      disabled={!canWrite}
+                    >
+                      <Mail className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleEdit(staffMember)}
                       disabled={!canWrite}
+                      title="Edit"
                     >
                       <Pencil className="h-4 w-4" />
                     </Button>
@@ -416,6 +507,7 @@ export default function Staff() {
                       size="icon"
                       onClick={() => handleDelete(staffMember.id)}
                       disabled={!canWrite}
+                      title="Delete"
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -627,6 +719,106 @@ export default function Staff() {
                   </>
                 ) : (
                   "Update Staff Member"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Staff History
+            </DialogTitle>
+            <DialogDescription>
+              View all changes made to this staff member's record.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {historyLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : staffHistory && staffHistory.length > 0 ? (
+              <div className="space-y-3">
+                {staffHistory.map((entry: any) => (
+                  <div key={entry.id} className="border rounded-lg p-4 bg-muted/30">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="font-medium text-sm">{entry.changeType}</p>
+                        <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                          <span className="line-through text-red-500">{entry.previousValue}</span>
+                          <span>→</span>
+                          <span className="text-green-600 font-medium">{entry.newValue}</span>
+                        </div>
+                      </div>
+                      <div className="text-right text-xs text-muted-foreground">
+                        <p>{new Date(entry.createdAt).toLocaleDateString()}</p>
+                        <p>{new Date(entry.createdAt).toLocaleTimeString()}</p>
+                      </div>
+                    </div>
+                    {entry.changedByName && (
+                      <p className="text-xs text-muted-foreground mt-2">Changed by: {entry.changedByName}</p>
+                    )}
+                    {entry.notes && (
+                      <p className="text-sm mt-2 text-muted-foreground">{entry.notes}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No history records found</p>
+                <p className="text-sm">Changes to this staff member will be tracked here.</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invite Dialog */}
+      <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Send Account Invitation
+            </DialogTitle>
+            <DialogDescription>
+              Send an email invitation to {inviteStaff?.name} to create their account.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSendInvite}>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="invite-email">Email Address *</Label>
+                <Input
+                  id="invite-email"
+                  type="email"
+                  placeholder="Enter staff member's email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                An email will be sent with a link to create their account. The invitation expires in 7 days.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsInviteOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={sendInvitation.isPending}>
+                {sendInvitation.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                ) : (
+                  <><Send className="mr-2 h-4 w-4" /> Send Invitation</>
                 )}
               </Button>
             </DialogFooter>

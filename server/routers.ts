@@ -414,6 +414,39 @@ export const appRouter = router({
         await db.deleteServiceUser(input.id);
         return { success: true };
       }),
+
+    // Get service user history
+    getHistory: protectedProcedure
+      .input(z.object({ serviceUserId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getServiceUserHistory(input.serviceUserId);
+      }),
+
+    // Add service user history entry
+    addHistory: protectedProcedure
+      .input(z.object({
+        serviceUserId: z.number(),
+        changeType: z.string(),
+        previousValue: z.string().optional(),
+        newValue: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Tenant not found" });
+        }
+        await db.addServiceUserHistory({
+          serviceUserId: input.serviceUserId,
+          tenantId: ctx.user.tenantId,
+          changeType: input.changeType,
+          previousValue: input.previousValue,
+          newValue: input.newValue,
+          changedBy: ctx.user.id,
+          changedByName: ctx.user.name || ctx.user.email,
+          notes: input.notes,
+        });
+        return { success: true };
+      }),
   }),
 
   // Staff management
@@ -453,6 +486,7 @@ export const appRouter = router({
           locationId: z.number(),
           name: z.string(),
           role: z.string().optional(),
+          employmentType: z.enum(["permanent_sponsored", "permanent_not_sponsored", "agency"]).optional(),
           employmentDate: z.string().optional(),
           dbsCertificateNumber: z.string().optional(),
           dbsDate: z.string().optional(),
@@ -467,6 +501,7 @@ export const appRouter = router({
         const staff = await db.createStaffMember({
           ...input,
           tenantId: ctx.user.tenantId,
+          employmentType: input.employmentType || "permanent_not_sponsored",
           employmentDate: input.employmentDate ? new Date(input.employmentDate) : null,
           dbsDate: input.dbsDate ? new Date(input.dbsDate) : null,
           isActive: input.isActive ?? true,
@@ -503,6 +538,39 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await db.deleteStaffMember(input.id);
+        return { success: true };
+      }),
+
+    // Get staff history
+    getHistory: protectedProcedure
+      .input(z.object({ staffId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getStaffHistory(input.staffId);
+      }),
+
+    // Add staff history entry
+    addHistory: protectedProcedure
+      .input(z.object({
+        staffId: z.number(),
+        changeType: z.string(),
+        previousValue: z.string().optional(),
+        newValue: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Tenant not found" });
+        }
+        await db.addStaffHistory({
+          staffId: input.staffId,
+          tenantId: ctx.user.tenantId,
+          changeType: input.changeType,
+          previousValue: input.previousValue,
+          newValue: input.newValue,
+          changedBy: ctx.user.id,
+          changedByName: ctx.user.name || ctx.user.email,
+          notes: input.notes,
+        });
         return { success: true };
       }),
   }),
@@ -1360,6 +1428,82 @@ export const appRouter = router({
         await db.updateUserRole(input.userId, input.role);
         return { success: true };
       }),
+
+    // Send staff invitation email
+    sendInvitation: superAdminProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          name: z.string().optional(),
+          staffId: z.number().optional(),
+          roleIds: z.array(z.number()).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No tenant" });
+        }
+
+        // Check if email already exists as a user
+        const existing = await db.getUserByEmail(input.email);
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "This email is already registered" });
+        }
+
+        // Generate a secure token
+        const crypto = await import("crypto");
+        const token = crypto.randomBytes(32).toString("hex");
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+        // Save invitation to database
+        await db.createStaffInvitation({
+          tenantId: ctx.user.tenantId,
+          staffId: input.staffId,
+          email: input.email,
+          name: input.name,
+          token,
+          roleIds: input.roleIds ? JSON.stringify(input.roleIds) : null,
+          expiresAt,
+          createdBy: ctx.user.id,
+        });
+
+        // Get tenant info for email
+        const tenant = await db.getTenantById(ctx.user.tenantId);
+        const companyName = tenant?.name || "Care Compliance System";
+
+        // Send invitation email
+        const { sendEmail } = await import("./_core/email");
+        const baseUrl = process.env.VITE_FRONTEND_FORGE_API_URL?.replace("/api", "") || "";
+        const inviteUrl = `${baseUrl}/accept-invitation?token=${token}`;
+
+        await sendEmail({
+          to: input.email,
+          subject: `You're invited to join ${companyName}`,
+          text: `Hello${input.name ? " " + input.name : ""},\n\nYou have been invited to join ${companyName} on the Care Compliance System.\n\nClick the link below to create your account:\n${inviteUrl}\n\nThis invitation expires in 7 days.\n\nBest regards,\n${companyName}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #1a1a1a;">You're Invited!</h2>
+              <p>Hello${input.name ? " " + input.name : ""},</p>
+              <p>You have been invited to join <strong>${companyName}</strong> on the Care Compliance System.</p>
+              <p style="margin: 30px 0;">
+                <a href="${inviteUrl}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Create Your Account</a>
+              </p>
+              <p style="color: #666; font-size: 14px;">This invitation expires in 7 days.</p>
+              <p style="color: #666; font-size: 14px;">If you didn't expect this invitation, you can safely ignore this email.</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+              <p style="color: #999; font-size: 12px;">Best regards,<br />${companyName}</p>
+            </div>
+          `,
+        });
+
+        return { success: true, message: "Invitation sent successfully" };
+      }),
+
+    // Get pending invitations
+    getInvitations: superAdminProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) return [];
+      return db.getStaffInvitationsByTenant(ctx.user.tenantId);
+    }),
   }),
 
   // AI Audits

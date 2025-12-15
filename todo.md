@@ -1242,3 +1242,12 @@
 ## Bug Fixes
 - [x] Fix user roles not showing as checked when reopening Roles dialog
 - [x] Fix staff employment type not persisting after save
+
+## History Tracking an## History Tracking and Incident Filter
+- [x] Create staffHistory table for tracking employment changes
+- [x] Create serviceUserHistory table for tracking status changes
+- [x] Add backend endpoints for history logging and retrieval
+- [x] Add history display UI to Staff and Service User pages
+- [x] Add location filter to Incidents pageage
+- [x] Add staff invitation email with account setup link
+- [x] Create invitation tokens table for secure account setup

@@ -10,6 +10,9 @@ import {
   userRoles,
   serviceUsers,
   staffMembers,
+  staffHistory,
+  serviceUserHistory,
+  staffInvitationTokens,
   complianceSections,
   complianceQuestions,
   complianceAssessments,
@@ -635,6 +638,110 @@ export async function deleteStaffMember(id: number) {
   await db.delete(staffMembers).where(eq(staffMembers.id, id));
 }
 
+// ============================================================================
+// STAFF HISTORY TRACKING
+// ============================================================================
+
+export async function addStaffHistory(data: {
+  staffId: number;
+  tenantId: number;
+  changeType: string;
+  previousValue?: string | null;
+  newValue?: string | null;
+  changedBy?: number | null;
+  changedByName?: string | null;
+  notes?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(staffHistory).values(data);
+}
+
+export async function getStaffHistory(staffId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(staffHistory)
+    .where(eq(staffHistory.staffId, staffId))
+    .orderBy(desc(staffHistory.createdAt));
+}
+
+// ============================================================================
+// SERVICE USER HISTORY TRACKING
+// ============================================================================
+
+export async function addServiceUserHistory(data: {
+  serviceUserId: number;
+  tenantId: number;
+  changeType: string;
+  previousValue?: string | null;
+  newValue?: string | null;
+  changedBy?: number | null;
+  changedByName?: string | null;
+  notes?: string | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(serviceUserHistory).values(data);
+}
+
+export async function getServiceUserHistory(serviceUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(serviceUserHistory)
+    .where(eq(serviceUserHistory.serviceUserId, serviceUserId))
+    .orderBy(desc(serviceUserHistory.createdAt));
+}
+
+// ============================================================================
+// STAFF INVITATION TOKENS
+// ============================================================================
+
+export async function createStaffInvitation(data: {
+  tenantId: number;
+  staffId?: number | null;
+  email: string;
+  name?: string | null;
+  token: string;
+  roleIds?: string | null;
+  expiresAt: Date;
+  createdBy?: number | null;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(staffInvitationTokens).values(data);
+}
+
+export async function getStaffInvitationByToken(token: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db.select().from(staffInvitationTokens)
+    .where(eq(staffInvitationTokens.token, token));
+  return results[0] || null;
+}
+
+export async function markInvitationUsed(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(staffInvitationTokens)
+    .set({ usedAt: new Date() })
+    .where(eq(staffInvitationTokens.token, token));
+}
+
+export async function getStaffInvitationsByTenant(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(staffInvitationTokens)
+    .where(eq(staffInvitationTokens.tenantId, tenantId))
+    .orderBy(desc(staffInvitationTokens.createdAt));
+}
 
 // ============================================================================
 // COMPLIANCE MANAGEMENT
