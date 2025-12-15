@@ -1145,3 +1145,8 @@
 - [x] Update compliance notification to send to all configured recipients
 - [x] Use custom templates when available
 - [x] Add Email Settings to admin navigation
+
+
+## BUG: Action Log Issues (December 15, 2025)
+- [x] Add completion date field to Update Action dialog
+- [x] Add issue number column to CSV export (uses ACT-{id} format)

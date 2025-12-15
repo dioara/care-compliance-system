@@ -27,6 +27,7 @@ export default function ActionLog() {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [updateNotes, setUpdateNotes] = useState("");
   const [updateStatus, setUpdateStatus] = useState<string>("");
+  const [updateCompletionDate, setUpdateCompletionDate] = useState<string>("");
 
   // Fetch all action plans across locations
   const { data: actionPlans, isLoading, refetch } = trpc.audits.getAllActionPlans.useQuery({
@@ -51,7 +52,7 @@ export default function ActionLog() {
       id: selectedAction.id,
       status: updateStatus as "not_started" | "in_progress" | "partially_completed" | "completed",
       actionTaken: updateNotes,
-      actualCompletionDate: updateStatus === "completed" ? new Date() : undefined,
+      actualCompletionDate: updateCompletionDate ? new Date(updateCompletionDate) : undefined,
     });
   };
 
@@ -59,6 +60,7 @@ export default function ActionLog() {
     setSelectedAction(action);
     setUpdateStatus(action.status);
     setUpdateNotes(action.actionTaken || "");
+    setUpdateCompletionDate(action.actualCompletionDate ? format(new Date(action.actualCompletionDate), "yyyy-MM-dd") : "");
     setIsUpdateDialogOpen(true);
   };
 
@@ -129,7 +131,7 @@ export default function ActionLog() {
     ];
 
     const rows = filteredActions.map((action) => [
-      action.issueNumber || "",
+      action.issueNumber || `ACT-${action.id}`,
       `"${(action.issueDescription || "").replace(/"/g, '""')}"`,
       action.auditOrigin || "",
       action.locationName || "",
@@ -283,7 +285,7 @@ export default function ActionLog() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">#</TableHead>
+                  <TableHead className="w-[80px]">Issue #</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Audit Origin</TableHead>
                   <TableHead>Location</TableHead>
@@ -297,7 +299,7 @@ export default function ActionLog() {
               <TableBody>
                 {filteredActions.map((action) => (
                   <TableRow key={action.id} className={action.status !== "completed" && isOverdue(action.targetCompletionDate) ? "bg-red-50" : ""}>
-                    <TableCell className="font-mono text-sm">{action.issueNumber || action.id}</TableCell>
+                    <TableCell className="font-mono text-sm font-medium">{action.issueNumber || `ACT-${action.id}`}</TableCell>
                     <TableCell className="max-w-[300px] truncate">{action.issueDescription}</TableCell>
                     <TableCell>{action.auditOrigin}</TableCell>
                     <TableCell>{action.locationName}</TableCell>
@@ -375,6 +377,16 @@ export default function ActionLog() {
                   onChange={(e) => setUpdateNotes(e.target.value)}
                   rows={4}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Completion Date</Label>
+                <Input
+                  type="date"
+                  value={updateCompletionDate}
+                  onChange={(e) => setUpdateCompletionDate(e.target.value)}
+                  placeholder="Select completion date"
+                />
+                <p className="text-xs text-muted-foreground">Enter the date when this action was completed</p>
               </div>
             </div>
           )}
