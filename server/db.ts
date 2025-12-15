@@ -32,7 +32,9 @@ import {
   dataExportRequests,
   emailRecipients,
   emailTemplates,
+  passwordResetTokens,
   type InsertUser,
+  type InsertPasswordResetToken,
   type InsertAiAudit,
   type InsertAiAuditSchedule,
   type InsertUserConsent,
@@ -110,6 +112,37 @@ export async function getUserById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+// ============================================================================
+// TWO-FACTOR AUTHENTICATION
+// ============================================================================
+
+export async function update2FASecret(userId: number, secret: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users)
+    .set({ twoFaSecret: secret, twoFaVerified: false })
+    .where(eq(users.id, userId));
+}
+
+export async function enable2FA(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users)
+    .set({ twoFaEnabled: true, twoFaVerified: true })
+    .where(eq(users.id, userId));
+}
+
+export async function disable2FA(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users)
+    .set({ twoFaEnabled: false, twoFaVerified: false, twoFaSecret: null })
+    .where(eq(users.id, userId));
+}
+
 export async function getUsersByTenant(tenantId: number) {
   const db = await getDb();
   if (!db) return [];
@@ -133,6 +166,61 @@ export async function updateUserLastSignIn(userId: number) {
 
 export async function verifyPassword(password: string, hashedPassword: string) {
   return await bcrypt.compare(password, hashedPassword);
+}
+
+// ============================================================================
+// PASSWORD RESET
+// ============================================================================
+
+export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Invalidate any existing tokens for this user
+  await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
+
+  // Create new token
+  await db.insert(passwordResetTokens).values({
+    userId,
+    token,
+    expiresAt,
+  });
+
+  return { success: true };
+}
+
+export async function getPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(passwordResetTokens)
+    .where(and(
+      eq(passwordResetTokens.token, token),
+      sql`${passwordResetTokens.usedAt} IS NULL`,
+      sql`${passwordResetTokens.expiresAt} > NOW()`
+    ))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function markPasswordResetTokenUsed(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(passwordResetTokens)
+    .set({ usedAt: new Date() })
+    .where(eq(passwordResetTokens.token, token));
+}
+
+export async function resetUserPassword(userId: number, newPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await db.update(users)
+    .set({ password: hashedPassword, updatedAt: new Date() })
+    .where(eq(users.id, userId));
 }
 
 export async function getUserByOpenId(openId: string) {
@@ -1330,6 +1418,53 @@ export async function updateIncidentNotification(
       updates.reportedToFamily = true;
       updates.familyNotifiedAt = now;
       updates.familyNotificationDetails = details;
+      break;
+  }
+  
+  await db
+    .update(incidents)
+    .set(updates)
+    .where(eq(incidents.id, id));
+}
+
+// Update notification status with toggle support
+export async function updateIncidentNotificationStatus(
+  id: number,
+  notificationType: 'cqc' | 'council' | 'ico' | 'police' | 'family',
+  notified: boolean,
+  details?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = new Date();
+  const updates: any = { updatedAt: now };
+  
+  switch (notificationType) {
+    case 'cqc':
+      updates.reportedToCqc = notified;
+      updates.cqcNotifiedAt = notified ? now : null;
+      if (details) updates.cqcNotificationDetails = details;
+      break;
+    case 'council':
+      updates.reportedToCouncil = notified;
+      updates.councilNotifiedAt = notified ? now : null;
+      if (details) updates.councilNotificationDetails = details;
+      break;
+    case 'ico':
+      updates.reportedToIco = notified;
+      updates.icoNotifiedAt = notified ? now : null;
+      if (details) updates.icoNotificationDetails = details;
+      break;
+    case 'police':
+      updates.reportedToPolice = notified;
+      updates.policeNotifiedAt = notified ? now : null;
+      if (details) updates.policeNotificationDetails = details;
+      break;
+    case 'family':
+      updates.reportedToFamily = notified;
+      updates.familyNotifiedAt = notified ? now : null;
+      if (details) updates.familyNotificationDetails = details;
       break;
   }
   

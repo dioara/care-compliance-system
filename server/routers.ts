@@ -1126,15 +1126,16 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Log notification
+    // Log notification - toggle notification status with timestamp
     logNotification: protectedProcedure
       .input(z.object({
         id: z.number(),
         notificationType: z.enum(['cqc', 'council', 'ico', 'police', 'family']),
-        details: z.string(),
+        notified: z.boolean(),
+        details: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        await db.updateIncidentNotification(input.id, input.notificationType, input.details);
+        await db.updateIncidentNotificationStatus(input.id, input.notificationType, input.notified, input.details);
         return { success: true };
       }),
 

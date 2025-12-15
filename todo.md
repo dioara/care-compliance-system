@@ -1207,3 +1207,28 @@
 - [x] Redesign login page with professional modern look
 - [x] Use custom icons and polished design elements
 - [x] Add visual branding and professional layout
+
+
+## Forgot Password, Social Login & 2FA Implementation
+- [ ] Create password reset tokens table in database schema
+- [ ] Implement forgot password email sending with reset link
+- [ ] Create password reset page with token validation
+- [ ] Add forgot password tRPC endpoints (request reset, verify token, reset password)
+- [ ] Add Google SSO button on login page (visual placeholder)
+- [ ] Add Microsoft SSO button on login page (visual placeholder)
+- [ ] Implement 2FA setup page with QR code generation
+- [ ] Implement 2FA verification on login
+- [ ] Add 2FA enable/disable in user settings
+- [ ] Test complete password reset flow
+- [ ] Test 2FA setup and verification flow
+
+## Additional UI/UX Improvements
+- [ ] Widen all form modals to use more screen width
+- [ ] Enhance Incident Reports with comprehensive non-tabular detail view
+- [ ] Add all incident details in a readable format
+
+## Incident Enhancements
+- [x] Add notification tracking checkboxes (CQC, Council, Police, Family, ICO) with timestamps
+- [x] Make non-closed incidents editable from detail view
+- [x] Widen incident detail modal
+- [x] Show comprehensive incident details in readable format

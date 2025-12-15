@@ -1052,9 +1052,9 @@ export default function Incidents() {
         </CardContent>
       </Card>
 
-      {/* Incident Detail Dialog */}
+      {/* Incident Detail Dialog - Enhanced with full width, notification tracking, and edit capability */}
       <Dialog open={!!selectedIncident} onOpenChange={(open) => !open && setSelectedIncident(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-y-auto">
           {selectedIncident && (
             <>
               <DialogHeader className="pb-4 border-b">
@@ -1070,6 +1070,7 @@ export default function Incidents() {
                         month: 'long', 
                         year: 'numeric' 
                       })}
+                      {selectedIncident.incidentTime && ` at ${selectedIncident.incidentTime}`}
                     </DialogDescription>
                   </div>
                   <div className="flex gap-2">
@@ -1081,97 +1082,320 @@ export default function Incidents() {
                 </div>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
-                {/* Incident Type */}
-                <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
-                  <div className="text-3xl">
-                    {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.icon || "📋"}
-                  </div>
-                  <div>
-                    <div className="font-medium capitalize">
-                      {selectedIncident.incidentType?.replace(/_/g, ' ')}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 py-4">
+                {/* Left Column - Main Details */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Incident Type */}
+                  <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
+                    <div className="text-3xl">
+                      {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.icon || "📋"}
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.description}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description */}
-                {selectedIncident.description && (
-                  <div>
-                    <h4 className="font-medium mb-2">Description</h4>
-                    <div className="p-4 bg-muted/30 rounded-lg">
-                      <RichTextDisplay content={selectedIncident.description} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Immediate Actions */}
-                {selectedIncident.immediateActions && (
-                  <div>
-                    <h4 className="font-medium mb-2">Immediate Actions Taken</h4>
-                    <div className="p-4 bg-muted/30 rounded-lg">
-                      <RichTextDisplay content={selectedIncident.immediateActions} />
-                    </div>
-                  </div>
-                )}
-
-                {/* Notifications */}
-                <div>
-                  <h4 className="font-medium mb-3">Notifications</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {[
-                      { key: 'reportedToCqc', label: 'CQC', icon: Shield },
-                      { key: 'reportedToCouncil', label: 'Council', icon: Building },
-                      { key: 'reportedToPolice', label: 'Police', icon: Shield },
-                      { key: 'reportedToFamily', label: 'Family', icon: Users },
-                      { key: 'reportedToIco', label: 'ICO', icon: Mail },
-                    ].map(({ key, label, icon: Icon }) => (
-                      <div 
-                        key={key}
-                        className={`p-3 rounded-lg border flex items-center gap-2 ${
-                          selectedIncident[key] 
-                            ? 'bg-green-50 border-green-200 text-green-700' 
-                            : 'bg-muted/30 text-muted-foreground'
-                        }`}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span className="text-sm font-medium">{label}</span>
-                        {selectedIncident[key] && <CheckCircle className="h-4 w-4 ml-auto" />}
+                    <div>
+                      <div className="font-medium capitalize text-lg">
+                        {selectedIncident.incidentType?.replace(/_/g, ' ')}
                       </div>
-                    ))}
+                      <div className="text-sm text-muted-foreground">
+                        {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.description}
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Location & Affected Person */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </div>
+                      <div className="font-medium">
+                        {locations.find((l: any) => l.id === selectedIncident.locationId)?.name || 'Unknown Location'}
+                      </div>
+                      {selectedIncident.locationDescription && (
+                        <div className="text-sm text-muted-foreground mt-1">
+                          {selectedIncident.locationDescription}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                        <User className="h-4 w-4" />
+                        Affected Person
+                      </div>
+                      <div className="font-medium capitalize">
+                        {selectedIncident.affectedPersonName || selectedIncident.affectedPersonType?.replace(/_/g, ' ') || 'Not specified'}
+                      </div>
+                      {selectedIncident.affectedPersonType && (
+                        <div className="text-sm text-muted-foreground mt-1 capitalize">
+                          Type: {selectedIncident.affectedPersonType.replace(/_/g, ' ')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  {selectedIncident.description && (
+                    <div>
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        Description of Incident
+                      </h4>
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <RichTextDisplay content={selectedIncident.description} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Immediate Actions */}
+                  {selectedIncident.immediateActions && (
+                    <div>
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <Activity className="h-4 w-4" />
+                        Immediate Actions Taken
+                      </h4>
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <RichTextDisplay content={selectedIncident.immediateActions} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Injuries & Treatment */}
+                  {(selectedIncident.injuriesDescription || selectedIncident.firstAidGiven || selectedIncident.hospitalAttendance) && (
+                    <div>
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <Stethoscope className="h-4 w-4" />
+                        Injuries & Medical Treatment
+                      </h4>
+                      <div className="p-4 bg-muted/30 rounded-lg space-y-3">
+                        {selectedIncident.injuriesDescription && (
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Injuries</div>
+                            <RichTextDisplay content={selectedIncident.injuriesDescription} />
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-3">
+                          {selectedIncident.firstAidGiven && (
+                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                              <CheckCircle className="h-3 w-3 mr-1" /> First Aid Given
+                            </Badge>
+                          )}
+                          {selectedIncident.medicalAttentionRequired && (
+                            <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                              <AlertCircle className="h-3 w-3 mr-1" /> Medical Attention Required
+                            </Badge>
+                          )}
+                          {selectedIncident.hospitalAttendance && (
+                            <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                              <Building className="h-3 w-3 mr-1" /> Hospital Attendance
+                            </Badge>
+                          )}
+                        </div>
+                        {selectedIncident.hospitalName && (
+                          <div className="text-sm">
+                            <span className="text-muted-foreground">Hospital:</span> {selectedIncident.hospitalName}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Witnesses */}
+                  {selectedIncident.witnessStatements && (
+                    <div>
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        Witness Statements
+                      </h4>
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <RichTextDisplay content={selectedIncident.witnessStatements} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Investigation Notes */}
+                  {selectedIncident.investigationNotes && (
+                    <div>
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4" />
+                        Investigation Notes
+                      </h4>
+                      <div className="p-4 bg-muted/30 rounded-lg">
+                        <RichTextDisplay content={selectedIncident.investigationNotes} />
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-4 border-t">
-                  {selectedIncident.status !== 'closed' && (
-                    <Button
-                      variant="outline"
-                      onClick={() => closeMutation.mutate({ id: selectedIncident.id })}
-                      disabled={closeMutation.isPending}
-                    >
-                      {closeMutation.isPending ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <XCircle className="mr-2 h-4 w-4" />
+                {/* Right Column - Notifications & Actions */}
+                <div className="space-y-6">
+                  {/* Notification Tracking */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        Notification Status
+                      </CardTitle>
+                      <CardDescription>Track who has been notified about this incident</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {[
+                        { key: 'reportedToCqc', atKey: 'cqcNotifiedAt', notifType: 'cqc' as const, label: 'CQC', icon: Shield, color: 'blue' },
+                        { key: 'reportedToCouncil', atKey: 'councilNotifiedAt', notifType: 'council' as const, label: 'Local Authority / Council', icon: Building, color: 'purple' },
+                        { key: 'reportedToPolice', atKey: 'policeNotifiedAt', notifType: 'police' as const, label: 'Police', icon: Shield, color: 'slate' },
+                        { key: 'reportedToFamily', atKey: 'familyNotifiedAt', notifType: 'family' as const, label: 'Family / Next of Kin', icon: Users, color: 'amber' },
+                        { key: 'reportedToIco', atKey: 'icoNotifiedAt', notifType: 'ico' as const, label: 'ICO (Data Breach)', icon: Mail, color: 'teal' },
+                      ].map(({ key, atKey, notifType, label, icon: Icon, color }) => {
+                        const isNotified = selectedIncident[key];
+                        const notifiedAt = selectedIncident[atKey];
+                        const canEdit = selectedIncident.status !== 'closed';
+                        
+                        return (
+                          <div 
+                            key={key}
+                            className={`p-3 rounded-lg border transition-all ${
+                              isNotified 
+                                ? `bg-${color}-50 border-${color}-200` 
+                                : 'bg-muted/30 border-border'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <Icon className={`h-4 w-4 ${isNotified ? `text-${color}-600` : 'text-muted-foreground'}`} />
+                                <span className={`text-sm font-medium ${isNotified ? `text-${color}-700` : ''}`}>{label}</span>
+                              </div>
+                              {canEdit ? (
+                                <Switch
+                                  checked={isNotified}
+                                  onCheckedChange={(checked) => {
+                                    logNotificationMutation.mutate({
+                                      id: selectedIncident.id,
+                                      notificationType: notifType,
+                                      notified: checked,
+                                    });
+                                  }}
+                                  disabled={logNotificationMutation.isPending}
+                                />
+                              ) : (
+                                isNotified && <CheckCircle className="h-4 w-4 text-green-600" />
+                              )}
+                            </div>
+                            {isNotified && notifiedAt && (
+                              <div className="text-xs text-muted-foreground mt-1 ml-6">
+                                Notified: {new Date(notifiedAt).toLocaleDateString('en-GB', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+
+                  {/* Reported By */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Reported By</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-sm">
+                        <div className="font-medium">{selectedIncident.reportedBy || 'Not specified'}</div>
+                        <div className="text-muted-foreground mt-1">
+                          {new Date(selectedIncident.createdAt).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Actions */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base">Actions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {selectedIncident.status !== 'closed' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                            onClick={() => {
+                              // Pre-populate form with incident data for editing
+                              setFormData({
+                                ...formData,
+                                locationId: String(selectedIncident.locationId),
+                                incidentNumber: selectedIncident.incidentNumber,
+                                incidentDate: selectedIncident.incidentDate,
+                                incidentTime: selectedIncident.incidentTime || '',
+                                incidentType: selectedIncident.incidentType,
+                                severity: selectedIncident.severity || 'low',
+                                locationDescription: selectedIncident.locationDescription || '',
+                                affectedPersonType: selectedIncident.affectedPersonType || '',
+                                serviceUserId: selectedIncident.serviceUserId ? String(selectedIncident.serviceUserId) : '',
+                                affectedStaffId: selectedIncident.affectedStaffId ? String(selectedIncident.affectedStaffId) : '',
+                                affectedPersonName: selectedIncident.affectedPersonName || '',
+                                staffInvolved: selectedIncident.staffInvolved || '',
+                                description: selectedIncident.description || '',
+                                immediateActions: selectedIncident.immediateActions || '',
+                                reportedBy: selectedIncident.reportedBy || '',
+                                injuriesDescription: selectedIncident.injuriesDescription || '',
+                                firstAidGiven: selectedIncident.firstAidGiven || false,
+                                firstAidDetails: selectedIncident.firstAidDetails || '',
+                                medicalAttentionRequired: selectedIncident.medicalAttentionRequired || false,
+                                hospitalAttendance: selectedIncident.hospitalAttendance || false,
+                                hospitalName: selectedIncident.hospitalName || '',
+                                witnessesPresent: !!selectedIncident.witnessStatements,
+                                witnessStatements: selectedIncident.witnessStatements || '',
+                                familyNotified: selectedIncident.reportedToFamily || false,
+                                riskAssessmentRequired: selectedIncident.investigationRequired || false,
+                                riskAssessmentNotes: selectedIncident.investigationNotes || '',
+                              });
+                              setSelectedIncident(null);
+                              setIsCreateDialogOpen(true);
+                              toast.info('Editing incident - make changes and save');
+                            }}
+                          >
+                            <FileText className="mr-2 h-4 w-4" />
+                            Edit Incident
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                            onClick={() => closeMutation.mutate({ id: selectedIncident.id })}
+                            disabled={closeMutation.isPending}
+                          >
+                            {closeMutation.isPending ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <XCircle className="mr-2 h-4 w-4" />
+                            )}
+                            Close Incident
+                          </Button>
+                        </>
                       )}
-                      Close Incident
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    onClick={() => generatePDFMutation.mutate({ incidentId: selectedIncident.id })}
-                    disabled={generatePDFMutation.isPending}
-                  >
-                    {generatePDFMutation.isPending ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Download className="mr-2 h-4 w-4" />
-                    )}
-                    Download PDF
-                  </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                        onClick={() => generatePDFMutation.mutate({})}
+                        disabled={generatePDFMutation.isPending}
+                      >
+                        {generatePDFMutation.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
+                        Download PDF Report
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             </>

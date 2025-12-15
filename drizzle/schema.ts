@@ -24,6 +24,21 @@ export const users = mysqlTable("users", {
 });
 
 /**
+ * Password reset tokens for forgot password functionality
+ */
+export const passwordResetTokens = mysqlTable("passwordResetTokens", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expiresAt: timestamp("expiresAt").notNull(),
+  usedAt: timestamp("usedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+export type SelectPasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
+/**
  * Tenant (company) table for multi-tenant architecture
  */
 export const tenants = mysqlTable("tenants", {

@@ -186,4 +186,208 @@ export const authRouter = router({
         });
       }
     }),
+
+  // Request password reset
+  requestPasswordReset: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const user = await db.getUserByEmail(input.email);
+      
+      // Always return success to prevent email enumeration
+      if (!user) {
+        return { success: true, message: "If an account exists with this email, you will receive a password reset link." };
+      }
+
+      // Generate a secure token
+      const crypto = await import("crypto");
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour expiry
+
+      await db.createPasswordResetToken(user.id, token, expiresAt);
+
+      // TODO: Send email with reset link
+      // For now, log the token (in production, send via email)
+      console.log(`[PASSWORD RESET] Token for ${input.email}: ${token}`);
+      console.log(`[PASSWORD RESET] Reset link: /reset-password?token=${token}`);
+
+      return { 
+        success: true, 
+        message: "If an account exists with this email, you will receive a password reset link.",
+        // In development, return token for testing
+        ...(process.env.NODE_ENV === "development" ? { devToken: token } : {})
+      };
+    }),
+
+  // Verify password reset token
+  verifyResetToken: publicProcedure
+    .input(
+      z.object({
+        token: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const tokenRecord = await db.getPasswordResetToken(input.token);
+      
+      if (!tokenRecord) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invalid or expired reset token",
+        });
+      }
+
+      return { valid: true };
+    }),
+
+  // Reset password with token
+  resetPassword: publicProcedure
+    .input(
+      z.object({
+        token: z.string(),
+        newPassword: z.string().min(8, "Password must be at least 8 characters"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const tokenRecord = await db.getPasswordResetToken(input.token);
+      
+      if (!tokenRecord) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invalid or expired reset token",
+        });
+      }
+
+      // Reset the password
+      await db.resetUserPassword(tokenRecord.userId, input.newPassword);
+      
+      // Mark token as used
+      await db.markPasswordResetTokenUsed(input.token);
+
+      return { success: true, message: "Password has been reset successfully" };
+    }),
+
+  // Setup 2FA - Generate secret and QR code
+  setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user?.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const speakeasy = await import("speakeasy");
+    const QRCode = await import("qrcode");
+
+    // Generate a new secret
+    const secret = speakeasy.default.generateSecret({
+      name: `CareCompliance:${ctx.user.email}`,
+      length: 20,
+    });
+
+    // Generate QR code as data URL
+    const qrCodeUrl = await QRCode.default.toDataURL(secret.otpauth_url || "");
+
+    // Save the secret to the user's record (not verified yet)
+    await db.update2FASecret(ctx.user.id, secret.base32);
+
+    return {
+      secret: secret.base32,
+      qrCode: qrCodeUrl,
+    };
+  }),
+
+  // Verify 2FA code and enable
+  verify2FA: protectedProcedure
+    .input(
+      z.object({
+        code: z.string().length(6),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.twoFaSecret) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "2FA setup not initiated",
+        });
+      }
+
+      const speakeasy = await import("speakeasy");
+      const verified = speakeasy.default.totp.verify({
+        secret: user.twoFaSecret,
+        encoding: "base32",
+        token: input.code,
+        window: 1,
+      });
+
+      if (!verified) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid verification code",
+        });
+      }
+
+      // Enable 2FA
+      await db.enable2FA(ctx.user.id);
+
+      return { success: true, message: "Two-factor authentication enabled" };
+    }),
+
+  // Disable 2FA
+  disable2FA: protectedProcedure
+    .input(
+      z.object({
+        code: z.string().length(6),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.twoFaSecret) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "2FA is not enabled",
+        });
+      }
+
+      const speakeasy = await import("speakeasy");
+      const verified = speakeasy.default.totp.verify({
+        secret: user.twoFaSecret,
+        encoding: "base32",
+        token: input.code,
+        window: 1,
+      });
+
+      if (!verified) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid verification code",
+        });
+      }
+
+      // Disable 2FA
+      await db.disable2FA(ctx.user.id);
+
+      return { success: true, message: "Two-factor authentication disabled" };
+    }),
+
+  // Get 2FA status
+  get2FAStatus: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const user = await db.getUserById(ctx.user.id);
+    return {
+      enabled: user?.twoFaEnabled || false,
+      verified: user?.twoFaVerified || false,
+    };
+  }),
 });
