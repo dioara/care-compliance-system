@@ -1260,3 +1260,8 @@
 - [x] Update backend to handle active/inactive status
 - [x] Add active/inactive toggle in Service Users UI
 - [x] Add filter to show active/inactive/all service users
+
+## Service User Discharge and History
+- [x] Implement discharge workflow with automatic date and status
+- [x] Add re-admission tracking to service user history
+- [x] Add service user history UI with timeline display

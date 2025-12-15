@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Users, Plus, Pencil, Trash2, Loader2, Calendar, Heart, ClipboardCheck, Filter, Lock } from "lucide-react";
+import { Users, Plus, Pencil, Trash2, Loader2, Calendar, Heart, ClipboardCheck, Filter, Lock, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
@@ -30,10 +30,19 @@ export default function ServiceUsers() {
   const createServiceUser = trpc.serviceUsers.create.useMutation();
   const updateServiceUser = trpc.serviceUsers.update.useMutation();
   const deleteServiceUser = trpc.serviceUsers.delete.useMutation();
+  const addServiceUserHistory = trpc.serviceUsers.addHistory.useMutation();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyServiceUserId, setHistoryServiceUserId] = useState<number | null>(null);
   const [editingServiceUser, setEditingServiceUser] = useState<any>(null);
+
+  // Fetch history for selected service user
+  const { data: serviceUserHistory = [], refetch: refetchHistory } = trpc.serviceUsers.getHistory.useQuery(
+    { serviceUserId: historyServiceUserId! },
+    { enabled: !!historyServiceUserId }
+  );
 
   const [formData, setFormData] = useState({
     name: "",
@@ -134,6 +143,11 @@ export default function ServiceUsers() {
     }
 
     try {
+      // Check if status changed for history logging
+      const wasActive = editingServiceUser.isActive !== false;
+      const isNowActive = formData.isActive;
+      const statusChanged = wasActive !== isNowActive;
+
       await updateServiceUser.mutateAsync({
         id: editingServiceUser.id,
         locationId: formData.locationId,
@@ -145,7 +159,28 @@ export default function ServiceUsers() {
         supportNeeds: formData.supportNeeds,
         isActive: formData.isActive,
       });
-      toast.success("Service user updated successfully");
+
+      // Log history for status changes
+      if (statusChanged) {
+        const changeType = isNowActive ? 'Re-admission' : 'Discharge';
+        const oldValue = wasActive ? 'Active' : 'Inactive';
+        const newValue = isNowActive ? 'Active' : 'Inactive';
+        await addServiceUserHistory.mutateAsync({
+          serviceUserId: editingServiceUser.id,
+          changeType,
+          fieldChanged: 'status',
+          oldValue,
+          newValue,
+          notes: isNowActive 
+            ? `Service user re-admitted on ${new Date().toLocaleDateString()}` 
+            : `Service user discharged on ${formData.dischargeDate || new Date().toLocaleDateString()}`,
+        });
+      }
+
+      toast.success(statusChanged 
+        ? (isNowActive ? "Service user re-admitted successfully" : "Service user discharged successfully")
+        : "Service user updated successfully"
+      );
       setIsEditOpen(false);
       setEditingServiceUser(null);
       resetForm();
@@ -412,6 +447,17 @@ export default function ServiceUsers() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => {
+                        setHistoryServiceUserId(serviceUser.id);
+                        setIsHistoryOpen(true);
+                      }}
+                      title="View History"
+                    >
+                      <History className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => handleEdit(serviceUser)}
                       disabled={!canWrite}
                     >
@@ -590,30 +636,60 @@ export default function ServiceUsers() {
               </div>
 
               {/* Active Status Toggle */}
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                <div>
-                  <Label htmlFor="edit-isActive" className="text-base font-medium">Client Status</Label>
-                  <p className="text-sm text-muted-foreground">Is this service user currently an active client?</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`text-sm ${!formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Inactive</span>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={formData.isActive}
-                    onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      formData.isActive ? 'bg-primary' : 'bg-gray-300'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        formData.isActive ? 'translate-x-6' : 'translate-x-1'
+              <div className="p-4 bg-muted/30 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="edit-isActive" className="text-base font-medium">Client Status</Label>
+                    <p className="text-sm text-muted-foreground">Is this service user currently an active client?</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm ${!formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Inactive</span>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={formData.isActive}
+                      onClick={() => {
+                        const newIsActive = !formData.isActive;
+                        setFormData(prev => ({
+                          ...prev,
+                          isActive: newIsActive,
+                          // Auto-set discharge date when marking inactive
+                          dischargeDate: !newIsActive && !prev.dischargeDate 
+                            ? new Date().toISOString().split('T')[0] 
+                            : newIsActive ? '' : prev.dischargeDate
+                        }));
+                      }}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        formData.isActive ? 'bg-primary' : 'bg-gray-300'
                       }`}
-                    />
-                  </button>
-                  <span className={`text-sm ${formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Active</span>
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                    <span className={`text-sm ${formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Active</span>
+                  </div>
                 </div>
+                
+                {/* Show discharge info when inactive */}
+                {!formData.isActive && (
+                  <div className="pt-3 border-t border-border/50">
+                    <p className="text-sm text-amber-600 mb-2">⚠️ This service user will be marked as discharged</p>
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="edit-dischargeDate-inline" className="text-sm whitespace-nowrap">Discharge Date:</Label>
+                      <Input
+                        id="edit-dischargeDate-inline"
+                        name="dischargeDate"
+                        type="date"
+                        value={formData.dischargeDate}
+                        onChange={handleInputChange}
+                        className="max-w-[180px]"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -643,6 +719,79 @@ export default function ServiceUsers() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={isHistoryOpen} onOpenChange={(open) => {
+        setIsHistoryOpen(open);
+        if (!open) setHistoryServiceUserId(null);
+      }}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <History className="h-5 w-5" />
+              Service User History
+            </DialogTitle>
+            <DialogDescription>
+              Timeline of status changes, admissions, and discharges
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            {serviceUserHistory.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>No history records found</p>
+                <p className="text-sm">Changes to this service user will appear here</p>
+              </div>
+            ) : (
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
+                
+                <div className="space-y-6">
+                  {serviceUserHistory.map((entry: any, index: number) => (
+                    <div key={entry.id || index} className="relative pl-10">
+                      {/* Timeline dot */}
+                      <div className={`absolute left-2.5 w-3 h-3 rounded-full border-2 border-background ${
+                        entry.changeType === 'Discharge' ? 'bg-red-500' :
+                        entry.changeType === 'Re-admission' ? 'bg-green-500' :
+                        'bg-blue-500'
+                      }`} />
+                      
+                      <div className="bg-muted/30 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant={entry.changeType === 'Discharge' ? 'destructive' : entry.changeType === 'Re-admission' ? 'default' : 'secondary'}>
+                            {entry.changeType}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(entry.changedAt).toLocaleString()}
+                          </span>
+                        </div>
+                        
+                        {entry.fieldChanged && (
+                          <p className="text-sm">
+                            <span className="font-medium">{entry.fieldChanged}:</span>{' '}
+                            <span className="text-muted-foreground line-through">{entry.oldValue}</span>
+                            {' → '}
+                            <span className="font-medium">{entry.newValue}</span>
+                          </p>
+                        )}
+                        
+                        {entry.notes && (
+                          <p className="text-sm text-muted-foreground mt-2">{entry.notes}</p>
+                        )}
+                        
+                        {entry.changedBy && (
+                          <p className="text-xs text-muted-foreground mt-2">Changed by: {entry.changedBy}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
