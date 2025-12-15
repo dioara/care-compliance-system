@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText } from "lucide-react";
+import { AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
@@ -47,6 +47,16 @@ export default function Incidents() {
     onSuccess: () => {
       toast.success("Incident closed");
       refetch();
+    },
+  });
+
+  const generatePDFMutation = trpc.incidents.generatePDF.useMutation({
+    onSuccess: (data) => {
+      window.open(data.url, "_blank");
+      toast.success("PDF report generated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate PDF: ${error.message}`);
     },
   });
 
@@ -131,13 +141,26 @@ export default function Incidents() {
             Log and track incidents with automatic categorisation and regulatory reporting
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Report Incident
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => generatePDFMutation.mutate({})}
+            disabled={generatePDFMutation.isPending}
+          >
+            {generatePDFMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="mr-2 h-4 w-4" />
+            )}
+            Download PDF
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Report Incident
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Report New Incident</DialogTitle>
@@ -347,6 +370,7 @@ export default function Incidents() {
             </form>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Statistics */}

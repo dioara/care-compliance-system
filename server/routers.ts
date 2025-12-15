@@ -1152,6 +1152,55 @@ export const appRouter = router({
         if (!ctx.user?.tenantId) return [];
         return db.getRecentIncidents(ctx.user.tenantId, input.days);
       }),
+
+    // Generate PDF report for incidents
+    generatePDF: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number().optional(),
+          severity: z.string().optional(),
+          status: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        
+        let locationName: string | undefined;
+        if (input.locationId) {
+          const location = await db.getLocationById(input.locationId);
+          locationName = location?.name;
+        }
+        
+        let incidents = await db.getIncidentsByTenant(ctx.user.tenantId);
+        
+        // Apply filters
+        if (input.locationId) {
+          incidents = incidents.filter(i => i.locationId === input.locationId);
+        }
+        if (input.severity && input.severity !== "all") {
+          incidents = incidents.filter(i => i.severity === input.severity);
+        }
+        if (input.status && input.status !== "all") {
+          incidents = incidents.filter(i => i.status === input.status);
+        }
+        
+        const { generateIncidentPDF } = await import("./services/incidentPdfService");
+        const pdfBuffer = await generateIncidentPDF({
+          incidents,
+          companyName: company.name,
+          companyLogo: company.logoUrl || undefined,
+          locationName,
+          generatedBy: ctx.user.name || ctx.user.email,
+        });
+        
+        const filename = `incident-report-${Date.now()}.pdf`;
+        const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
+        
+        return { url, filename };
+      }),
   }),
 
   // Analytics

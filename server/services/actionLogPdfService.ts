@@ -45,6 +45,20 @@ const COLORS = {
  * Generate a PDF report for the Action Log
  */
 export async function generateActionLogPDF(data: ActionLogReportData): Promise<Buffer> {
+  // Pre-fetch logo if provided
+  let logoBuffer: Buffer | null = null;
+  if (data.companyLogo) {
+    try {
+      const response = await fetch(data.companyLogo);
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        logoBuffer = Buffer.from(arrayBuffer);
+      }
+    } catch (e) {
+      console.error("Failed to fetch company logo:", e);
+    }
+  }
+
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
@@ -70,7 +84,7 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
       const contentWidth = pageWidth - (margin * 2);
 
       // Header Section
-      drawHeader(doc, data, contentWidth, margin);
+      drawHeader(doc, data, contentWidth, margin, logoBuffer);
 
       // Summary Statistics
       drawSummaryStats(doc, data.actions, contentWidth, margin);
@@ -92,17 +106,29 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
   });
 }
 
-function drawHeader(doc: PDFKit.PDFDocument, data: ActionLogReportData, contentWidth: number, margin: number) {
+function drawHeader(doc: PDFKit.PDFDocument, data: ActionLogReportData, contentWidth: number, margin: number, logoBuffer: Buffer | null) {
   // Header background
   doc.rect(0, 0, 841.89, 80).fill(COLORS.headerBg);
 
+  let textStartX = margin;
+  
+  // Company logo (if provided)
+  if (logoBuffer) {
+    try {
+      doc.image(logoBuffer, margin, 15, { height: 50 });
+      textStartX = margin + 70; // Move text to the right of logo
+    } catch (e) {
+      console.error("Failed to render company logo:", e);
+    }
+  }
+
   // Company name
   doc.fontSize(24).font("Helvetica-Bold").fillColor("#ffffff");
-  doc.text(data.companyName, margin, 20, { width: contentWidth - 200 });
+  doc.text(data.companyName, textStartX, 20, { width: contentWidth - 200 - (textStartX - margin) });
 
   // Report title
   doc.fontSize(12).font("Helvetica").fillColor("#93c5fd");
-  doc.text("Master Action Log Report", margin, 50);
+  doc.text("Master Action Log Report", textStartX, 50);
 
   // Date and location on the right
   doc.fontSize(10).fillColor("#ffffff");

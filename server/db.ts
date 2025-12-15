@@ -154,6 +154,11 @@ export async function getTenantById(id: number) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+// Alias for getTenantById - used by PDF generation
+export async function getCompanyByTenantId(tenantId: number) {
+  return getTenantById(tenantId);
+}
+
 export async function updateTenant(id: number, data: Partial<InsertTenant>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

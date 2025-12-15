@@ -24,6 +24,20 @@ interface AuditReportData {
  * Generate a PDF report for an AI audit
  */
 export async function generateAuditPDF(data: AuditReportData): Promise<Buffer> {
+  // Pre-fetch logo if provided
+  let logoBuffer: Buffer | null = null;
+  if (data.companyLogo) {
+    try {
+      const response = await fetch(data.companyLogo);
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        logoBuffer = Buffer.from(arrayBuffer);
+      }
+    } catch (e) {
+      console.error("Failed to fetch company logo:", e);
+    }
+  }
+
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
@@ -41,6 +55,17 @@ export async function generateAuditPDF(data: AuditReportData): Promise<Buffer> {
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
+
+      // Company logo if provided
+      if (logoBuffer) {
+        try {
+          // Center the logo
+          doc.image(logoBuffer, 247, 30, { height: 50 });
+          doc.moveDown(4);
+        } catch (e) {
+          console.error("Failed to render company logo:", e);
+        }
+      }
 
       // Header
       doc.fontSize(20).font("Helvetica-Bold").fillColor("#1a365d");

@@ -1158,3 +1158,13 @@
 - [x] Use landscape orientation for table display
 - [x] Add professional styling with colors and formatting
 - [x] Add PDF download button to Action Log page
+
+
+## BUG FIX & PDF Enhancements (December 15, 2025)
+### Bug Fix
+- [x] Fix getCompanyByTenantId not a function error
+
+### PDF Enhancements
+- [x] Add company logo support to PDF header
+- [x] Add PDF export to audit reports (logo support added)
+- [x] Add PDF export to incident reports
