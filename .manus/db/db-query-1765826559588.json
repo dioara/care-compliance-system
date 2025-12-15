@@ -1,0 +1,472 @@
+{
+  "query": "SELECT atq.id, atq.questionNumber, LEFT(atq.questionText, 50) as questionText, atq.displayOrder FROM auditTemplateQuestions atq JOIN auditTemplateSections ats ON atq.auditTemplateSectionId = ats.id JOIN auditTemplates at ON ats.auditTemplateId = at.id WHERE at.templateName LIKE '%Staff%' OR at.templateName LIKE '%Recruitment%' ORDER BY atq.questionNumber LIMIT 100;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT atq.id, atq.questionNumber, LEFT(atq.questionText, 50) as questionText, atq.displayOrder FROM auditTemplateQuestions atq JOIN auditTemplateSections ats ON atq.auditTemplateSectionId = ats.id JOIN auditTemplates at ON ats.auditTemplateId = at.id WHERE at.templateName LIKE '%Staff%' OR at.templateName LIKE '%Recruitment%' ORDER BY atq.questionNumber LIMIT 100;",
+  "rows": [
+    {
+      "id": "90168",
+      "questionNumber": "1.1",
+      "questionText": "All staff receive supervision at least 6 times per",
+      "displayOrder": "1"
+    },
+    {
+      "id": "60104",
+      "questionNumber": "1.1",
+      "questionText": "Dependency assessments completed for all residents",
+      "displayOrder": "1"
+    },
+    {
+      "id": "90180",
+      "questionNumber": "1.1",
+      "questionText": "DBS checks completed before employment starts",
+      "displayOrder": "1"
+    },
+    {
+      "id": "31",
+      "questionNumber": "1.1",
+      "questionText": "Completed Application form is on file - all gaps i",
+      "displayOrder": "1"
+    },
+    {
+      "id": "40",
+      "questionNumber": "1.10",
+      "questionText": "Membership of any professional bodies are noted an",
+      "displayOrder": "10"
+    },
+    {
+      "id": "41",
+      "questionNumber": "1.11",
+      "questionText": "Certificate/proof of registration are on file for ",
+      "displayOrder": "11"
+    },
+    {
+      "id": "42",
+      "questionNumber": "1.12",
+      "questionText": "Letter of Offer of employment is on file",
+      "displayOrder": "12"
+    },
+    {
+      "id": "43",
+      "questionNumber": "1.13",
+      "questionText": "Completed Medical/Health questionnaire is on file ",
+      "displayOrder": "13"
+    },
+    {
+      "id": "44",
+      "questionNumber": "1.14",
+      "questionText": "Staff personal details form is on file with up-to-",
+      "displayOrder": "14"
+    },
+    {
+      "id": "45",
+      "questionNumber": "1.15",
+      "questionText": "A copy of Equalities and Diversity statement is si",
+      "displayOrder": "15"
+    },
+    {
+      "id": "46",
+      "questionNumber": "1.16",
+      "questionText": "Any relevant staff benefit forms are on file i.e.,",
+      "displayOrder": "16"
+    },
+    {
+      "id": "47",
+      "questionNumber": "1.17",
+      "questionText": "A copy of the job description and person specifica",
+      "displayOrder": "17"
+    },
+    {
+      "id": "48",
+      "questionNumber": "1.18",
+      "questionText": "A signed copy of contract of employment is on file",
+      "displayOrder": "18"
+    },
+    {
+      "id": "49",
+      "questionNumber": "1.19",
+      "questionText": "A signed and dated copy of the Working Time Direct",
+      "displayOrder": "19"
+    },
+    {
+      "id": "90169",
+      "questionNumber": "1.2",
+      "questionText": "New staff receive monthly supervision during proba",
+      "displayOrder": "2"
+    },
+    {
+      "id": "32",
+      "questionNumber": "1.2",
+      "questionText": "Copy of Curriculum Vitae is on file",
+      "displayOrder": "2"
+    },
+    {
+      "id": "90181",
+      "questionNumber": "1.2",
+      "questionText": "Two written references obtained",
+      "displayOrder": "2"
+    },
+    {
+      "id": "60105",
+      "questionNumber": "1.2",
+      "questionText": "Dependency tool is appropriate and validated",
+      "displayOrder": "2"
+    },
+    {
+      "id": "50",
+      "questionNumber": "1.20",
+      "questionText": "Records of any amendments to contract are on file",
+      "displayOrder": "20"
+    },
+    {
+      "id": "51",
+      "questionNumber": "1.21",
+      "questionText": "Copy of driving documentation is on file (driving ",
+      "displayOrder": "21"
+    },
+    {
+      "id": "33",
+      "questionNumber": "1.3",
+      "questionText": "Copy of all interview notes are on file along with",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90182",
+      "questionNumber": "1.3",
+      "questionText": "Employment history gaps are explored",
+      "displayOrder": "3"
+    },
+    {
+      "id": "60106",
+      "questionNumber": "1.3",
+      "questionText": "Assessments are reviewed monthly",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90170",
+      "questionNumber": "1.3",
+      "questionText": "Supervision records are maintained",
+      "displayOrder": "3"
+    },
+    {
+      "id": "60107",
+      "questionNumber": "1.4",
+      "questionText": "Changes in dependency are reflected promptly",
+      "displayOrder": "4"
+    },
+    {
+      "id": "34",
+      "questionNumber": "1.4",
+      "questionText": "Two written references are on file (one profession",
+      "displayOrder": "4"
+    },
+    {
+      "id": "90171",
+      "questionNumber": "1.4",
+      "questionText": "Supervision dates are scheduled in advance",
+      "displayOrder": "4"
+    },
+    {
+      "id": "90183",
+      "questionNumber": "1.4",
+      "questionText": "Right to work checks completed",
+      "displayOrder": "4"
+    },
+    {
+      "id": "60108",
+      "questionNumber": "1.5",
+      "questionText": "Overall dependency score is calculated",
+      "displayOrder": "5"
+    },
+    {
+      "id": "35",
+      "questionNumber": "1.5",
+      "questionText": "Start date of employment is noted on file",
+      "displayOrder": "5"
+    },
+    {
+      "id": "90184",
+      "questionNumber": "1.5",
+      "questionText": "Interview records are maintained",
+      "displayOrder": "5"
+    },
+    {
+      "id": "36",
+      "questionNumber": "1.6",
+      "questionText": "Evidence of relevant qualifications and or prior t",
+      "displayOrder": "6"
+    },
+    {
+      "id": "37",
+      "questionNumber": "1.7",
+      "questionText": "Evidence of entitlement to work in the UK e.g. UK ",
+      "displayOrder": "7"
+    },
+    {
+      "id": "38",
+      "questionNumber": "1.8",
+      "questionText": "Up to date DBS certificate number, date, and list ",
+      "displayOrder": "8"
+    },
+    {
+      "id": "39",
+      "questionNumber": "1.9",
+      "questionText": "A record of any conflicts of interests are noted a",
+      "displayOrder": "9"
+    },
+    {
+      "id": "52",
+      "questionNumber": "2.1",
+      "questionText": "Evidence that a staff handbook has been issued and",
+      "displayOrder": "1"
+    },
+    {
+      "id": "90172",
+      "questionNumber": "2.1",
+      "questionText": "Supervision covers performance, development, and w",
+      "displayOrder": "1"
+    },
+    {
+      "id": "90185",
+      "questionNumber": "2.1",
+      "questionText": "Induction programme is in place",
+      "displayOrder": "1"
+    },
+    {
+      "id": "60109",
+      "questionNumber": "2.1",
+      "questionText": "Staffing levels match dependency requirements",
+      "displayOrder": "1"
+    },
+    {
+      "id": "90173",
+      "questionNumber": "2.2",
+      "questionText": "Actions from previous supervision are reviewed",
+      "displayOrder": "2"
+    },
+    {
+      "id": "90186",
+      "questionNumber": "2.2",
+      "questionText": "Care Certificate is completed within 12 weeks",
+      "displayOrder": "2"
+    },
+    {
+      "id": "53",
+      "questionNumber": "2.2",
+      "questionText": "Completed staff induction booklet is on file",
+      "displayOrder": "2"
+    },
+    {
+      "id": "60110",
+      "questionNumber": "2.2",
+      "questionText": "Minimum staffing levels are maintained at all time",
+      "displayOrder": "2"
+    },
+    {
+      "id": "60111",
+      "questionNumber": "2.3",
+      "questionText": "Rotas reflect planned staffing levels",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90174",
+      "questionNumber": "2.3",
+      "questionText": "Training needs are identified",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90187",
+      "questionNumber": "2.3",
+      "questionText": "Shadowing period is provided",
+      "displayOrder": "3"
+    },
+    {
+      "id": "54",
+      "questionNumber": "2.3",
+      "questionText": "Evidence that training is up to date is on file",
+      "displayOrder": "3"
+    },
+    {
+      "id": "60112",
+      "questionNumber": "2.4",
+      "questionText": "Actual staffing matches rota (sickness/absence cov",
+      "displayOrder": "4"
+    },
+    {
+      "id": "90175",
+      "questionNumber": "2.4",
+      "questionText": "Staff sign supervision records",
+      "displayOrder": "4"
+    },
+    {
+      "id": "90188",
+      "questionNumber": "2.4",
+      "questionText": "Induction records are signed off",
+      "displayOrder": "4"
+    },
+    {
+      "id": "55",
+      "questionNumber": "2.4",
+      "questionText": "A record is made of any additional training reques",
+      "displayOrder": "4"
+    },
+    {
+      "id": "60113",
+      "questionNumber": "2.5",
+      "questionText": "Night staffing is adequate for resident needs",
+      "displayOrder": "5"
+    },
+    {
+      "id": "90189",
+      "questionNumber": "2.5",
+      "questionText": "Probation reviews are completed",
+      "displayOrder": "5"
+    },
+    {
+      "id": "56",
+      "questionNumber": "3.1",
+      "questionText": "Regular supervision is taking place in line with t",
+      "displayOrder": "1"
+    },
+    {
+      "id": "90176",
+      "questionNumber": "3.1",
+      "questionText": "All staff receive annual appraisal",
+      "displayOrder": "1"
+    },
+    {
+      "id": "60114",
+      "questionNumber": "3.1",
+      "questionText": "Registered nurse is on duty at all times (if nursi",
+      "displayOrder": "1"
+    },
+    {
+      "id": "57",
+      "questionNumber": "3.2",
+      "questionText": "Any ad-hoc supervisions are recorded and noted on ",
+      "displayOrder": "2"
+    },
+    {
+      "id": "60115",
+      "questionNumber": "3.2",
+      "questionText": "Skill mix is appropriate for resident needs",
+      "displayOrder": "2"
+    },
+    {
+      "id": "90177",
+      "questionNumber": "3.2",
+      "questionText": "Appraisals include objective setting",
+      "displayOrder": "2"
+    },
+    {
+      "id": "58",
+      "questionNumber": "3.3",
+      "questionText": "Annual appraisal is on file and is being actioned ",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90178",
+      "questionNumber": "3.3",
+      "questionText": "Development plans are created",
+      "displayOrder": "3"
+    },
+    {
+      "id": "60116",
+      "questionNumber": "3.3",
+      "questionText": "Senior staff member is identified for each shift",
+      "displayOrder": "3"
+    },
+    {
+      "id": "90179",
+      "questionNumber": "3.4",
+      "questionText": "Appraisal records are on file",
+      "displayOrder": "4"
+    },
+    {
+      "id": "60117",
+      "questionNumber": "3.4",
+      "questionText": "Specialist skills are available (e.g., dementia, e",
+      "displayOrder": "4"
+    },
+    {
+      "id": "59",
+      "questionNumber": "3.4",
+      "questionText": "Any informal or formal action in line with the cap",
+      "displayOrder": "4"
+    },
+    {
+      "id": "60",
+      "questionNumber": "4.1",
+      "questionText": "A record of annual leave requests, those authorise",
+      "displayOrder": "1"
+    },
+    {
+      "id": "61",
+      "questionNumber": "4.2",
+      "questionText": "A record of any sickness absence is kept on file",
+      "displayOrder": "2"
+    },
+    {
+      "id": "62",
+      "questionNumber": "4.3",
+      "questionText": "A record of return to work follow staff absence in",
+      "displayOrder": "3"
+    },
+    {
+      "id": "63",
+      "questionNumber": "4.4",
+      "questionText": "A record of any compassionate leave is kept on fil",
+      "displayOrder": "4"
+    },
+    {
+      "id": "64",
+      "questionNumber": "4.5",
+      "questionText": "A record of any unauthorised leave is kept on file",
+      "displayOrder": "5"
+    },
+    {
+      "id": "65",
+      "questionNumber": "4.6",
+      "questionText": "A record of any Occupational Health or other wellb",
+      "displayOrder": "6"
+    },
+    {
+      "id": "66",
+      "questionNumber": "5.1",
+      "questionText": "Resignation letter on file",
+      "displayOrder": "1"
+    },
+    {
+      "id": "67",
+      "questionNumber": "5.2",
+      "questionText": "Completed exit interview that has been signed off ",
+      "displayOrder": "2"
+    },
+    {
+      "id": "68",
+      "questionNumber": "5.3",
+      "questionText": "Reason for leaving is noted on file",
+      "displayOrder": "3"
+    },
+    {
+      "id": "69",
+      "questionNumber": "5.4",
+      "questionText": "Last date of employment is noted on file",
+      "displayOrder": "4"
+    },
+    {
+      "id": "70",
+      "questionNumber": "6.1",
+      "questionText": "General correspondence is filed",
+      "displayOrder": "1"
+    },
+    {
+      "id": "71",
+      "questionNumber": "6.2",
+      "questionText": "Consent forms are filed",
+      "displayOrder": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tquestionNumber\tquestionText\tdisplayOrder\n90168\t1.1\tAll staff receive supervision at least 6 times per\t1\n60104\t1.1\tDependency assessments completed for all residents\t1\n90180\t1.1\tDBS checks completed before employment starts\t1\n31\t1.1\tCompleted Application form is on file - all gaps i\t1\n40\t1.10\tMembership of any professional bodies are noted an\t10\n41\t1.11\tCertificate/proof of registration are on file for \t11\n42\t1.12\tLetter of Offer of employment is on file\t12\n43\t1.13\tCompleted Medical/Health questionnaire is on file \t13\n44\t1.14\tStaff personal details form is on file with up-to-\t14\n45\t1.15\tA copy of Equalities and Diversity statement is si\t15\n46\t1.16\tAny relevant staff benefit forms are on file i.e.,\t16\n47\t1.17\tA copy of the job description and person specifica\t17\n48\t1.18\tA signed copy of contract of employment is on file\t18\n49\t1.19\tA signed and dated copy of the Working Time Direct\t19\n90169\t1.2\tNew staff receive monthly supervision during proba\t2\n32\t1.2\tCopy of Curriculum Vitae is on file\t2\n90181\t1.2\tTwo written references obtained\t2\n60105\t1.2\tDependency tool is appropriate and validated\t2\n50\t1.20\tRecords of any amendments to contract are on file\t20\n51\t1.21\tCopy of driving documentation is on file (driving \t21\n33\t1.3\tCopy of all interview notes are on file along with\t3\n90182\t1.3\tEmployment history gaps are explored\t3\n60106\t1.3\tAssessments are reviewed monthly\t3\n90170\t1.3\tSupervision records are maintained\t3\n60107\t1.4\tChanges in dependency are reflected promptly\t4\n34\t1.4\tTwo written references are on file (one profession\t4\n90171\t1.4\tSupervision dates are scheduled in advance\t4\n90183\t1.4\tRight to work checks completed\t4\n60108\t1.5\tOverall dependency score is calculated\t5\n35\t1.5\tStart date of employment is noted on file\t5\n90184\t1.5\tInterview records are maintained\t5\n36\t1.6\tEvidence of relevant qualifications and or prior t\t6\n37\t1.7\tEvidence of entitlement to work in the UK e.g. UK \t7\n38\t1.8\tUp to date DBS certificate number, date, and list \t8\n39\t1.9\tA record of any conflicts of interests are noted a\t9\n52\t2.1\tEvidence that a staff handbook has been issued and\t1\n90172\t2.1\tSupervision covers performance, development, and w\t1\n90185\t2.1\tInduction programme is in place\t1\n60109\t2.1\tStaffing levels match dependency requirements\t1\n90173\t2.2\tActions from previous supervision are reviewed\t2\n90186\t2.2\tCare Certificate is completed within 12 weeks\t2\n53\t2.2\tCompleted staff induction booklet is on file\t2\n60110\t2.2\tMinimum staffing levels are maintained at all time\t2\n60111\t2.3\tRotas reflect planned staffing levels\t3\n90174\t2.3\tTraining needs are identified\t3\n90187\t2.3\tShadowing period is provided\t3\n54\t2.3\tEvidence that training is up to date is on file\t3\n60112\t2.4\tActual staffing matches rota (sickness/absence cov\t4\n90175\t2.4\tStaff sign supervision records\t4\n90188\t2.4\tInduction records are signed off\t4\n55\t2.4\tA record is made of any additional training reques\t4\n60113\t2.5\tNight staffing is adequate for resident needs\t5\n90189\t2.5\tProbation reviews are completed\t5\n56\t3.1\tRegular supervision is taking place in line with t\t1\n90176\t3.1\tAll staff receive annual appraisal\t1\n60114\t3.1\tRegistered nurse is on duty at all times (if nursi\t1\n57\t3.2\tAny ad-hoc supervisions are recorded and noted on \t2\n60115\t3.2\tSkill mix is appropriate for resident needs\t2\n90177\t3.2\tAppraisals include objective setting\t2\n58\t3.3\tAnnual appraisal is on file and is being actioned \t3\n90178\t3.3\tDevelopment plans are created\t3\n60116\t3.3\tSenior staff member is identified for each shift\t3\n90179\t3.4\tAppraisal records are on file\t4\n60117\t3.4\tSpecialist skills are available (e.g., dementia, e\t4\n59\t3.4\tAny informal or formal action in line with the cap\t4\n60\t4.1\tA record of annual leave requests, those authorise\t1\n61\t4.2\tA record of any sickness absence is kept on file\t2\n62\t4.3\tA record of return to work follow staff absence in\t3\n63\t4.4\tA record of any compassionate leave is kept on fil\t4\n64\t4.5\tA record of any unauthorised leave is kept on file\t5\n65\t4.6\tA record of any Occupational Health or other wellb\t6\n66\t5.1\tResignation letter on file\t1\n67\t5.2\tCompleted exit interview that has been signed off \t2\n68\t5.3\tReason for leaving is noted on file\t3\n69\t5.4\tLast date of employment is noted on file\t4\n70\t6.1\tGeneral correspondence is filed\t1\n71\t6.2\tConsent forms are filed\t2\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

@@ -1280,3 +1280,14 @@
 ## Incident Action Log Sync
 - [x] Auto-add incident follow-up actions to master action log
 - [x] Link action log items back to source incident
+- [ ] Fix staff compliance questions not displaying (23.7-23.11, 23.19-23.22, etc.)
+
+
+## BUG FIX: Staff Compliance Questions Not Displaying (23.7-23.11, 23.19-23.22)
+- [x] Investigated issue where staff compliance questions 23.7-23.11, 23.19-23.22 were not showing
+- [x] Found root cause: conditional logic in database was hiding questions based on employment type selection
+- [x] Conditional logic referenced question "1.7" but employment type question is actually "23.31"
+- [x] Removed all conditional logic from complianceQuestions table per user request
+- [x] Verified all 82 staff compliance questions now display (23.1-23.33, 24.1-24.8, 25.1-25.8, 26.1-26.9, 27.1-27.9, 28.1-28.7, 29.1-29.8)
+- [x] All questions including 23.7, 23.8, 23.9, 23.10, 23.11, 23.19, 23.20, 23.21, 23.22, 23.24 now visible
+

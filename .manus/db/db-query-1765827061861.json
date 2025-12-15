@@ -1,0 +1,502 @@
+{
+  "query": "SELECT id, sectionId, questionNumber, LEFT(questionText, 80) as questionText FROM complianceQuestions WHERE sectionId IN (SELECT id FROM complianceSections WHERE sectionType = 'staff') ORDER BY sectionId, questionNumber LIMIT 100;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, sectionId, questionNumber, LEFT(questionText, 80) as questionText FROM complianceQuestions WHERE sectionId IN (SELECT id FROM complianceSections WHERE sectionType = 'staff') ORDER BY sectionId, questionNumber LIMIT 100;",
+  "rows": [
+    {
+      "id": "60001",
+      "sectionId": "23",
+      "questionNumber": "23.1",
+      "questionText": "There is an up-to-date recruitment policy and procedure in place."
+    },
+    {
+      "id": "60018",
+      "sectionId": "23",
+      "questionNumber": "23.10",
+      "questionText": "For sponsored workers from TB-testing required countries: There is evidence of a"
+    },
+    {
+      "id": "60019",
+      "sectionId": "23",
+      "questionNumber": "23.11",
+      "questionText": "For sponsored workers: There is evidence that the sponsored worker meets the Eng"
+    },
+    {
+      "id": "60002",
+      "sectionId": "23",
+      "questionNumber": "23.12",
+      "questionText": "The recruitment process is in line with the Equality Act 2010."
+    },
+    {
+      "id": "60020",
+      "sectionId": "23",
+      "questionNumber": "23.13",
+      "questionText": "For staff with time-limited right to work: There is evidence that the visa has n"
+    },
+    {
+      "id": "60021",
+      "sectionId": "23",
+      "questionNumber": "23.14",
+      "questionText": "For staff with time-limited right to work: There is evidence that the employer i"
+    },
+    {
+      "id": "60022",
+      "sectionId": "23",
+      "questionNumber": "23.15",
+      "questionText": "There is a contract of employment which has been signed by both parties."
+    },
+    {
+      "id": "60023",
+      "sectionId": "23",
+      "questionNumber": "23.16",
+      "questionText": "Where there are agreed salary deductions (e.g., for accommodation, uniform, or t"
+    },
+    {
+      "id": "60024",
+      "sectionId": "23",
+      "questionNumber": "23.17",
+      "questionText": "There is a copy of the staff member's job description on their file for their cu"
+    },
+    {
+      "id": "60025",
+      "sectionId": "23",
+      "questionNumber": "23.18",
+      "questionText": "Where there is a relevant health concern that may impact on their employment, th"
+    },
+    {
+      "id": "60026",
+      "sectionId": "23",
+      "questionNumber": "23.19",
+      "questionText": "For agency staff: Staff profiles are in place which detail full name, photograph"
+    },
+    {
+      "id": "60010",
+      "sectionId": "23",
+      "questionNumber": "23.2",
+      "questionText": "There is an enhanced DBS prior to commencement of employment or evidence of an A"
+    },
+    {
+      "id": "60027",
+      "sectionId": "23",
+      "questionNumber": "23.20",
+      "questionText": "For agency staff: There is relevant induction completed by the care provider on "
+    },
+    {
+      "id": "60028",
+      "sectionId": "23",
+      "questionNumber": "23.21",
+      "questionText": "For agency staff: There is evidence that the care provider has verified the agen"
+    },
+    {
+      "id": "60029",
+      "sectionId": "23",
+      "questionNumber": "23.22",
+      "questionText": "For bank staff: Bank staff have undergone the same recruitment checks as permane"
+    },
+    {
+      "id": "60003",
+      "sectionId": "23",
+      "questionNumber": "23.23",
+      "questionText": "There is evidence of an application form which includes full employment history "
+    },
+    {
+      "id": "60030",
+      "sectionId": "23",
+      "questionNumber": "23.24",
+      "questionText": "For bank staff: Bank staff have completed a full induction and maintain up-to-da"
+    },
+    {
+      "id": "60031",
+      "sectionId": "23",
+      "questionNumber": "23.25",
+      "questionText": "There is a process for the safe recruitment of volunteers (if applicable)."
+    },
+    {
+      "id": "60032",
+      "sectionId": "23",
+      "questionNumber": "23.26",
+      "questionText": "There is an effective approach to managing staff absences for all staff."
+    },
+    {
+      "id": "60033",
+      "sectionId": "23",
+      "questionNumber": "23.27",
+      "questionText": "There is a system in place for ongoing monitoring of staff compliance, including"
+    },
+    {
+      "id": "60004",
+      "sectionId": "23",
+      "questionNumber": "23.28",
+      "questionText": "There is a documented record of interviews having taken place and by two people "
+    },
+    {
+      "id": "60005",
+      "sectionId": "23",
+      "questionNumber": "23.29",
+      "questionText": "There is a scoring mechanism in place with an agreed appointment threshold."
+    },
+    {
+      "id": "60011",
+      "sectionId": "23",
+      "questionNumber": "23.3",
+      "questionText": "There is a certificate of good conduct/overseas police check from country of ori"
+    },
+    {
+      "id": "60006",
+      "sectionId": "23",
+      "questionNumber": "23.30",
+      "questionText": "There is relevant identification documentation that has been validated (signed a"
+    },
+    {
+      "id": "60007",
+      "sectionId": "23",
+      "questionNumber": "23.31",
+      "questionText": "Is this staff member employed as: (a) Permanent staff, (b) Agency staff, or (c) "
+    },
+    {
+      "id": "60008",
+      "sectionId": "23",
+      "questionNumber": "23.32",
+      "questionText": "For permanent staff: Is this staff member (a) a British or Irish citizen with in"
+    },
+    {
+      "id": "60009",
+      "sectionId": "23",
+      "questionNumber": "23.33",
+      "questionText": "There is proof of right to work documentation in the UK that has been validated "
+    },
+    {
+      "id": "60012",
+      "sectionId": "23",
+      "questionNumber": "23.4",
+      "questionText": "There are two written references, one of which is from the most recent employer,"
+    },
+    {
+      "id": "60013",
+      "sectionId": "23",
+      "questionNumber": "23.5",
+      "questionText": "There is satisfactory evidence of conduct in previous employment concerned with "
+    },
+    {
+      "id": "60014",
+      "sectionId": "23",
+      "questionNumber": "23.6",
+      "questionText": "Evidence of appropriate qualifications (including PIN and revalidation status fo"
+    },
+    {
+      "id": "60015",
+      "sectionId": "23",
+      "questionNumber": "23.7",
+      "questionText": "For sponsored workers: There is evidence of a valid Certificate of Sponsorship ("
+    },
+    {
+      "id": "60016",
+      "sectionId": "23",
+      "questionNumber": "23.8",
+      "questionText": "For sponsored workers: There is a copy of the staff member's current visa or Bio"
+    },
+    {
+      "id": "60017",
+      "sectionId": "23",
+      "questionNumber": "23.9",
+      "questionText": "For sponsored workers: There is an overseas criminal record certificate from the"
+    },
+    {
+      "id": "90001",
+      "sectionId": "24",
+      "questionNumber": "24.1",
+      "questionText": "There is a whistleblowing policy in place that is up-to-date and includes contac"
+    },
+    {
+      "id": "90002",
+      "sectionId": "24",
+      "questionNumber": "24.2",
+      "questionText": "There is a bullying and harassment policy in place that references the whistlebl"
+    },
+    {
+      "id": "90003",
+      "sectionId": "24",
+      "questionNumber": "24.3",
+      "questionText": "There is evidence that all staff have access to core policies and procedures and"
+    },
+    {
+      "id": "90004",
+      "sectionId": "24",
+      "questionNumber": "24.4",
+      "questionText": "There is a policy review schedule in place ensuring all policies are reviewed at"
+    },
+    {
+      "id": "90005",
+      "sectionId": "24",
+      "questionNumber": "24.5",
+      "questionText": "There is an up-to-date safeguarding policy that reflects current legislation and"
+    },
+    {
+      "id": "90006",
+      "sectionId": "24",
+      "questionNumber": "24.6",
+      "questionText": "There is an up-to-date health and safety policy that complies with the Health an"
+    },
+    {
+      "id": "90007",
+      "sectionId": "24",
+      "questionNumber": "24.7",
+      "questionText": "There is an up-to-date infection prevention and control policy that reflects cur"
+    },
+    {
+      "id": "90008",
+      "sectionId": "24",
+      "questionNumber": "24.8",
+      "questionText": "There is an up-to-date medication policy that covers ordering, storage, administ"
+    },
+    {
+      "id": "90009",
+      "sectionId": "25",
+      "questionNumber": "25.1",
+      "questionText": "There is evidence that the staff handbook has been issued and/or is available to"
+    },
+    {
+      "id": "90010",
+      "sectionId": "25",
+      "questionNumber": "25.2",
+      "questionText": "There is evidence of a comprehensive and role-specific service induction that ha"
+    },
+    {
+      "id": "90011",
+      "sectionId": "25",
+      "questionNumber": "25.3",
+      "questionText": "There is evidence of staff shadowing at induction, with records showing who was "
+    },
+    {
+      "id": "90012",
+      "sectionId": "25",
+      "questionNumber": "25.4",
+      "questionText": "There is evidence that the Care Certificate has been completed within the first "
+    },
+    {
+      "id": "90013",
+      "sectionId": "25",
+      "questionNumber": "25.5",
+      "questionText": "There is evidence of increased supervision and support during the induction peri"
+    },
+    {
+      "id": "90014",
+      "sectionId": "25",
+      "questionNumber": "25.6",
+      "questionText": "There is evidence that new staff have been assessed as competent in key areas be"
+    },
+    {
+      "id": "90015",
+      "sectionId": "25",
+      "questionNumber": "25.7",
+      "questionText": "There is evidence that new staff are asked for feedback on their induction exper"
+    },
+    {
+      "id": "90016",
+      "sectionId": "25",
+      "questionNumber": "25.8",
+      "questionText": "There is a process for re-induction or refresher induction for staff returning a"
+    },
+    {
+      "id": "90017",
+      "sectionId": "26",
+      "questionNumber": "26.1",
+      "questionText": "There is evidence of a minimum of 6 recorded supervisions per annum (50% of whic"
+    },
+    {
+      "id": "90018",
+      "sectionId": "26",
+      "questionNumber": "26.2",
+      "questionText": "There is evidence of clinical supervisions for nursing staff that are signed and"
+    },
+    {
+      "id": "90019",
+      "sectionId": "26",
+      "questionNumber": "26.3",
+      "questionText": "Supervision records demonstrate meaningful, two-way discussions that support sta"
+    },
+    {
+      "id": "90020",
+      "sectionId": "26",
+      "questionNumber": "26.4",
+      "questionText": "There is evidence that all staff receive an annual appraisal that reviews perfor"
+    },
+    {
+      "id": "90021",
+      "sectionId": "26",
+      "questionNumber": "26.5",
+      "questionText": "There is evidence that appraisal targets are reviewed throughout the year (durin"
+    },
+    {
+      "id": "90022",
+      "sectionId": "26",
+      "questionNumber": "26.6",
+      "questionText": "There is a clear and appropriate process for supporting and managing staff regar"
+    },
+    {
+      "id": "90023",
+      "sectionId": "26",
+      "questionNumber": "26.7",
+      "questionText": "There is evidence of up-to-date, robust role-specific competency assessments in "
+    },
+    {
+      "id": "90024",
+      "sectionId": "26",
+      "questionNumber": "26.8",
+      "questionText": "There is evidence of documented direct observations of care practice undertaken "
+    },
+    {
+      "id": "90025",
+      "sectionId": "26",
+      "questionNumber": "26.9",
+      "questionText": "There is evidence that staff who provide supervision to others (e.g., senior car"
+    },
+    {
+      "id": "90026",
+      "sectionId": "27",
+      "questionNumber": "27.1",
+      "questionText": "There is evidence that a training matrix or equivalent is in place which documen"
+    },
+    {
+      "id": "90027",
+      "sectionId": "27",
+      "questionNumber": "27.2",
+      "questionText": "There is evidence that all staff have undertaken appropriate mandatory and statu"
+    },
+    {
+      "id": "90028",
+      "sectionId": "27",
+      "questionNumber": "27.3",
+      "questionText": "There is evidence that all staff have completed the Oliver McGowan Mandatory Tra"
+    },
+    {
+      "id": "90029",
+      "sectionId": "27",
+      "questionNumber": "27.4",
+      "questionText": "There is evidence that all staff have undertaken any additional training require"
+    },
+    {
+      "id": "90030",
+      "sectionId": "27",
+      "questionNumber": "27.5",
+      "questionText": "There is evidence of blended learning approaches (e.g., classroom, face-to-face,"
+    },
+    {
+      "id": "90031",
+      "sectionId": "27",
+      "questionNumber": "27.6",
+      "questionText": "There is evidence of a training needs analysis process that identifies individua"
+    },
+    {
+      "id": "90032",
+      "sectionId": "27",
+      "questionNumber": "27.7",
+      "questionText": "There is evidence that training effectiveness is evaluated (e.g., through post-t"
+    },
+    {
+      "id": "90033",
+      "sectionId": "27",
+      "questionNumber": "27.8",
+      "questionText": "There is evidence that staff are supported to access professional development op"
+    },
+    {
+      "id": "90034",
+      "sectionId": "27",
+      "questionNumber": "27.9",
+      "questionText": "Staff confirm that they have received an induction which was appropriate to thei"
+    },
+    {
+      "id": "90035",
+      "sectionId": "28",
+      "questionNumber": "28.1",
+      "questionText": "Staff confirm they receive regular, two-way, meaningful and supportive supervisi"
+    },
+    {
+      "id": "90036",
+      "sectionId": "28",
+      "questionNumber": "28.2",
+      "questionText": "Staff confirm they feel valued, supported, and listened to by management."
+    },
+    {
+      "id": "90037",
+      "sectionId": "28",
+      "questionNumber": "28.3",
+      "questionText": "There is evidence of regular staff meetings (team meetings, handovers, or briefi"
+    },
+    {
+      "id": "90038",
+      "sectionId": "28",
+      "questionNumber": "28.4",
+      "questionText": "There is evidence that staff are consulted on and involved in service developmen"
+    },
+    {
+      "id": "90039",
+      "sectionId": "28",
+      "questionNumber": "28.5",
+      "questionText": "There is evidence of regular staff surveys or feedback mechanisms, with results "
+    },
+    {
+      "id": "90040",
+      "sectionId": "28",
+      "questionNumber": "28.6",
+      "questionText": "There is a process for conducting exit interviews with departing staff, and feed"
+    },
+    {
+      "id": "90041",
+      "sectionId": "28",
+      "questionNumber": "28.7",
+      "questionText": "There is evidence of staff recognition and appreciation initiatives (e.g., emplo"
+    },
+    {
+      "id": "90042",
+      "sectionId": "29",
+      "questionNumber": "29.1",
+      "questionText": "There is evidence that the organisation actively supports staff wellbeing, inclu"
+    },
+    {
+      "id": "90043",
+      "sectionId": "29",
+      "questionNumber": "29.2",
+      "questionText": "There is evidence of stress risk assessments for staff, particularly those in hi"
+    },
+    {
+      "id": "90044",
+      "sectionId": "29",
+      "questionNumber": "29.3",
+      "questionText": "There is evidence that the organisation promotes work-life balance through flexi"
+    },
+    {
+      "id": "90045",
+      "sectionId": "29",
+      "questionNumber": "29.4",
+      "questionText": "There is evidence that staff have access to occupational health services for wor"
+    },
+    {
+      "id": "90046",
+      "sectionId": "29",
+      "questionNumber": "29.5",
+      "questionText": "There is evidence that staff receive debriefing and support following challengin"
+    },
+    {
+      "id": "90047",
+      "sectionId": "29",
+      "questionNumber": "29.6",
+      "questionText": "There is evidence of effective sickness absence monitoring and management, inclu"
+    },
+    {
+      "id": "90048",
+      "sectionId": "29",
+      "questionNumber": "29.7",
+      "questionText": "There is evidence of lone working risk assessments and safety measures for staff"
+    },
+    {
+      "id": "90049",
+      "sectionId": "29",
+      "questionNumber": "29.8",
+      "questionText": "There is evidence of proactive wellbeing initiatives offered to staff (e.g., wel"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsectionId\tquestionNumber\tquestionText\n60001\t23\t23.1\tThere is an up-to-date recruitment policy and procedure in place.\n60018\t23\t23.10\tFor sponsored workers from TB-testing required countries: There is evidence of a\n60019\t23\t23.11\tFor sponsored workers: There is evidence that the sponsored worker meets the Eng\n60002\t23\t23.12\tThe recruitment process is in line with the Equality Act 2010.\n60020\t23\t23.13\tFor staff with time-limited right to work: There is evidence that the visa has n\n60021\t23\t23.14\tFor staff with time-limited right to work: There is evidence that the employer i\n60022\t23\t23.15\tThere is a contract of employment which has been signed by both parties.\n60023\t23\t23.16\tWhere there are agreed salary deductions (e.g., for accommodation, uniform, or t\n60024\t23\t23.17\tThere is a copy of the staff member's job description on their file for their cu\n60025\t23\t23.18\tWhere there is a relevant health concern that may impact on their employment, th\n60026\t23\t23.19\tFor agency staff: Staff profiles are in place which detail full name, photograph\n60010\t23\t23.2\tThere is an enhanced DBS prior to commencement of employment or evidence of an A\n60027\t23\t23.20\tFor agency staff: There is relevant induction completed by the care provider on \n60028\t23\t23.21\tFor agency staff: There is evidence that the care provider has verified the agen\n60029\t23\t23.22\tFor bank staff: Bank staff have undergone the same recruitment checks as permane\n60003\t23\t23.23\tThere is evidence of an application form which includes full employment history \n60030\t23\t23.24\tFor bank staff: Bank staff have completed a full induction and maintain up-to-da\n60031\t23\t23.25\tThere is a process for the safe recruitment of volunteers (if applicable).\n60032\t23\t23.26\tThere is an effective approach to managing staff absences for all staff.\n60033\t23\t23.27\tThere is a system in place for ongoing monitoring of staff compliance, including\n60004\t23\t23.28\tThere is a documented record of interviews having taken place and by two people \n60005\t23\t23.29\tThere is a scoring mechanism in place with an agreed appointment threshold.\n60011\t23\t23.3\tThere is a certificate of good conduct/overseas police check from country of ori\n60006\t23\t23.30\tThere is relevant identification documentation that has been validated (signed a\n60007\t23\t23.31\tIs this staff member employed as: (a) Permanent staff, (b) Agency staff, or (c) \n60008\t23\t23.32\tFor permanent staff: Is this staff member (a) a British or Irish citizen with in\n60009\t23\t23.33\tThere is proof of right to work documentation in the UK that has been validated \n60012\t23\t23.4\tThere are two written references, one of which is from the most recent employer,\n60013\t23\t23.5\tThere is satisfactory evidence of conduct in previous employment concerned with \n60014\t23\t23.6\tEvidence of appropriate qualifications (including PIN and revalidation status fo\n60015\t23\t23.7\tFor sponsored workers: There is evidence of a valid Certificate of Sponsorship (\n60016\t23\t23.8\tFor sponsored workers: There is a copy of the staff member's current visa or Bio\n60017\t23\t23.9\tFor sponsored workers: There is an overseas criminal record certificate from the\n90001\t24\t24.1\tThere is a whistleblowing policy in place that is up-to-date and includes contac\n90002\t24\t24.2\tThere is a bullying and harassment policy in place that references the whistlebl\n90003\t24\t24.3\tThere is evidence that all staff have access to core policies and procedures and\n90004\t24\t24.4\tThere is a policy review schedule in place ensuring all policies are reviewed at\n90005\t24\t24.5\tThere is an up-to-date safeguarding policy that reflects current legislation and\n90006\t24\t24.6\tThere is an up-to-date health and safety policy that complies with the Health an\n90007\t24\t24.7\tThere is an up-to-date infection prevention and control policy that reflects cur\n90008\t24\t24.8\tThere is an up-to-date medication policy that covers ordering, storage, administ\n90009\t25\t25.1\tThere is evidence that the staff handbook has been issued and/or is available to\n90010\t25\t25.2\tThere is evidence of a comprehensive and role-specific service induction that ha\n90011\t25\t25.3\tThere is evidence of staff shadowing at induction, with records showing who was \n90012\t25\t25.4\tThere is evidence that the Care Certificate has been completed within the first \n90013\t25\t25.5\tThere is evidence of increased supervision and support during the induction peri\n90014\t25\t25.6\tThere is evidence that new staff have been assessed as competent in key areas be\n90015\t25\t25.7\tThere is evidence that new staff are asked for feedback on their induction exper\n90016\t25\t25.8\tThere is a process for re-induction or refresher induction for staff returning a\n90017\t26\t26.1\tThere is evidence of a minimum of 6 recorded supervisions per annum (50% of whic\n90018\t26\t26.2\tThere is evidence of clinical supervisions for nursing staff that are signed and\n90019\t26\t26.3\tSupervision records demonstrate meaningful, two-way discussions that support sta\n90020\t26\t26.4\tThere is evidence that all staff receive an annual appraisal that reviews perfor\n90021\t26\t26.5\tThere is evidence that appraisal targets are reviewed throughout the year (durin\n90022\t26\t26.6\tThere is a clear and appropriate process for supporting and managing staff regar\n90023\t26\t26.7\tThere is evidence of up-to-date, robust role-specific competency assessments in \n90024\t26\t26.8\tThere is evidence of documented direct observations of care practice undertaken \n90025\t26\t26.9\tThere is evidence that staff who provide supervision to others (e.g., senior car\n90026\t27\t27.1\tThere is evidence that a training matrix or equivalent is in place which documen\n90027\t27\t27.2\tThere is evidence that all staff have undertaken appropriate mandatory and statu\n90028\t27\t27.3\tThere is evidence that all staff have completed the Oliver McGowan Mandatory Tra\n90029\t27\t27.4\tThere is evidence that all staff have undertaken any additional training require\n90030\t27\t27.5\tThere is evidence of blended learning approaches (e.g., classroom, face-to-face,\n90031\t27\t27.6\tThere is evidence of a training needs analysis process that identifies individua\n90032\t27\t27.7\tThere is evidence that training effectiveness is evaluated (e.g., through post-t\n90033\t27\t27.8\tThere is evidence that staff are supported to access professional development op\n90034\t27\t27.9\tStaff confirm that they have received an induction which was appropriate to thei\n90035\t28\t28.1\tStaff confirm they receive regular, two-way, meaningful and supportive supervisi\n90036\t28\t28.2\tStaff confirm they feel valued, supported, and listened to by management.\n90037\t28\t28.3\tThere is evidence of regular staff meetings (team meetings, handovers, or briefi\n90038\t28\t28.4\tThere is evidence that staff are consulted on and involved in service developmen\n90039\t28\t28.5\tThere is evidence of regular staff surveys or feedback mechanisms, with results \n90040\t28\t28.6\tThere is a process for conducting exit interviews with departing staff, and feed\n90041\t28\t28.7\tThere is evidence of staff recognition and appreciation initiatives (e.g., emplo\n90042\t29\t29.1\tThere is evidence that the organisation actively supports staff wellbeing, inclu\n90043\t29\t29.2\tThere is evidence of stress risk assessments for staff, particularly those in hi\n90044\t29\t29.3\tThere is evidence that the organisation promotes work-life balance through flexi\n90045\t29\t29.4\tThere is evidence that staff have access to occupational health services for wor\n90046\t29\t29.5\tThere is evidence that staff receive debriefing and support following challengin\n90047\t29\t29.6\tThere is evidence of effective sickness absence monitoring and management, inclu\n90048\t29\t29.7\tThere is evidence of lone working risk assessments and safety measures for staff\n90049\t29\t29.8\tThere is evidence of proactive wellbeing initiatives offered to staff (e.g., wel\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}
