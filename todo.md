@@ -688,4 +688,13 @@
 - [x] Verify all 256 questions have comprehensive evidence requirements (100% complete)
 - [x] Run update script to update remaining 116 questions (133 + 6 + 36 = 175 questions updated)
 - [x] Test updated questions in browser (Question 3.10 verified - evidence requirements displaying correctly)
-- [ ] Save checkpoint with all 256 questions complete
+- [x] Save checkpoint with all 256 questions complete (checkpoint e97145c8)
+
+## BUG: Evidence Requirement Display Issues (User Report)
+- [x] Find and clean up questions with irrelevant intervention plan text (removed Evidence Requirement from UI)
+- [x] Remove "Evidence Requirement" section from UI display entirely (PersonCompliance.tsx updated)
+- [x] Keep only "Example Evidence" section visible to users (confirmed working)
+- [x] Fix question numbering display issue (fixed frontend sorting logic to parse as integers)
+- [ ] Test fixes in browser to verify correct display
+- [ ] Push complete system to GitHub with all data and schema
+- [ ] Save checkpoint after fixes complete

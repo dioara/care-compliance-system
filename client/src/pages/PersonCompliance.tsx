@@ -147,9 +147,12 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
   // Sort questions numerically within each section
   questionsBySection.forEach((questions, sectionId) => {
     questions.sort((a, b) => {
-      const numA = parseFloat(a.questionNumber);
-      const numB = parseFloat(b.questionNumber);
-      return numA - numB;
+      // Parse as "section.question" where both parts are integers
+      // This makes 1.2 come before 1.10 (not 1.1 < 1.2 < 1.10)
+      const [secA, qA] = a.questionNumber.split('.').map(Number);
+      const [secB, qB] = b.questionNumber.split('.').map(Number);
+      if (secA !== secB) return secA - secB;
+      return qA - qB;
     });
   });
 
@@ -348,17 +351,6 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                                   <p className="text-sm font-medium mb-2">Question:</p>
                                   <p className="text-sm">{question.questionText}</p>
                                 </div>
-
-                                {/* Evidence requirement */}
-                                {question.standardDescription && (
-                                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                                    <p className="text-sm font-medium text-amber-900 mb-1 flex items-center gap-2">
-                                      <HelpCircle className="h-4 w-4" />
-                                      Evidence Requirement:
-                                    </p>
-                                    <p className="text-sm text-amber-800">{question.standardDescription}</p>
-                                  </div>
-                                )}
 
                                 {/* Guidance/Example */}
                                 {question.guidance && (
