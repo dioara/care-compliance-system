@@ -1,0 +1,22 @@
+{
+  "query": "SELECT serviceTypes, COUNT(*) as cnt FROM auditTypes GROUP BY serviceTypes;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT serviceTypes, COUNT(*) as cnt FROM auditTypes GROUP BY serviceTypes;",
+  "rows": [
+    {
+      "serviceTypes": "[\"residential\", \"nursing\"]",
+      "cnt": "5"
+    },
+    {
+      "serviceTypes": "[\"nursing\"]",
+      "cnt": "1"
+    },
+    {
+      "serviceTypes": "[\"all\"]",
+      "cnt": "61"
+    }
+  ],
+  "messages": [],
+  "stdout": "serviceTypes\tcnt\n[\"residential\", \"nursing\"]\t5\n[\"nursing\"]\t1\n[\"all\"]\t61\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

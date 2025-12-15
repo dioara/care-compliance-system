@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, auditName, serviceTypes FROM auditTypes LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, auditName, serviceTypes FROM auditTypes LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "auditName": "Care Plan Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "2",
+      "auditName": "Medication Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "4",
+      "auditName": "Staff File Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "5",
+      "auditName": "Infection Control Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "6",
+      "auditName": "Health & Safety Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "7",
+      "auditName": "Safeguarding Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "8",
+      "auditName": "Dignity Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "9",
+      "auditName": "Finance Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "10",
+      "auditName": "Complaints Audit",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "11",
+      "auditName": "Missed and Late Calls",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "12",
+      "auditName": "Weight Analysis",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "13",
+      "auditName": "Skin Integrity",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "14",
+      "auditName": "Kitchen/Catering",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "15",
+      "auditName": "Dining Experience",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "16",
+      "auditName": "Manager Walkabout",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "17",
+      "auditName": "Night Visits",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "18",
+      "auditName": "Call Bell Analysis",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "19",
+      "auditName": "Senior Manager QA",
+      "serviceTypes": "[\"all\"]"
+    },
+    {
+      "id": "20",
+      "auditName": "NMC Checks",
+      "serviceTypes": "[\"all\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\tserviceTypes\n1\tCare Plan Audit\t[\"all\"]\n2\tMedication Audit\t[\"all\"]\n3\tDaily Notes Audit\t[\"all\"]\n4\tStaff File Audit\t[\"all\"]\n5\tInfection Control Audit\t[\"all\"]\n6\tHealth & Safety Audit\t[\"all\"]\n7\tSafeguarding Audit\t[\"all\"]\n8\tDignity Audit\t[\"all\"]\n9\tFinance Audit\t[\"all\"]\n10\tComplaints Audit\t[\"all\"]\n11\tMissed and Late Calls\t[\"all\"]\n12\tWeight Analysis\t[\"all\"]\n13\tSkin Integrity\t[\"all\"]\n14\tKitchen/Catering\t[\"all\"]\n15\tDining Experience\t[\"all\"]\n16\tManager Walkabout\t[\"all\"]\n17\tNight Visits\t[\"all\"]\n18\tCall Bell Analysis\t[\"all\"]\n19\tSenior Manager QA\t[\"all\"]\n20\tNMC Checks\t[\"all\"]\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

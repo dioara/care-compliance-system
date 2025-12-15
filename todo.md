@@ -1273,3 +1273,6 @@
 - [x] Change serviceType from enum to JSON array for multiple types
 - [x] Update filter logic to handle multiple service types
 - [x] Assign appropriate service types to existing audits
+
+## Bug Fixes
+- [x] Fix audit service type filtering not working

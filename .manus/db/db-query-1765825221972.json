@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE auditTypes SET serviceTypes = '[\"residential\", \"nursing\"]' WHERE id IN (\n  30005, -- Falls Prevention Audit\n  30010, -- Tissue Viability\n  30011, -- Dependency Tool/Staffing Levels\n  30007, -- Water Safety (Legionella)\n  30024, -- End-of-Life Care\n  30037, -- Dementia Care\n  30025, -- Continence Management\n  30019, -- Bed Rails Safety\n  30020, -- Moving and Handling\n  30021, -- Specialist Equipment\n  30023, -- Activities and Social Engagement\n  30022, -- Dignity and Respect\n  30039, -- Nutrition and Mealtimes\n  15, -- Dining Experience\n  14, -- Kitchen/Catering\n  30016, -- Kitchen Hygiene\n  17 -- Night Visits\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE auditTypes SET serviceTypes = '[\"residential\", \"nursing\"]' WHERE id IN (\n  30005, -- Falls Prevention Audit\n  30010, -- Tissue Viability\n  30011, -- Dependency Tool/Staffing Levels\n  30007, -- Water Safety (Legionella)\n  30024, -- End-of-Life Care\n  30037, -- Dementia Care\n  30025, -- Continence Management\n  30019, -- Bed Rails Safety\n  30020, -- Moving and Handling\n  30021, -- Specialist Equipment\n  30023, -- Activities and Social Engagement\n  30022, -- Dignity and Respect\n  30039, -- Nutrition and Mealtimes\n  15, -- Dining Experience\n  14, -- Kitchen/Catering\n  30016, -- Kitchen Hygiene\n  17 -- Night Visits\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

@@ -1,0 +1,30 @@
+{
+  "query": "SELECT auditName, serviceTypes FROM auditTypes WHERE serviceTypes LIKE '%residential%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT auditName, serviceTypes FROM auditTypes WHERE serviceTypes LIKE '%residential%';",
+  "rows": [
+    {
+      "auditName": "Falls Prevention Audit",
+      "serviceTypes": "[\"residential\", \"nursing\"]"
+    },
+    {
+      "auditName": "Water Safety (Legionella) Audit",
+      "serviceTypes": "[\"residential\", \"nursing\"]"
+    },
+    {
+      "auditName": "Tissue Viability (Pressure Ulcer Prevention) Audit",
+      "serviceTypes": "[\"residential\", \"nursing\"]"
+    },
+    {
+      "auditName": "Dependency Tool/Staffing Levels Audit",
+      "serviceTypes": "[\"residential\", \"nursing\"]"
+    },
+    {
+      "auditName": "Dementia Care Audit",
+      "serviceTypes": "[\"residential\", \"nursing\"]"
+    }
+  ],
+  "messages": [],
+  "stdout": "auditName\tserviceTypes\nFalls Prevention Audit\t[\"residential\", \"nursing\"]\nWater Safety (Legionella) Audit\t[\"residential\", \"nursing\"]\nTissue Viability (Pressure Ulcer Prevention) Audit\t[\"residential\", \"nursing\"]\nDependency Tool/Staffing Levels Audit\t[\"residential\", \"nursing\"]\nDementia Care Audit\t[\"residential\", \"nursing\"]\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

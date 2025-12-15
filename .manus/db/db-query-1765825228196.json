@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE auditTypes SET serviceTypes = '[\"domiciliary_care\"]' WHERE id IN (\n  11, -- Missed and Late Calls\n  21, -- Driving License & Insurance Checks\n  18 -- Call Bell Analysis\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE auditTypes SET serviceTypes = '[\"domiciliary_care\"]' WHERE id IN (\n  11, -- Missed and Late Calls\n  21, -- Driving License & Insurance Checks\n  18 -- Call Bell Analysis\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 61
+}
