@@ -1251,3 +1251,6 @@
 - [x] Add location filter to Incidents pageage
 - [x] Add staff invitation email with account setup link
 - [x] Create invitation tokens table for secure account setup
+
+## Modal Width Fixes
+- [x] Fix incident detail modal to be full-width
