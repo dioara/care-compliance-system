@@ -1254,3 +1254,9 @@
 
 ## Modal Width Fixes
 - [x] Fix incident detail modal to be full-width
+
+## Service User Status
+- [x] Add isActive field to serviceUsers table
+- [x] Update backend to handle active/inactive status
+- [x] Add active/inactive toggle in Service Users UI
+- [x] Add filter to show active/inactive/all service users

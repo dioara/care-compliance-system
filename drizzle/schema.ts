@@ -98,7 +98,9 @@ export const serviceUsers = mysqlTable("serviceUsers", {
   dateOfBirth: date("dateOfBirth"),
   carePackageType: varchar("carePackageType", { length: 100 }),
   admissionDate: date("admissionDate"),
+  dischargeDate: date("dischargeDate"),
   supportNeeds: text("supportNeeds"),
+  isActive: boolean("isActive").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

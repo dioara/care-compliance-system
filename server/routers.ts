@@ -369,7 +369,9 @@ export const appRouter = router({
           dateOfBirth: z.string().optional(),
           carePackageType: z.string().optional(),
           admissionDate: z.string().optional(),
+          dischargeDate: z.string().optional(),
           supportNeeds: z.string().optional(),
+          isActive: z.boolean().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -382,6 +384,8 @@ export const appRouter = router({
           tenantId: ctx.user.tenantId,
           dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
           admissionDate: input.admissionDate ? new Date(input.admissionDate) : null,
+          dischargeDate: input.dischargeDate ? new Date(input.dischargeDate) : null,
+          isActive: input.isActive ?? true,
         });
 
         return serviceUser;
@@ -391,11 +395,14 @@ export const appRouter = router({
       .input(
         z.object({
           id: z.number(),
+          locationId: z.number().optional(),
           name: z.string().optional(),
           dateOfBirth: z.string().optional(),
           carePackageType: z.string().optional(),
           admissionDate: z.string().optional(),
+          dischargeDate: z.string().optional(),
           supportNeeds: z.string().optional(),
+          isActive: z.boolean().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -404,6 +411,7 @@ export const appRouter = router({
           ...data,
           dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
           admissionDate: data.admissionDate ? new Date(data.admissionDate) : undefined,
+          dischargeDate: data.dischargeDate ? new Date(data.dischargeDate) : undefined,
         });
         return { success: true };
       }),

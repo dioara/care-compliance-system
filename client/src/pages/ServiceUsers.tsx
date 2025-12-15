@@ -16,6 +16,7 @@ import { useLocation as useRouter } from "wouter";
 export default function ServiceUsers() {
   const { activeLocationId, canWrite, permissions } = useLocation();
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
   
   // Use filter location if set, otherwise use active location
   const effectiveLocationId = filterLocationId || activeLocationId;
@@ -39,8 +40,10 @@ export default function ServiceUsers() {
     dateOfBirth: "",
     carePackageType: "",
     admissionDate: "",
+    dischargeDate: "",
     supportNeeds: "",
     locationId: activeLocationId || 0,
+    isActive: true,
   });
 
   // Fetch locations for dropdown
@@ -52,10 +55,20 @@ export default function ServiceUsers() {
       dateOfBirth: "",
       carePackageType: "",
       admissionDate: "",
+      dischargeDate: "",
       supportNeeds: "",
       locationId: activeLocationId || 0,
+      isActive: true,
     });
   };
+
+  // Filter service users by status
+  const filteredServiceUsers = serviceUsers?.filter((user: any) => {
+    if (statusFilter === 'all') return true;
+    if (statusFilter === 'active') return user.isActive !== false;
+    if (statusFilter === 'inactive') return user.isActive === false;
+    return true;
+  }) || [];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -102,8 +115,10 @@ export default function ServiceUsers() {
       dateOfBirth: serviceUser.dateOfBirth ? new Date(serviceUser.dateOfBirth).toISOString().split('T')[0] : "",
       carePackageType: serviceUser.carePackageType || "",
       admissionDate: serviceUser.admissionDate ? new Date(serviceUser.admissionDate).toISOString().split('T')[0] : "",
+      dischargeDate: serviceUser.dischargeDate ? new Date(serviceUser.dischargeDate).toISOString().split('T')[0] : "",
       supportNeeds: serviceUser.supportNeeds || "",
       locationId: serviceUser.locationId || activeLocationId || 0,
+      isActive: serviceUser.isActive !== false,
     });
     setIsEditOpen(true);
   };
@@ -126,7 +141,9 @@ export default function ServiceUsers() {
         dateOfBirth: formData.dateOfBirth,
         carePackageType: formData.carePackageType,
         admissionDate: formData.admissionDate,
+        dischargeDate: formData.dischargeDate,
         supportNeeds: formData.supportNeeds,
+        isActive: formData.isActive,
       });
       toast.success("Service user updated successfully");
       setIsEditOpen(false);
@@ -192,29 +209,68 @@ export default function ServiceUsers() {
         </div>
       </div>
       
-      {/* Location Filter */}
-      {accessibleLocations.length > 1 && (
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Filter by location:</span>
-          <Select
-            value={filterLocationId?.toString() || "all"}
-            onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
-          >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All accessible locations" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Current location</SelectItem>
-              {accessibleLocations.map((location) => (
-                <SelectItem key={location.id} value={location.id.toString()}>
-                  {location.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      {/* Filters */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          {/* Location Filter */}
+          {accessibleLocations.length > 1 && (
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Location:</span>
+              <Select
+                value={filterLocationId?.toString() || "all"}
+                onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
+              >
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="All accessible locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Current location</SelectItem>
+                  {accessibleLocations.map((location) => (
+                    <SelectItem key={location.id} value={location.id.toString()}>
+                      {location.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
-      )}
+        
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <button
+            onClick={() => setStatusFilter('active')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              statusFilter === 'active'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setStatusFilter('inactive')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              statusFilter === 'inactive'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Inactive
+          </button>
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              statusFilter === 'all'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            All
+          </button>
+        </div>
+      </div>
 
       <div className="flex items-center justify-between">
         {!canWrite && (
@@ -334,16 +390,19 @@ export default function ServiceUsers() {
         </Dialog>
       </div>
 
-      {serviceUsers && serviceUsers.length > 0 ? (
+      {filteredServiceUsers && filteredServiceUsers.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {serviceUsers.map((serviceUser) => (
-            <Card key={serviceUser.id}>
+          {filteredServiceUsers.map((serviceUser: any) => (
+            <Card key={serviceUser.id} className={serviceUser.isActive === false ? 'opacity-60' : ''}>
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-pink-500" />
+                      <Heart className={`h-5 w-5 ${serviceUser.isActive === false ? 'text-gray-400' : 'text-pink-500'}`} />
                       {serviceUser.name}
+                      {serviceUser.isActive === false && (
+                        <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                      )}
                     </CardTitle>
                     {serviceUser.carePackageType && (
                       <CardDescription>{serviceUser.carePackageType}</CardDescription>
@@ -516,6 +575,44 @@ export default function ServiceUsers() {
                     value={formData.admissionDate}
                     onChange={handleInputChange}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-dischargeDate">Discharge Date</Label>
+                  <Input
+                    id="edit-dischargeDate"
+                    name="dischargeDate"
+                    type="date"
+                    value={formData.dischargeDate}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+
+              {/* Active Status Toggle */}
+              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                <div>
+                  <Label htmlFor="edit-isActive" className="text-base font-medium">Client Status</Label>
+                  <p className="text-sm text-muted-foreground">Is this service user currently an active client?</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm ${!formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Inactive</span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={formData.isActive}
+                    onClick={() => setFormData(prev => ({ ...prev, isActive: !prev.isActive }))}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      formData.isActive ? 'bg-primary' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        formData.isActive ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                  <span className={`text-sm ${formData.isActive ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Active</span>
                 </div>
               </div>
 
