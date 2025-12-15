@@ -932,7 +932,7 @@ export const appRouter = router({
         const pdfBuffer = await generateActionLogPDF({
           actions,
           companyName: company.name,
-          companyLogo: company.logo || undefined,
+          companyLogo: company.logoUrl || undefined,
           locationName,
           generatedBy: ctx.user.name || ctx.user.email,
         });
