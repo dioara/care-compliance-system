@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { LocationSwitcher } from "./LocationSwitcher";
@@ -29,15 +29,15 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Heart, label: "Service Users", path: "/service-users" },
-  { icon: UserCheck, label: "Staff", path: "/staff" },
-  { icon: ClipboardList, label: "Audits", path: "/audits" },
-  { icon: Brain, label: "AI Audits", path: "/ai-audits" },
-  { icon: AlertTriangle, label: "Incidents", path: "/incidents" },
-  { icon: BarChart3, label: "Analytics", path: "/analytics" },
-  { icon: FileText, label: "Reports", path: "/reports" },
-  { icon: ClipboardCheck, label: "Action Log", path: "/action-log" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/", description: "Overview & metrics" },
+  { icon: Heart, label: "Service Users", path: "/service-users", description: "Manage residents" },
+  { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
+  { icon: ClipboardList, label: "Audits", path: "/audits", description: "Compliance audits" },
+  { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
+  { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
+  { icon: BarChart3, label: "Analytics", path: "/analytics", description: "Data insights" },
+  { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },
+  { icon: ClipboardCheck, label: "Action Log", path: "/action-log", description: "Track actions" },
 ];
 
 // Admin-only menu items (shown only to super admins)
@@ -178,27 +178,36 @@ function DashboardLayoutContent({
           className="border-r-0"
           disableTransition={isResizing}
         >
-          <SidebarHeader className="h-16 justify-center">
-            <div className="flex items-center gap-3 px-2 transition-all w-full">
+          <SidebarHeader className="h-16 justify-center border-b border-sidebar-border/50">
+            <div className="flex items-center gap-3 px-3 transition-all w-full">
               <button
                 onClick={toggleSidebar}
-                className="h-8 w-8 flex items-center justify-center hover:bg-accent rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+                className="h-9 w-9 flex items-center justify-center hover:bg-primary/10 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0 group"
                 aria-label="Toggle navigation"
               >
-                <PanelLeft className="h-4 w-4 text-muted-foreground" />
+                <PanelLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
-                  </span>
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm">
+                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-semibold tracking-tight truncate text-sm">
+                      Care Compliance
+                    </span>
+                    <span className="text-[10px] text-muted-foreground -mt-0.5">Management System</span>
+                  </div>
                 </div>
               ) : null}
             </div>
           </SidebarHeader>
 
-          <SidebarContent className="gap-0">
-            <SidebarMenu className="px-2 py-1">
+          <SidebarContent className="gap-0 py-2">
+            <SidebarMenu className="px-3 space-y-1">
               {menuItems.map(item => {
                 const isActive = location === item.path;
                 return (
@@ -207,12 +216,13 @@ function DashboardLayoutContent({
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-10 transition-all font-normal`}
+                      className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
                     >
-                      <item.icon
-                        className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
-                      />
+                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
                       <span>{item.label}</span>
+                      {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50" />}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -221,8 +231,8 @@ function DashboardLayoutContent({
               {/* Admin-only menu items */}
               {user?.superAdmin && (
                 <>
-                  <div className="my-2 mx-2 border-t" />
-                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <div className="my-3 mx-1 border-t border-sidebar-border/50" />
+                  <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
                     {!isCollapsed && "Administration"}
                   </div>
                   {adminMenuItems.map(item => {
@@ -233,12 +243,13 @@ function DashboardLayoutContent({
                           isActive={isActive}
                           onClick={() => setLocation(item.path)}
                           tooltip={item.label}
-                          className={`h-10 transition-all font-normal`}
+                          className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
                         >
-                          <item.icon
-                            className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
-                          />
+                          <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
+                            <item.icon className="h-4 w-4" />
+                          </div>
                           <span>{item.label}</span>
+                          {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50" />}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     );
@@ -248,20 +259,20 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="p-3 border-t border-sidebar-border/50">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-                  <Avatar className="h-9 w-9 border shrink-0">
-                    <AvatarFallback className="text-xs font-medium">
+                <button className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-accent transition-all duration-200 w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  <Avatar className="h-10 w-10 border-2 border-primary/20 shrink-0 shadow-sm">
+                    <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                       {user?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-medium truncate leading-none">
+                    <p className="text-sm font-semibold truncate leading-none">
                       {user?.name || "-"}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate mt-1.5">
+                    <p className="text-xs text-muted-foreground truncate mt-1">
                       {user?.email || "-"}
                     </p>
                   </div>

@@ -301,14 +301,19 @@ export default function Incidents() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-            Incident Reporting
-          </h1>
-          <p className="text-muted-foreground mt-2 max-w-2xl">
-            Log and track incidents with comprehensive documentation, automatic categorisation, and regulatory reporting compliance.
-          </p>
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center shadow-sm">
+            <AlertTriangle className="h-6 w-6 text-orange-500" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Incident Reporting
+            </h1>
+            <p className="text-muted-foreground mt-1 max-w-2xl">
+              Log and track incidents with comprehensive documentation, automatic categorisation, and regulatory reporting compliance.
+            </p>
+          </div>
         </div>
         <div className="flex gap-3">
           <Button

@@ -230,28 +230,30 @@ export default function ActionLog() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <ClipboardList className="h-8 w-8 text-primary" />
-            Master Action Log
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Track and manage all action items from audits across your organization
-          </p>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
+            <ClipboardList className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Master Action Log</h1>
+            <p className="text-muted-foreground mt-1">
+              Track and manage all action items from audits across your organization
+            </p>
+          </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleDownloadCSV}>
+          <Button variant="outline" onClick={handleDownloadCSV} className="shadow-sm">
             <Download className="h-4 w-4 mr-2" />
             CSV
           </Button>
-          <Button variant="outline" onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending}>
+          <Button variant="outline" onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending} className="shadow-sm">
             <FileText className="h-4 w-4 mr-2" />
             {generatePdfMutation.isPending ? "Generating..." : "PDF"}
           </Button>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Button onClick={() => setIsAddDialogOpen(true)} className="shadow-md hover:shadow-lg transition-all duration-200">
             <Plus className="h-4 w-4 mr-2" />
             Add Action
           </Button>

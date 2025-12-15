@@ -265,13 +265,18 @@ export default function Staff() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Staff Members</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage staff members for the selected location. Track employment details and DBS certificates.
-          </p>
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
+            <UserCheck className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Staff Members</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage staff members for the selected location. Track employment details and DBS certificates.
+            </p>
+          </div>
         </div>
       </div>
       

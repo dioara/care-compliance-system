@@ -125,17 +125,22 @@ export default function Audits() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Audit Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage and conduct compliance audits across your care home
-          </p>
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
+            <ClipboardList className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Audit Management</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage and conduct compliance audits across your care home
+            </p>
+          </div>
         </div>
         <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="lg">
+            <Button size="lg" className="shadow-md hover:shadow-lg transition-all duration-200">
               <Plus className="h-5 w-5 mr-2" />
               Schedule Audit
             </Button>
