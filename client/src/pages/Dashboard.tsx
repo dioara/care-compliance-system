@@ -46,8 +46,11 @@ export default function Dashboard() {
         locationId: activeLocationId || undefined
       });
       if (result.sent) {
+        const methods: string[] = [];
+        if (result.notificationSent) methods.push("in-app notification");
+        if (result.emailSent) methods.push("email");
         toast.success("Alert Sent", {
-          description: "Compliance alert notification has been sent to the owner.",
+          description: `Compliance alert sent via ${methods.join(" and ") || "notification"}.`,
         });
       } else {
         toast.info("No Alert Needed", {

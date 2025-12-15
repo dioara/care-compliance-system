@@ -7,6 +7,7 @@ import { rolesRouter } from "./roles";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { notifyOwner } from "./_core/notification";
+import { sendComplianceAlertEmail } from "./_core/email";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -85,10 +86,30 @@ export const appRouter = router({
         const title = `⚠️ Compliance Alert - ${tenant?.name || "Your Care Home"}`;
         const content = `**Location:** ${locationName}\n\n**Alerts:**\n${alerts.map(a => `- ${a}`).join("\n")}\n\n**Current Status:**\n- Overall Compliance: ${stats.overallCompliance}%\n- Compliant (Green): ${stats.ragStatus.green}\n- Partial (Amber): ${stats.ragStatus.amber}\n- Non-Compliant (Red): ${stats.ragStatus.red}\n\nPlease review and address these compliance issues promptly.`;
         
-        const sent = await notifyOwner({ title, content });
+        // Send in-app notification to owner
+        const notificationSent = await notifyOwner({ title, content });
+        
+        // Also send email notification if user has an email
+        let emailSent = false;
+        if (ctx.user.email) {
+          emailSent = await sendComplianceAlertEmail(
+            ctx.user.email,
+            tenant?.name || "Your Care Home",
+            locationName,
+            alerts,
+            {
+              compliance: stats.overallCompliance,
+              threshold,
+              overdueActions: stats.overdueActions,
+              ragStatus: stats.ragStatus
+            }
+          );
+        }
         
         return { 
-          sent, 
+          sent: notificationSent || emailSent,
+          notificationSent,
+          emailSent,
           alerts,
           stats: {
             compliance: stats.overallCompliance,
