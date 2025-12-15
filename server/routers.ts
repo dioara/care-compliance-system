@@ -1013,7 +1013,7 @@ export const appRouter = router({
             },
             anonymizationSummary: {
               namesRedacted: redactionSummary.namesRedacted,
-              piiRedacted: Object.values(redactionSummary.piiRedacted).reduce((a, b) => a + b, 0),
+              piiRedacted: Object.values(redactionSummary.piiRedacted).reduce((a: number, b: number) => a + b, 0),
             },
           };
         } catch (error) {
@@ -1058,6 +1058,181 @@ export const appRouter = router({
           recommendations: audit.recommendations ? JSON.parse(audit.recommendations) : [],
           examples: audit.examples ? JSON.parse(audit.examples) : [],
         };
+      }),
+
+    // Generate PDF report for an audit
+    generatePDF: protectedProcedure
+      .input(z.object({ auditId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        
+        const audit = await db.getAiAuditById(input.auditId);
+        if (!audit || audit.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Audit not found" });
+        }
+        
+        if (audit.status !== "completed") {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot generate PDF for incomplete audit" });
+        }
+        
+        const tenant = await db.getTenantById(ctx.user.tenantId);
+        const { generateAuditPDF } = await import("./services/pdfService");
+        
+        const pdfBuffer = await generateAuditPDF({
+          auditId: audit.id,
+          auditType: audit.auditType as "care_plan" | "daily_notes",
+          documentName: audit.documentName || "Unnamed Document",
+          score: audit.score || 0,
+          strengths: audit.strengths ? JSON.parse(audit.strengths) : [],
+          areasForImprovement: audit.areasForImprovement ? JSON.parse(audit.areasForImprovement) : [],
+          recommendations: audit.recommendations ? JSON.parse(audit.recommendations) : [],
+          cqcComplianceNotes: audit.cqcComplianceNotes || undefined,
+          anonymizationReport: audit.anonymizationReport || undefined,
+          createdAt: audit.createdAt || new Date(),
+          companyName: tenant?.name || undefined,
+        });
+        
+        // Upload PDF to S3
+        const filename = `audit-report-${audit.id}-${Date.now()}.pdf`;
+        const { url } = await storagePut(`ai-audits/reports/${filename}`, pdfBuffer, "application/pdf");
+        
+        return { url, filename };
+      }),
+
+    // Submit audit from file upload
+    submitFromFile: protectedProcedure
+      .input(
+        z.object({
+          auditType: z.enum(["care_plan", "daily_notes"]),
+          fileContent: z.string(), // Base64 encoded file content
+          fileName: z.string(),
+          documentName: z.string().optional(),
+          customNames: z.array(z.string()).optional(),
+          notifyEmail: z.string().email().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        
+        const tenant = await db.getTenantById(ctx.user.tenantId);
+        if (!tenant?.openaiApiKey) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "OpenAI API key not configured" });
+        }
+        
+        // Decode base64 file content
+        const fileBuffer = Buffer.from(input.fileContent, "base64");
+        
+        // Validate file size (max 10MB)
+        if (fileBuffer.length > 10 * 1024 * 1024) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "File size exceeds 10MB limit" });
+        }
+        
+        // Extract text from file
+        const { extractTextFromFile } = await import("./services/fileExtractionService");
+        let documentText: string;
+        try {
+          documentText = await extractTextFromFile(fileBuffer, input.fileName);
+        } catch (error) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: error instanceof Error ? error.message : "Failed to extract text from file",
+          });
+        }
+        
+        if (documentText.length < 100) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Extracted text is too short (minimum 100 characters)" });
+        }
+        
+        // Anonymize the text
+        const { anonymizeDocument } = await import("./utils/anonymize");
+        const { anonymizedText, redactionSummary } = anonymizeDocument(documentText, { customNames: input.customNames });
+        const anonymizationReport = `Names redacted: ${redactionSummary.namesRedacted}, PII redacted: ${Object.values(redactionSummary.piiRedacted).reduce((a: number, b: number) => a + b, 0)}`;
+        
+        // Create audit record
+        const auditId = await db.createAiAudit({
+          tenantId: ctx.user.tenantId,
+          locationId: ctx.user.locationId || 1,
+          auditType: input.auditType,
+          documentName: input.documentName || input.fileName,
+          status: "processing",
+          anonymizationReport,
+          requestedById: ctx.user.id,
+        });
+        
+        // Process with OpenAI
+        try {
+          const { analyzeCarePlan, analyzeDailyNotes } = await import("./services/openaiService");
+          
+          let result;
+          if (input.auditType === "care_plan") {
+            result = await analyzeCarePlan(anonymizedText, tenant.openaiApiKey);
+          } else {
+            result = await analyzeDailyNotes(anonymizedText, tenant.openaiApiKey);
+          }
+          
+          // Update audit with results
+          await db.updateAiAudit(auditId, {
+            status: "completed",
+            score: result.score,
+            strengths: JSON.stringify(result.strengths),
+            areasForImprovement: JSON.stringify(result.areasForImprovement),
+            recommendations: JSON.stringify(result.recommendations),
+            examples: JSON.stringify(result.examples),
+            cqcComplianceNotes: 'cqcComplianceNotes' in result ? result.cqcComplianceNotes : ('professionalismNotes' in result ? result.professionalismNotes : ''),
+            processedAt: new Date(),
+          });
+          
+          // Send email notification if requested
+          if (input.notifyEmail) {
+            try {
+              const { sendAuditCompletionEmail } = await import("./services/emailService");
+              await sendAuditCompletionEmail({
+                to: input.notifyEmail,
+                auditId,
+                documentName: input.documentName || input.fileName,
+                auditType: input.auditType,
+                score: result.score,
+                strengths: result.strengths.slice(0, 3),
+                areasForImprovement: result.areasForImprovement.slice(0, 3),
+                companyName: tenant.name || "Care Compliance System",
+              });
+            } catch (emailError) {
+              console.error("Failed to send email notification:", emailError);
+              // Don't throw - email failure shouldn't fail the audit
+            }
+          }
+          
+          return {
+            success: true,
+            auditId,
+            result: {
+              score: result.score,
+              strengths: result.strengths,
+              areasForImprovement: result.areasForImprovement,
+              recommendations: result.recommendations,
+              examples: result.examples,
+              cqcComplianceNotes: 'cqcComplianceNotes' in result ? result.cqcComplianceNotes : ('professionalismNotes' in result ? result.professionalismNotes : ''),
+            },
+            anonymizationSummary: {
+              namesRedacted: redactionSummary.namesRedacted,
+              piiRedacted: Object.values(redactionSummary.piiRedacted).reduce((a: number, b: number) => a + b, 0),
+            },
+          };
+        } catch (error) {
+          await db.updateAiAudit(auditId, {
+            status: "failed",
+            cqcComplianceNotes: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          });
+          
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: error instanceof Error ? error.message : "Failed to process document",
+          });
+        }
       }),
   }),
 });

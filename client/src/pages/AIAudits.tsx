@@ -7,10 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Brain, Upload, FileText, AlertCircle, CheckCircle, XCircle, Clock, Key, ExternalLink, Loader2, Shield, Download } from "lucide-react";
+import { Brain, Upload, FileText, AlertCircle, CheckCircle, XCircle, Clock, Key, Loader2, Shield, Download, File } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Link } from "wouter";
 
@@ -18,18 +17,45 @@ export default function AIAudits() {
   const { data: apiKeyStatus, isLoading: isLoadingApiKey } = trpc.aiAudits.getApiKeyStatus.useQuery();
   const { data: auditHistory, refetch: refetchHistory } = trpc.aiAudits.getHistory.useQuery({ limit: 10 });
   const submitAudit = trpc.aiAudits.submitAudit.useMutation();
+  const submitFromFile = trpc.aiAudits.submitFromFile.useMutation();
+  const generatePDF = trpc.aiAudits.generatePDF.useMutation();
 
   const [carePlanText, setCarePlanText] = useState("");
   const [carePlanName, setCarePlanName] = useState("");
   const [dailyNotesText, setDailyNotesText] = useState("");
   const [dailyNotesName, setDailyNotesName] = useState("");
   const [customNames, setCustomNames] = useState("");
+  const [notifyEmail, setNotifyEmail] = useState("");
   const [auditResult, setAuditResult] = useState<any>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadMode, setUploadMode] = useState<"text" | "file">("text");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const validTypes = [".pdf", ".docx", ".txt"];
+      const ext = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
+      if (!validTypes.includes(ext)) {
+        toast.error("Please upload a PDF, Word (.docx), or text file");
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("File size exceeds 10MB limit");
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
 
   const handleSubmitCarePlan = async () => {
-    if (carePlanText.length < 100) {
+    if (uploadMode === "text" && carePlanText.length < 100) {
       toast.error("Please enter at least 100 characters of care plan text");
+      return;
+    }
+    if (uploadMode === "file" && !selectedFile) {
+      toast.error("Please select a file to upload");
       return;
     }
 
@@ -37,12 +63,25 @@ export default function AIAudits() {
     setAuditResult(null);
 
     try {
-      const result = await submitAudit.mutateAsync({
-        auditType: "care_plan",
-        documentText: carePlanText,
-        documentName: carePlanName || undefined,
-        customNames: customNames ? customNames.split(",").map(n => n.trim()).filter(Boolean) : undefined,
-      });
+      let result;
+      if (uploadMode === "file" && selectedFile) {
+        const fileContent = await fileToBase64(selectedFile);
+        result = await submitFromFile.mutateAsync({
+          auditType: "care_plan",
+          fileContent,
+          fileName: selectedFile.name,
+          documentName: carePlanName || undefined,
+          customNames: customNames ? customNames.split(",").map(n => n.trim()).filter(Boolean) : undefined,
+          notifyEmail: notifyEmail || undefined,
+        });
+      } else {
+        result = await submitAudit.mutateAsync({
+          auditType: "care_plan",
+          documentText: carePlanText,
+          documentName: carePlanName || undefined,
+          customNames: customNames ? customNames.split(",").map(n => n.trim()).filter(Boolean) : undefined,
+        });
+      }
 
       setAuditResult(result);
       refetchHistory();
@@ -81,18 +120,44 @@ export default function AIAudits() {
     }
   };
 
+  const handleDownloadPDF = async (auditId: number) => {
+    try {
+      toast.info("Generating PDF report...");
+      const { url, filename } = await generatePDF.mutateAsync({ auditId });
+      
+      // Download the PDF
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast.success("PDF report downloaded!");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to generate PDF");
+    }
+  };
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 8) return "text-green-600";
     if (score >= 6) return "text-yellow-600";
     if (score >= 4) return "text-orange-600";
     return "text-red-600";
-  };
-
-  const getScoreBadge = (score: number) => {
-    if (score >= 8) return <Badge className="bg-green-100 text-green-800">Excellent</Badge>;
-    if (score >= 6) return <Badge className="bg-yellow-100 text-yellow-800">Good</Badge>;
-    if (score >= 4) return <Badge className="bg-orange-100 text-orange-800">Needs Improvement</Badge>;
-    return <Badge className="bg-red-100 text-red-800">Poor</Badge>;
   };
 
   if (isLoadingApiKey) {
@@ -163,10 +228,30 @@ export default function AIAudits() {
               <CardHeader>
                 <CardTitle>AI Care Plan Quality Audit</CardTitle>
                 <CardDescription>
-                  Paste or type care plan content for AI analysis. Names are automatically converted to initials.
+                  Upload a file or paste care plan content for AI analysis. Names are automatically converted to initials.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Upload Mode Toggle */}
+                <div className="flex gap-2">
+                  <Button
+                    variant={uploadMode === "text" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUploadMode("text")}
+                  >
+                    <FileText className="mr-2 h-4 w-4" />
+                    Paste Text
+                  </Button>
+                  <Button
+                    variant={uploadMode === "file" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUploadMode("file")}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload File
+                  </Button>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="carePlanName">Document Name (optional)</Label>
                   <Input
@@ -178,20 +263,62 @@ export default function AIAudits() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="carePlanText">Care Plan Content *</Label>
-                  <Textarea
-                    id="carePlanText"
-                    placeholder="Paste the care plan text here..."
-                    value={carePlanText}
-                    onChange={(e) => setCarePlanText(e.target.value)}
-                    rows={12}
-                    disabled={!apiKeyStatus?.hasApiKey || isProcessing}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {carePlanText.length} characters (minimum 100 required)
-                  </p>
-                </div>
+                {uploadMode === "text" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="carePlanText">Care Plan Content *</Label>
+                    <Textarea
+                      id="carePlanText"
+                      placeholder="Paste the care plan text here..."
+                      value={carePlanText}
+                      onChange={(e) => setCarePlanText(e.target.value)}
+                      rows={10}
+                      disabled={!apiKeyStatus?.hasApiKey || isProcessing}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {carePlanText.length} characters (minimum 100 required)
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label>Upload Document *</Label>
+                    <div
+                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+                        selectedFile ? "border-green-500 bg-green-50" : "border-muted-foreground/25 hover:border-primary"
+                      }`}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        disabled={!apiKeyStatus?.hasApiKey || isProcessing}
+                      />
+                      {selectedFile ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <File className="h-8 w-8 text-green-600" />
+                          <div className="text-left">
+                            <p className="font-medium">{selectedFile.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {(selectedFile.size / 1024).toFixed(1)} KB
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Click to upload or drag and drop
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            PDF, Word (.docx), or Text files up to 10MB
+                          </p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="customNames">Additional Names to Anonymise (optional)</Label>
@@ -207,9 +334,29 @@ export default function AIAudits() {
                   </p>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="notifyEmail">Email Notification (optional)</Label>
+                  <Input
+                    id="notifyEmail"
+                    type="email"
+                    placeholder="your@email.com"
+                    value={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.value)}
+                    disabled={!apiKeyStatus?.hasApiKey || isProcessing}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Receive an email summary when the audit completes
+                  </p>
+                </div>
+
                 <Button
                   onClick={handleSubmitCarePlan}
-                  disabled={!apiKeyStatus?.hasApiKey || isProcessing || carePlanText.length < 100}
+                  disabled={
+                    !apiKeyStatus?.hasApiKey ||
+                    isProcessing ||
+                    (uploadMode === "text" && carePlanText.length < 100) ||
+                    (uploadMode === "file" && !selectedFile)
+                  }
                   className="w-full"
                 >
                   {isProcessing ? (
@@ -252,7 +399,7 @@ export default function AIAudits() {
                 )}
 
                 {auditResult && (
-                  <AuditResultDisplay result={auditResult} />
+                  <AuditResultDisplay result={auditResult} onDownloadPDF={() => handleDownloadPDF(auditResult.auditId)} />
                 )}
               </CardContent>
             </Card>
@@ -341,7 +488,7 @@ export default function AIAudits() {
                 )}
 
                 {auditResult && (
-                  <AuditResultDisplay result={auditResult} />
+                  <AuditResultDisplay result={auditResult} onDownloadPDF={() => handleDownloadPDF(auditResult.auditId)} />
                 )}
               </CardContent>
             </Card>
@@ -397,8 +544,17 @@ export default function AIAudits() {
                           })}
                         </p>
                       </div>
-                      <Button variant="outline" size="sm" disabled>
-                        <Download className="mr-2 h-4 w-4" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadPDF(audit.id)}
+                        disabled={audit.status !== "completed" || generatePDF.isPending}
+                      >
+                        {generatePDF.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
                         PDF
                       </Button>
                     </div>
@@ -418,7 +574,7 @@ export default function AIAudits() {
   );
 }
 
-function AuditResultDisplay({ result }: { result: any }) {
+function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownloadPDF: () => void }) {
   const { score, strengths, areasForImprovement, recommendations, examples, cqcComplianceNotes, anonymizationSummary } = result.result;
 
   const getScoreColor = (score: number) => {
@@ -450,20 +606,18 @@ function AuditResultDisplay({ result }: { result: any }) {
         </Alert>
       )}
 
-      <Separator />
-
       {/* Strengths */}
       {strengths && strengths.length > 0 && (
         <div>
-          <h4 className="font-semibold flex items-center gap-2 text-green-700 mb-2">
+          <h4 className="font-semibold text-green-700 flex items-center gap-2 mb-2">
             <CheckCircle className="h-4 w-4" />
             Strengths
           </h4>
           <ul className="space-y-1 text-sm">
             {strengths.map((s: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-green-500 mt-1">✓</span>
-                <span>{s}</span>
+                <span className="text-green-600">•</span>
+                {s}
               </li>
             ))}
           </ul>
@@ -473,15 +627,15 @@ function AuditResultDisplay({ result }: { result: any }) {
       {/* Areas for Improvement */}
       {areasForImprovement && areasForImprovement.length > 0 && (
         <div>
-          <h4 className="font-semibold flex items-center gap-2 text-orange-700 mb-2">
+          <h4 className="font-semibold text-orange-700 flex items-center gap-2 mb-2">
             <AlertCircle className="h-4 w-4" />
             Areas for Improvement
           </h4>
           <ul className="space-y-1 text-sm">
             {areasForImprovement.map((a: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-orange-500 mt-1">•</span>
-                <span>{a}</span>
+                <span className="text-orange-600">•</span>
+                {a}
               </li>
             ))}
           </ul>
@@ -491,28 +645,34 @@ function AuditResultDisplay({ result }: { result: any }) {
       {/* Recommendations */}
       {recommendations && recommendations.length > 0 && (
         <div>
-          <h4 className="font-semibold flex items-center gap-2 text-blue-700 mb-2">
+          <h4 className="font-semibold text-blue-700 flex items-center gap-2 mb-2">
             <Brain className="h-4 w-4" />
             Recommendations
           </h4>
           <ul className="space-y-1 text-sm">
             {recommendations.map((r: string, i: number) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="text-blue-500 mt-1">→</span>
-                <span>{r}</span>
+                <span className="text-blue-600">→</span>
+                {r}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* CQC Compliance Notes */}
+      {/* CQC Notes */}
       {cqcComplianceNotes && (
-        <div className="p-3 bg-muted rounded-lg">
+        <div className="bg-muted p-3 rounded-lg">
           <h4 className="font-semibold text-sm mb-1">CQC Compliance Notes</h4>
           <p className="text-sm text-muted-foreground">{cqcComplianceNotes}</p>
         </div>
       )}
+
+      {/* Download Button */}
+      <Button onClick={onDownloadPDF} variant="outline" className="w-full">
+        <Download className="mr-2 h-4 w-4" />
+        Download PDF Report
+      </Button>
     </div>
   );
 }

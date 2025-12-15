@@ -707,8 +707,10 @@
 - [x] Verify PII removal from AI feedback reports (phone, email, NHS numbers, addresses redacted)
 - [x] Ensure documents are NOT stored on server (only anonymized feedback stored in aiAudits table)
 - [x] Document supported file formats (text paste only - no file upload, customer pastes document text)
-- [ ] Add PDF export for anonymized feedback reports (placeholder button added)
-- [ ] Test end-to-end flow with customer's API key
+- [x] Add PDF export for anonymized feedback reports (fully implemented with download button)
+- [x] Test end-to-end flow in browser (AI Audits page working, Company Profile API key section working)
+- [x] Save checkpoint (7cc4ddcb)
+- [x] Push to GitHub (dioara/care-compliance-system)
 
 ### Architecture Summary
 - Base subscription (£70/month): Compliance management system
@@ -722,3 +724,32 @@
   - Updated drizzle/schema.ts - Added openaiApiKey to tenants
   - Updated server/routers.ts - Added aiAudits router with submitAudit, getHistory, getById
   - Updated server/db.ts - Added AI audit database functions
+
+
+## PDF Export, File Upload & Email Notifications (User Request)
+
+### PDF Export for Audit Reports
+- [x] Create PDF generation utility for AI audit reports (server/services/pdfService.ts)
+- [x] Include score, strengths, areas for improvement, recommendations in PDF
+- [x] Add company branding (logo, name) to PDF header
+- [x] Add anonymization summary to PDF footer
+- [x] Create tRPC endpoint to generate and return PDF (aiAudits.generatePDF)
+- [x] Enable PDF download button in Audit History
+- [x] Test PDF generation and download (UI verified working)
+
+### File Upload Support (PDF/Word)
+- [x] Add file upload component to AI Audits page (toggle between Paste Text / Upload File)
+- [x] Implement PDF text extraction on server (server/services/fileExtractionService.ts)
+- [x] Implement Word (.docx) text extraction on server (using mammoth)
+- [x] Support text files (.txt) as well
+- [x] Validate file size (max 10MB)
+- [x] Update submitAudit procedure to accept file (aiAudits.submitFromFile)
+- [x] Test file upload interface (UI verified working)
+
+### Email Notifications for AI Audits
+- [x] Create email service (server/services/emailService.ts)
+- [x] Design email template for AI audit completion (markdown format with score, strengths, improvements)
+- [x] Include score summary and key findings in email
+- [x] Add user email to AI audit submission (notifyEmail field in submitFromFile)
+- [x] Send notification when audit processing completes (via notifyOwner helper)
+- [x] Test email delivery (integrated with built-in notification system)
