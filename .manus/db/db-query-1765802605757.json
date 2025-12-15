@@ -1,0 +1,19 @@
+{
+  "query": "SELECT * FROM role_location_permissions;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT * FROM role_location_permissions;",
+  "rows": [
+    {
+      "id": "30002",
+      "roleId": "1",
+      "locationId": "30001",
+      "canRead": "1",
+      "canWrite": "0",
+      "createdAt": "2025-12-15 12:42:31",
+      "updatedAt": "2025-12-15 12:42:31"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\troleId\tlocationId\tcanRead\tcanWrite\tcreatedAt\tupdatedAt\n30002\t1\t30001\t1\t0\t2025-12-15 12:42:31\t2025-12-15 12:42:31\n",
+  "stderr": "",
+  "execution_time_ms": 115
+}

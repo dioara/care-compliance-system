@@ -1,0 +1,21 @@
+{
+  "query": "SELECT rlp.*, r.name as role_name, l.name as location_name FROM role_location_permissions rlp JOIN roles r ON rlp.roleId = r.id JOIN locations l ON rlp.locationId = l.id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT rlp.*, r.name as role_name, l.name as location_name FROM role_location_permissions rlp JOIN roles r ON rlp.roleId = r.id JOIN locations l ON rlp.locationId = l.id;",
+  "rows": [
+    {
+      "id": "30002",
+      "roleId": "1",
+      "locationId": "30001",
+      "canRead": "1",
+      "canWrite": "0",
+      "createdAt": "2025-12-15 12:42:31",
+      "updatedAt": "2025-12-15 12:42:31",
+      "role_name": "St helens",
+      "location_name": "Main Office"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\troleId\tlocationId\tcanRead\tcanWrite\tcreatedAt\tupdatedAt\trole_name\tlocation_name\n30002\t1\t30001\t1\t0\t2025-12-15 12:42:31\t2025-12-15 12:42:31\tSt helens\tMain Office\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

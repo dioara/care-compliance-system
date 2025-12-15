@@ -107,6 +107,8 @@ export default function RoleManagement() {
     }
   };
 
+  const trpcUtils = trpc.useUtils();
+  
   const openPermissions = async (role: any) => {
     setSelectedRole(role);
     // Initialize permissions with all locations
@@ -117,21 +119,24 @@ export default function RoleManagement() {
       canWrite: false,
     }));
     setPermissionsState(initialPermissions);
+    setIsPermissionsOpen(true);
     
-    // Fetch existing permissions for this role
+    // Fetch existing permissions for this role using tRPC utils
     try {
-      const existingPerms = await trpc.roles.getPermissions.query({ roleId: role.id });
-      setPermissionsState(prev => prev.map(p => {
-        const existing = existingPerms.find((e: any) => e.locationId === p.locationId);
-        if (existing) {
-          return { ...p, canRead: existing.canRead, canWrite: existing.canWrite };
-        }
-        return p;
-      }));
+      const existingPerms = await trpcUtils.roles.getPermissions.fetch({ roleId: role.id });
+      
+      if (existingPerms && existingPerms.length > 0) {
+        setPermissionsState(prev => prev.map(p => {
+          const existing = existingPerms.find((e: any) => e.locationId === p.locationId);
+          if (existing) {
+            return { ...p, canRead: existing.canRead, canWrite: existing.canWrite };
+          }
+          return p;
+        }));
+      }
     } catch (error) {
       console.error("Failed to fetch permissions", error);
     }
-    setIsPermissionsOpen(true);
   };
 
   const handlePermissionChange = (locationId: number, field: "canRead" | "canWrite", value: boolean) => {

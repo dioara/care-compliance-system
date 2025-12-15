@@ -969,3 +969,17 @@
 - server/db.ts: Updated getDashboardStats to accept optional locationId parameter
 - server/routers.ts: Updated dashboard.getStats to accept locationId input
 - Created TermsOfService.tsx page with comprehensive legal terms
+
+
+## BUG: Role Permissions Not Displaying After Save
+- [ ] Investigate why role permissions don't show after being set
+- [ ] Fix permissions persistence or display issue
+- [ ] Test role permissions workflow end-to-end
+
+
+## BUG FIX: Role Permissions Not Displaying (December 15, 2025)
+- [x] Investigated why permissions don't show when reopening permissions dialog
+- [x] Root cause: Direct trpc.roles.getPermissions.query() call was not working correctly
+- [x] Fixed by using trpcUtils.roles.getPermissions.fetch() instead
+- [x] Tested: Permissions now correctly display when opening dialog
+- [x] Tested: New permissions save and display correctly on re-open
