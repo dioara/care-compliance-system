@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
+import { IncidentAttachments, IncidentSignatures } from "@/components/IncidentAttachmentsSignatures";
 
 // Incident types with icons and descriptions
 const INCIDENT_TYPES = [
@@ -1402,6 +1403,18 @@ export default function Incidents() {
                       </p>
                     </CardContent>
                   </Card>
+
+                  {/* Attachments */}
+                  <IncidentAttachments 
+                    incidentId={selectedIncident.id} 
+                    incidentStatus={selectedIncident.status} 
+                  />
+
+                  {/* Digital Signatures */}
+                  <IncidentSignatures 
+                    incidentId={selectedIncident.id} 
+                    incidentStatus={selectedIncident.status} 
+                  />
 
                   {/* Quick Actions */}
                   <Card>

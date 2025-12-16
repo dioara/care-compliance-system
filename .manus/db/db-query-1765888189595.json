@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `incident_attachments` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `incidentId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `fileName` varchar(255) NOT NULL,\n  `fileType` varchar(100) NOT NULL,\n  `fileSize` int NOT NULL,\n  `fileUrl` text NOT NULL,\n  `fileKey` text NOT NULL,\n  `description` text,\n  `uploadedById` int NOT NULL,\n  `uploadedByName` varchar(255),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `incident_attachments_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `incident_attachments` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `incidentId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `fileName` varchar(255) NOT NULL,\n  `fileType` varchar(100) NOT NULL,\n  `fileSize` int NOT NULL,\n  `fileUrl` text NOT NULL,\n  `fileKey` text NOT NULL,\n  `description` text,\n  `uploadedById` int NOT NULL,\n  `uploadedByName` varchar(255),\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `incident_attachments_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 761
+}

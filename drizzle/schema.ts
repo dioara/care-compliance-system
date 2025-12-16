@@ -905,3 +905,56 @@ export type InsertTenantSubscription = typeof tenantSubscriptions.$inferInsert;
 export type SelectTenantSubscription = typeof tenantSubscriptions.$inferSelect;
 export type InsertUserLicense = typeof userLicenses.$inferInsert;
 export type SelectUserLicense = typeof userLicenses.$inferSelect;
+
+
+/**
+ * Incident Attachments - photos and documents attached to incidents
+ */
+export const incidentAttachments = mysqlTable("incident_attachments", {
+  id: int("id").autoincrement().primaryKey(),
+  incidentId: int("incidentId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  // File information
+  fileName: varchar("fileName", { length: 255 }).notNull(),
+  fileType: varchar("fileType", { length: 100 }).notNull(), // 'image/jpeg', 'image/png', 'application/pdf', etc.
+  fileSize: int("fileSize").notNull(), // in bytes
+  fileUrl: text("fileUrl").notNull(),
+  fileKey: text("fileKey").notNull(), // S3 key for deletion
+  // Metadata
+  description: text("description"),
+  uploadedById: int("uploadedById").notNull(),
+  uploadedByName: varchar("uploadedByName", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InsertIncidentAttachment = typeof incidentAttachments.$inferInsert;
+export type SelectIncidentAttachment = typeof incidentAttachments.$inferSelect;
+
+/**
+ * Incident Signatures - digital signatures for incident reports
+ */
+export const incidentSignatures = mysqlTable("incident_signatures", {
+  id: int("id").autoincrement().primaryKey(),
+  incidentId: int("incidentId").notNull(),
+  tenantId: int("tenantId").notNull(),
+  // Signature type
+  signatureType: mysqlEnum("signatureType", ["manager", "reviewer", "witness"]).notNull(),
+  // Signer information
+  signedById: int("signedById").notNull(),
+  signedByName: varchar("signedByName", { length: 255 }).notNull(),
+  signedByRole: varchar("signedByRole", { length: 100 }),
+  signedByEmail: varchar("signedByEmail", { length: 255 }),
+  // Signature data
+  signatureData: text("signatureData").notNull(), // Base64 encoded signature image
+  signatureHash: varchar("signatureHash", { length: 64 }), // SHA-256 hash for verification
+  // IP and timestamp for audit trail
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  userAgent: text("userAgent"),
+  signedAt: timestamp("signedAt").defaultNow().notNull(),
+  // Additional notes
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InsertIncidentSignature = typeof incidentSignatures.$inferInsert;
+export type SelectIncidentSignature = typeof incidentSignatures.$inferSelect;

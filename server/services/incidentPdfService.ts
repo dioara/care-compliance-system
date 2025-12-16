@@ -56,6 +56,24 @@ interface IncidentItem {
   closedAt?: Date | string | null;
   createdAt?: Date | string | null;
   updatedAt?: Date | string | null;
+  // Attachments and Signatures (for single incident reports)
+  attachments?: Array<{
+    id: number;
+    fileName: string;
+    fileType: string;
+    fileUrl: string;
+    description?: string | null;
+    createdAt: Date | string;
+  }>;
+  signatures?: Array<{
+    id: number;
+    signatureType: string;
+    signedByName: string;
+    signedByRole?: string | null;
+    signatureData: string;
+    signedAt: Date | string;
+    notes?: string | null;
+  }>;
 }
 
 interface IncidentReportData {
@@ -383,30 +401,117 @@ function renderIncidentReport(
     y = renderField(doc, "Last Updated", formatDate(incident.updatedAt), y, margin, contentWidth);
   }
 
+  // ===== SECTION: ATTACHMENTS =====
+  if (incident.attachments && incident.attachments.length > 0) {
+    y = checkPageBreak(doc, y, 80, dims);
+    y = renderSection(doc, "ATTACHMENTS", y, margin, contentWidth);
+    
+    for (const attachment of incident.attachments) {
+      y = checkPageBreak(doc, y, 40, dims);
+      doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+      doc.text(`• ${attachment.fileName}`, margin, y);
+      y += 15;
+      
+      if (attachment.description) {
+        doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
+        doc.text(`  ${attachment.description}`, margin + 10, y);
+        y += 12;
+      }
+      
+      doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
+      doc.text(`  Uploaded: ${formatDate(attachment.createdAt)}`, margin + 10, y);
+      y += 15;
+    }
+    y += 10;
+  }
+
   // ===== SIGNATURE SECTION =====
-  y = checkPageBreak(doc, y, 120, dims);
-  y += 30;
+  y = checkPageBreak(doc, y, 150, dims);
+  y += 20;
   
   doc.moveTo(margin, y).lineTo(pageWidth - margin, y).strokeColor(COLORS.border).stroke();
   y += 20;
 
   doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
-  doc.text("AUTHORISATION", margin, y);
+  doc.text("AUTHORISATION & SIGNATURES", margin, y);
   y += 20;
 
-  // Signature lines
-  const sigWidth = (contentWidth - 40) / 2;
-  
-  doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
-  doc.text("Manager/Supervisor Signature:", margin, y);
-  doc.moveTo(margin, y + 30).lineTo(margin + sigWidth, y + 30).stroke();
-  doc.text("Date:", margin, y + 40);
-  doc.moveTo(margin + 35, y + 40).lineTo(margin + sigWidth, y + 40).stroke();
+  // Check if we have actual digital signatures
+  if (incident.signatures && incident.signatures.length > 0) {
+    // Render actual digital signatures
+    for (const sig of incident.signatures) {
+      y = checkPageBreak(doc, y, 80, dims);
+      
+      const sigTypeLabel = sig.signatureType === 'manager' ? 'Manager/Supervisor' 
+        : sig.signatureType === 'reviewer' ? 'Reviewer' 
+        : 'Witness';
+      
+      doc.fontSize(9).font("Helvetica-Bold").fillColor(COLORS.text);
+      doc.text(`${sigTypeLabel}:`, margin, y);
+      y += 5;
+      
+      // Draw signature image if it's base64 data
+      if (sig.signatureData && sig.signatureData.startsWith('data:image')) {
+        try {
+          const base64Data = sig.signatureData.split(',')[1];
+          const sigBuffer = Buffer.from(base64Data, 'base64');
+          doc.image(sigBuffer, margin, y, { height: 40 });
+          y += 45;
+        } catch (e) {
+          // If image fails, show placeholder
+          doc.moveTo(margin, y + 20).lineTo(margin + 150, y + 20).stroke();
+          y += 25;
+        }
+      } else {
+        doc.moveTo(margin, y + 20).lineTo(margin + 150, y + 20).stroke();
+        y += 25;
+      }
+      
+      doc.fontSize(8).font("Helvetica").fillColor(COLORS.textLight);
+      doc.text(`${sig.signedByName}${sig.signedByRole ? ` (${sig.signedByRole})` : ''}`, margin, y);
+      y += 12;
+      doc.text(`Signed: ${formatDate(sig.signedAt)}`, margin, y);
+      y += 12;
+      
+      if (sig.notes) {
+        doc.fontSize(8).font("Helvetica-Oblique").fillColor(COLORS.textMuted);
+        doc.text(`"${sig.notes}"`, margin, y);
+        y += 12;
+      }
+      y += 10;
+    }
+    
+    // Show which signatures are still pending
+    const signedTypes = incident.signatures.map(s => s.signatureType);
+    const pendingTypes = ['manager', 'reviewer', 'witness'].filter(t => !signedTypes.includes(t));
+    
+    if (pendingTypes.length > 0) {
+      y = checkPageBreak(doc, y, 60, dims);
+      doc.fontSize(9).font("Helvetica").fillColor(COLORS.textMuted);
+      doc.text("Pending signatures:", margin, y);
+      y += 15;
+      
+      for (const type of pendingTypes) {
+        const label = type === 'manager' ? 'Manager/Supervisor' : type === 'reviewer' ? 'Reviewer' : 'Witness';
+        doc.text(`• ${label}`, margin + 10, y);
+        y += 12;
+      }
+    }
+  } else {
+    // No digital signatures - show blank signature lines
+    const sigWidth = (contentWidth - 40) / 2;
+    
+    doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
+    doc.text("Manager/Supervisor Signature:", margin, y);
+    doc.moveTo(margin, y + 30).lineTo(margin + sigWidth, y + 30).stroke();
+    doc.text("Date:", margin, y + 40);
+    doc.moveTo(margin + 35, y + 40).lineTo(margin + sigWidth, y + 40).stroke();
 
-  doc.text("Reviewed By:", margin + sigWidth + 40, y);
-  doc.moveTo(margin + sigWidth + 40, y + 30).lineTo(pageWidth - margin, y + 30).stroke();
-  doc.text("Date:", margin + sigWidth + 40, y + 40);
-  doc.moveTo(margin + sigWidth + 75, y + 40).lineTo(pageWidth - margin, y + 40).stroke();
+    doc.text("Reviewed By:", margin + sigWidth + 40, y);
+    doc.moveTo(margin + sigWidth + 40, y + 30).lineTo(pageWidth - margin, y + 30).stroke();
+    doc.text("Date:", margin + sigWidth + 40, y + 40);
+    doc.moveTo(margin + sigWidth + 75, y + 40).lineTo(pageWidth - margin, y + 40).stroke();
+  }
 }
 
 // Helper functions

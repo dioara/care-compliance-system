@@ -1420,6 +1420,10 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Incident not found" });
         }
         
+        // Fetch attachments and signatures for this incident
+        const attachments = await db.getIncidentAttachments(input.incidentId, ctx.user.tenantId);
+        const signatures = await db.getIncidentSignatures(input.incidentId, ctx.user.tenantId);
+        
         let locationName: string | undefined;
         if (incident.locationId) {
           const location = await db.getLocationById(incident.locationId);
@@ -1428,7 +1432,7 @@ export const appRouter = router({
         
         const { generateIncidentPDF } = await import("./services/incidentPdfService");
         const pdfBuffer = await generateIncidentPDF({
-          incidents: [incident],
+          incidents: [{ ...incident, attachments, signatures }],
           companyName: company.name,
           companyLogo: company.logoUrl || undefined,
           locationName,
@@ -1439,6 +1443,163 @@ export const appRouter = router({
         const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
         
         return { url, filename };
+      }),
+
+    // ============ Attachments ============
+    
+    // Get attachments for an incident
+    getAttachments: protectedProcedure
+      .input(z.object({ incidentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getIncidentAttachments(input.incidentId, ctx.user.tenantId);
+      }),
+
+    // Upload attachment to incident
+    uploadAttachment: protectedProcedure
+      .input(
+        z.object({
+          incidentId: z.number(),
+          fileName: z.string(),
+          fileType: z.string(),
+          fileSize: z.number(),
+          fileData: z.string(), // Base64 encoded file data
+          description: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Verify incident belongs to tenant
+        const incident = await db.getIncidentById(input.incidentId);
+        if (!incident || incident.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Incident not found" });
+        }
+        
+        // Decode base64 and upload to S3
+        const fileBuffer = Buffer.from(input.fileData, "base64");
+        const fileKey = `incidents/${ctx.user.tenantId}/${input.incidentId}/${Date.now()}-${input.fileName}`;
+        const { url } = await storagePut(fileKey, fileBuffer, input.fileType);
+        
+        // Save to database
+        const attachmentId = await db.createIncidentAttachment({
+          incidentId: input.incidentId,
+          tenantId: ctx.user.tenantId,
+          fileName: input.fileName,
+          fileType: input.fileType,
+          fileSize: input.fileSize,
+          fileUrl: url,
+          fileKey: fileKey,
+          description: input.description,
+          uploadedById: ctx.user.id,
+          uploadedByName: ctx.user.name || ctx.user.email,
+        });
+        
+        return { id: attachmentId, url };
+      }),
+
+    // Delete attachment
+    deleteAttachment: protectedProcedure
+      .input(z.object({ attachmentId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const deleted = await db.deleteIncidentAttachment(input.attachmentId, ctx.user.tenantId);
+        if (!deleted) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Attachment not found" });
+        }
+        
+        // Note: S3 file deletion could be added here using storageDelete if available
+        return { success: true };
+      }),
+
+    // ============ Digital Signatures ============
+    
+    // Get signatures for an incident
+    getSignatures: protectedProcedure
+      .input(z.object({ incidentId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) return [];
+        return db.getIncidentSignatures(input.incidentId, ctx.user.tenantId);
+      }),
+
+    // Add digital signature to incident
+    addSignature: protectedProcedure
+      .input(
+        z.object({
+          incidentId: z.number(),
+          signatureType: z.enum(["manager", "reviewer", "witness"]),
+          signatureData: z.string(), // Base64 encoded signature image
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Verify incident belongs to tenant
+        const incident = await db.getIncidentById(input.incidentId);
+        if (!incident || incident.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Incident not found" });
+        }
+        
+        // Check if signature of this type already exists
+        const existingSignature = await db.getIncidentSignatureByType(
+          input.incidentId,
+          ctx.user.tenantId,
+          input.signatureType
+        );
+        
+        if (existingSignature) {
+          throw new TRPCError({ 
+            code: "CONFLICT", 
+            message: `A ${input.signatureType} signature already exists for this incident` 
+          });
+        }
+        
+        // Create hash of signature data for verification
+        const crypto = await import("crypto");
+        const signatureHash = crypto
+          .createHash("sha256")
+          .update(input.signatureData)
+          .digest("hex");
+        
+        // Get user's role
+        const userRoles = await db.getUserRoles(ctx.user.id);
+        const primaryRole = userRoles[0]?.roleName || "User";
+        
+        // Save signature
+        const signatureId = await db.createIncidentSignature({
+          incidentId: input.incidentId,
+          tenantId: ctx.user.tenantId,
+          signatureType: input.signatureType,
+          signedById: ctx.user.id,
+          signedByName: ctx.user.name || ctx.user.email,
+          signedByRole: primaryRole,
+          signedByEmail: ctx.user.email,
+          signatureData: input.signatureData,
+          signatureHash: signatureHash,
+          notes: input.notes,
+        });
+        
+        return { id: signatureId, signatureHash };
+      }),
+
+    // Delete signature (only by the signer or admin)
+    deleteSignature: protectedProcedure
+      .input(z.object({ signatureId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Only admins can delete signatures for audit trail purposes
+        if (ctx.user.role !== "admin") {
+          throw new TRPCError({ 
+            code: "FORBIDDEN", 
+            message: "Only administrators can delete signatures" 
+          });
+        }
+        
+        await db.deleteIncidentSignature(input.signatureId, ctx.user.tenantId);
+        return { success: true };
       }),
   }),
 

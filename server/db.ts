@@ -27,6 +27,8 @@ import {
   auditEvidence,
   auditSchedules,
   incidents,
+  incidentAttachments,
+  incidentSignatures,
   assessmentTemplates,
   templateQuestions,
   aiAudits,
@@ -2553,4 +2555,146 @@ export async function createDefaultEmailTemplates(tenantId: number) {
   for (const template of defaultTemplates) {
     await db.insert(emailTemplates).values(template);
   }
+}
+
+
+// ============ Incident Attachments ============
+
+export async function createIncidentAttachment(data: {
+  incidentId: number;
+  tenantId: number;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileUrl: string;
+  fileKey: string;
+  description?: string;
+  uploadedById: number;
+  uploadedByName?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(incidentAttachments).values(data);
+  return result.insertId;
+}
+
+export async function getIncidentAttachments(incidentId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(incidentAttachments)
+    .where(
+      and(
+        eq(incidentAttachments.incidentId, incidentId),
+        eq(incidentAttachments.tenantId, tenantId)
+      )
+    )
+    .orderBy(desc(incidentAttachments.createdAt));
+}
+
+export async function deleteIncidentAttachment(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // First get the attachment to return the fileKey for S3 deletion
+  const [attachment] = await db
+    .select()
+    .from(incidentAttachments)
+    .where(
+      and(
+        eq(incidentAttachments.id, id),
+        eq(incidentAttachments.tenantId, tenantId)
+      )
+    );
+  
+  if (!attachment) return null;
+  
+  await db
+    .delete(incidentAttachments)
+    .where(
+      and(
+        eq(incidentAttachments.id, id),
+        eq(incidentAttachments.tenantId, tenantId)
+      )
+    );
+  
+  return attachment;
+}
+
+// ============ Incident Signatures ============
+
+export async function createIncidentSignature(data: {
+  incidentId: number;
+  tenantId: number;
+  signatureType: "manager" | "reviewer" | "witness";
+  signedById: number;
+  signedByName: string;
+  signedByRole?: string;
+  signedByEmail?: string;
+  signatureData: string;
+  signatureHash?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  notes?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const [result] = await db.insert(incidentSignatures).values(data);
+  return result.insertId;
+}
+
+export async function getIncidentSignatures(incidentId: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select()
+    .from(incidentSignatures)
+    .where(
+      and(
+        eq(incidentSignatures.incidentId, incidentId),
+        eq(incidentSignatures.tenantId, tenantId)
+      )
+    )
+    .orderBy(desc(incidentSignatures.signedAt));
+}
+
+export async function getIncidentSignatureByType(
+  incidentId: number, 
+  tenantId: number, 
+  signatureType: "manager" | "reviewer" | "witness"
+) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [signature] = await db
+    .select()
+    .from(incidentSignatures)
+    .where(
+      and(
+        eq(incidentSignatures.incidentId, incidentId),
+        eq(incidentSignatures.tenantId, tenantId),
+        eq(incidentSignatures.signatureType, signatureType)
+      )
+    );
+  
+  return signature;
+}
+
+export async function deleteIncidentSignature(id: number, tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .delete(incidentSignatures)
+    .where(
+      and(
+        eq(incidentSignatures.id, id),
+        eq(incidentSignatures.tenantId, tenantId)
+      )
+    );
 }

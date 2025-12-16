@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `incident_signatures` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `incidentId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `signatureType` enum('manager','reviewer','witness') NOT NULL,\n  `signedById` int NOT NULL,\n  `signedByName` varchar(255) NOT NULL,\n  `signedByRole` varchar(100),\n  `signedByEmail` varchar(255),\n  `signatureData` text NOT NULL,\n  `signatureHash` varchar(64),\n  `ipAddress` varchar(45),\n  `userAgent` text,\n  `signedAt` timestamp NOT NULL DEFAULT (now()),\n  `notes` text,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `incident_signatures_id` PRIMARY KEY(`id`)\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `incident_signatures` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `incidentId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `signatureType` enum('manager','reviewer','witness') NOT NULL,\n  `signedById` int NOT NULL,\n  `signedByName` varchar(255) NOT NULL,\n  `signedByRole` varchar(100),\n  `signedByEmail` varchar(255),\n  `signatureData` text NOT NULL,\n  `signatureHash` varchar(64),\n  `ipAddress` varchar(45),\n  `userAgent` text,\n  `signedAt` timestamp NOT NULL DEFAULT (now()),\n  `notes` text,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `incident_signatures_id` PRIMARY KEY(`id`)\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 322
+}
