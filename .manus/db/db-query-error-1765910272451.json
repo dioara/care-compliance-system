@@ -1,0 +1,8 @@
+{
+  "query": "SELECT \n  at.id,\n  at.name,\n  at.description,\n  COUNT(DISTINCT ats.id) as section_count,\n  COUNT(atq.id) as question_count\nFROM auditTemplates at\nLEFT JOIN auditTemplateSections ats ON at.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nGROUP BY at.id, at.name, at.description\nORDER BY question_count ASC, at.name",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  at.id,\n  at.name,\n  at.description,\n  COUNT(DISTINCT ats.id) as section_count,\n  COUNT(atq.id) as question_count\nFROM auditTemplates at\nLEFT JOIN auditTemplateSections ats ON at.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nGROUP BY at.id, at.name, at.description\nORDER BY question_count ASC, at.name",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'at.name' in 'group statement'"
+  ]
+}

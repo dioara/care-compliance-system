@@ -1,0 +1,66 @@
+{
+  "query": "SELECT id, auditTemplateQuestionId, response, responseValue, observations FROM auditResponses WHERE auditInstanceId = 270002 ORDER BY auditTemplateQuestionId",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, auditTemplateQuestionId, response, responseValue, observations FROM auditResponses WHERE auditInstanceId = 270002 ORDER BY auditTemplateQuestionId",
+  "rows": [
+    {
+      "id": "180005",
+      "auditTemplateQuestionId": "60058",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "180006",
+      "auditTemplateQuestionId": "60058",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "180007",
+      "auditTemplateQuestionId": "60059",
+      "response": "no",
+      "responseValue": "no",
+      "observations": "NULL"
+    },
+    {
+      "id": "180008",
+      "auditTemplateQuestionId": "60059",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "180009",
+      "auditTemplateQuestionId": "60060",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "180010",
+      "auditTemplateQuestionId": "60060",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "180011",
+      "auditTemplateQuestionId": "60061",
+      "response": "no",
+      "responseValue": "no",
+      "observations": "zalskalskas"
+    },
+    {
+      "id": "180012",
+      "auditTemplateQuestionId": "60061",
+      "response": "na",
+      "responseValue": "na",
+      "observations": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditTemplateQuestionId\tresponse\tresponseValue\tobservations\n180005\t60058\tyes\tyes\tNULL\n180006\t60058\t\tNULL\tNULL\n180007\t60059\tno\tno\tNULL\n180008\t60059\t\tNULL\tNULL\n180009\t60060\t\tNULL\tNULL\n180010\t60060\tyes\tyes\tNULL\n180011\t60061\tno\tno\tzalskalskas\n180012\t60061\tna\tna\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}

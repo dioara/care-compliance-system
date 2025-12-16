@@ -1570,3 +1570,33 @@
 - [ ] Add email notification for approaching due dates (3 days before)
 - [ ] Add email notification when actions are marked complete
 - [ ] Create email templates for each notification type
+
+
+## Audit Response Saving Bug Fix
+- [x] Fixed critical bug where audit responses were not saving correctly
+- [x] Fixed RadioGroup uncontrolled/controlled state warning
+- [x] Fixed double handleResponseChange call causing race condition
+- [x] Responses now save correctly to database and show in PDF exports
+
+## Audit Template Review & Completion
+- [ ] Review all 25 audit templates for completeness
+- [ ] Research UK care home audit standards for missing questions
+- [ ] Add missing questions to incomplete templates
+- [ ] Verify all templates have proper question types and sections
+
+## AI Audit Page 404 Error
+- [x] Investigate AI Audit page routing issue
+- [x] Fix 404 error on AI Audit page - Added /ai-audits route
+- [ ] Test AI Audit page functionality
+
+## Audit Calendar Implementation
+- [ ] Create Audit Calendar page with monthly view
+- [ ] Implement auto-suggest scheduling for next 12 months
+- [ ] Add email reminders 1 day before audits
+- [ ] Test calendar functionality
+
+## Email Notifications
+- [ ] Set up email notifications for audit reminders
+- [ ] Set up email notifications for action plan assignments
+- [ ] Set up email notifications 3 days before action plan due dates
+- [ ] Set up email notifications when actions are completed

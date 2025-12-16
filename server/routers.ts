@@ -853,7 +853,9 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
+        console.log('[saveResponse] Received input:', JSON.stringify(input, null, 2));
         const responseId = await db.saveAuditResponse(input);
+        console.log('[saveResponse] Saved with ID:', responseId);
         return { id: responseId };
       }),
 

@@ -1,0 +1,190 @@
+{
+  "query": "SELECT \n  at.id,\n  at.templateName,\n  COUNT(DISTINCT ats.id) as section_count,\n  COUNT(atq.id) as question_count\nFROM auditTemplates at\nLEFT JOIN auditTemplateSections ats ON at.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nGROUP BY at.id, at.templateName\nORDER BY question_count ASC, at.templateName\nLIMIT 30",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  at.id,\n  at.templateName,\n  COUNT(DISTINCT ats.id) as section_count,\n  COUNT(atq.id) as question_count\nFROM auditTemplates at\nLEFT JOIN auditTemplateSections ats ON at.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nGROUP BY at.id, at.templateName\nORDER BY question_count ASC, at.templateName\nLIMIT 30",
+  "rows": [
+    {
+      "id": "90012",
+      "templateName": "Recruitment and Induction Audit",
+      "section_count": "2",
+      "question_count": "10"
+    },
+    {
+      "id": "90022",
+      "templateName": "LOLER Equipment Testing Audit",
+      "section_count": "3",
+      "question_count": "11"
+    },
+    {
+      "id": "90002",
+      "templateName": "Bed Rails Safety Audit",
+      "section_count": "3",
+      "question_count": "12"
+    },
+    {
+      "id": "90011",
+      "templateName": "Staff Supervision and Appraisal Audit",
+      "section_count": "3",
+      "question_count": "12"
+    },
+    {
+      "id": "90014",
+      "templateName": "Environmental Risk Assessment Audit",
+      "section_count": "3",
+      "question_count": "13"
+    },
+    {
+      "id": "90013",
+      "templateName": "Security and Access Control Audit",
+      "section_count": "3",
+      "question_count": "13"
+    },
+    {
+      "id": "90004",
+      "templateName": "Specialist Equipment Maintenance Audit",
+      "section_count": "3",
+      "question_count": "13"
+    },
+    {
+      "id": "60006",
+      "templateName": "Dependency Tool and Staffing Levels Audit",
+      "section_count": "3",
+      "question_count": "14"
+    },
+    {
+      "id": "60010",
+      "templateName": "Resident Finances Audit",
+      "section_count": "3",
+      "question_count": "14"
+    },
+    {
+      "id": "90023",
+      "templateName": "Contingency Planning Audit",
+      "section_count": "4",
+      "question_count": "15"
+    },
+    {
+      "id": "90020",
+      "templateName": "Communication Audit",
+      "section_count": "4",
+      "question_count": "16"
+    },
+    {
+      "id": "90008",
+      "templateName": "Continence Management Audit",
+      "section_count": "4",
+      "question_count": "16"
+    },
+    {
+      "id": "60003",
+      "templateName": "Water Safety (Legionella) Audit",
+      "section_count": "3",
+      "question_count": "16"
+    },
+    {
+      "id": "90006",
+      "templateName": "Activities and Social Engagement Audit",
+      "section_count": "4",
+      "question_count": "17"
+    },
+    {
+      "id": "90016",
+      "templateName": "Complaints Management Audit",
+      "section_count": "4",
+      "question_count": "17"
+    },
+    {
+      "id": "90001",
+      "templateName": "Health and Safety Audit",
+      "section_count": "4",
+      "question_count": "17"
+    },
+    {
+      "id": "60009",
+      "templateName": "Restraint and Restrictive Practice Audit",
+      "section_count": "4",
+      "question_count": "17"
+    },
+    {
+      "id": "90010",
+      "templateName": "Safeguarding Audit",
+      "section_count": "4",
+      "question_count": "17"
+    },
+    {
+      "id": "60002",
+      "templateName": "First Aid Equipment Audit",
+      "section_count": "3",
+      "question_count": "18"
+    },
+    {
+      "id": "90009",
+      "templateName": "Training and Competency Audit",
+      "section_count": "4",
+      "question_count": "18"
+    },
+    {
+      "id": "60012",
+      "templateName": "Cleanliness and Housekeeping Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90024",
+      "templateName": "Data Protection and GDPR Audit",
+      "section_count": "5",
+      "question_count": "19"
+    },
+    {
+      "id": "90018",
+      "templateName": "Diabetes Care Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90005",
+      "templateName": "Dignity and Respect Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90007",
+      "templateName": "End-of-Life Care Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "60007",
+      "templateName": "Maintenance Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90017",
+      "templateName": "Mental Capacity Act and DoLS Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90003",
+      "templateName": "Moving and Handling Audit",
+      "section_count": "4",
+      "question_count": "19"
+    },
+    {
+      "id": "90015",
+      "templateName": "Quality Assurance and Governance Audit",
+      "section_count": "4",
+      "question_count": "20"
+    },
+    {
+      "id": "90021",
+      "templateName": "Nutrition and Hydration Audit",
+      "section_count": "4",
+      "question_count": "21"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttemplateName\tsection_count\tquestion_count\n90012\tRecruitment and Induction Audit\t2\t10\n90022\tLOLER Equipment Testing Audit\t3\t11\n90002\tBed Rails Safety Audit\t3\t12\n90011\tStaff Supervision and Appraisal Audit\t3\t12\n90014\tEnvironmental Risk Assessment Audit\t3\t13\n90013\tSecurity and Access Control Audit\t3\t13\n90004\tSpecialist Equipment Maintenance Audit\t3\t13\n60006\tDependency Tool and Staffing Levels Audit\t3\t14\n60010\tResident Finances Audit\t3\t14\n90023\tContingency Planning Audit\t4\t15\n90020\tCommunication Audit\t4\t16\n90008\tContinence Management Audit\t4\t16\n60003\tWater Safety (Legionella) Audit\t3\t16\n90006\tActivities and Social Engagement Audit\t4\t17\n90016\tComplaints Management Audit\t4\t17\n90001\tHealth and Safety Audit\t4\t17\n60009\tRestraint and Restrictive Practice Audit\t4\t17\n90010\tSafeguarding Audit\t4\t17\n60002\tFirst Aid Equipment Audit\t3\t18\n90009\tTraining and Competency Audit\t4\t18\n60012\tCleanliness and Housekeeping Audit\t4\t19\n90024\tData Protection and GDPR Audit\t5\t19\n90018\tDiabetes Care Audit\t4\t19\n90005\tDignity and Respect Audit\t4\t19\n90007\tEnd-of-Life Care Audit\t4\t19\n60007\tMaintenance Audit\t4\t19\n90017\tMental Capacity Act and DoLS Audit\t4\t19\n90003\tMoving and Handling Audit\t4\t19\n90015\tQuality Assurance and Governance Audit\t4\t20\n90021\tNutrition and Hydration Audit\t4\t21\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

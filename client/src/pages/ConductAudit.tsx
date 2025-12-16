@@ -187,10 +187,33 @@ export default function ConductAudit() {
         return (
           <div className="space-y-3">
             <RadioGroup
-              value={currentResponse.response || ""}
+              value={currentResponse.response || undefined}
               onValueChange={(value) => {
-                handleResponseChange(questionId, "response", value);
-                handleResponseChange(questionId, "isCompliant", value === "yes");
+                // Update both response and isCompliant at once
+                const currentResponseData = responses[questionId] || {};
+                const updatedResponseData = {
+                  ...currentResponseData,
+                  response: value,
+                  isCompliant: value === "yes",
+                };
+                
+                setResponses((prev) => ({
+                  ...prev,
+                  [questionId]: updatedResponseData,
+                }));
+
+                // Auto-save after 1 second delay
+                setIsSaving(true);
+                setTimeout(() => {
+                  saveResponseMutation.mutate({
+                    auditInstanceId: auditId,
+                    auditTemplateQuestionId: questionId,
+                    response: updatedResponseData.response || "",
+                    observations: updatedResponseData.observations,
+                    isCompliant: updatedResponseData.isCompliant,
+                    responseValue: updatedResponseData.response || undefined,
+                  });
+                }, 1000);
               }}
             >
               <div className="flex items-center space-x-2">

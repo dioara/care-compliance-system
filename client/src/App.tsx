@@ -178,6 +178,12 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      <Route path="/ai-audits">
+        <DashboardLayout>
+          <AIAudits />
+        </DashboardLayout>
+      </Route>
+      
       <Route path="/audits">
         <DashboardLayout>
           <Audits />
