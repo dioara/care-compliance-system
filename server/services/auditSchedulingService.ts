@@ -49,6 +49,7 @@ interface AuditType {
   id: number;
   auditName: string;
   recommendedFrequency: string;
+  targetType?: 'general' | 'staff' | 'serviceUser';
 }
 
 interface ExistingAudit {
@@ -203,6 +204,7 @@ export function generateAuditSchedule(
 
 /**
  * Create audit instances from accepted suggestions
+ * For staff/serviceUser specific audits, creates one instance per person
  */
 export interface CreateScheduledAuditsInput {
   tenantId: number;
@@ -212,17 +214,49 @@ export interface CreateScheduledAuditsInput {
   suggestions: Array<{
     auditTypeId: number;
     suggestedDate: Date;
+    targetType?: 'general' | 'staff' | 'serviceUser';
   }>;
+  staffMembers?: Array<{ id: number; name: string }>;
+  serviceUsers?: Array<{ id: number; name: string }>;
 }
 
 export function prepareAuditInstancesForCreation(input: CreateScheduledAuditsInput) {
-  return input.suggestions.map(suggestion => ({
-    tenantId: input.tenantId,
-    locationId: input.locationId,
-    auditTypeId: suggestion.auditTypeId,
-    auditDate: suggestion.suggestedDate,
-    auditorId: input.auditorId,
-    auditorName: input.auditorName,
-    status: 'scheduled' as const,
-  }));
+  const instances: any[] = [];
+
+  input.suggestions.forEach(suggestion => {
+    const baseInstance = {
+      tenantId: input.tenantId,
+      locationId: input.locationId,
+      auditTypeId: suggestion.auditTypeId,
+      auditDate: suggestion.suggestedDate,
+      auditorId: input.auditorId,
+      auditorName: input.auditorName,
+      status: 'scheduled' as const,
+    };
+
+    // For staff-specific audits, create one instance per staff member
+    if (suggestion.targetType === 'staff' && input.staffMembers && input.staffMembers.length > 0) {
+      input.staffMembers.forEach(staff => {
+        instances.push({
+          ...baseInstance,
+          staffMemberId: staff.id,
+        });
+      });
+    }
+    // For service-user-specific audits, create one instance per service user
+    else if (suggestion.targetType === 'serviceUser' && input.serviceUsers && input.serviceUsers.length > 0) {
+      input.serviceUsers.forEach(user => {
+        instances.push({
+          ...baseInstance,
+          serviceUserId: user.id,
+        });
+      });
+    }
+    // For general audits, create one instance
+    else {
+      instances.push(baseInstance);
+    }
+  });
+
+  return instances;
 }

@@ -23,6 +23,7 @@ import Audits from "./pages/Audits";
 import Analytics from "@/pages/Analytics";
 import ComplianceReports from "@/pages/ComplianceReports";
 import AuditSchedules from "@/pages/AuditSchedules";
+import AuditHistory from "@/pages/AuditHistory";
 import ConductAudit from "./pages/ConductAudit";
 import AuditResults from "./pages/AuditResults";
 import AIAudits from "./pages/AIAudits";
@@ -173,9 +174,14 @@ function Router() {
         </DashboardLayout>
       </Route>
       
-      <Route path="/audits/:id">
+      <Route path="/audit-history">
         <DashboardLayout>
-          <ConductAudit />
+          <AuditHistory />
+        </DashboardLayout>
+      </Route>
+
+      <Route path="/audit-schedules">        <DashboardLayout>
+          <Incidents />
         </DashboardLayout>
       </Route>
       

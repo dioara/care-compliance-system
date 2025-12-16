@@ -1750,3 +1750,21 @@
 - [x] Check if data is being fetched correctly
 - [x] Fix field mapping (firstName/lastName vs name)
 - [x] Test dropdown population
+
+
+## Enhanced Auto-Scheduling for Staff and Service Users
+- [x] Identify audit types that are staff-specific (need individual audit per staff member)
+- [x] Identify audit types that are service-user-specific (need individual audit per service user)
+- [x] Update auto-scheduling logic to create multiple audit instances
+- [x] Create one audit per staff member for staff-specific audits
+- [x] Create one audit per service user for service-user-specific audits
+- [x] Test auto-scheduling with staff and service user specific audits
+
+## Audit History Improvements
+- [x] Add pagination to audit history (show 20 audits per page)
+- [x] Add filter by audit status (all, in_progress, completed, archived)
+- [x] Add filter by audit type dropdown
+- [x] Add date range filter (from/to dates)
+- [x] Add search functionality (search by audit name, location, auditor)
+- [x] Update backend to support pagination and filtering
+- [x] Test pagination, filters, and search functionality

@@ -73,6 +73,7 @@ const menuItems = [
   { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
   { icon: ClipboardList, label: "Audits", path: "/audits", description: "Compliance audits" },
   { icon: Calendar, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track" },
+  { icon: FileText, label: "Audit History", path: "/audit-history", description: "View all audits" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
   { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
   { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },

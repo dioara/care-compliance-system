@@ -739,13 +739,18 @@ export const appRouter = router({
       return db.getAllAuditTypes();
     }),
 
-    // List audits with optional date range filter
+    // List audits with pagination, filters, and search
     list: protectedProcedure
       .input(
         z.object({
           locationId: z.number().optional(),
           startDate: z.string().optional(),
           endDate: z.string().optional(),
+          status: z.enum(['all', 'in_progress', 'completed', 'archived']).optional(),
+          auditTypeId: z.number().optional(),
+          search: z.string().optional(),
+          page: z.number().default(1),
+          pageSize: z.number().default(20),
         })
       )
       .query(async ({ ctx, input }) => {
@@ -759,6 +764,16 @@ export const appRouter = router({
           audits = audits.filter(a => a.locationId === input.locationId);
         }
         
+        // Filter by status if provided
+        if (input.status && input.status !== 'all') {
+          audits = audits.filter(a => a.status === input.status);
+        }
+        
+        // Filter by audit type if provided
+        if (input.auditTypeId) {
+          audits = audits.filter(a => a.auditTypeId === input.auditTypeId);
+        }
+        
         // Filter by date range if provided
         if (input.startDate && input.endDate) {
           const start = new Date(input.startDate);
@@ -769,7 +784,35 @@ export const appRouter = router({
           });
         }
         
-        return audits;
+        // Search filter (search in audit name, location name, auditor name)
+        if (input.search) {
+          const searchLower = input.search.toLowerCase();
+          audits = audits.filter(a => {
+            const auditName = a.auditName?.toLowerCase() || '';
+            const locationName = a.locationName?.toLowerCase() || '';
+            const auditorName = a.auditorName?.toLowerCase() || '';
+            return auditName.includes(searchLower) || 
+                   locationName.includes(searchLower) || 
+                   auditorName.includes(searchLower);
+          });
+        }
+        
+        // Calculate pagination
+        const totalCount = audits.length;
+        const totalPages = Math.ceil(totalCount / input.pageSize);
+        const startIndex = (input.page - 1) * input.pageSize;
+        const endIndex = startIndex + input.pageSize;
+        const paginatedAudits = audits.slice(startIndex, endIndex);
+        
+        return {
+          audits: paginatedAudits,
+          pagination: {
+            page: input.page,
+            pageSize: input.pageSize,
+            totalCount,
+            totalPages,
+          },
+        };
       }),
 
     // Get audit type by ID
@@ -1311,6 +1354,10 @@ export const appRouter = router({
         
         const createdAudits = [];
         
+        // Get staff and service users for this location
+        const staffMembers = await db.getStaffMembersByLocation(input.locationId);
+        const serviceUsers = await db.getServiceUsersByLocation(input.locationId);
+        
         // Create audit instances for each accepted suggestion
         for (const suggestion of input.suggestions) {
           console.log('[acceptScheduleSuggestions] Processing suggestion:', suggestion);
@@ -1321,21 +1368,63 @@ export const appRouter = router({
             continue;
           }
           
+          // Get audit type to check targetType
+          const auditType = await db.getAuditTypeById(suggestion.auditTypeId);
+          if (!auditType) continue;
+          
           try {
-            const instanceId = await db.createAuditInstance({
-              tenantId: ctx.user.tenantId,
-              locationId: input.locationId,
-              auditTypeId: suggestion.auditTypeId,
-              auditTemplateId: template.id,
-              auditDate: new Date(suggestion.suggestedDate),
-              auditorId: ctx.user.id,
-              auditorName: ctx.user.name || undefined,
-              auditorRole: ctx.user.role || undefined,
-              status: 'in_progress',
-            });
-            console.log('[acceptScheduleSuggestions] Created audit instance:', instanceId);
-            
-            createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId });
+            // For staff-specific audits, create one instance per staff member
+            if (auditType.targetType === 'staff' && staffMembers.length > 0) {
+              for (const staff of staffMembers) {
+                const instanceId = await db.createAuditInstance({
+                  tenantId: ctx.user.tenantId,
+                  locationId: input.locationId,
+                  auditTypeId: suggestion.auditTypeId,
+                  auditTemplateId: template.id,
+                  auditDate: new Date(suggestion.suggestedDate),
+                  auditorId: ctx.user.id,
+                  auditorName: ctx.user.name || undefined,
+                  auditorRole: ctx.user.role || undefined,
+                  status: 'in_progress',
+                  staffMemberId: staff.id,
+                });
+                createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId, staffMemberId: staff.id });
+              }
+            }
+            // For service-user-specific audits, create one instance per service user
+            else if (auditType.targetType === 'serviceUser' && serviceUsers.length > 0) {
+              for (const user of serviceUsers) {
+                const instanceId = await db.createAuditInstance({
+                  tenantId: ctx.user.tenantId,
+                  locationId: input.locationId,
+                  auditTypeId: suggestion.auditTypeId,
+                  auditTemplateId: template.id,
+                  auditDate: new Date(suggestion.suggestedDate),
+                  auditorId: ctx.user.id,
+                  auditorName: ctx.user.name || undefined,
+                  auditorRole: ctx.user.role || undefined,
+                  status: 'in_progress',
+                  serviceUserId: user.id,
+                });
+                createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId, serviceUserId: user.id });
+              }
+            }
+            // For general audits, create one instance
+            else {
+              const instanceId = await db.createAuditInstance({
+                tenantId: ctx.user.tenantId,
+                locationId: input.locationId,
+                auditTypeId: suggestion.auditTypeId,
+                auditTemplateId: template.id,
+                auditDate: new Date(suggestion.suggestedDate),
+                auditorId: ctx.user.id,
+                auditorName: ctx.user.name || undefined,
+                auditorRole: ctx.user.role || undefined,
+                status: 'in_progress',
+              });
+              createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId });
+            }
+            console.log('[acceptScheduleSuggestions] Created audit instances for auditTypeId:', suggestion.auditTypeId);
           } catch (error) {
             console.error('[acceptScheduleSuggestions] Failed to create audit instance:', error);
             throw error;
