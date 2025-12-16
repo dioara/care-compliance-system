@@ -1,36 +1,61 @@
 import ExcelJS from 'exceljs';
 
+interface IncidentData {
+  id: number;
+  incidentNumber: string | null;
+  incidentDate: Date | string | null;
+  incidentTime: string | null;
+  locationId: number | null;
+  severity: string | null;
+  status: string | null;
+  affectedPersonType: string | null;
+  affectedPersonName: string | null;
+  staffInvolved: string | null;
+  description: string | null;
+  immediateActions: string | null;
+  witnessStatements: string | null;
+  reportedToCqc: boolean | null;
+  reportedToCouncil: boolean | null;
+  reportedToPolice: boolean | null;
+  familyNotified: boolean | null;
+  reportedToIco: boolean | null;
+  requiresInvestigation: boolean | null;
+  investigationNotes: string | null;
+  actionsRequired: string | null;
+  lessonsLearned: string | null;
+  reportedBy: string | null;
+  createdAt: Date | string | null;
+  updatedAt: Date | string | null;
+  incidentType: string | null;
+  locationDescription: string | null;
+}
+
 interface IncidentExportData {
-  incidents: {
-    id: number;
-    incidentRef: string;
-    incidentDate: Date | null;
-    incidentTime: string | null;
-    location: string | null;
-    severity: string | null;
-    status: string | null;
-    personType: string | null;
-    personName: string | null;
-    staffInvolved: string | null;
-    description: string | null;
-    immediateActions: string | null;
-    witnesses: string | null;
-    notifiedCqc: boolean | null;
-    notifiedCouncil: boolean | null;
-    notifiedPolice: boolean | null;
-    notifiedFamily: boolean | null;
-    notifiedIco: boolean | null;
-    investigationRequired: boolean | null;
-    investigationNotes: string | null;
-    actionsRequired: string | null;
-    lessonsLearned: string | null;
-    reportedBy: string | null;
-    createdAt: Date | null;
-    updatedAt: Date | null;
-  }[];
+  incidents: IncidentData[];
   companyName: string;
   locationName?: string;
   generatedBy: string;
+  locations?: { id: number; name: string }[];
+}
+
+// Helper to strip HTML tags
+function stripHtml(html: string | null): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, '').trim();
+}
+
+// Helper to format date
+function formatDate(date: Date | string | null): string {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleDateString('en-GB');
+}
+
+// Helper to format datetime
+function formatDateTime(date: Date | string | null): string {
+  if (!date) return '';
+  const d = new Date(date);
+  return d.toLocaleString('en-GB');
 }
 
 export async function generateIncidentExcel(data: IncidentExportData): Promise<Buffer> {
@@ -45,29 +70,30 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
     }
   });
 
-  // Define columns
+  // Define columns - matching actual database field names
   worksheet.columns = [
-    { header: 'Reference', key: 'incidentRef', width: 20 },
+    { header: 'Reference', key: 'incidentNumber', width: 25 },
     { header: 'Date', key: 'incidentDate', width: 15 },
     { header: 'Time', key: 'incidentTime', width: 10 },
-    { header: 'Location', key: 'location', width: 20 },
+    { header: 'Type', key: 'incidentType', width: 20 },
+    { header: 'Location', key: 'locationDescription', width: 25 },
     { header: 'Severity', key: 'severity', width: 12 },
     { header: 'Status', key: 'status', width: 15 },
-    { header: 'Person Type', key: 'personType', width: 15 },
-    { header: 'Person Name', key: 'personName', width: 20 },
-    { header: 'Staff Involved', key: 'staffInvolved', width: 20 },
-    { header: 'Description', key: 'description', width: 40 },
-    { header: 'Immediate Actions', key: 'immediateActions', width: 30 },
-    { header: 'Witnesses', key: 'witnesses', width: 20 },
-    { header: 'CQC Notified', key: 'notifiedCqc', width: 12 },
-    { header: 'Council Notified', key: 'notifiedCouncil', width: 15 },
-    { header: 'Police Notified', key: 'notifiedPolice', width: 14 },
-    { header: 'Family Notified', key: 'notifiedFamily', width: 14 },
-    { header: 'ICO Notified', key: 'notifiedIco', width: 12 },
-    { header: 'Investigation Required', key: 'investigationRequired', width: 20 },
-    { header: 'Investigation Notes', key: 'investigationNotes', width: 30 },
-    { header: 'Actions Required', key: 'actionsRequired', width: 30 },
-    { header: 'Lessons Learned', key: 'lessonsLearned', width: 30 },
+    { header: 'Person Type', key: 'affectedPersonType', width: 15 },
+    { header: 'Person Name', key: 'affectedPersonName', width: 20 },
+    { header: 'Staff Involved', key: 'staffInvolved', width: 25 },
+    { header: 'Description', key: 'description', width: 50 },
+    { header: 'Immediate Actions', key: 'immediateActions', width: 40 },
+    { header: 'Witnesses', key: 'witnessStatements', width: 30 },
+    { header: 'CQC Notified', key: 'reportedToCqc', width: 12 },
+    { header: 'Council Notified', key: 'reportedToCouncil', width: 15 },
+    { header: 'Police Notified', key: 'reportedToPolice', width: 14 },
+    { header: 'Family Notified', key: 'familyNotified', width: 14 },
+    { header: 'ICO Notified', key: 'reportedToIco', width: 12 },
+    { header: 'Investigation Required', key: 'requiresInvestigation', width: 20 },
+    { header: 'Investigation Notes', key: 'investigationNotes', width: 40 },
+    { header: 'Actions Required', key: 'actionsRequired', width: 40 },
+    { header: 'Lessons Learned', key: 'lessonsLearned', width: 40 },
     { header: 'Reported By', key: 'reportedBy', width: 20 },
     { header: 'Created', key: 'createdAt', width: 18 },
     { header: 'Last Updated', key: 'updatedAt', width: 18 },
@@ -84,33 +110,34 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
   headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
   headerRow.height = 25;
 
-  // Add data rows
+  // Add data rows - map database fields correctly
   data.incidents.forEach((incident) => {
     const row = worksheet.addRow({
-      incidentRef: incident.incidentRef,
-      incidentDate: incident.incidentDate ? new Date(incident.incidentDate).toLocaleDateString('en-GB') : '',
+      incidentNumber: incident.incidentNumber || '',
+      incidentDate: formatDate(incident.incidentDate),
       incidentTime: incident.incidentTime || '',
-      location: incident.location || '',
+      incidentType: incident.incidentType || '',
+      locationDescription: incident.locationDescription || '',
       severity: incident.severity || '',
       status: incident.status || '',
-      personType: incident.personType || '',
-      personName: incident.personName || '',
-      staffInvolved: incident.staffInvolved || '',
-      description: incident.description || '',
-      immediateActions: incident.immediateActions || '',
-      witnesses: incident.witnesses || '',
-      notifiedCqc: incident.notifiedCqc ? 'Yes' : 'No',
-      notifiedCouncil: incident.notifiedCouncil ? 'Yes' : 'No',
-      notifiedPolice: incident.notifiedPolice ? 'Yes' : 'No',
-      notifiedFamily: incident.notifiedFamily ? 'Yes' : 'No',
-      notifiedIco: incident.notifiedIco ? 'Yes' : 'No',
-      investigationRequired: incident.investigationRequired ? 'Yes' : 'No',
-      investigationNotes: incident.investigationNotes || '',
-      actionsRequired: incident.actionsRequired || '',
-      lessonsLearned: incident.lessonsLearned || '',
+      affectedPersonType: incident.affectedPersonType || '',
+      affectedPersonName: incident.affectedPersonName || '',
+      staffInvolved: stripHtml(incident.staffInvolved),
+      description: stripHtml(incident.description),
+      immediateActions: stripHtml(incident.immediateActions),
+      witnessStatements: stripHtml(incident.witnessStatements),
+      reportedToCqc: incident.reportedToCqc ? 'Yes' : 'No',
+      reportedToCouncil: incident.reportedToCouncil ? 'Yes' : 'No',
+      reportedToPolice: incident.reportedToPolice ? 'Yes' : 'No',
+      familyNotified: incident.familyNotified ? 'Yes' : 'No',
+      reportedToIco: incident.reportedToIco ? 'Yes' : 'No',
+      requiresInvestigation: incident.requiresInvestigation ? 'Yes' : 'No',
+      investigationNotes: stripHtml(incident.investigationNotes),
+      actionsRequired: stripHtml(incident.actionsRequired),
+      lessonsLearned: stripHtml(incident.lessonsLearned),
       reportedBy: incident.reportedBy || '',
-      createdAt: incident.createdAt ? new Date(incident.createdAt).toLocaleString('en-GB') : '',
-      updatedAt: incident.updatedAt ? new Date(incident.updatedAt).toLocaleString('en-GB') : '',
+      createdAt: formatDateTime(incident.createdAt),
+      updatedAt: formatDateTime(incident.updatedAt),
     });
 
     // Apply severity-based coloring
@@ -130,45 +157,28 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
 
     // Apply status-based coloring
     const statusCell = row.getCell('status');
-    if (incident.status === 'closed') {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF22C55E' } };
-      statusCell.font = { color: { argb: 'FFFFFFFF' } };
+    if (incident.status === 'open') {
+      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
     } else if (incident.status === 'under_investigation') {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF97316' } };
-      statusCell.font = { color: { argb: 'FFFFFFFF' } };
-    } else if (incident.status === 'open') {
-      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } };
-      statusCell.font = { color: { argb: 'FFFFFFFF' } };
+      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+    } else if (incident.status === 'closed') {
+      statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
     }
 
     // Wrap text for long content columns
-    row.getCell('description').alignment = { wrapText: true };
-    row.getCell('immediateActions').alignment = { wrapText: true };
-    row.getCell('investigationNotes').alignment = { wrapText: true };
-    row.getCell('actionsRequired').alignment = { wrapText: true };
-    row.getCell('lessonsLearned').alignment = { wrapText: true };
+    row.getCell('description').alignment = { wrapText: true, vertical: 'top' };
+    row.getCell('immediateActions').alignment = { wrapText: true, vertical: 'top' };
+    row.getCell('witnessStatements').alignment = { wrapText: true, vertical: 'top' };
+    row.getCell('investigationNotes').alignment = { wrapText: true, vertical: 'top' };
+    row.getCell('actionsRequired').alignment = { wrapText: true, vertical: 'top' };
+    row.getCell('lessonsLearned').alignment = { wrapText: true, vertical: 'top' };
   });
-
-  // Add borders to all cells
-  worksheet.eachRow((row, rowNumber) => {
-    row.eachCell((cell) => {
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
-      };
-    });
-  });
-
-  // Freeze header row
-  worksheet.views = [{ state: 'frozen', ySplit: 1 }];
 
   // Add summary sheet
   const summarySheet = workbook.addWorksheet('Summary');
   summarySheet.columns = [
-    { header: 'Metric', key: 'metric', width: 30 },
-    { header: 'Value', key: 'value', width: 20 },
+    { header: 'Metric', key: 'metric', width: 25 },
+    { header: 'Value', key: 'value', width: 30 },
   ];
 
   // Style summary header
@@ -183,40 +193,30 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
   // Calculate summary stats
   const totalIncidents = data.incidents.length;
   const openIncidents = data.incidents.filter(i => i.status === 'open').length;
-  const closedIncidents = data.incidents.filter(i => i.status === 'closed').length;
   const underInvestigation = data.incidents.filter(i => i.status === 'under_investigation').length;
-  const criticalIncidents = data.incidents.filter(i => i.severity === 'critical').length;
-  const highIncidents = data.incidents.filter(i => i.severity === 'high').length;
-  const mediumIncidents = data.incidents.filter(i => i.severity === 'medium').length;
-  const lowIncidents = data.incidents.filter(i => i.severity === 'low').length;
+  const closedIncidents = data.incidents.filter(i => i.status === 'closed').length;
+  const criticalSeverity = data.incidents.filter(i => i.severity === 'critical').length;
+  const highSeverity = data.incidents.filter(i => i.severity === 'high').length;
+  const mediumSeverity = data.incidents.filter(i => i.severity === 'medium').length;
+  const lowSeverity = data.incidents.filter(i => i.severity === 'low').length;
 
-  summarySheet.addRows([
-    { metric: 'Total Incidents', value: totalIncidents },
-    { metric: 'Open Incidents', value: openIncidents },
-    { metric: 'Under Investigation', value: underInvestigation },
-    { metric: 'Closed Incidents', value: closedIncidents },
-    { metric: '', value: '' },
-    { metric: 'Critical Severity', value: criticalIncidents },
-    { metric: 'High Severity', value: highIncidents },
-    { metric: 'Medium Severity', value: mediumIncidents },
-    { metric: 'Low Severity', value: lowIncidents },
-    { metric: '', value: '' },
-    { metric: 'Report Generated', value: new Date().toLocaleString('en-GB') },
-    { metric: 'Generated By', value: data.generatedBy },
-    { metric: 'Company', value: data.companyName },
-  ]);
-
-  // Add borders to summary
-  summarySheet.eachRow((row) => {
-    row.eachCell((cell) => {
-      cell.border = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-        bottom: { style: 'thin' },
-        right: { style: 'thin' }
-      };
-    });
-  });
+  // Add summary data
+  summarySheet.addRow({ metric: 'Total Incidents', value: totalIncidents });
+  summarySheet.addRow({ metric: 'Open Incidents', value: openIncidents });
+  summarySheet.addRow({ metric: 'Under Investigation', value: underInvestigation });
+  summarySheet.addRow({ metric: 'Closed Incidents', value: closedIncidents });
+  summarySheet.addRow({ metric: '', value: '' });
+  summarySheet.addRow({ metric: 'Critical Severity', value: criticalSeverity });
+  summarySheet.addRow({ metric: 'High Severity', value: highSeverity });
+  summarySheet.addRow({ metric: 'Medium Severity', value: mediumSeverity });
+  summarySheet.addRow({ metric: 'Low Severity', value: lowSeverity });
+  summarySheet.addRow({ metric: '', value: '' });
+  summarySheet.addRow({ metric: 'Report Generated', value: formatDateTime(new Date()) });
+  summarySheet.addRow({ metric: 'Generated By', value: data.generatedBy });
+  summarySheet.addRow({ metric: 'Company', value: data.companyName });
+  if (data.locationName) {
+    summarySheet.addRow({ metric: 'Location Filter', value: data.locationName });
+  }
 
   // Generate buffer
   const buffer = await workbook.xlsx.writeBuffer();

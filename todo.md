@@ -1474,3 +1474,7 @@
 ## GitHub Push & Excel Export (Dec 16, 2025)
 - [x] Push all PDF fixes to GitHub
 - [x] Add incident export to Excel feature for bulk data export
+
+
+## Excel Export Fix (Dec 16, 2025)
+- [x] Fix missing fields in Excel export - mapped all database field names correctly
