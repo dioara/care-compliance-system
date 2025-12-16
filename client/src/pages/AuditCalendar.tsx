@@ -19,6 +19,7 @@ export default function AuditCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showAutoScheduleDialog, setShowAutoScheduleDialog] = useState(false);
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
+  const [scheduleStartDate, setScheduleStartDate] = useState<Date>(new Date());
 
   // Fetch audits for the current month
   const monthStart = startOfMonth(currentMonth);
@@ -116,13 +117,31 @@ export default function AuditCalendar() {
     setShowAutoScheduleDialog(true);
     setSelectedSuggestions(new Set());
     
+    // Generate suggestions with the selected start date
     try {
       await generateSuggestions.mutateAsync({
         locationId: activeLocationId,
+        startDate: scheduleStartDate.toISOString(),
       });
     } catch (error) {
       toast.error('Failed to generate schedule suggestions');
       setShowAutoScheduleDialog(false);
+    }
+  };
+  
+  const handleRegenerateSuggestions = async () => {
+    if (!activeLocationId) return;
+    
+    setSelectedSuggestions(new Set());
+    
+    try {
+      await generateSuggestions.mutateAsync({
+        locationId: activeLocationId,
+        startDate: scheduleStartDate.toISOString(),
+      });
+      toast.success('Suggestions regenerated');
+    } catch (error) {
+      toast.error('Failed to regenerate suggestions');
     }
   };
 
@@ -269,7 +288,8 @@ export default function AuditCalendar() {
               return (
                 <div
                   key={date.toISOString()}
-                  className={`min-h-[120px] border rounded-lg p-2 transition-colors ${
+                  onClick={() => setSelectedDate(date)}
+                  className={`min-h-[120px] border rounded-lg p-2 transition-colors cursor-pointer ${
                     isCurrentDay ? 'border-primary border-2 bg-primary/5' : 'hover:bg-muted/50'
                   } ${isPast ? 'bg-muted/20' : 'bg-background'}`}
                 >
@@ -351,6 +371,26 @@ export default function AuditCalendar() {
             </DialogDescription>
           </DialogHeader>
           
+          {/* Start Date Picker */}
+          <div className="mb-4 flex gap-3 items-end">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">When should the first audit begin?</label>
+              <input
+                type="date"
+                value={format(scheduleStartDate, 'yyyy-MM-dd')}
+                onChange={(e) => setScheduleStartDate(new Date(e.target.value))}
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+            <Button 
+              onClick={handleRegenerateSuggestions} 
+              disabled={generateSuggestions.isPending}
+              variant="outline"
+            >
+              {generateSuggestions.isPending ? 'Generating...' : 'Generate'}
+            </Button>
+          </div>
+          
           {generateSuggestions.isPending && (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -411,6 +451,64 @@ export default function AuditCalendar() {
             >
               {acceptSuggestions.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Accept Selected ({selectedSuggestions.size})
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Date Click Dialog - View/Create Audits */}
+      <Dialog open={!!selectedDate} onOpenChange={(open) => !open && setSelectedDate(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedDate && format(selectedDate, 'MMMM d, yyyy')}
+            </DialogTitle>
+            <DialogDescription>
+              View existing audits or schedule a new audit for this date
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedDate && (
+            <div className="space-y-4">
+              {/* Existing Audits */}
+              {getAuditsForDate(selectedDate).length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-2">Scheduled Audits</h3>
+                  <div className="space-y-2">
+                    {getAuditsForDate(selectedDate).map((audit) => (
+                      <div key={audit.id} className="p-3 border rounded-lg flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{audit.auditName}</p>
+                          <p className="text-sm text-muted-foreground">
+                            Status: <span className="capitalize">{audit.status}</span>
+                          </p>
+                        </div>
+                        <Button size="sm" variant="outline" asChild>
+                          <a href={`/audits/${audit.id}`}>View</a>
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Schedule New Audit */}
+              <div>
+                <h3 className="font-semibold mb-2">Schedule New Audit</h3>
+                <Button onClick={() => {
+                  // Navigate to schedule audit with pre-filled date
+                  window.location.href = `/audits?date=${format(selectedDate, 'yyyy-MM-dd')}`;
+                }}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Schedule Audit for This Date
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedDate(null)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>

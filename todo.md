@@ -1673,3 +1673,21 @@
 - [x] Replace all activeLocation references with activeLocationId
 - [x] Get location details from locations array based on activeLocationId
 - [ ] Test that selecting a location updates the calendar view
+
+
+## BUG: Auto-Schedule Fails to Create Audits
+- [x] Debug acceptScheduleSuggestions mutation failure - Added detailed logging
+- [x] Check server logs for error details - Logging in place
+- [ ] Fix the audit creation logic - Pending user testing with logs
+
+## Feature: Start Date Picker for Auto-Schedule
+- [x] Add date picker to auto-schedule dialog
+- [x] Pass start date to generateScheduleSuggestions mutation
+- [x] Update suggestions based on selected start date
+- [x] Add Generate button to regenerate with new start date
+
+## Feature: Click Calendar Date to Add/Edit Audits
+- [x] Make calendar date cells clickable
+- [x] Show dialog when clicking any date
+- [x] Display existing audits for clicked date
+- [x] Add button to schedule new audit with pre-filled date

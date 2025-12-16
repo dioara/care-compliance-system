@@ -1258,6 +1258,7 @@ export const appRouter = router({
       .input(
         z.object({
           locationId: z.number(),
+          startDate: z.string().optional(), // ISO date string, defaults to today
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -1272,6 +1273,7 @@ export const appRouter = router({
         
         // Generate suggestions
         const { generateAuditSchedule } = await import("./services/auditSchedulingService");
+        const startDate = input.startDate ? new Date(input.startDate) : new Date();
         const suggestions = generateAuditSchedule(
           auditTypes,
           locationAudits.map(a => ({
@@ -1279,7 +1281,8 @@ export const appRouter = router({
             auditTypeId: a.auditTypeId,
             scheduledDate: a.scheduledDate,
           })),
-          input.locationId
+          input.locationId,
+          startDate
         );
         
         return suggestions;
@@ -1301,26 +1304,40 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
         
+        console.log('[acceptScheduleSuggestions] Input:', JSON.stringify(input, null, 2));
+        console.log('[acceptScheduleSuggestions] User:', ctx.user.email, 'TenantId:', ctx.user.tenantId);
+        
         const createdAudits = [];
         
         // Create audit instances for each accepted suggestion
         for (const suggestion of input.suggestions) {
+          console.log('[acceptScheduleSuggestions] Processing suggestion:', suggestion);
           const template = await db.getAuditTemplateByAuditTypeId(suggestion.auditTypeId);
-          if (!template) continue;
+          console.log('[acceptScheduleSuggestions] Template found:', template ? template.id : 'null');
+          if (!template) {
+            console.log('[acceptScheduleSuggestions] No template found for auditTypeId:', suggestion.auditTypeId);
+            continue;
+          }
           
-          const instanceId = await db.createAuditInstance({
-            tenantId: ctx.user.tenantId,
-            locationId: input.locationId,
-            auditTypeId: suggestion.auditTypeId,
-            auditTemplateId: template.id,
-            auditDate: new Date(suggestion.suggestedDate),
-            auditorId: ctx.user.id,
-            auditorName: ctx.user.name || undefined,
-            auditorRole: ctx.user.role || undefined,
-            status: 'scheduled',
-          });
-          
-          createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId });
+          try {
+            const instanceId = await db.createAuditInstance({
+              tenantId: ctx.user.tenantId,
+              locationId: input.locationId,
+              auditTypeId: suggestion.auditTypeId,
+              auditTemplateId: template.id,
+              auditDate: new Date(suggestion.suggestedDate),
+              auditorId: ctx.user.id,
+              auditorName: ctx.user.name || undefined,
+              auditorRole: ctx.user.role || undefined,
+              status: 'scheduled',
+            });
+            console.log('[acceptScheduleSuggestions] Created audit instance:', instanceId);
+            
+            createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId });
+          } catch (error) {
+            console.error('[acceptScheduleSuggestions] Failed to create audit instance:', error);
+            throw error;
+          }
         }
         
         return { success: true, count: createdAudits.length, audits: createdAudits };
