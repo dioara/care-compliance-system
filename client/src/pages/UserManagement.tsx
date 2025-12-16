@@ -306,6 +306,11 @@ export default function UserManagement() {
             </CardTitle>
             <CardDescription>
               {users.length} user{users.length !== 1 ? "s" : ""} in your organisation
+              {subscription?.licenseStats && (
+                <span className="ml-2 text-xs">
+                  • <span className="text-green-600 font-medium">{subscription.licenseStats.unassigned}</span> of {subscription.licenseStats.total} licenses available
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>

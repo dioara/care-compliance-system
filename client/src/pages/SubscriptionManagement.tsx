@@ -29,6 +29,7 @@ export default function SubscriptionManagement() {
   const [newLicenseCount, setNewLicenseCount] = useState(1);
 
   const { data: subscription, refetch: refetchSubscription } = trpc.subscription.getSubscription.useQuery();
+  const { data: trialStatus } = trpc.subscription.getTrialStatus.useQuery();
   const { data: pricing } = trpc.subscription.getPricing.useQuery({ quantity, billingInterval });
   const { data: licenses, refetch: refetchLicenses } = trpc.subscription.getLicenses.useQuery();
   const { data: usersWithoutLicenses } = trpc.subscription.getUsersWithoutLicenses.useQuery();
@@ -174,6 +175,53 @@ export default function SubscriptionManagement() {
           </Button>
         )}
       </div>
+
+      {/* Trial Status Banner */}
+      {trialStatus?.isTrial && (
+        <Card className={trialStatus.isExpired ? "border-red-300 bg-red-50" : trialStatus.daysRemaining <= 7 ? "border-amber-300 bg-amber-50" : "border-violet-300 bg-violet-50"}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className={`h-5 w-5 ${trialStatus.isExpired ? "text-red-600" : trialStatus.daysRemaining <= 7 ? "text-amber-600" : "text-violet-600"}`} />
+                  {trialStatus.isExpired ? "Trial Expired" : "Free Trial"}
+                </CardTitle>
+                <CardDescription>
+                  {trialStatus.isExpired 
+                    ? "Your free trial has ended. Subscribe to continue using all features."
+                    : `${trialStatus.daysRemaining} days remaining • ${trialStatus.trialLicensesCount} trial licenses included`}
+                </CardDescription>
+              </div>
+              <Badge className={trialStatus.isExpired ? "bg-red-100 text-red-800" : trialStatus.daysRemaining <= 7 ? "bg-amber-100 text-amber-800" : "bg-violet-100 text-violet-800"}>
+                {trialStatus.isExpired ? "Expired" : `${trialStatus.daysRemaining} days left`}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="p-4 bg-white/80 rounded-lg">
+                <p className="text-sm text-muted-foreground">Trial Licenses</p>
+                <p className="text-2xl font-bold">{trialStatus.trialLicensesCount}</p>
+              </div>
+              <div className="p-4 bg-white/80 rounded-lg">
+                <p className="text-sm text-muted-foreground">Trial Ends</p>
+                <p className="text-lg font-semibold">{trialStatus.trialEndsAt ? new Date(trialStatus.trialEndsAt).toLocaleDateString() : "N/A"}</p>
+              </div>
+              <div className="p-4 bg-white/80 rounded-lg">
+                <p className="text-sm text-muted-foreground">Status</p>
+                <p className={`text-lg font-semibold ${trialStatus.isExpired ? "text-red-600" : "text-green-600"}`}>
+                  {trialStatus.isExpired ? "Expired" : "Active"}
+                </p>
+              </div>
+            </div>
+            {!trialStatus.isExpired && (
+              <p className="mt-4 text-sm text-muted-foreground">
+                Upgrade anytime to keep your licenses and unlock additional features. Your data will be preserved.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Current Subscription Status */}
       {subscription?.status === "active" ? (

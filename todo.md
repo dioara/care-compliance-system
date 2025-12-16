@@ -1389,3 +1389,11 @@
 - [x] Show trial status in Subscription Management page
 - [x] Handle trial expiration (restrict access if no payment method)
 - [x] Fix yearly pricing calculation in Stripe checkout
+
+
+## BUG FIX: Subscription & License UI Issues
+- [x] Fix yearly pricing showing £59.50 instead of £714 (£59.50 × 12)
+- [x] Remove duplicate notification icon in header
+- [x] Add "Assign License" button in User Management with available license count
+- [x] Show trial status and details in Subscription Management screen
+- [x] Show license count (X of Y available) in User Management

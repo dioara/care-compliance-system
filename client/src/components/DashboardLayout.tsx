@@ -356,8 +356,10 @@ function DashboardLayoutContent({
                 </div>
               </div>
             </div>
-            <NotificationCenter />
-            <LocationSwitcher />
+            <div className="flex items-center gap-2">
+              <NotificationCenter />
+              <LocationSwitcher />
+            </div>
           </div>
         )}
         {!isMobile && (
