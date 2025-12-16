@@ -1465,3 +1465,7 @@
 - [x] Fix page numbering creating extra pages - added lineBreak: false to prevent new content
 
 - [x] Fix page numbers still appearing on separate pages - removed page numbering feature to prevent extra pages
+
+
+## PDF Signature Title Fix (Dec 16, 2025)
+- [x] Fix title before signature section not showing properly - increased spacing between label and signature image

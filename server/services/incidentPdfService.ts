@@ -442,7 +442,7 @@ function renderIncidentReport(
       
       doc.fontSize(9).font("Helvetica-Bold").fillColor(COLORS.text);
       doc.text(`${sigTypeLabel}:`, margin, y);
-      y += 5;
+      y += 15; // More space between label and signature
       
       // Draw signature image if it's base64 data
       if (sig.signatureData && sig.signatureData.startsWith('data:image')) {

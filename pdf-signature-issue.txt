@@ -1,0 +1,12 @@
+PDF Signature Section Issue Analysis:
+
+Page 2 shows:
+- "AUTHORISATION & SIGNATURES" section header
+- "Manager/Supervisor:" label appears to have a strikethrough or is cut off
+- The signature image appears below it
+- "Admin User (User)" and "Signed: 16 December 2025" show correctly
+- "Pending signatures:" with bullet points for Reviewer and Witness
+
+Issue: The "Manager/Supervisor:" label text appears to have formatting issues - looks like it has a strikethrough or is being cut off/overlapped by something.
+
+Fix needed: Check the signature type label rendering in the PDF service.
