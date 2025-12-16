@@ -1364,15 +1364,24 @@ export const appRouter = router({
         const audits = await db.getAuditInstancesByLocation(input.locationId);
         const count = audits.length;
 
+        // Get database instance
+        const database = await db.getDb();
+        if (!database) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Database not available',
+          });
+        }
+
         // Delete all audits
-        await ctx.db.delete(auditInstances)
+        await database.delete(auditInstances)
           .where(and(
             eq(auditInstances.tenantId, ctx.user.tenantId),
             eq(auditInstances.locationId, input.locationId)
           ));
 
         // Log to audit trail
-        await ctx.db.insert(auditTrail).values({
+        await database.insert(auditTrail).values({
           tenantId: ctx.user.tenantId,
           userId: ctx.user.id,
           entityType: 'audit_bulk_delete',

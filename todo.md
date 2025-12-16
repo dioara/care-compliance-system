@@ -1731,3 +1731,9 @@
 - [x] Include audit details (type, location, date) in email
 - [x] Test email reminder functionality
 - [x] Add logging for sent reminders
+
+
+## BUG: Delete All Audits Error
+- [x] Fix "Cannot read properties of undefined (reading 'delete')" error in deleteAll mutation
+- [x] Ensure ctx.db is properly passed to the mutation
+- [x] Test delete all functionality
