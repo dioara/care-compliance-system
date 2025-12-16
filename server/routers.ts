@@ -1486,11 +1486,16 @@ export const appRouter = router({
         }
         
         const { generateIncidentExcel } = await import("./services/incidentExcelService");
+        
+        // Ensure incidents is an array and handle null values
+        const safeIncidents = Array.isArray(incidents) ? incidents : [];
+        console.log('[Excel] Generating report for', safeIncidents.length, 'incidents');
+        
         const excelBuffer = await generateIncidentExcel({
-          incidents,
-          companyName: company.name,
+          incidents: safeIncidents,
+          companyName: company.name || 'Unknown Company',
           locationName,
-          generatedBy: ctx.user.name || ctx.user.email,
+          generatedBy: ctx.user.name || ctx.user.email || 'Unknown',
         });
         
         const filename = `incident-report-${Date.now()}.xlsx`;

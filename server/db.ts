@@ -1505,6 +1505,7 @@ export async function getIncidentsByTenant(tenantId: number, limit = 100) {
   const db = await getDb();
   if (!db) return [];
   
+  // Use correct column names from schema
   const results = await db
     .select({
       id: incidents.id,
@@ -1528,13 +1529,13 @@ export async function getIncidentsByTenant(tenantId: number, limit = 100) {
       reportedToCqc: incidents.reportedToCqc,
       reportedToCouncil: incidents.reportedToCouncil,
       reportedToPolice: incidents.reportedToPolice,
-      familyNotified: incidents.familyNotified,
+      reportedToFamily: incidents.reportedToFamily,
       reportedToIco: incidents.reportedToIco,
-      requiresInvestigation: incidents.requiresInvestigation,
+      investigationRequired: incidents.investigationRequired,
       investigationNotes: incidents.investigationNotes,
-      actionsRequired: incidents.actionsRequired,
+      actionRequired: incidents.actionRequired,
       lessonsLearned: incidents.lessonsLearned,
-      reportedBy: incidents.reportedBy,
+      reportedByName: incidents.reportedByName,
       createdAt: incidents.createdAt,
       updatedAt: incidents.updatedAt,
       serviceUserName: serviceUsers.name,

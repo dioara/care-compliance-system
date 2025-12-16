@@ -1480,3 +1480,11 @@
 - [x] Fix missing fields in Excel export - mapped all database field names correctly
 
 - [x] Fix service user name not showing in Person Name column - joined serviceUsers table in getIncidentsByTenant
+
+
+## Excel Export Error Fix (Dec 16, 2025)
+- [x] Fix "Cannot convert undefined or null to object" error - root cause was mismatched column names between db.ts query and database schema
+- [x] Updated getIncidentsByTenant to use correct schema column names (reportedToFamily, investigationRequired, actionRequired, reportedByName)
+- [x] Updated incidentExcelService.ts interface and data mapping to match corrected field names
+- [x] Added null safety checks throughout Excel generation
+- [x] Excel export now working successfully with service user names populated

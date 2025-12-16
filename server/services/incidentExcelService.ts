@@ -17,13 +17,13 @@ interface IncidentData {
   reportedToCqc: boolean | null;
   reportedToCouncil: boolean | null;
   reportedToPolice: boolean | null;
-  familyNotified: boolean | null;
+  reportedToFamily: boolean | null;
   reportedToIco: boolean | null;
-  requiresInvestigation: boolean | null;
+  investigationRequired: boolean | null;
   investigationNotes: string | null;
-  actionsRequired: string | null;
+  actionRequired: string | null;
   lessonsLearned: string | null;
-  reportedBy: string | null;
+  reportedByName: string | null;
   createdAt: Date | string | null;
   updatedAt: Date | string | null;
   incidentType: string | null;
@@ -111,32 +111,34 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
   headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
   headerRow.height = 25;
 
-  // Add data rows - map database fields correctly
+  // Add data rows - map database fields correctly with null safety
   data.incidents.forEach((incident) => {
+    if (!incident) return; // Skip null/undefined incidents
+    
     const row = worksheet.addRow({
-      incidentNumber: incident.incidentNumber || '',
+      incidentNumber: incident.incidentNumber ?? '',
       incidentDate: formatDate(incident.incidentDate),
-      incidentTime: incident.incidentTime || '',
-      incidentType: incident.incidentType || '',
-      locationDescription: incident.locationDescription || '',
-      severity: incident.severity || '',
-      status: incident.status || '',
-      affectedPersonType: incident.affectedPersonType || '',
-      affectedPersonName: incident.serviceUserName || incident.affectedPersonName || '',
+      incidentTime: incident.incidentTime ?? '',
+      incidentType: incident.incidentType ?? '',
+      locationDescription: incident.locationDescription ?? '',
+      severity: incident.severity ?? '',
+      status: incident.status ?? '',
+      affectedPersonType: incident.affectedPersonType ?? '',
+      affectedPersonName: incident.serviceUserName ?? incident.affectedPersonName ?? '',
       staffInvolved: stripHtml(incident.staffInvolved),
       description: stripHtml(incident.description),
       immediateActions: stripHtml(incident.immediateActions),
       witnessStatements: stripHtml(incident.witnessStatements),
-      reportedToCqc: incident.reportedToCqc ? 'Yes' : 'No',
-      reportedToCouncil: incident.reportedToCouncil ? 'Yes' : 'No',
-      reportedToPolice: incident.reportedToPolice ? 'Yes' : 'No',
-      familyNotified: incident.familyNotified ? 'Yes' : 'No',
-      reportedToIco: incident.reportedToIco ? 'Yes' : 'No',
-      requiresInvestigation: incident.requiresInvestigation ? 'Yes' : 'No',
+      reportedToCqc: incident.reportedToCqc === true ? 'Yes' : 'No',
+      reportedToCouncil: incident.reportedToCouncil === true ? 'Yes' : 'No',
+      reportedToPolice: incident.reportedToPolice === true ? 'Yes' : 'No',
+      familyNotified: incident.reportedToFamily === true ? 'Yes' : 'No',
+      reportedToIco: incident.reportedToIco === true ? 'Yes' : 'No',
+      requiresInvestigation: incident.investigationRequired === true ? 'Yes' : 'No',
       investigationNotes: stripHtml(incident.investigationNotes),
-      actionsRequired: stripHtml(incident.actionsRequired),
+      actionsRequired: stripHtml(incident.actionRequired),
       lessonsLearned: stripHtml(incident.lessonsLearned),
-      reportedBy: incident.reportedBy || '',
+      reportedBy: incident.reportedByName ?? '',
       createdAt: formatDateTime(incident.createdAt),
       updatedAt: formatDateTime(incident.updatedAt),
     });
