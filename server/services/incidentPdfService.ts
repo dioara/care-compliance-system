@@ -164,11 +164,11 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
       for (let i = range.start; i < range.start + range.count; i++) {
         doc.switchToPage(i);
         
-        // Footer with page numbers
+        // Footer with page numbers - use lineBreak: false to prevent creating new content
         const footerY = pageHeight - 35;
         doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
-        doc.text(`${data.companyName} - Confidential`, margin, footerY, { width: contentWidth / 2 });
-        doc.text(`Page ${i + 1} of ${totalPages}`, pageWidth - margin - 100, footerY, { width: 100, align: "right" });
+        doc.text(`${data.companyName} - Confidential`, margin, footerY, { lineBreak: false });
+        doc.text(`Page ${i + 1} of ${totalPages}`, pageWidth - margin - 100, footerY, { width: 100, align: "right", lineBreak: false });
       }
 
       doc.end();

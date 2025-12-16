@@ -1459,3 +1459,7 @@
 
 ## PDF Header Fix (Dec 16, 2025)
 - [x] Fix logo and business name overlapping in PDF header - added fixed width to logo and proper spacing
+
+
+## PDF Page Numbering Fix (Dec 16, 2025)
+- [x] Fix page numbering creating extra pages - added lineBreak: false to prevent new content
