@@ -1,4 +1,4 @@
-import { eq, and, inArray, sql, desc } from "drizzle-orm";
+import { eq, and, inArray, sql, desc, gte, lte, ne } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import bcrypt from "bcryptjs";
 import {
@@ -2756,6 +2756,44 @@ export async function deleteIncidentSignature(id: number, tenantId: number) {
       and(
         eq(incidentSignatures.id, id),
         eq(incidentSignatures.tenantId, tenantId)
+      )
+    );
+}
+
+// ============================================
+// Audit Reminders
+// ============================================
+
+export async function getAllAuditInstancesForReminders(startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db
+    .select({
+      id: auditInstances.id,
+      tenantId: auditInstances.tenantId,
+      auditTypeId: auditInstances.auditTypeId,
+      auditTypeName: auditTypes.auditName,
+      locationId: auditInstances.locationId,
+      locationName: locations.name,
+      auditDate: auditInstances.auditDate,
+      status: auditInstances.status,
+      auditorId: auditInstances.auditorId,
+      auditorName: users.name,
+      auditorEmail: users.email,
+      tenantName: tenants.name,
+    })
+    .from(auditInstances)
+    .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+    .leftJoin(locations, eq(auditInstances.locationId, locations.id))
+    .leftJoin(users, eq(auditInstances.auditorId, users.id))
+    .leftJoin(tenants, eq(auditInstances.tenantId, tenants.id))
+    .where(
+      and(
+        gte(auditInstances.auditDate, startDate),
+        lte(auditInstances.auditDate, endDate),
+        ne(auditInstances.status, 'completed'),
+        ne(auditInstances.status, 'archived')
       )
     );
 }

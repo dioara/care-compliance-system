@@ -1425,6 +1425,19 @@ export const appRouter = router({
         return { success: true, auditId: instanceId };
       }),
 
+    // Send audit reminders manually (admin only)
+    sendReminders: adminProcedure
+      .mutation(async () => {
+        const { sendDailyAuditReminders } = await import('./services/auditReminderService');
+        const result = await sendDailyAuditReminders();
+        return {
+          success: true,
+          sent: result.sent,
+          failed: result.failed,
+          message: `Sent ${result.sent} reminders, ${result.failed} failed`,
+        };
+      }),
+
   }),
 
   // Incidents

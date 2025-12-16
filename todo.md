@@ -1721,3 +1721,13 @@
 - [ ] Wire "Schedule Audit for This Date" button in date dialog to open form with pre-filled date
 - [ ] Create backend mutation to create new audit instance
 - [ ] Test audit creation and calendar refresh
+
+
+## Email Reminder System for Audits
+- [x] Create email reminder service to check for audits due tomorrow
+- [x] Create daily cron job scheduler (runs at 9 AM daily)
+- [x] Build email template for audit reminders
+- [x] Send reminders to assigned auditors
+- [x] Include audit details (type, location, date) in email
+- [x] Test email reminder functionality
+- [x] Add logging for sent reminders
