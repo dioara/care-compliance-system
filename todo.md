@@ -1408,3 +1408,10 @@
 - [x] Remove duplicate subscription key in routers.ts
 - [x] Test all features in browser after server restart
 - [x] Save checkpoint with all fixes
+
+
+## Bug Fixes (Dec 16, 2025 - Session 2)
+- [x] Fix duplicate trial banner showing twice (removed from Dashboard, kept in DashboardLayout)
+- [x] Add license assign/unassign buttons to User Management Actions column (already implemented)
+- [x] Show license availability counter in User Management header (already implemented)
+- [x] Create 5 trial licenses for tenant 30002 in database

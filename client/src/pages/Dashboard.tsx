@@ -27,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -39,8 +38,6 @@ export default function Dashboard() {
     activeLocationId ? { locationId: activeLocationId } : undefined
   );
   
-  // Trial status
-  const { data: trialStatus } = trpc.subscription.getTrialStatus.useQuery();
   
   // Compliance alerts
   const { data: alertStatus } = trpc.notifications.getAlertStatus.useQuery(
@@ -101,43 +98,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Trial Status Banner */}
-      {trialStatus?.isTrial && !trialStatus.isExpired && (
-        <Alert className="border-violet-200 bg-gradient-to-r from-violet-50 to-indigo-50 shadow-sm">
-          <Clock className="h-5 w-5 text-violet-600" />
-          <AlertTitle className="flex items-center justify-between text-violet-800">
-            <span className="font-semibold">Free Trial Active</span>
-            <Badge className={trialStatus.daysRemaining <= 7 ? "bg-amber-100 text-amber-800" : "bg-violet-100 text-violet-800"}>
-              {trialStatus.daysRemaining} days remaining
-            </Badge>
-          </AlertTitle>
-          <AlertDescription className="text-violet-700">
-            You have {trialStatus.trialLicensesCount} trial licenses included. 
-            <Button variant="link" className="text-violet-700 font-medium p-0 h-auto" onClick={() => setLocation('/admin/subscription')}>
-              Upgrade now
-            </Button>
-            {" "}to continue using all features after your trial ends.
-          </AlertDescription>
-        </Alert>
-      )}
-      
-      {/* Trial Expired Banner */}
-      {trialStatus?.isExpired && (
-        <Alert variant="destructive" className="border-red-200 bg-red-50 shadow-sm">
-          <AlertTriangle className="h-5 w-5" />
-          <AlertTitle className="flex items-center justify-between text-red-800">
-            <span className="font-semibold">Trial Expired</span>
-          </AlertTitle>
-          <AlertDescription className="text-red-700">
-            Your free trial has ended. 
-            <Button variant="link" className="text-red-700 font-medium p-0 h-auto" onClick={() => setLocation('/admin/subscription')}>
-              Subscribe now
-            </Button>
-            {" "}to continue using all features.
-          </AlertDescription>
-        </Alert>
-      )}
-      
       {/* Compliance Alert Banner */}
       {alertStatus?.hasAlerts && !alertDismissed && (
         <Alert variant="destructive" className="relative border-red-200 bg-red-50 shadow-sm">

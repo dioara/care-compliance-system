@@ -1,0 +1,15 @@
+{
+  "query": "SELECT COUNT(*) as total, SUM(CASE WHEN userId IS NOT NULL THEN 1 ELSE 0 END) as assigned, SUM(CASE WHEN userId IS NULL THEN 1 ELSE 0 END) as unassigned FROM userLicenses WHERE tenantId = 30002 AND isActive = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT COUNT(*) as total, SUM(CASE WHEN userId IS NOT NULL THEN 1 ELSE 0 END) as assigned, SUM(CASE WHEN userId IS NULL THEN 1 ELSE 0 END) as unassigned FROM userLicenses WHERE tenantId = 30002 AND isActive = 1;",
+  "rows": [
+    {
+      "total": "0",
+      "assigned": "NULL",
+      "unassigned": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\tassigned\tunassigned\n0\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 64
+}
