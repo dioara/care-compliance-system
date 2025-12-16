@@ -1650,3 +1650,9 @@
 - [x] Add location dropdown to Dashboard page header (not just global context)
 - [x] Add location dropdown to Audit Calendar page header (not just global context)
 - [x] Ensure dropdowns update the page data when changed
+
+
+## BUG: Audit Calendar Location Dropdown Not Visible
+- [x] Debug why location dropdown is not showing on Audit Calendar page - Blocking early return prevented rendering
+- [x] Fix the "No Location Selected" blocking message - Moved dropdown outside conditional
+- [x] Ensure dropdown renders and functions properly - Now shows dropdown even when no location selected

@@ -167,25 +167,14 @@ export default function AuditCalendar() {
     }
   };
 
-  if (!activeLocation) {
-    return (
-      <div className="container py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>No Location Selected</CardTitle>
-            <CardDescription>Please select a location to view the audit calendar.</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Audit Calendar</h1>
-          <p className="text-muted-foreground">Schedule and track audits</p>
+          <p className="text-muted-foreground">
+            {activeLocation ? `Schedule and track audits for ${activeLocation.locationName}` : 'Select a location to view audits'}
+          </p>
         </div>
         <div className="flex gap-2">
           <Select
@@ -193,7 +182,7 @@ export default function AuditCalendar() {
             onValueChange={(value) => {
               const location = (locations || []).find(l => l.id.toString() === value);
               if (location) {
-                // Update location context here if needed
+                // Location context should update automatically via LocationContext
               }
             }}
           >
@@ -208,19 +197,32 @@ export default function AuditCalendar() {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="outline" size="sm" onClick={handleAutoSchedule}>
-            <Sparkles className="h-4 w-4 mr-2" />
-            Auto-Schedule
-          </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Schedule Audit
-          </Button>
+          {activeLocation && (
+            <>
+              <Button variant="outline" size="sm" onClick={handleAutoSchedule}>
+                <Sparkles className="h-4 w-4 mr-2" />
+                Auto-Schedule
+              </Button>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Schedule Audit
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Calendar Navigation */}
-      <Card className="mb-6">
+      {!activeLocation ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>No Location Selected</CardTitle>
+            <CardDescription>Please select a location from the dropdown above to view the audit calendar.</CardDescription>
+          </CardHeader>
+        </Card>
+      ) : (
+        <>
+          {/* Calendar Navigation */}
+          <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -436,6 +438,8 @@ export default function AuditCalendar() {
           </div>
         </CardContent>
       </Card>
+        </>
+      )}
     </div>
   );
 }
