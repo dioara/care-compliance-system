@@ -1768,3 +1768,14 @@
 - [x] Add search functionality (search by audit name, location, auditor)
 - [x] Update backend to support pagination and filtering
 - [x] Test pagination, filters, and search functionality
+
+
+## BUG: Audit Calendar Error
+- [x] Fix "audits.reduce is not a function" error in AuditCalendar
+- [x] Update AuditCalendar to handle new API response structure { audits, pagination }
+- [x] Test Audit Calendar loads without errors
+
+## BUG: Audit History Navigation Not Visible
+- [x] Check if Audit History link appears in sidebar navigation
+- [x] Verify route is properly configured
+- [x] Test navigation to /audit-history works

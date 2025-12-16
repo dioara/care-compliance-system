@@ -36,13 +36,16 @@ export default function AuditCalendar() {
   // Get current location details
   const activeLocation = locations?.find(l => l.id === activeLocationId);
 
-  const { data: audits, isLoading } = trpc.audits.list.useQuery({
+  const { data: auditData, isLoading } = trpc.audits.list.useQuery({
     locationId: activeLocationId || 0,
     startDate: monthStart.toISOString(),
     endDate: monthEnd.toISOString(),
   }, {
     enabled: !!activeLocationId,
   });
+  
+  // Extract audits array from the response
+  const audits = auditData?.audits || [];
 
   const { data: auditTypes } = trpc.audits.listTypes.useQuery();
 
