@@ -1545,6 +1545,17 @@
 - [x] Check server logs for debugging output - added comprehensive logging
 - [x] Fix response value mapping in PDF generation - use responseValue || response || null
 - [ ] Test with actual audit data to verify fix - needs user to export PDF and check logs
+- [ ] Examine audit 210002 PDF vs app to see exact mismatch
+- [ ] Check server logs for debugging output
+- [ ] Fix the root cause of response value mismatch
+- [ ] Examine console logs from audit 240001 export
+- [ ] Fix audit responses not saving correctly
+- [ ] Verify save and export both work correctly
+
+## Missing Audit Templates (Dec 16, 2025)
+- [ ] Research complete audit templates for care homes
+- [ ] Add missing audit template questions
+- [ ] Ensure all required audit types are available
 
 ## Audit Calendar Feature (Dec 16, 2025)
 - [ ] Create Audit Calendar page with calendar view

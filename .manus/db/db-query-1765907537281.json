@@ -1,0 +1,210 @@
+{
+  "query": "SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText, atq.questionNumber \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 210002 \nORDER BY atq.questionNumber\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText, atq.questionNumber \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 210002 \nORDER BY atq.questionNumber\nLIMIT 20;",
+  "rows": [
+    {
+      "id": "120010",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60058",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Daily notes are completed for every shift",
+      "questionNumber": "1.1"
+    },
+    {
+      "id": "120009",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60058",
+      "response": "yes",
+      "responseValue": "NULL",
+      "observations": "asascasc",
+      "questionText": "Daily notes are completed for every shift",
+      "questionNumber": "1.1"
+    },
+    {
+      "id": "120012",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60059",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Notes are legible and written in black ink",
+      "questionNumber": "1.2"
+    },
+    {
+      "id": "120011",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60059",
+      "response": "yes",
+      "responseValue": "NULL",
+      "observations": "atreweqw",
+      "questionText": "Notes are legible and written in black ink",
+      "questionNumber": "1.2"
+    },
+    {
+      "id": "120013",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60060",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "eewewewewe",
+      "questionText": "Notes are factual, objective, and person-centred",
+      "questionNumber": "1.3"
+    },
+    {
+      "id": "120014",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60060",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Notes are factual, objective, and person-centred",
+      "questionNumber": "1.3"
+    },
+    {
+      "id": "120016",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60061",
+      "response": "no",
+      "responseValue": "no",
+      "observations": "NULL",
+      "questionText": "Notes reflect care plan implementation",
+      "questionNumber": "1.4"
+    },
+    {
+      "id": "120015",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60061",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Notes reflect care plan implementation",
+      "questionNumber": "1.4"
+    },
+    {
+      "id": "120017",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60062",
+      "response": "na",
+      "responseValue": "NULL",
+      "observations": "wewefwefw",
+      "questionText": "Significant events and changes are documented",
+      "questionNumber": "1.5"
+    },
+    {
+      "id": "120018",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60062",
+      "response": "na",
+      "responseValue": "na",
+      "observations": "NULL",
+      "questionText": "Significant events and changes are documented",
+      "questionNumber": "1.5"
+    },
+    {
+      "id": "120019",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60063",
+      "response": "no",
+      "responseValue": "no",
+      "observations": "NULL",
+      "questionText": "Notes are dated, timed, and signed by staff member",
+      "questionNumber": "1.6"
+    },
+    {
+      "id": "120020",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60063",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Notes are dated, timed, and signed by staff member",
+      "questionNumber": "1.6"
+    },
+    {
+      "id": "120021",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60064",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Staff name and designation are clearly identifiable",
+      "questionNumber": "1.7"
+    },
+    {
+      "id": "120022",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60064",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Staff name and designation are clearly identifiable",
+      "questionNumber": "1.7"
+    },
+    {
+      "id": "120024",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60065",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "No gaps in recording are evident",
+      "questionNumber": "2.1"
+    },
+    {
+      "id": "120023",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60065",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "No gaps in recording are evident",
+      "questionNumber": "2.1"
+    },
+    {
+      "id": "120026",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60066",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Corrections are made appropriately (single line, initialled)",
+      "questionNumber": "2.2"
+    },
+    {
+      "id": "120025",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60066",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Corrections are made appropriately (single line, initialled)",
+      "questionNumber": "2.2"
+    },
+    {
+      "id": "120028",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60067",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "No use of correction fluid or erasures",
+      "questionNumber": "2.3"
+    },
+    {
+      "id": "120027",
+      "auditInstanceId": "210002",
+      "auditTemplateQuestionId": "60067",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "No use of correction fluid or erasures",
+      "questionNumber": "2.3"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditInstanceId\tauditTemplateQuestionId\tresponse\tresponseValue\tobservations\tquestionText\tquestionNumber\n120010\t210002\t60058\tyes\tyes\tNULL\tDaily notes are completed for every shift\t1.1\n120009\t210002\t60058\tyes\tNULL\tasascasc\tDaily notes are completed for every shift\t1.1\n120012\t210002\t60059\tyes\tyes\tNULL\tNotes are legible and written in black ink\t1.2\n120011\t210002\t60059\tyes\tNULL\tatreweqw\tNotes are legible and written in black ink\t1.2\n120013\t210002\t60060\tyes\tyes\teewewewewe\tNotes are factual, objective, and person-centred\t1.3\n120014\t210002\t60060\t\tNULL\tNULL\tNotes are factual, objective, and person-centred\t1.3\n120016\t210002\t60061\tno\tno\tNULL\tNotes reflect care plan implementation\t1.4\n120015\t210002\t60061\t\tNULL\tNULL\tNotes reflect care plan implementation\t1.4\n120017\t210002\t60062\tna\tNULL\twewefwefw\tSignificant events and changes are documented\t1.5\n120018\t210002\t60062\tna\tna\tNULL\tSignificant events and changes are documented\t1.5\n120019\t210002\t60063\tno\tno\tNULL\tNotes are dated, timed, and signed by staff member\t1.6\n120020\t210002\t60063\t\tNULL\tNULL\tNotes are dated, timed, and signed by staff member\t1.6\n120021\t210002\t60064\t\tNULL\tNULL\tStaff name and designation are clearly identifiable\t1.7\n120022\t210002\t60064\tyes\tyes\tNULL\tStaff name and designation are clearly identifiable\t1.7\n120024\t210002\t60065\tyes\tyes\tNULL\tNo gaps in recording are evident\t2.1\n120023\t210002\t60065\t\tNULL\tNULL\tNo gaps in recording are evident\t2.1\n120026\t210002\t60066\tyes\tyes\tNULL\tCorrections are made appropriately (single line, initialled)\t2.2\n120025\t210002\t60066\t\tNULL\tNULL\tCorrections are made appropriately (single line, initialled)\t2.2\n120028\t210002\t60067\tyes\tyes\tNULL\tNo use of correction fluid or erasures\t2.3\n120027\t210002\t60067\t\tNULL\tNULL\tNo use of correction fluid or erasures\t2.3\n",
+  "stderr": "",
+  "execution_time_ms": 3912
+}

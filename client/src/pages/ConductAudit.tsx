@@ -88,25 +88,31 @@ export default function ConductAudit() {
   });
 
   const handleResponseChange = (questionId: number, field: "response" | "observations" | "isCompliant", value: string | boolean) => {
+    // Capture the current response data BEFORE updating state
+    const currentResponseData = responses[questionId] || {};
+    
+    // Build the updated response data
+    const updatedResponseData = {
+      ...currentResponseData,
+      [field]: value,
+    };
+    
+    // Update state
     setResponses((prev) => ({
       ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        [field]: value,
-      },
+      [questionId]: updatedResponseData,
     }));
 
-    // Auto-save after 1 second delay
+    // Auto-save after 1 second delay using the captured updated data
     setIsSaving(true);
     setTimeout(() => {
-      const responseData = responses[questionId] || {};
       saveResponseMutation.mutate({
         auditInstanceId: auditId,
         auditTemplateQuestionId: questionId,
-        response: field === "response" ? (value as string) : (responseData.response || ""),
-        observations: field === "observations" ? (value as string) : responseData.observations,
-        isCompliant: field === "isCompliant" ? (value as boolean) : responseData.isCompliant,
-        responseValue: field === "response" ? (value as string) : undefined,
+        response: updatedResponseData.response || "",
+        observations: updatedResponseData.observations,
+        isCompliant: updatedResponseData.isCompliant,
+        responseValue: updatedResponseData.response || undefined,
       });
     }, 1000);
   };
