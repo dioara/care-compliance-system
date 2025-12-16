@@ -1868,3 +1868,30 @@
 - [x] Require 2FA for admin login
 - [x] Add backup codes for account recovery
 - [x] Test 2FA flow with Google Authenticator
+
+
+## BUG: Locations Page - Service User and Staff Counts Not Showing
+- [x] Diagnose why counts show 0 instead of actual numbers
+- [x] Fix query or data fetching for location counts
+- [x] Test location counts display correctly
+
+## Feature: Audit History Table Sorting
+- [x] Add sort functionality to Audit History table columns
+- [x] Allow ascending/descending sort order toggle
+- [x] Persist sort preference in URL or state
+- [x] Test sorting on all columns
+
+## BUG: Role Management Duplicate Header
+- [x] Find and remove duplicate header on Role Management page
+- [x] Test Role Management page displays correctly
+
+## Feature: Functional Notification System
+- [x] Implement notification bell icon functionality
+- [x] Create notifications dropdown/panel
+- [x] Add notification types (audit reminders, security alerts, etc.)
+- [x] Mark notifications as read
+- [x] Test notification system end-to-end
+## Feature: Updated Product Tour with 2FA
+- [x] Update tour to include all new features
+- [x] Add 2FA setup step in tour (with skip option)
+- [x] Test tour flow end-to-end

@@ -26,6 +26,18 @@ export default function AuditHistory() {
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [page, setPage] = useState(1);
   const pageSize = 20;
+  const [sortBy, setSortBy] = useState<"scheduledDate" | "auditName" | "status">("scheduledDate");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const handleSort = (column: "scheduledDate" | "auditName" | "status") => {
+    if (sortBy === column) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+    setPage(1);
+  };
 
   // Fetch audit types and locations for filters
   const { data: auditTypes } = trpc.audits.listTypes.useQuery();
@@ -41,6 +53,8 @@ export default function AuditHistory() {
     search: search || undefined,
     page,
     pageSize,
+    sortBy,
+    sortOrder,
   });
 
   const audits = auditData?.audits || [];
@@ -251,11 +265,41 @@ export default function AuditHistory() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Audit Name</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("auditName")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Audit Name
+                        {sortBy === "auditName" && (
+                          <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Location</TableHead>
-                    <TableHead>Scheduled Date</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("scheduledDate")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Scheduled Date
+                        {sortBy === "scheduledDate" && (
+                          <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead>Auditor</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-muted/50"
+                      onClick={() => handleSort("status")}
+                    >
+                      <div className="flex items-center gap-2">
+                        Status
+                        {sortBy === "status" && (
+                          <span className="text-xs">{sortOrder === "asc" ? "↑" : "↓"}</span>
+                        )}
+                      </div>
+                    </TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>

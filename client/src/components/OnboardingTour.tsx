@@ -4,7 +4,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Progress } from "@/components/ui/progress";
 import { 
   LayoutDashboard, Heart, UserCheck, ClipboardList, AlertTriangle, 
-  ClipboardCheck, ChevronRight, ChevronLeft, X, Sparkles, CheckCircle2
+  ClipboardCheck, ChevronRight, ChevronLeft, X, Sparkles, CheckCircle2,
+  Calendar, FileText, Brain, Shield, Bell
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -75,9 +76,48 @@ const tourSteps: TourStep[] = [
     tip: "Review the action log weekly to ensure nothing falls through the cracks",
   },
   {
+    id: "audit-calendar",
+    title: "Audit Calendar",
+    description: "Visualize all scheduled audits in month, week, or day views. Auto-schedule audits intelligently or manually schedule them. Export calendars to PDF for staff areas.",
+    icon: <Calendar className="h-8 w-8 text-indigo-500" />,
+    highlight: "Audit Calendar",
+    tip: "Use auto-scheduling to create staff and service-user specific audits automatically",
+  },
+  {
+    id: "audit-history",
+    title: "Audit History",
+    description: "Search, filter, and sort through all past audits with powerful pagination. Filter by status, type, location, and date range to find exactly what you need.",
+    icon: <FileText className="h-8 w-8 text-cyan-500" />,
+    highlight: "Audit History",
+    tip: "Use the search bar to quickly find specific audits by name, location, or auditor",
+  },
+  {
+    id: "ai-audits",
+    title: "AI-Powered Audits",
+    description: "Let AI assist with audit analysis and recommendations. Get intelligent insights to improve compliance scores and identify areas for improvement.",
+    icon: <Brain className="h-8 w-8 text-purple-500" />,
+    highlight: "AI Audits",
+    tip: "AI can help identify patterns and suggest corrective actions",
+  },
+  {
+    id: "notifications",
+    title: "Smart Notifications",
+    description: "Stay informed with real-time notifications for upcoming audits, overdue actions, compliance alerts, and security events. Click the bell icon anytime to check.",
+    icon: <Bell className="h-8 w-8 text-yellow-500" />,
+    highlight: "Notifications",
+    tip: "Enable email reminders for audits due tomorrow in your settings",
+  },
+  {
+    id: "2fa-optional",
+    title: "Two-Factor Authentication (Optional)",
+    description: "For admin accounts, we recommend enabling 2FA for extra security. You can set this up now or skip and do it later in Settings. It only takes 30 seconds with Google Authenticator.",
+    icon: <Shield className="h-8 w-8 text-emerald-500" />,
+    tip: "2FA adds an extra layer of protection against unauthorized access",
+  },
+  {
     id: "complete",
     title: "You're All Set!",
-    description: "You now know the key features of Care Compliance. Start by exploring the dashboard and scheduling your first audit. We're here to help!",
+    description: "You now know all the key features of Care Compliance. Start by exploring the dashboard, scheduling your first audit, or setting up 2FA. We're here to help!",
     icon: <CheckCircle2 className="h-8 w-8 text-green-500" />,
     tip: "Need help? Contact support anytime from the settings menu",
   },

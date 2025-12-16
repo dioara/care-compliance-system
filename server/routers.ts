@@ -291,7 +291,23 @@ export const appRouter = router({
   locations: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       if (!ctx.user?.tenantId) return [];
-      return db.getLocationsByTenant(ctx.user.tenantId);
+      const locations = await db.getLocationsByTenant(ctx.user.tenantId);
+      
+      // Get actual counts for each location
+      const locationsWithCounts = await Promise.all(
+        locations.map(async (location) => {
+          const staff = await db.getStaffMembersByLocation(location.id);
+          const serviceUsers = await db.getServiceUsersByLocation(location.id);
+          
+          return {
+            ...location,
+            numberOfStaff: staff.length,
+            numberOfServiceUsers: serviceUsers.length,
+          };
+        })
+      );
+      
+      return locationsWithCounts;
     }),
 
     create: protectedProcedure
@@ -751,6 +767,8 @@ export const appRouter = router({
           search: z.string().optional(),
           page: z.number().default(1),
           pageSize: z.number().default(20),
+          sortBy: z.enum(['scheduledDate', 'auditName', 'status']).default('scheduledDate'),
+          sortOrder: z.enum(['asc', 'desc']).default('desc'),
         })
       )
       .query(async ({ ctx, input }) => {
@@ -796,6 +814,23 @@ export const appRouter = router({
                    auditorName.includes(searchLower);
           });
         }
+        
+        // Sort audits
+        audits.sort((a, b) => {
+          let comparison = 0;
+          
+          if (input.sortBy === 'scheduledDate') {
+            const dateA = new Date(a.scheduledDate).getTime();
+            const dateB = new Date(b.scheduledDate).getTime();
+            comparison = dateA - dateB;
+          } else if (input.sortBy === 'auditName') {
+            comparison = (a.auditName || '').localeCompare(b.auditName || '');
+          } else if (input.sortBy === 'status') {
+            comparison = a.status.localeCompare(b.status);
+          }
+          
+          return input.sortOrder === 'asc' ? comparison : -comparison;
+        });
         
         // Calculate pagination
         const totalCount = audits.length;
