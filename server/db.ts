@@ -164,7 +164,7 @@ export async function getUsersByTenant(tenantId: number) {
   // Add hasLicense field to each user
   return allUsers.map(user => ({
     ...user,
-    hasLicense: user.superAdmin || licensedUserIds.has(user.id)
+    hasLicense: Boolean(user.superAdmin) || licensedUserIds.has(user.id)
   }));
 }
 

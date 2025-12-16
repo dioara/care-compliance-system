@@ -1426,3 +1426,5 @@
 
 ## Bug Fixes (Dec 16, 2025 - Session 4)
 - [x] Fix license badge showing "No License" - added missing userLicenses import to db.ts
+
+- [x] Debug why license badge still shows No License - fixed file watcher limit and server restart issues
