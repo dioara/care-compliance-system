@@ -1601,3 +1601,11 @@
 - [ ] Set up email notifications for action plan assignments
 - [ ] Set up email notifications 3 days before action plan due dates
 - [ ] Set up email notifications when actions are completed
+
+
+## BUG: Missing Audit Templates
+- [x] Identify all audit types without templates (Daily Notes, Infection Control, etc.) - Found 25 missing
+- [x] Create comprehensive templates for all missing audit types - Created all 25 with CQC-compliant questions
+- [x] Verify all 40 audit types now have templates - 0 missing templates
+- [ ] Test scheduling audits for all audit types
+- [ ] Verify no "Audit template not found" errors in production

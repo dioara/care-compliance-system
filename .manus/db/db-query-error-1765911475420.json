@@ -1,0 +1,8 @@
+{
+  "query": "SELECT aty.id, aty.auditName, aty.templateReference, aty.category,\n  (SELECT COUNT(*) FROM auditTemplates WHERE auditTypeId = aty.id) as templateCount\nFROM auditTypes aty\nHAVING templateCount = 0\nORDER BY aty.category, aty.auditName;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT aty.id, aty.auditName, aty.templateReference, aty.category,\n  (SELECT COUNT(*) FROM auditTemplates WHERE auditTypeId = aty.id) as templateCount\nFROM auditTypes aty\nHAVING templateCount = 0\nORDER BY aty.category, aty.auditName;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'aty.category' in 'order clause'"
+  ]
+}

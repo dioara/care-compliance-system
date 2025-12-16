@@ -1,0 +1,160 @@
+{
+  "query": "SELECT aty.id, aty.auditName, aty.templateReference,\n  (SELECT COUNT(*) FROM auditTemplates WHERE auditTypeId = aty.id) as templateCount\nFROM auditTypes aty\nHAVING templateCount = 0\nORDER BY aty.auditName;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT aty.id, aty.auditName, aty.templateReference,\n  (SELECT COUNT(*) FROM auditTemplates WHERE auditTypeId = aty.id) as templateCount\nFROM auditTypes aty\nHAVING templateCount = 0\nORDER BY aty.auditName;",
+  "rows": [
+    {
+      "id": "24",
+      "auditName": "Body Fluid Spillage Kits",
+      "templateReference": "spillage_kit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "25",
+      "auditName": "Burns Kit",
+      "templateReference": "burns_kit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "18",
+      "auditName": "Call Bell Analysis",
+      "templateReference": "call_bell_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "1",
+      "auditName": "Care Plan Audit",
+      "templateReference": "care_plan_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "10",
+      "auditName": "Complaints Audit",
+      "templateReference": "complaints_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "templateReference": "daily_notes_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "8",
+      "auditName": "Dignity Audit",
+      "templateReference": "dignity_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "15",
+      "auditName": "Dining Experience",
+      "templateReference": "dining_experience_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "21",
+      "auditName": "Driving License & Insurance Checks",
+      "templateReference": "driving_checks_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "9",
+      "auditName": "Finance Audit",
+      "templateReference": "finance_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "23",
+      "auditName": "First Aid Box",
+      "templateReference": "first_aid_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "6",
+      "auditName": "Health & Safety Audit",
+      "templateReference": "health_safety_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "5",
+      "auditName": "Infection Control Audit",
+      "templateReference": "infection_control_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "14",
+      "auditName": "Kitchen/Catering",
+      "templateReference": "kitchen_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "16",
+      "auditName": "Manager Walkabout",
+      "templateReference": "manager_walkabout_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "2",
+      "auditName": "Medication Audit",
+      "templateReference": "medication_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "11",
+      "auditName": "Missed and Late Calls",
+      "templateReference": "missed_calls_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "17",
+      "auditName": "Night Visits",
+      "templateReference": "night_visits_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "20",
+      "auditName": "NMC Checks",
+      "templateReference": "nmc_checks_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "22",
+      "auditName": "Safe Contents",
+      "templateReference": "safe_contents_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "7",
+      "auditName": "Safeguarding Audit",
+      "templateReference": "safeguarding_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "19",
+      "auditName": "Senior Manager QA",
+      "templateReference": "senior_qa_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "13",
+      "auditName": "Skin Integrity",
+      "templateReference": "skin_integrity_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "4",
+      "auditName": "Staff File Audit",
+      "templateReference": "staff_file_audit_template",
+      "templateCount": "0"
+    },
+    {
+      "id": "12",
+      "auditName": "Weight Analysis",
+      "templateReference": "weight_analysis_template",
+      "templateCount": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\ttemplateReference\ttemplateCount\n24\tBody Fluid Spillage Kits\tspillage_kit_template\t0\n25\tBurns Kit\tburns_kit_template\t0\n18\tCall Bell Analysis\tcall_bell_template\t0\n1\tCare Plan Audit\tcare_plan_template\t0\n10\tComplaints Audit\tcomplaints_audit_template\t0\n3\tDaily Notes Audit\tdaily_notes_template\t0\n8\tDignity Audit\tdignity_audit_template\t0\n15\tDining Experience\tdining_experience_template\t0\n21\tDriving License & Insurance Checks\tdriving_checks_template\t0\n9\tFinance Audit\tfinance_audit_template\t0\n23\tFirst Aid Box\tfirst_aid_template\t0\n6\tHealth & Safety Audit\thealth_safety_template\t0\n5\tInfection Control Audit\tinfection_control_template\t0\n14\tKitchen/Catering\tkitchen_audit_template\t0\n16\tManager Walkabout\tmanager_walkabout_template\t0\n2\tMedication Audit\tmedication_audit_template\t0\n11\tMissed and Late Calls\tmissed_calls_template\t0\n17\tNight Visits\tnight_visits_template\t0\n20\tNMC Checks\tnmc_checks_template\t0\n22\tSafe Contents\tsafe_contents_template\t0\n7\tSafeguarding Audit\tsafeguarding_audit_template\t0\n19\tSenior Manager QA\tsenior_qa_template\t0\n13\tSkin Integrity\tskin_integrity_template\t0\n4\tStaff File Audit\tstaff_file_audit_template\t0\n12\tWeight Analysis\tweight_analysis_template\t0\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}
