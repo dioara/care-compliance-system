@@ -24,6 +24,9 @@ export default function AuditCalendar() {
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   
+  // Fetch locations for dropdown
+  const { data: locations } = trpc.locations.list.useQuery();
+
   const { data: audits, isLoading } = trpc.audits.list.useQuery({
     locationId: activeLocation?.id,
     startDate: monthStart.toISOString(),

@@ -1661,3 +1661,8 @@
 ## BUG: Select Component Not Imported in AuditCalendar
 - [x] Add Select component imports to AuditCalendar.tsx
 - [x] Test that page loads without errors
+
+
+## BUG: Locations Variable Not Defined in AuditCalendar
+- [x] Add locations query using tRPC in AuditCalendar component
+- [x] Test that dropdown populates with locations
