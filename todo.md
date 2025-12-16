@@ -1799,3 +1799,14 @@
 - [x] Add color coding for audit statuses in PDF
 - [x] Test PDF generation for all three views (month, week, day)
 - [x] Add download functionality for generated PDF
+
+
+## BUG: Audit History Missing Scheduled Date Filter
+- [x] Add scheduled date range filter to Audit History page
+- [x] Update backend query to support scheduled date filtering
+- [x] Test scheduled date filter
+
+## BUG: Audit History View Button 404 Error
+- [x] Diagnose why View button leads to 404
+- [x] Add proper route for viewing audit details
+- [x] Test View button navigation

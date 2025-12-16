@@ -174,7 +174,7 @@ export default function AuditHistory() {
 
             {/* Start Date Filter */}
             <div>
-              <label className="text-sm font-medium mb-2 block">Start Date</label>
+              <label className="text-sm font-medium mb-2 block">Scheduled From</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -197,7 +197,7 @@ export default function AuditHistory() {
 
             {/* End Date Filter */}
             <div>
-              <label className="text-sm font-medium mb-2 block">End Date</label>
+              <label className="text-sm font-medium mb-2 block">Scheduled To</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -273,7 +273,7 @@ export default function AuditHistory() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setLocation(`/audits/${audit.id}`)}
+                          onClick={() => setLocation(`/audits/${audit.id}/results`)}
                         >
                           <FileText className="h-4 w-4 mr-2" />
                           View
