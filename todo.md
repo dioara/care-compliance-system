@@ -1428,3 +1428,11 @@
 - [x] Fix license badge showing "No License" - added missing userLicenses import to db.ts
 
 - [x] Debug why license badge still shows No License - fixed file watcher limit and server restart issues
+
+
+## Incident Report Improvement (Dec 16, 2025)
+- [x] Review current incident report PDF format
+- [x] Redesign report with white/glossy background (works with any logo color)
+- [x] Use non-tabular, narrative format for better readability
+- [x] Include all incident fields: description, witnesses, immediate actions, investigation, notifications, actions, lessons learned
+- [x] Make report professional and easily printable with signature section

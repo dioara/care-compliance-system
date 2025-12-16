@@ -1,6 +1,7 @@
 /**
  * PDF Generation Service for Incident Reports
  * Generates professional PDF reports with company branding
+ * Uses clean white background to work with any logo color
  */
 
 import PDFDocument from "pdfkit";
@@ -17,11 +18,44 @@ interface IncidentItem {
   locationDescription?: string | null;
   affectedPersonType?: string | null;
   affectedPersonName?: string | null;
+  serviceUserId?: number | null;
+  staffInvolved?: string | null;
   immediateActions?: string | null;
+  witnessStatements?: string | null;
+  // Notifications
   reportedToCqc?: boolean | null;
+  cqcNotifiedAt?: Date | string | null;
+  cqcNotificationDetails?: string | null;
   reportedToCouncil?: boolean | null;
+  councilNotifiedAt?: Date | string | null;
+  councilNotificationDetails?: string | null;
   reportedToPolice?: boolean | null;
+  policeNotifiedAt?: Date | string | null;
+  policeNotificationDetails?: string | null;
   reportedToFamily?: boolean | null;
+  familyNotifiedAt?: Date | string | null;
+  familyNotificationDetails?: string | null;
+  reportedToIco?: boolean | null;
+  icoNotifiedAt?: Date | string | null;
+  icoNotificationDetails?: string | null;
+  // Investigation
+  investigationRequired?: boolean | null;
+  investigationNotes?: string | null;
+  investigationCompletedAt?: Date | string | null;
+  // Actions and follow-up
+  actionRequired?: string | null;
+  assignedToId?: number | null;
+  assignedToName?: string | null;
+  targetCompletionDate?: Date | string | null;
+  lessonsLearned?: string | null;
+  // Metadata
+  reportedById?: number | null;
+  reportedByName?: string | null;
+  closedById?: number | null;
+  closedByName?: string | null;
+  closedAt?: Date | string | null;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
 }
 
 interface IncidentReportData {
@@ -35,19 +69,22 @@ interface IncidentReportData {
 
 const COLORS = {
   primary: "#1e40af",
-  secondary: "#3b82f6",
+  secondary: "#6366f1",
+  accent: "#7c3aed",
   success: "#16a34a",
   warning: "#d97706",
   danger: "#dc2626",
   text: "#1f2937",
   textLight: "#6b7280",
+  textMuted: "#9ca3af",
   border: "#e5e7eb",
-  headerBg: "#7c3aed",
-  rowAlt: "#f9fafb",
+  borderLight: "#f3f4f6",
+  white: "#ffffff",
+  background: "#fafafa",
 };
 
 /**
- * Generate a PDF report for incidents
+ * Generate a PDF report for incidents - detailed narrative format
  */
 export async function generateIncidentPDF(data: IncidentReportData): Promise<Buffer> {
   // Pre-fetch logo if provided
@@ -68,8 +105,8 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
     try {
       const doc = new PDFDocument({
         size: "A4",
-        layout: "landscape",
-        margin: 40,
+        layout: "portrait",
+        margin: 50,
         info: {
           Title: `Incident Report - ${data.companyName}`,
           Author: data.companyName,
@@ -83,181 +120,36 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
 
-      const pageWidth = 841.89;
-      const pageHeight = 595.28;
-      const margin = 40;
+      const pageWidth = 595.28;
+      const pageHeight = 841.89;
+      const margin = 50;
       const contentWidth = pageWidth - (margin * 2);
 
-      // Header
-      doc.rect(0, 0, pageWidth, 80).fill(COLORS.headerBg);
-
-      let textStartX = margin;
-      if (logoBuffer) {
-        try {
-          doc.image(logoBuffer, margin, 15, { height: 50 });
-          textStartX = margin + 70;
-        } catch (e) {
-          console.error("Failed to render logo:", e);
-        }
-      }
-
-      doc.fontSize(24).font("Helvetica-Bold").fillColor("#ffffff");
-      doc.text(data.companyName, textStartX, 20, { width: contentWidth - 200 });
-
-      doc.fontSize(12).font("Helvetica").fillColor("#c4b5fd");
-      doc.text("Incident Report", textStartX, 50);
-
-      const dateStr = new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-      doc.fontSize(10).fillColor("#ffffff");
-      doc.text(`Generated: ${dateStr}`, pageWidth - margin - 200, 25, { width: 200, align: "right" });
-      if (data.locationName) {
-        doc.text(`Location: ${data.locationName}`, pageWidth - margin - 200, 40, { width: 200, align: "right" });
-      }
-      doc.text(`By: ${data.generatedBy}`, pageWidth - margin - 200, 55, { width: 200, align: "right" });
-
-      doc.y = 95;
-
-      // Summary Statistics
-      const total = data.incidents.length;
-      const critical = data.incidents.filter(i => i.severity === "critical").length;
-      const high = data.incidents.filter(i => i.severity === "high").length;
-      const open = data.incidents.filter(i => i.status === "open" || i.status === "under_investigation").length;
-      const resolved = data.incidents.filter(i => i.status === "resolved" || i.status === "closed").length;
-
-      const boxWidth = (contentWidth - 40) / 5;
-      const boxHeight = 50;
-      const startY = doc.y;
-
-      // Stat boxes
-      drawStatBox(doc, margin, startY, boxWidth, boxHeight, "Total Incidents", total.toString(), COLORS.primary);
-      drawStatBox(doc, margin + boxWidth + 10, startY, boxWidth, boxHeight, "Critical", critical.toString(), COLORS.danger);
-      drawStatBox(doc, margin + (boxWidth + 10) * 2, startY, boxWidth, boxHeight, "High Severity", high.toString(), COLORS.warning);
-      drawStatBox(doc, margin + (boxWidth + 10) * 3, startY, boxWidth, boxHeight, "Open", open.toString(), "#7c3aed");
-      drawStatBox(doc, margin + (boxWidth + 10) * 4, startY, boxWidth, boxHeight, "Resolved", resolved.toString(), COLORS.success);
-
-      doc.y = startY + boxHeight + 20;
-
-      // Table
-      const columns = [
-        { header: "Reference", width: 70, key: "incidentNumber" },
-        { header: "Date", width: 70, key: "incidentDate" },
-        { header: "Type", width: 90, key: "incidentType" },
-        { header: "Location", width: 100, key: "locationDescription" },
-        { header: "Severity", width: 60, key: "severity" },
-        { header: "Status", width: 80, key: "status" },
-        { header: "Affected Person", width: 100, key: "affectedPersonName" },
-        { header: "Description", width: 200, key: "description" },
-      ];
-
-      const tableTop = doc.y;
-      const rowHeight = 25;
-      const headerHeight = 30;
-
-      // Table header
-      let x = margin;
-      doc.rect(margin, tableTop, contentWidth, headerHeight).fill(COLORS.primary);
-      columns.forEach(col => {
-        doc.fontSize(8).font("Helvetica-Bold").fillColor("#ffffff");
-        doc.text(col.header, x + 4, tableTop + 10, { width: col.width - 8, align: "left" });
-        x += col.width;
-      });
-
-      // Table rows
-      let y = tableTop + headerHeight;
-      let rowIndex = 0;
-
-      data.incidents.forEach((incident) => {
-        if (y + rowHeight > pageHeight - 60) {
+      // Process each incident as a separate detailed report
+      data.incidents.forEach((incident, index) => {
+        if (index > 0) {
           doc.addPage();
-          y = 40;
-          x = margin;
-          doc.rect(margin, y, contentWidth, headerHeight).fill(COLORS.primary);
-          columns.forEach(col => {
-            doc.fontSize(8).font("Helvetica-Bold").fillColor("#ffffff");
-            doc.text(col.header, x + 4, y + 10, { width: col.width - 8, align: "left" });
-            x += col.width;
-          });
-          y += headerHeight;
-          rowIndex = 0;
         }
 
-        if (rowIndex % 2 === 1) {
-          doc.rect(margin, y, contentWidth, rowHeight).fill(COLORS.rowAlt);
-        }
-        doc.rect(margin, y, contentWidth, rowHeight).stroke(COLORS.border);
-
-        x = margin;
-        columns.forEach(col => {
-          let value = "";
-          let textColor = COLORS.text;
-
-          switch (col.key) {
-            case "incidentNumber":
-              value = incident.incidentNumber || `INC-${incident.id}`;
-              doc.font("Helvetica-Bold");
-              break;
-            case "incidentDate":
-              value = incident.incidentDate ? new Date(incident.incidentDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "";
-              doc.font("Helvetica");
-              break;
-            case "incidentType":
-              value = (incident.incidentType || "").replace(/_/g, " ");
-              value = value.charAt(0).toUpperCase() + value.slice(1);
-              doc.font("Helvetica");
-              break;
-            case "locationDescription":
-              value = incident.locationDescription || "";
-              if (value.length > 20) value = value.substring(0, 17) + "...";
-              doc.font("Helvetica");
-              break;
-            case "severity":
-              const severityMap: Record<string, string> = { critical: "Critical", high: "High", medium: "Medium", low: "Low" };
-              value = severityMap[incident.severity || ""] || incident.severity || "";
-              textColor = incident.severity === "critical" ? COLORS.danger : incident.severity === "high" ? COLORS.warning : COLORS.text;
-              doc.font("Helvetica-Bold");
-              break;
-            case "status":
-              const statusMap: Record<string, string> = { open: "Open", under_investigation: "Investigating", resolved: "Resolved", closed: "Closed" };
-              value = statusMap[incident.status || ""] || incident.status || "";
-              textColor = incident.status === "resolved" || incident.status === "closed" ? COLORS.success : "#7c3aed";
-              doc.font("Helvetica-Bold");
-              break;
-            case "affectedPersonName":
-              value = incident.affectedPersonName || "";
-              doc.font("Helvetica");
-              break;
-            case "description":
-              // Strip HTML tags from rich text
-              value = (incident.description || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-              if (value.length > 50) value = value.substring(0, 47) + "...";
-              doc.font("Helvetica");
-              break;
-            default:
-              value = "";
-          }
-
-          doc.fontSize(7).fillColor(textColor);
-          doc.text(value, x + 4, y + 8, { width: col.width - 8, align: "left" });
-          x += col.width;
+        renderIncidentReport(doc, incident, data, logoBuffer, {
+          pageWidth,
+          pageHeight,
+          margin,
+          contentWidth,
         });
-
-        y += rowHeight;
-        rowIndex++;
       });
 
-      // Footer on each page
+      // Add page numbers to all pages
       const pageCount = doc.bufferedPageRange().count;
       for (let i = 0; i < pageCount; i++) {
         doc.switchToPage(i);
-        const footerY = pageHeight - 30;
-        doc.moveTo(margin, footerY - 5).lineTo(pageWidth - margin, footerY - 5).stroke(COLORS.border);
-        doc.fontSize(7).font("Helvetica").fillColor(COLORS.textLight);
-        doc.text(`${data.companyName} - Incident Report`, margin, footerY, { width: 300 });
-        doc.text("Confidential - For Internal Use Only", pageWidth / 2 - 75, footerY, { width: 150, align: "center" });
+        
+        // Footer
+        const footerY = pageHeight - 40;
+        doc.moveTo(margin, footerY - 10).lineTo(pageWidth - margin, footerY - 10).strokeColor(COLORS.border).stroke();
+        
+        doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
+        doc.text(`${data.companyName} - Confidential Incident Report`, margin, footerY, { width: contentWidth / 2 });
         doc.text(`Page ${i + 1} of ${pageCount}`, pageWidth - margin - 100, footerY, { width: 100, align: "right" });
       }
 
@@ -268,11 +160,338 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
   });
 }
 
-function drawStatBox(doc: PDFKit.PDFDocument, x: number, y: number, width: number, height: number, label: string, value: string, color: string) {
-  doc.rect(x, y, width, height).fillAndStroke("#ffffff", COLORS.border);
-  doc.rect(x, y, width, 4).fill(color);
-  doc.fontSize(20).font("Helvetica-Bold").fillColor(color);
-  doc.text(value, x, y + 12, { width: width, align: "center" });
-  doc.fontSize(8).font("Helvetica").fillColor(COLORS.textLight);
-  doc.text(label, x, y + 35, { width: width, align: "center" });
+function renderIncidentReport(
+  doc: PDFKit.PDFDocument,
+  incident: IncidentItem,
+  data: IncidentReportData,
+  logoBuffer: Buffer | null,
+  dims: { pageWidth: number; pageHeight: number; margin: number; contentWidth: number }
+) {
+  const { pageWidth, margin, contentWidth } = dims;
+  let y = margin;
+
+  // ===== HEADER (White background) =====
+  // Logo and company name
+  let headerTextX = margin;
+  if (logoBuffer) {
+    try {
+      doc.image(logoBuffer, margin, y, { height: 50 });
+      headerTextX = margin + 60;
+    } catch (e) {
+      console.error("Failed to render logo:", e);
+    }
+  }
+
+  doc.fontSize(18).font("Helvetica-Bold").fillColor(COLORS.text);
+  doc.text(data.companyName, headerTextX, y + 5, { width: contentWidth - 150 });
+  
+  doc.fontSize(10).font("Helvetica").fillColor(COLORS.textLight);
+  doc.text("Incident Report", headerTextX, y + 28);
+
+  // Report metadata on the right
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  doc.fontSize(9).fillColor(COLORS.textLight);
+  doc.text(`Generated: ${dateStr}`, pageWidth - margin - 150, y + 5, { width: 150, align: "right" });
+  if (data.locationName) {
+    doc.text(`Location: ${data.locationName}`, pageWidth - margin - 150, y + 18, { width: 150, align: "right" });
+  }
+  doc.text(`By: ${data.generatedBy}`, pageWidth - margin - 150, y + 31, { width: 150, align: "right" });
+
+  y += 65;
+
+  // Divider line
+  doc.moveTo(margin, y).lineTo(pageWidth - margin, y).strokeColor(COLORS.border).lineWidth(1).stroke();
+  y += 15;
+
+  // ===== INCIDENT REFERENCE BANNER =====
+  const severityColor = getSeverityColor(incident.severity);
+  const statusColor = getStatusColor(incident.status);
+  
+  doc.fontSize(14).font("Helvetica-Bold").fillColor(COLORS.text);
+  doc.text(`Incident Reference: ${incident.incidentNumber || `INC-${incident.id}`}`, margin, y);
+  y += 25;
+
+  // Status and Severity badges inline
+  const badgeY = y;
+  
+  // Severity badge
+  doc.roundedRect(margin, badgeY, 80, 22, 3).fill(severityColor);
+  doc.fontSize(9).font("Helvetica-Bold").fillColor(COLORS.white);
+  doc.text(formatSeverity(incident.severity), margin + 5, badgeY + 6, { width: 70, align: "center" });
+
+  // Status badge
+  doc.roundedRect(margin + 90, badgeY, 90, 22, 3).fill(statusColor);
+  doc.text(formatStatus(incident.status), margin + 95, badgeY + 6, { width: 80, align: "center" });
+
+  // Type badge
+  doc.roundedRect(margin + 190, badgeY, 100, 22, 3).fill(COLORS.secondary);
+  doc.text(formatIncidentType(incident.incidentType), margin + 195, badgeY + 6, { width: 90, align: "center" });
+
+  y += 40;
+
+  // ===== SECTION: INCIDENT DETAILS =====
+  y = renderSection(doc, "INCIDENT DETAILS", y, margin, contentWidth);
+  
+  y = renderField(doc, "Date of Incident", formatDate(incident.incidentDate), y, margin, contentWidth);
+  y = renderField(doc, "Time of Incident", incident.incidentTime || "Not specified", y, margin, contentWidth);
+  y = renderField(doc, "Location", incident.locationDescription || "Not specified", y, margin, contentWidth);
+  y += 10;
+
+  // ===== SECTION: AFFECTED PERSON =====
+  y = renderSection(doc, "AFFECTED PERSON", y, margin, contentWidth);
+  
+  y = renderField(doc, "Person Type", formatPersonType(incident.affectedPersonType), y, margin, contentWidth);
+  y = renderField(doc, "Name", incident.affectedPersonName || "Not specified", y, margin, contentWidth);
+  if (incident.staffInvolved) {
+    y = renderField(doc, "Staff Involved", stripHtml(incident.staffInvolved), y, margin, contentWidth);
+  }
+  y += 10;
+
+  // ===== SECTION: INCIDENT DESCRIPTION =====
+  y = renderSection(doc, "INCIDENT DESCRIPTION", y, margin, contentWidth);
+  y = renderTextBlock(doc, stripHtml(incident.description) || "No description provided.", y, margin, contentWidth);
+  y += 15;
+
+  // ===== SECTION: IMMEDIATE ACTIONS TAKEN =====
+  y = renderSection(doc, "IMMEDIATE ACTIONS TAKEN", y, margin, contentWidth);
+  y = renderTextBlock(doc, stripHtml(incident.immediateActions) || "No immediate actions recorded.", y, margin, contentWidth);
+  y += 15;
+
+  // ===== SECTION: WITNESS STATEMENTS =====
+  if (incident.witnessStatements) {
+    y = checkPageBreak(doc, y, 100, dims);
+    y = renderSection(doc, "WITNESS STATEMENTS", y, margin, contentWidth);
+    
+    try {
+      const witnesses = JSON.parse(incident.witnessStatements);
+      if (Array.isArray(witnesses) && witnesses.length > 0) {
+        witnesses.forEach((witness: any, idx: number) => {
+          y = checkPageBreak(doc, y, 60, dims);
+          doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+          doc.text(`Witness ${idx + 1}: ${witness.name || "Anonymous"}`, margin, y);
+          y += 15;
+          doc.fontSize(10).font("Helvetica").fillColor(COLORS.textLight);
+          doc.text(witness.statement || "No statement provided.", margin + 10, y, { width: contentWidth - 10 });
+          y += doc.heightOfString(witness.statement || "No statement provided.", { width: contentWidth - 10 }) + 10;
+        });
+      } else {
+        y = renderTextBlock(doc, "No witness statements recorded.", y, margin, contentWidth);
+      }
+    } catch {
+      y = renderTextBlock(doc, stripHtml(incident.witnessStatements), y, margin, contentWidth);
+    }
+    y += 10;
+  }
+
+  // ===== SECTION: NOTIFICATIONS =====
+  y = checkPageBreak(doc, y, 120, dims);
+  y = renderSection(doc, "NOTIFICATIONS & REPORTING", y, margin, contentWidth);
+  
+  const notifications = [
+    { label: "CQC", reported: incident.reportedToCqc, date: incident.cqcNotifiedAt, details: incident.cqcNotificationDetails },
+    { label: "Local Authority/Council", reported: incident.reportedToCouncil, date: incident.councilNotifiedAt, details: incident.councilNotificationDetails },
+    { label: "Police", reported: incident.reportedToPolice, date: incident.policeNotifiedAt, details: incident.policeNotificationDetails },
+    { label: "Family/Next of Kin", reported: incident.reportedToFamily, date: incident.familyNotifiedAt, details: incident.familyNotificationDetails },
+    { label: "ICO (Data Protection)", reported: incident.reportedToIco, date: incident.icoNotifiedAt, details: incident.icoNotificationDetails },
+  ];
+
+  notifications.forEach(notif => {
+    const status = notif.reported ? "Yes" : "No";
+    const statusColor = notif.reported ? COLORS.success : COLORS.textMuted;
+    
+    doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+    doc.text(`${notif.label}:`, margin, y, { continued: true });
+    doc.font("Helvetica").fillColor(statusColor);
+    doc.text(` ${status}`, { continued: false });
+    
+    if (notif.reported && notif.date) {
+      doc.fontSize(9).fillColor(COLORS.textLight);
+      doc.text(`  Notified on: ${formatDate(notif.date)}`, margin + 200, y);
+    }
+    y += 18;
+    
+    if (notif.reported && notif.details) {
+      doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
+      doc.text(`Details: ${stripHtml(notif.details)}`, margin + 15, y, { width: contentWidth - 15 });
+      y += doc.heightOfString(`Details: ${stripHtml(notif.details)}`, { width: contentWidth - 15 }) + 5;
+    }
+  });
+  y += 10;
+
+  // ===== SECTION: INVESTIGATION =====
+  y = checkPageBreak(doc, y, 100, dims);
+  y = renderSection(doc, "INVESTIGATION", y, margin, contentWidth);
+  
+  y = renderField(doc, "Investigation Required", incident.investigationRequired ? "Yes" : "No", y, margin, contentWidth);
+  if (incident.investigationCompletedAt) {
+    y = renderField(doc, "Investigation Completed", formatDate(incident.investigationCompletedAt), y, margin, contentWidth);
+  }
+  if (incident.investigationNotes) {
+    doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+    doc.text("Investigation Notes:", margin, y);
+    y += 15;
+    y = renderTextBlock(doc, stripHtml(incident.investigationNotes), y, margin, contentWidth);
+  } else {
+    y = renderTextBlock(doc, "No investigation notes recorded.", y, margin, contentWidth);
+  }
+  y += 10;
+
+  // ===== SECTION: ACTIONS & FOLLOW-UP =====
+  y = checkPageBreak(doc, y, 100, dims);
+  y = renderSection(doc, "ACTIONS & FOLLOW-UP", y, margin, contentWidth);
+  
+  if (incident.actionRequired) {
+    doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+    doc.text("Actions Required:", margin, y);
+    y += 15;
+    y = renderTextBlock(doc, stripHtml(incident.actionRequired), y, margin, contentWidth);
+  } else {
+    y = renderTextBlock(doc, "No actions specified.", y, margin, contentWidth);
+  }
+  
+  if (incident.assignedToName) {
+    y = renderField(doc, "Assigned To", incident.assignedToName, y + 5, margin, contentWidth);
+  }
+  if (incident.targetCompletionDate) {
+    y = renderField(doc, "Target Completion Date", formatDate(incident.targetCompletionDate), y, margin, contentWidth);
+  }
+  y += 10;
+
+  // ===== SECTION: LESSONS LEARNED =====
+  if (incident.lessonsLearned) {
+    y = checkPageBreak(doc, y, 80, dims);
+    y = renderSection(doc, "LESSONS LEARNED", y, margin, contentWidth);
+    y = renderTextBlock(doc, stripHtml(incident.lessonsLearned), y, margin, contentWidth);
+    y += 10;
+  }
+
+  // ===== SECTION: RECORD INFORMATION =====
+  y = checkPageBreak(doc, y, 100, dims);
+  y = renderSection(doc, "RECORD INFORMATION", y, margin, contentWidth);
+  
+  y = renderField(doc, "Reported By", incident.reportedByName || "Not specified", y, margin, contentWidth);
+  y = renderField(doc, "Date Reported", formatDate(incident.createdAt), y, margin, contentWidth);
+  if (incident.closedAt) {
+    y = renderField(doc, "Closed By", incident.closedByName || "Not specified", y, margin, contentWidth);
+    y = renderField(doc, "Date Closed", formatDate(incident.closedAt), y, margin, contentWidth);
+  }
+  if (incident.updatedAt) {
+    y = renderField(doc, "Last Updated", formatDate(incident.updatedAt), y, margin, contentWidth);
+  }
+
+  // ===== SIGNATURE SECTION =====
+  y = checkPageBreak(doc, y, 120, dims);
+  y += 30;
+  
+  doc.moveTo(margin, y).lineTo(pageWidth - margin, y).strokeColor(COLORS.border).stroke();
+  y += 20;
+
+  doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+  doc.text("AUTHORISATION", margin, y);
+  y += 20;
+
+  // Signature lines
+  const sigWidth = (contentWidth - 40) / 2;
+  
+  doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
+  doc.text("Manager/Supervisor Signature:", margin, y);
+  doc.moveTo(margin, y + 30).lineTo(margin + sigWidth, y + 30).stroke();
+  doc.text("Date:", margin, y + 40);
+  doc.moveTo(margin + 35, y + 40).lineTo(margin + sigWidth, y + 40).stroke();
+
+  doc.text("Reviewed By:", margin + sigWidth + 40, y);
+  doc.moveTo(margin + sigWidth + 40, y + 30).lineTo(pageWidth - margin, y + 30).stroke();
+  doc.text("Date:", margin + sigWidth + 40, y + 40);
+  doc.moveTo(margin + sigWidth + 75, y + 40).lineTo(pageWidth - margin, y + 40).stroke();
+}
+
+// Helper functions
+function renderSection(doc: PDFKit.PDFDocument, title: string, y: number, margin: number, contentWidth: number): number {
+  doc.fontSize(11).font("Helvetica-Bold").fillColor(COLORS.primary);
+  doc.text(title, margin, y);
+  y += 5;
+  doc.moveTo(margin, y + 10).lineTo(margin + contentWidth, y + 10).strokeColor(COLORS.borderLight).lineWidth(0.5).stroke();
+  return y + 20;
+}
+
+function renderField(doc: PDFKit.PDFDocument, label: string, value: string, y: number, margin: number, contentWidth: number): number {
+  doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
+  doc.text(`${label}:`, margin, y, { continued: true, width: 150 });
+  doc.font("Helvetica").fillColor(COLORS.textLight);
+  doc.text(` ${value}`, { continued: false });
+  return y + 18;
+}
+
+function renderTextBlock(doc: PDFKit.PDFDocument, text: string, y: number, margin: number, contentWidth: number): number {
+  doc.fontSize(10).font("Helvetica").fillColor(COLORS.text);
+  doc.text(text, margin, y, { width: contentWidth, lineGap: 3 });
+  return y + doc.heightOfString(text, { width: contentWidth, lineGap: 3 }) + 5;
+}
+
+function checkPageBreak(doc: PDFKit.PDFDocument, y: number, requiredSpace: number, dims: { pageHeight: number; margin: number }): number {
+  if (y + requiredSpace > dims.pageHeight - 60) {
+    doc.addPage();
+    return dims.margin;
+  }
+  return y;
+}
+
+function stripHtml(text: string | null | undefined): string {
+  if (!text) return "";
+  return text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function formatDate(date: Date | string | null | undefined): string {
+  if (!date) return "Not specified";
+  const d = new Date(date);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function formatSeverity(severity: string | null | undefined): string {
+  const map: Record<string, string> = { critical: "CRITICAL", high: "HIGH", medium: "MEDIUM", low: "LOW" };
+  return map[severity || ""] || severity?.toUpperCase() || "UNKNOWN";
+}
+
+function formatStatus(status: string | null | undefined): string {
+  const map: Record<string, string> = { open: "OPEN", under_investigation: "INVESTIGATING", resolved: "RESOLVED", closed: "CLOSED" };
+  return map[status || ""] || status?.toUpperCase() || "UNKNOWN";
+}
+
+function formatIncidentType(type: string | null | undefined): string {
+  if (!type) return "Unknown";
+  return type.replace(/_/g, " ").split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+}
+
+function formatPersonType(type: string | null | undefined): string {
+  const map: Record<string, string> = { 
+    service_user: "Service User", 
+    staff: "Staff Member", 
+    visitor: "Visitor", 
+    other: "Other" 
+  };
+  return map[type || ""] || type || "Not specified";
+}
+
+function getSeverityColor(severity: string | null | undefined): string {
+  const map: Record<string, string> = { 
+    critical: COLORS.danger, 
+    high: COLORS.warning, 
+    medium: "#f59e0b", 
+    low: COLORS.success 
+  };
+  return map[severity || ""] || COLORS.textMuted;
+}
+
+function getStatusColor(status: string | null | undefined): string {
+  const map: Record<string, string> = { 
+    open: COLORS.accent, 
+    under_investigation: COLORS.warning, 
+    resolved: COLORS.success, 
+    closed: COLORS.textLight 
+  };
+  return map[status || ""] || COLORS.textMuted;
 }
