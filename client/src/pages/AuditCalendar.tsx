@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay } from 'date-fns';
 
 export default function AuditCalendar() {
-  const { activeLocation } = useLocation();
+  const { activeLocationId, setActiveLocationId } = useLocation();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -26,13 +26,16 @@ export default function AuditCalendar() {
   
   // Fetch locations for dropdown
   const { data: locations } = trpc.locations.list.useQuery();
+  
+  // Get current location details
+  const activeLocation = locations?.find(l => l.id === activeLocationId);
 
   const { data: audits, isLoading } = trpc.audits.list.useQuery({
-    locationId: activeLocation?.id,
+    locationId: activeLocationId || 0,
     startDate: monthStart.toISOString(),
     endDate: monthEnd.toISOString(),
   }, {
-    enabled: !!activeLocation,
+    enabled: !!activeLocationId,
   });
 
   const { data: auditTypes } = trpc.audits.listTypes.useQuery();
@@ -105,7 +108,7 @@ export default function AuditCalendar() {
   };
 
   const handleAutoSchedule = async () => {
-    if (!activeLocation?.id) {
+    if (!activeLocationId) {
       toast.error('Please select a location first');
       return;
     }
@@ -115,7 +118,7 @@ export default function AuditCalendar() {
     
     try {
       await generateSuggestions.mutateAsync({
-        locationId: activeLocation.id,
+        locationId: activeLocationId,
       });
     } catch (error) {
       toast.error('Failed to generate schedule suggestions');
@@ -142,7 +145,7 @@ export default function AuditCalendar() {
   };
 
   const handleAcceptSelected = async () => {
-    if (!activeLocation?.id || !generateSuggestions.data) return;
+    if (!activeLocationId || !generateSuggestions.data) return;
     
     const selectedItems = Array.from(selectedSuggestions)
       .map(index => generateSuggestions.data[index])
@@ -159,7 +162,7 @@ export default function AuditCalendar() {
     
     try {
       const result = await acceptSuggestions.mutateAsync({
-        locationId: activeLocation.id,
+        locationId: activeLocationId,
         suggestions: selectedItems,
       });
       
@@ -182,12 +185,9 @@ export default function AuditCalendar() {
         </div>
         <div className="flex gap-2">
           <Select
-            value={activeLocation?.id?.toString() || ""}
+            value={activeLocationId?.toString() || ""}
             onValueChange={(value) => {
-              const location = (locations || []).find(l => l.id.toString() === value);
-              if (location) {
-                // Location context should update automatically via LocationContext
-              }
+              setActiveLocationId(parseInt(value));
             }}
           >
             <SelectTrigger className="w-[220px]">

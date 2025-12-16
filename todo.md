@@ -1666,3 +1666,10 @@
 ## BUG: Locations Variable Not Defined in AuditCalendar
 - [x] Add locations query using tRPC in AuditCalendar component
 - [x] Test that dropdown populates with locations
+
+
+## BUG: Location Dropdown Not Updating Context
+- [x] Wire dropdown onValueChange to call setActiveLocationId from LocationContext
+- [x] Replace all activeLocation references with activeLocationId
+- [x] Get location details from locations array based on activeLocationId
+- [ ] Test that selecting a location updates the calendar view
