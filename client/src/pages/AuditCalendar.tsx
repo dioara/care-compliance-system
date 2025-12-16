@@ -185,9 +185,29 @@ export default function AuditCalendar() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Audit Calendar</h1>
-          <p className="text-muted-foreground">Schedule and track audits for {activeLocation.locationName}</p>
+          <p className="text-muted-foreground">Schedule and track audits</p>
         </div>
         <div className="flex gap-2">
+          <Select
+            value={activeLocation?.id?.toString() || ""}
+            onValueChange={(value) => {
+              const location = (locations || []).find(l => l.id.toString() === value);
+              if (location) {
+                // Update location context here if needed
+              }
+            }}
+          >
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Select Location" />
+            </SelectTrigger>
+            <SelectContent>
+              {(locations || []).map((location) => (
+                <SelectItem key={location.id} value={location.id.toString()}>
+                  {location.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Button variant="outline" size="sm" onClick={handleAutoSchedule}>
             <Sparkles className="h-4 w-4 mr-2" />
             Auto-Schedule

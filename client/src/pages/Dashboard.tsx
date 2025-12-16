@@ -140,41 +140,41 @@ export default function Dashboard() {
       
       {/* Header Section */}
       <div className="flex flex-col gap-4">
-        <div className="flex items-start gap-3 md:gap-4">
-          <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl shrink-0">
-            <Activity className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+        <div className="flex items-center justify-between">
+          <div className="flex items-start gap-3 md:gap-4">
+            <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl shrink-0">
+              <Activity className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Welcome back, {user?.name?.split(' ')[0] || 'User'}
+              </h1>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              Welcome back, {user?.name?.split(' ')[0] || 'User'}
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-1">
-              {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
-            </p>
-          </div>
-        </div>
-        
-        {/* Location Filter */}
-        {accessibleLocations && accessibleLocations.length > 1 && (
-          <div className="flex items-center gap-2 md:gap-3 bg-muted/30 rounded-xl p-2 pr-3 w-fit">
-            <Building2 className="h-4 w-4 text-muted-foreground ml-2" />
+          <div className="flex items-center gap-2">
             <Select
-              value={activeLocationId?.toString() || ""}
-              onValueChange={(value) => setActiveLocationId(parseInt(value))}
+              value={activeLocationId?.toString() || "all"}
+              onValueChange={(value) => setActiveLocationId(value === "all" ? null : parseInt(value))}
             >
-              <SelectTrigger className="w-[160px] md:w-[200px] border-0 bg-transparent shadow-none focus:ring-0">
+              <SelectTrigger className="w-[220px]">
                 <SelectValue placeholder="All Locations" />
               </SelectTrigger>
               <SelectContent>
-                {accessibleLocations.map((loc) => (
-                  <SelectItem key={loc.id} value={loc.id.toString()}>
-                    {loc.name}
+                <SelectItem value="all">All Locations</SelectItem>
+                {locations?.map((location) => (
+                  <SelectItem key={location.id} value={location.id.toString()}>
+                    {location.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-        )}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm md:text-base text-muted-foreground mt-1">
+            {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
+          </p>
+        </div>
       </div>
 
       {/* Key Metrics - Redesigned */}

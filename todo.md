@@ -1644,3 +1644,9 @@
 - [x] Show loading state while generating suggestions
 - [x] Show success message after accepting suggestions
 - [x] Add Select All / Deselect All functionality
+
+
+## Add Visible Location Filter Dropdowns
+- [x] Add location dropdown to Dashboard page header (not just global context)
+- [x] Add location dropdown to Audit Calendar page header (not just global context)
+- [x] Ensure dropdowns update the page data when changed
