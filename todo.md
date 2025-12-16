@@ -1507,3 +1507,6 @@
 - Staff.tsx: Improved header and grid layout responsiveness
 - Incidents.tsx: Improved header and stats cards grid responsiveness
 - Dashboard.tsx: Improved header and metrics grid responsiveness
+
+## Header Location Filter Removal (Dec 16, 2025)
+- [x] Remove LocationSwitcher from header in DashboardLayout

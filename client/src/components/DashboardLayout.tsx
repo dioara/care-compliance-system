@@ -24,7 +24,7 @@ import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard, Menu } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
-import { LocationSwitcher } from "./LocationSwitcher";
+// LocationSwitcher removed from header per user request
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -394,10 +394,9 @@ function DashboardLayoutContent({
           {/* Spacer for desktop to push location switcher to right */}
           <div className="hidden md:block" />
           
-          {/* Right side - notifications and location switcher (always visible) */}
+          {/* Right side - notifications */}
           <div className="flex items-center gap-2 md:gap-3">
             <NotificationCenter />
-            <LocationSwitcher />
           </div>
         </header>
         
