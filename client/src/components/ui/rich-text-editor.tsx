@@ -1,7 +1,8 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
+import DOMPurify from 'dompurify';
 import { Bold, Italic, List, ListOrdered, Undo, Redo } from 'lucide-react';
 import { Button } from './button';
 
@@ -148,10 +149,16 @@ export function RichTextEditor({
 
 // Simple text display component for viewing rich text content
 export function RichTextDisplay({ content, className }: { content: string; className?: string }) {
+  // Sanitize HTML content to prevent XSS attacks
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre'],
+    ALLOWED_ATTR: ['href', 'target', 'rel']
+  });
+  
   return (
     <div 
       className={cn('prose prose-sm max-w-none', className)}
-      dangerouslySetInnerHTML={{ __html: content }}
+      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   );
 }

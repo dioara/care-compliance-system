@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { notifyOwner } from "./notification";
+import { getSecurityMetrics } from "../services/securityMonitoringService";
 import { adminProcedure, publicProcedure, router } from "./trpc";
 
 export const systemRouter = router({
@@ -25,5 +26,11 @@ export const systemRouter = router({
       return {
         success: delivered,
       } as const;
+    }),
+
+  // Get security metrics
+  getSecurityMetrics: adminProcedure
+    .query(() => {
+      return getSecurityMetrics();
     }),
 });

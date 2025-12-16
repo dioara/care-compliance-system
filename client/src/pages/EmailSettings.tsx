@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import DOMPurify from 'dompurify';
 import {
   Mail,
   Plus,
@@ -689,9 +690,9 @@ export default function EmailSettings() {
             <div className="border rounded-lg overflow-hidden">
               <div
                 dangerouslySetInnerHTML={{
-                  __html: editingTemplate.bodyHtml
+                  __html: DOMPurify.sanitize(editingTemplate.bodyHtml
                     .replace(/\{\{companyName\}\}/g, "Test Care Home")
-                    .replace(/\{\{locationName\}\}/g, "Main Office")
+                    .replace(/\{\{locationName\}\}/g, "Main Office"))
                     .replace(/\{\{recipientName\}\}/g, "John Smith")
                     .replace(/\{\{complianceRate\}\}/g, "75")
                     .replace(/\{\{nonCompliantCount\}\}/g, "12")

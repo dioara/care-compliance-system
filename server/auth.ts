@@ -4,6 +4,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import jwt from "jsonwebtoken";
 import { startFreeTrial } from "./subscription";
+import { trackFailedLogin, resetFailedLoginAttempts, logSecurityEvent } from "./services/securityMonitoringService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
@@ -78,9 +79,12 @@ export const authRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       console.log("[LOGIN] Attempting login for:", input.email);
+      const ipAddress = ctx.req?.ip || ctx.req?.headers['x-forwarded-for'] as string || 'unknown';
+      
       const user = await db.getUserByEmail(input.email);
       if (!user) {
         console.log("[LOGIN] User not found");
+        trackFailedLogin(input.email, ipAddress);
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
@@ -91,11 +95,25 @@ export const authRouter = router({
       const isValidPassword = await db.verifyPassword(input.password, user.password);
       console.log("[LOGIN] Password valid:", isValidPassword);
       if (!isValidPassword) {
+        trackFailedLogin(input.email, ipAddress);
         throw new TRPCError({
           code: "UNAUTHORIZED",
           message: "Invalid email or password",
         });
       }
+      
+      // Reset failed attempts on successful login
+      resetFailedLoginAttempts(input.email, ipAddress);
+      
+      // Log successful login
+      logSecurityEvent({
+        eventType: "failed_login",
+        severity: "low",
+        userId: user.id,
+        email: user.email,
+        ipAddress,
+        details: `Successful login for ${user.email}`,
+      });
 
       // Update last sign in
       await db.updateUserLastSignIn(user.id);
