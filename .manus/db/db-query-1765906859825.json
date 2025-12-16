@@ -1,0 +1,82 @@
+{
+  "query": "SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 210001 \nORDER BY atq.questionNumber \nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 210001 \nORDER BY atq.questionNumber \nLIMIT 10",
+  "rows": [
+    {
+      "id": "120001",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60001",
+      "response": "yes",
+      "responseValue": "NULL",
+      "observations": "dcas;as;clamc",
+      "questionText": "All incidents are recorded in the incident log"
+    },
+    {
+      "id": "120002",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60001",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "All incidents are recorded in the incident log"
+    },
+    {
+      "id": "120004",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60002",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Incident forms are completed fully and accurately"
+    },
+    {
+      "id": "120003",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60002",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "a;sld;asld;qwdlq;wl",
+      "questionText": "Incident forms are completed fully and accurately"
+    },
+    {
+      "id": "120005",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60003",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Incidents are recorded in a timely manner"
+    },
+    {
+      "id": "120006",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60003",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Incidents are recorded in a timely manner"
+    },
+    {
+      "id": "120008",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60004",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "Witness statements are obtained where appropriate"
+    },
+    {
+      "id": "120007",
+      "auditInstanceId": "210001",
+      "auditTemplateQuestionId": "60004",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL",
+      "questionText": "Witness statements are obtained where appropriate"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditInstanceId\tauditTemplateQuestionId\tresponse\tresponseValue\tobservations\tquestionText\n120001\t210001\t60001\tyes\tNULL\tdcas;as;clamc\tAll incidents are recorded in the incident log\n120002\t210001\t60001\tyes\tyes\tNULL\tAll incidents are recorded in the incident log\n120004\t210001\t60002\t\tNULL\tNULL\tIncident forms are completed fully and accurately\n120003\t210001\t60002\tyes\tyes\ta;sld;asld;qwdlq;wl\tIncident forms are completed fully and accurately\n120005\t210001\t60003\tyes\tyes\tNULL\tIncidents are recorded in a timely manner\n120006\t210001\t60003\t\tNULL\tNULL\tIncidents are recorded in a timely manner\n120008\t210001\t60004\t\tNULL\tNULL\tWitness statements are obtained where appropriate\n120007\t210001\t60004\tyes\tyes\tNULL\tWitness statements are obtained where appropriate\n",
+  "stderr": "",
+  "execution_time_ms": 109
+}

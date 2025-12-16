@@ -1060,6 +1060,10 @@ export const appRouter = router({
         
         // Get all responses for this audit
         const responses = await db.getAuditResponses(input.auditInstanceId);
+        console.log(`[generatePdf] Retrieved ${responses.length} responses from database for audit ${input.auditInstanceId}`);
+        responses.forEach((r, idx) => {
+          console.log(`[generatePdf] DB Response ${idx + 1}: questionId=${r.auditTemplateQuestionId}, response='${r.response}', responseValue='${r.responseValue}'`);
+        });
         
         // Map responses to include question details
         const mappedResponses = responses.map(r => {
@@ -1074,13 +1078,14 @@ export const appRouter = router({
               break;
             }
           }
-          const responseValue = r.responseValue || r.response;
-          console.log(`[generatePdf] Question ${questionNumber}: responseValue='${r.responseValue}', response='${r.response}', final='${responseValue}'`);
+          // Use responseValue first (for yes/no/na), then response (for text/number)
+          const finalResponse = r.responseValue || r.response || null;
+          console.log(`[generatePdf] Question ${questionNumber}: responseValue='${r.responseValue}', response='${r.response}', final='${finalResponse}'`);
           return {
             questionId: r.auditTemplateQuestionId,
             questionNumber,
             questionText,
-            response: responseValue, // Use responseValue first, fallback to response
+            response: finalResponse,
             observations: r.observations,
             actionRequired: r.actionRequired,
           };

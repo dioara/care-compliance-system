@@ -1538,3 +1538,24 @@
 - [x] Fix audit report PDF showing "N/A" instead of actual responses (Yes/No/Partial) - use responseValue field
 - [x] Fix Master Action Log template to include all details in table format - added Action Taken column
 - [x] Change Master Action Log background to white to avoid logo clashes
+
+
+## Audit Report PDF Fix (Dec 16, 2025)
+- [x] Examine uploaded audit report PDF to see response value issue - questions 1.2-1.4 show N/A instead of Yes
+- [x] Check server logs for debugging output - added comprehensive logging
+- [x] Fix response value mapping in PDF generation - use responseValue || response || null
+- [ ] Test with actual audit data to verify fix - needs user to export PDF and check logs
+
+## Audit Calendar Feature (Dec 16, 2025)
+- [ ] Create Audit Calendar page with calendar view
+- [ ] Implement audit scheduling functionality
+- [ ] Add auto-suggest for scheduling audits across next 12 months
+- [ ] Implement auto-reminders 1 day before scheduled audits
+- [ ] Add flexible date management for monthly audits
+
+## Email Notifications (Dec 16, 2025)
+- [ ] Set up SendGrid email service integration
+- [ ] Implement email notification for action plan assignments
+- [ ] Add email notification for approaching due dates (3 days before)
+- [ ] Add email notification when actions are marked complete
+- [ ] Create email templates for each notification type
