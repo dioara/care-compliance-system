@@ -1076,7 +1076,7 @@ export const appRouter = router({
             questionId: r.auditTemplateQuestionId,
             questionNumber,
             questionText,
-            response: r.response,
+            response: r.responseValue || r.response, // Use responseValue first, fallback to response
             observations: r.observations,
             actionRequired: r.actionRequired,
           };

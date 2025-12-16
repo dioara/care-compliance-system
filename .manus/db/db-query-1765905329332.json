@@ -1,0 +1,28 @@
+{
+  "query": "SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 150001 \nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT ar.id, ar.auditInstanceId, ar.auditTemplateQuestionId, ar.response, ar.responseValue, ar.observations, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.auditTemplateQuestionId = atq.id \nWHERE ar.auditInstanceId = 150001 \nLIMIT 10",
+  "rows": [
+    {
+      "id": "90001",
+      "auditInstanceId": "150001",
+      "auditTemplateQuestionId": "60001",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "",
+      "questionText": "All incidents are recorded in the incident log"
+    },
+    {
+      "id": "90002",
+      "auditInstanceId": "150001",
+      "auditTemplateQuestionId": "60001",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL",
+      "questionText": "All incidents are recorded in the incident log"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditInstanceId\tauditTemplateQuestionId\tresponse\tresponseValue\tobservations\tquestionText\n90001\t150001\t60001\tyes\tyes\t\tAll incidents are recorded in the incident log\n90002\t150001\t60001\t\tNULL\tNULL\tAll incidents are recorded in the incident log\n",
+  "stderr": "",
+  "execution_time_ms": 67
+}

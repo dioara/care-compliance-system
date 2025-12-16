@@ -37,7 +37,7 @@ const COLORS = {
   text: "#1f2937",
   textLight: "#6b7280",
   border: "#e5e7eb",
-  headerBg: "#1e3a8a",
+  headerBg: "#ffffff", // Changed to white to avoid logo clashes
   rowAlt: "#f9fafb",
 };
 
@@ -107,8 +107,9 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
 }
 
 function drawHeader(doc: PDFKit.PDFDocument, data: ActionLogReportData, contentWidth: number, margin: number, logoBuffer: Buffer | null) {
-  // Header background
+  // Header background - white with subtle border
   doc.rect(0, 0, 841.89, 80).fill(COLORS.headerBg);
+  doc.rect(0, 78, 841.89, 2).fill(COLORS.primary); // Blue bottom border
 
   let textStartX = margin;
   
@@ -123,15 +124,15 @@ function drawHeader(doc: PDFKit.PDFDocument, data: ActionLogReportData, contentW
   }
 
   // Company name
-  doc.fontSize(24).font("Helvetica-Bold").fillColor("#ffffff");
+  doc.fontSize(24).font("Helvetica-Bold").fillColor(COLORS.text);
   doc.text(data.companyName, textStartX, 20, { width: contentWidth - 200 - (textStartX - margin) });
 
   // Report title
-  doc.fontSize(12).font("Helvetica").fillColor("#93c5fd");
+  doc.fontSize(12).font("Helvetica").fillColor(COLORS.primary);
   doc.text("Master Action Log Report", textStartX, 50);
 
   // Date and location on the right
-  doc.fontSize(10).fillColor("#ffffff");
+  doc.fontSize(10).fillColor(COLORS.text);
   const dateStr = new Date().toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -197,15 +198,16 @@ function drawStatBox(doc: PDFKit.PDFDocument, x: number, y: number, width: numbe
 function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], contentWidth: number, margin: number, pageHeight: number) {
   // Column definitions
   const columns = [
-    { header: "Issue #", width: 55, key: "issueNumber" },
-    { header: "Description", width: 180, key: "issueDescription" },
-    { header: "Audit Origin", width: 100, key: "auditOrigin" },
-    { header: "Location", width: 80, key: "locationName" },
-    { header: "Priority", width: 55, key: "ragStatus" },
-    { header: "Assigned To", width: 90, key: "responsiblePersonName" },
-    { header: "Target Date", width: 70, key: "targetCompletionDate" },
-    { header: "Status", width: 70, key: "status" },
-    { header: "Completion", width: 70, key: "actualCompletionDate" },
+    { header: "Issue #", width: 50, key: "issueNumber" },
+    { header: "Description", width: 150, key: "issueDescription" },
+    { header: "Audit Origin", width: 85, key: "auditOrigin" },
+    { header: "Location", width: 70, key: "locationName" },
+    { header: "Priority", width: 50, key: "ragStatus" },
+    { header: "Assigned To", width: 80, key: "responsiblePersonName" },
+    { header: "Target Date", width: 65, key: "targetCompletionDate" },
+    { header: "Status", width: 65, key: "status" },
+    { header: "Action Taken", width: 110, key: "actionTaken" },
+    { header: "Completion", width: 65, key: "actualCompletionDate" },
   ];
 
   const tableTop = doc.y;
@@ -302,6 +304,11 @@ function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], content
           value = statusMap[action.status] || action.status;
           textColor = action.status === "completed" ? COLORS.success : action.status === "in_progress" ? COLORS.secondary : COLORS.textLight;
           doc.font("Helvetica-Bold");
+          break;
+        case "actionTaken":
+          value = action.actionTaken || "-";
+          if (value.length > 30) value = value.substring(0, 27) + "...";
+          doc.font("Helvetica");
           break;
         case "actualCompletionDate":
           value = action.actualCompletionDate ? new Date(action.actualCompletionDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "-";

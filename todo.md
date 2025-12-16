@@ -1533,3 +1533,8 @@
 - [x] Distribute monthly audits across the month (mid-month for flexibility)
 - [x] Add auto-reminders 1 day before scheduled audits - service created with manual trigger for admins
 - [ ] Add calendar navigation and filters
+
+## Audit Report and Action Log PDF Fixes (Dec 16, 2025)
+- [x] Fix audit report PDF showing "N/A" instead of actual responses (Yes/No/Partial) - use responseValue field
+- [x] Fix Master Action Log template to include all details in table format - added Action Taken column
+- [x] Change Master Action Log background to white to avoid logo clashes

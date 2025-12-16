@@ -1,0 +1,8 @@
+{
+  "query": "SELECT ar.id, ar.auditInstanceId, ar.questionId, ar.response, ar.textResponse, ar.numberResponse, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.questionId = atq.id \nWHERE ar.auditInstanceId = 150001 \nAND atq.questionText LIKE '%All incidents are recorded%'\nLIMIT 5",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT ar.id, ar.auditInstanceId, ar.questionId, ar.response, ar.textResponse, ar.numberResponse, atq.questionText \nFROM auditResponses ar \nJOIN auditTemplateQuestions atq ON ar.questionId = atq.id \nWHERE ar.auditInstanceId = 150001 \nAND atq.questionText LIKE '%All incidents are recorded%'\nLIMIT 5",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'ar.questionid' in 'on clause'"
+  ]
+}
