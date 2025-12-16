@@ -1329,7 +1329,7 @@ export const appRouter = router({
               auditorId: ctx.user.id,
               auditorName: ctx.user.name || undefined,
               auditorRole: ctx.user.role || undefined,
-              status: 'scheduled',
+              status: 'in_progress',
             });
             console.log('[acceptScheduleSuggestions] Created audit instance:', instanceId);
             

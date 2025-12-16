@@ -1,4 +1,49 @@
-import { addMonths, addDays, startOfMonth, endOfMonth, format, isSameDay, parseISO } from 'date-fns';
+import { format, addDays, parseISO, getDay, addMonths, startOfMonth, endOfMonth } from 'date-fns';
+
+// UK Bank Holidays 2025-2026
+const UK_BANK_HOLIDAYS = [
+  // 2025
+  '2025-01-01', // New Year's Day
+  '2025-04-18', // Good Friday
+  '2025-04-21', // Easter Monday
+  '2025-05-05', // Early May Bank Holiday
+  '2025-05-26', // Spring Bank Holiday
+  '2025-08-25', // Summer Bank Holiday
+  '2025-12-25', // Christmas Day
+  '2025-12-26', // Boxing Day
+  // 2026
+  '2026-01-01', // New Year's Day
+  '2026-04-03', // Good Friday
+  '2026-04-06', // Easter Monday
+  '2026-05-04', // Early May Bank Holiday
+  '2026-05-25', // Spring Bank Holiday
+  '2026-08-31', // Summer Bank Holiday
+  '2026-12-25', // Christmas Day
+  '2026-12-28', // Boxing Day (substitute)
+];
+
+/**
+ * Check if a date is a weekend (Saturday or Sunday)
+ */
+function isWeekend(date: Date): boolean {
+  const day = getDay(date); // 0 = Sunday, 6 = Saturday
+  return day === 0 || day === 6;
+}
+
+/**
+ * Check if a date is a UK bank holiday
+ */
+function isBankHoliday(date: Date): boolean {
+  const dateStr = format(date, 'yyyy-MM-dd');
+  return UK_BANK_HOLIDAYS.includes(dateStr);
+}
+
+/**
+ * Check if a date is a working day (not weekend, not bank holiday)
+ */
+function isWorkingDay(date: Date): boolean {
+  return !isWeekend(date) && !isBankHoliday(date);
+}
 
 interface AuditType {
   id: number;
@@ -108,15 +153,15 @@ export function generateAuditSchedule(
       // Stop if we've exceeded the 12-month window
       if (currentDate > endDate) break;
       
-      // Find a suitable date (avoid days with too many audits)
+      // Find a suitable date (avoid weekends, bank holidays, and days with too many audits)
       let suggestedDate = currentDate;
       let attempts = 0;
-      while (attempts < 7) {
+      while (attempts < 14) { // Increased attempts to account for weekends
         const dateKey = format(suggestedDate, 'yyyy-MM-dd');
         const auditsOnDate = scheduledDates.get(dateKey) || 0;
         
-        // If fewer than 3 audits on this date, use it
-        if (auditsOnDate < 3) {
+        // Check if it's a working day with capacity
+        if (isWorkingDay(suggestedDate) && auditsOnDate < 3) {
           break;
         }
         

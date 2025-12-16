@@ -1691,3 +1691,17 @@
 - [x] Show dialog when clicking any date
 - [x] Display existing audits for clicked date
 - [x] Add button to schedule new audit with pre-filled date
+
+
+## BUG: Auto-Schedule Status Value Error
+- [x] Fix status value in acceptScheduleSuggestions - changed from 'scheduled' to 'in_progress'
+- [x] Ensure status matches allowed ENUM values (in_progress, completed, reviewed, archived)
+- [ ] Test that audits are created successfully after fix
+
+
+## Feature: Exclude Weekends and Bank Holidays from Auto-Schedule
+- [x] Add UK bank holidays list (2025-2026) to scheduling service
+- [x] Add function to check if date is weekend (Saturday/Sunday)
+- [x] Add function to check if date is UK bank holiday
+- [x] Update scheduling logic to skip non-working days
+- [ ] Test that suggestions only include weekdays (Mon-Fri) excluding bank holidays
