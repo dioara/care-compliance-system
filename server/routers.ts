@@ -277,6 +277,12 @@ export const appRouter = router({
 
         return { success: true, url };
       }),
+
+    // List all locations for the company (used by LocationSwitcher)
+    listLocations: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) return [];
+      return db.getLocationsByTenant(ctx.user.tenantId);
+    }),
   }),
 
   // Location management

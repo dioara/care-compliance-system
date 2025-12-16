@@ -28,8 +28,6 @@ export function NotificationCenter() {
   // Fetch dashboard stats for notifications
   const { data: dashboardStats } = trpc.dashboard.getStats.useQuery();
   const { data: alertStatus } = trpc.notifications.getAlertStatus.useQuery({ threshold: 80 });
-  const { data: actionPlans } = trpc.actionPlans.list.useQuery({ status: "in_progress" });
-  
   // Build notifications from real data
   const notifications: Notification[] = [];
   

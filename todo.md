@@ -1440,3 +1440,9 @@
 
 ## Bug Fix - PDF Generation Error (Dec 16, 2025)
 - [x] Fix "switchToPage(0) out of bounds" error - removed page switching code, added footer to each page directly
+
+
+## Bug Fixes - Stack Overflow & Missing Procedures (Dec 16, 2025)
+- [x] Fix Maximum call stack size exceeded error - removed recursive addPage override
+- [x] Fix missing company.listLocations procedure - added to company router
+- [x] Fix missing actionPlans.list procedure - removed unused query from NotificationCenter

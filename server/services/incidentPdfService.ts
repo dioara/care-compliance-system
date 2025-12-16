@@ -174,23 +174,8 @@ function renderIncidentReport(
   const { pageWidth, pageHeight, margin, contentWidth } = dims;
   let y = margin;
 
-  // Add footer to current page
-  const addFooter = () => {
-    const footerY = pageHeight - 40;
-    doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
-    doc.text(`${data.companyName} - Confidential Incident Report`, margin, footerY, { width: contentWidth / 2 });
-  };
-  
-  // Add footer to first page
-  addFooter();
-  
-  // Override addPage to add footer to new pages
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function(...args: any[]) {
-    const result = originalAddPage(...args);
-    addFooter();
-    return result;
-  };
+  // Footer will be added at the bottom of content areas
+  // No page-level footer to avoid pagination issues
 
   // ===== HEADER (White background) =====
   // Logo and company name
