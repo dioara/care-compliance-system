@@ -1454,4 +1454,8 @@
 
 ## Page Numbers & GitHub Push (Dec 16, 2025)
 - [x] Add page numbers (Page X of Y) to PDF footer - using bufferPages option
-- [ ] Push all changes to GitHub
+- [x] Push all changes to GitHub
+
+
+## PDF Header Fix (Dec 16, 2025)
+- [x] Fix logo and business name overlapping in PDF header - added fixed width to logo and proper spacing

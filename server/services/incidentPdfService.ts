@@ -194,17 +194,22 @@ function renderIncidentReport(
   // ===== HEADER (White background) =====
   // Logo and company name
   let headerTextX = margin;
+  let logoWidth = 0;
   if (logoBuffer) {
     try {
-      doc.image(logoBuffer, margin, y, { height: 50 });
-      headerTextX = margin + 60;
+      // Render logo with fixed width to prevent overlap
+      doc.image(logoBuffer, margin, y, { height: 50, width: 50 });
+      logoWidth = 60; // Logo width + padding
+      headerTextX = margin + logoWidth;
     } catch (e) {
       console.error("Failed to render logo:", e);
     }
   }
 
+  // Company name with proper spacing from logo
+  const headerTextWidth = contentWidth - logoWidth - 160; // Leave space for right-side metadata
   doc.fontSize(18).font("Helvetica-Bold").fillColor(COLORS.text);
-  doc.text(data.companyName, headerTextX, y + 5, { width: contentWidth - 150 });
+  doc.text(data.companyName, headerTextX, y + 5, { width: headerTextWidth });
   
   doc.fontSize(10).font("Helvetica").fillColor(COLORS.textLight);
   doc.text("Incident Report", headerTextX, y + 28);
