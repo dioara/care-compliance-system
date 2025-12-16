@@ -72,9 +72,9 @@ const menuItems = [
   { icon: Heart, label: "Service Users", path: "/service-users", description: "Manage residents" },
   { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
   { icon: ClipboardList, label: "Audits", path: "/audits", description: "Compliance audits" },
+
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
   { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
-  { icon: BarChart3, label: "Analytics", path: "/analytics", description: "Data insights" },
   { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },
   { icon: ClipboardCheck, label: "Action Log", path: "/action-log", description: "Track actions" },
 ];

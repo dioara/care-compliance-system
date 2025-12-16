@@ -1521,3 +1521,15 @@
 - [x] Remove extra blank pages caused by headers/footers
 - [x] Ensure all audit fields are displayed in the PDF
 - [x] Keep tabular format for better readability
+
+## Navigation and PDF Fixes (Dec 16, 2025)
+- [x] Remove Analytics tab from navigation menu
+- [x] Fix audit report PDF to show all completed responses (not N/A) - normalized response values and added text/number response handling
+
+## Audit Calendar Feature (Dec 16, 2025)
+- [x] Create Audit Calendar page with calendar view
+- [x] Implement auto-suggest for audit schedules (next 12 months)
+- [x] Allow super admin to edit/delete calendar events
+- [x] Distribute monthly audits across the month (mid-month for flexibility)
+- [x] Add auto-reminders 1 day before scheduled audits - service created with manual trigger for admins
+- [ ] Add calendar navigation and filters

@@ -176,6 +176,13 @@
       "when": 1765888181363,
       "tag": "0024_lucky_odin",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1765903605972,
+      "tag": "0025_sleepy_chamber",
+      "breakpoints": true
     }
   ]
 }

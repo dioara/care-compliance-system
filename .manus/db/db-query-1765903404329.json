@@ -1,0 +1,70 @@
+{
+  "query": "SELECT id, response, responseValue, observations FROM auditResponses WHERE auditInstanceId = 30001 LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, response, responseValue, observations FROM auditResponses WHERE auditInstanceId = 30001 LIMIT 10",
+  "rows": [
+    {
+      "id": "1",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "2",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "3",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "4",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "5",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "6",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "7",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "8",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    },
+    {
+      "id": "9",
+      "response": "yes",
+      "responseValue": "yes",
+      "observations": "NULL"
+    },
+    {
+      "id": "10",
+      "response": "",
+      "responseValue": "NULL",
+      "observations": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tresponse\tresponseValue\tobservations\n1\tyes\tyes\tNULL\n2\t\tNULL\tNULL\n3\tyes\tyes\tNULL\n4\t\tNULL\tNULL\n5\tyes\tyes\tNULL\n6\t\tNULL\tNULL\n7\tyes\tyes\tNULL\n8\t\tNULL\tNULL\n9\tyes\tyes\tNULL\n10\t\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 90
+}

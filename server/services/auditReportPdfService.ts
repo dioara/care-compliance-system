@@ -316,23 +316,29 @@ function drawResponses(doc: PDFKit.PDFDocument, data: AuditReportData, contentWi
         const badgeHeight = 18;
         
         let badgeColor = COLORS.textLight;
-        let badgeText = response.response || "N/A";
+        let badgeText = "N/A";
         let badgeBg = "#f3f4f6";
         
-        if (response.response === "yes") {
+        // Normalize response value (handle both lowercase and capitalized)
+        const normalizedResponse = response.response?.toLowerCase().trim();
+        
+        if (normalizedResponse === "yes") {
           badgeColor = COLORS.success;
           badgeText = "Yes";
           badgeBg = COLORS.greenBg;
-        } else if (response.response === "no") {
+        } else if (normalizedResponse === "no") {
           badgeColor = COLORS.danger;
           badgeText = "No";
           badgeBg = COLORS.redBg;
-        } else if (response.response === "na") {
+        } else if (normalizedResponse === "na" || normalizedResponse === "n/a") {
           badgeText = "N/A";
-        } else if (response.response === "partial") {
+        } else if (normalizedResponse === "partial") {
           badgeColor = COLORS.warning;
           badgeText = "Partial";
           badgeBg = COLORS.amberBg;
+        } else if (response.response && normalizedResponse !== "na" && normalizedResponse !== "n/a") {
+          // For text/number responses, show the actual value
+          badgeText = response.response.length > 50 ? response.response.substring(0, 47) + "..." : response.response;
         }
 
         doc.rect(badgeX, badgeY, badgeWidth, badgeHeight).fillAndStroke(badgeBg, badgeColor);
