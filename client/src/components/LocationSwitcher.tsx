@@ -28,14 +28,14 @@ export function LocationSwitcher() {
   const activeLocation = accessibleLocations.find(loc => loc.id === activeLocationId);
 
   return (
-    <div className="flex items-center gap-2">
-      <MapPin className="h-4 w-4 text-muted-foreground" />
+    <div className="flex items-center gap-1.5 sm:gap-2">
+      <MapPin className="h-4 w-4 text-muted-foreground hidden sm:block" />
       <Select
         value={activeLocationId?.toString() || ""}
         onValueChange={(value) => setActiveLocationId(parseInt(value))}
       >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Select location" />
+        <SelectTrigger className="w-[140px] sm:w-[160px] md:w-[200px] h-9 text-sm">
+          <SelectValue placeholder="Location" />
         </SelectTrigger>
         <SelectContent>
           {accessibleLocations.map((location) => {
@@ -43,9 +43,9 @@ export function LocationSwitcher() {
             return (
               <SelectItem key={location.id} value={location.id.toString()}>
                 <div className="flex items-center justify-between w-full">
-                  <span>{location.name}</span>
+                  <span className="truncate">{location.name}</span>
                   {permission && !permission.canWrite && (
-                    <Lock className="h-3 w-3 ml-2 text-muted-foreground" />
+                    <Lock className="h-3 w-3 ml-2 text-muted-foreground shrink-0" />
                   )}
                 </div>
               </SelectItem>
@@ -54,7 +54,7 @@ export function LocationSwitcher() {
         </SelectContent>
       </Select>
       {activeLocation && !canWrite && (
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant="secondary" className="text-xs hidden md:flex">
           <Lock className="h-3 w-3 mr-1" />
           Read Only
         </Badge>

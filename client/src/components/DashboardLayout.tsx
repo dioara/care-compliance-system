@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard, Menu } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { LocationSwitcher } from "./LocationSwitcher";
@@ -32,6 +32,12 @@ import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { NotificationCenter } from "./NotificationCenter";
 import { OnboardingTour } from "./OnboardingTour";
 import { TrialBanner } from "./TrialBanner";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Theme toggle component for dropdown menu
 function ThemeToggleItem() {
@@ -141,9 +147,11 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
-      <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
-        {children}
-      </DashboardLayoutContent>
+      <TooltipProvider delayDuration={0}>
+        <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
+          {children}
+        </DashboardLayoutContent>
+      </TooltipProvider>
     </SidebarProvider>
   );
 }
@@ -202,6 +210,44 @@ function DashboardLayoutContent({
     };
   }, [isResizing, setSidebarWidth]);
 
+  // Sidebar menu item component with proper tooltip support
+  const SidebarNavItem = ({ item, isActive }: { item: typeof menuItems[0], isActive: boolean }) => {
+    const content = (
+      <SidebarMenuButton
+        isActive={isActive}
+        onClick={() => setLocation(item.path)}
+        tooltip={item.label}
+        className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
+      >
+        <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all shrink-0 ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
+          <item.icon className="h-4 w-4" />
+        </div>
+        {!isCollapsed && (
+          <>
+            <span className="truncate">{item.label}</span>
+            {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50 shrink-0" />}
+          </>
+        )}
+      </SidebarMenuButton>
+    );
+
+    // Show tooltip when collapsed
+    if (isCollapsed && !isMobile) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {content}
+          </TooltipTrigger>
+          <TooltipContent side="right" className="font-medium">
+            {item.label}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return content;
+  };
+
   return (
     <>
       <div className="relative" ref={sidebarRef}>
@@ -212,29 +258,36 @@ function DashboardLayoutContent({
         >
           <SidebarHeader className="h-16 justify-center border-b border-sidebar-border/50">
             <div className="flex items-center gap-3 px-3 transition-all w-full">
-              <button
-                onClick={toggleSidebar}
-                className="h-9 w-9 flex items-center justify-center hover:bg-primary/10 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0 group"
-                aria-label="Toggle navigation"
-              >
-                <PanelLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-              </button>
-              {!isCollapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleSidebar}
+                    className="h-9 w-9 flex items-center justify-center hover:bg-primary/10 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0 group"
+                    aria-label="Toggle navigation"
+                  >
+                    <PanelLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                </TooltipContent>
+              </Tooltip>
+              {!isCollapsed && (
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm">
+                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm shrink-0">
                     <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col min-w-0">
                     <span className="font-semibold tracking-tight truncate text-sm">
                       Care Compliance
                     </span>
                     <span className="text-[10px] text-muted-foreground -mt-0.5">Management System</span>
                   </div>
                 </div>
-              ) : null}
+              )}
             </div>
           </SidebarHeader>
 
@@ -244,18 +297,7 @@ function DashboardLayoutContent({
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>
-                    <SidebarMenuButton
-                      isActive={isActive}
-                      onClick={() => setLocation(item.path)}
-                      tooltip={item.label}
-                      className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
-                    >
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                      <span>{item.label}</span>
-                      {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50" />}
-                    </SidebarMenuButton>
+                    <SidebarNavItem item={item} isActive={isActive} />
                   </SidebarMenuItem>
                 );
               })}
@@ -264,25 +306,16 @@ function DashboardLayoutContent({
               {user?.superAdmin && (
                 <>
                   <div className="my-3 mx-1 border-t border-sidebar-border/50" />
-                  <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
-                    {!isCollapsed && "Administration"}
-                  </div>
+                  {!isCollapsed && (
+                    <div className="px-3 py-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+                      Administration
+                    </div>
+                  )}
                   {adminMenuItems.map(item => {
                     const isActive = location === item.path;
                     return (
                       <SidebarMenuItem key={item.path}>
-                        <SidebarMenuButton
-                          isActive={isActive}
-                          onClick={() => setLocation(item.path)}
-                          tooltip={item.label}
-                          className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
-                        >
-                          <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
-                            <item.icon className="h-4 w-4" />
-                          </div>
-                          <span>{item.label}</span>
-                          {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50" />}
-                        </SidebarMenuButton>
+                        <SidebarNavItem item={item} isActive={isActive} />
                       </SidebarMenuItem>
                     );
                   })}
@@ -294,20 +327,22 @@ function DashboardLayoutContent({
           <SidebarFooter className="p-3 border-t border-sidebar-border/50">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-accent transition-all duration-200 w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <button className={`flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-accent transition-all duration-200 w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isCollapsed ? "justify-center" : ""}`}>
                   <Avatar className="h-10 w-10 border-2 border-primary/20 shrink-0 shadow-sm">
                     <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
                       {user?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-semibold truncate leading-none">
-                      {user?.name || "-"}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate mt-1">
-                      {user?.email || "-"}
-                    </p>
-                  </div>
+                  {!isCollapsed && (
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate leading-none">
+                        {user?.name || "-"}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate mt-1">
+                        {user?.email || "-"}
+                      </p>
+                    </div>
+                  )}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -332,43 +367,41 @@ function DashboardLayoutContent({
             </DropdownMenu>
           </SidebarFooter>
         </Sidebar>
-        <div
-          className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
-          onMouseDown={() => {
-            if (isCollapsed) return;
-            setIsResizing(true);
-          }}
-          style={{ zIndex: 50 }}
-        />
+        {!isCollapsed && (
+          <div
+            className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-primary/20 transition-colors"
+            onMouseDown={() => {
+              if (isCollapsed) return;
+              setIsResizing(true);
+            }}
+            style={{ zIndex: 50 }}
+          />
+        )}
       </div>
 
-      <SidebarInset>
+      <SidebarInset className="flex flex-col">
         <TrialBanner />
-        {isMobile && (
-          <div className="flex border-b h-14 items-center justify-between bg-background/95 px-2 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="h-9 w-9 rounded-lg bg-background" />
-              <div className="flex items-center gap-3">
-                <div className="flex flex-col gap-1">
-                  <span className="tracking-tight text-foreground">
-                    {activeMenuItem?.label ?? "Menu"}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <NotificationCenter />
-              <LocationSwitcher />
-            </div>
+        {/* Unified header for all screen sizes */}
+        <header className="flex border-b h-14 items-center justify-between bg-background/95 px-3 md:px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+          {/* Left side - mobile menu trigger and page title */}
+          <div className="flex items-center gap-2 md:hidden">
+            <SidebarTrigger className="h-9 w-9 rounded-lg" />
+            <span className="font-medium text-sm truncate">
+              {activeMenuItem?.label ?? "Menu"}
+            </span>
           </div>
-        )}
-        {!isMobile && (
-          <div className="flex border-b h-14 items-center justify-end gap-3 bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
+          
+          {/* Spacer for desktop to push location switcher to right */}
+          <div className="hidden md:block" />
+          
+          {/* Right side - notifications and location switcher (always visible) */}
+          <div className="flex items-center gap-2 md:gap-3">
             <NotificationCenter />
             <LocationSwitcher />
           </div>
-        )}
-        <main className="flex-1 p-4">{children}</main>
+        </header>
+        
+        <main className="flex-1 p-3 md:p-4 lg:p-6">{children}</main>
         <OnboardingTour />
       </SidebarInset>
     </>

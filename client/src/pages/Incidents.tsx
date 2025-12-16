@@ -310,23 +310,23 @@ export default function Incidents() {
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center shadow-sm">
-            <AlertTriangle className="h-6 w-6 text-orange-500" />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center shadow-sm shrink-0">
+            <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
               Incident Reporting
             </h1>
-            <p className="text-muted-foreground mt-1 max-w-2xl">
+            <p className="text-sm md:text-base text-muted-foreground mt-1 max-w-2xl">
               Log and track incidents with comprehensive documentation, automatic categorisation, and regulatory reporting compliance.
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 md:gap-3">
           <Button
             variant="outline"
             onClick={() => generatePDFMutation.mutate({})}
@@ -957,7 +957,7 @@ export default function Incidents() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
         <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-slate-600">Total Incidents</CardTitle>

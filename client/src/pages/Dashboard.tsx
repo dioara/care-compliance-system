@@ -97,7 +97,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       {/* Compliance Alert Banner */}
       {alertStatus?.hasAlerts && !alertDismissed && (
         <Alert variant="destructive" className="relative border-red-200 bg-red-50 shadow-sm">
@@ -139,32 +139,30 @@ export default function Dashboard() {
       )}
       
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl">
-              <Activity className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                Welcome back, {user?.name?.split(' ')[0] || 'User'}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
-              </p>
-            </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl shrink-0">
+            <Activity className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              Welcome back, {user?.name?.split(' ')[0] || 'User'}
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">
+              {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
+            </p>
           </div>
         </div>
         
         {/* Location Filter */}
         {accessibleLocations && accessibleLocations.length > 1 && (
-          <div className="flex items-center gap-3 bg-muted/30 rounded-xl p-2 pr-3">
+          <div className="flex items-center gap-2 md:gap-3 bg-muted/30 rounded-xl p-2 pr-3 w-fit">
             <Building2 className="h-4 w-4 text-muted-foreground ml-2" />
             <Select
               value={activeLocationId?.toString() || ""}
               onValueChange={(value) => setActiveLocationId(parseInt(value))}
             >
-              <SelectTrigger className="w-[200px] border-0 bg-transparent shadow-none focus:ring-0">
+              <SelectTrigger className="w-[160px] md:w-[200px] border-0 bg-transparent shadow-none focus:ring-0">
                 <SelectValue placeholder="All Locations" />
               </SelectTrigger>
               <SelectContent>
@@ -180,9 +178,9 @@ export default function Dashboard() {
       </div>
 
       {/* Key Metrics - Redesigned */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 md:gap-4 grid-cols-2 lg:grid-cols-4">
         {/* Overall Compliance - Featured Card */}
-        <Card className="md:col-span-2 lg:col-span-1 bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-xl overflow-hidden relative">
+        <Card className="col-span-2 lg:col-span-1 bg-gradient-to-br from-slate-900 to-slate-800 text-white border-0 shadow-xl overflow-hidden relative">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16" />
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-slate-300 flex items-center gap-2">

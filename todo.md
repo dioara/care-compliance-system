@@ -1488,3 +1488,22 @@
 - [x] Updated incidentExcelService.ts interface and data mapping to match corrected field names
 - [x] Added null safety checks throughout Excel generation
 - [x] Excel export now working successfully with service user names populated
+
+
+## Responsive Design Overhaul (Dec 16, 2025)
+- [x] Fix collapsed sidebar to show icons only (not truncated text)
+- [x] Add tooltips to sidebar icons when collapsed
+- [x] Ensure location switcher is always visible in header across all screen sizes
+- [x] Improve mobile breakpoints (< 768px)
+- [x] Improve tablet breakpoints (768px - 1024px)
+- [x] Improve desktop breakpoints (> 1024px)
+- [x] Test responsive design on all pages
+- [x] Ensure cards and grids adapt properly to screen width
+
+### Changes Made:
+- DashboardLayout.tsx: Redesigned sidebar with proper icon-only collapsed state and tooltips
+- DashboardLayout.tsx: Unified header with location switcher always visible
+- LocationSwitcher.tsx: Made responsive with adaptive widths (140px mobile, 200px desktop)
+- Staff.tsx: Improved header and grid layout responsiveness
+- Incidents.tsx: Improved header and stats cards grid responsiveness
+- Dashboard.tsx: Improved header and metrics grid responsiveness

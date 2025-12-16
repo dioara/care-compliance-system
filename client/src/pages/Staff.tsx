@@ -265,15 +265,16 @@ export default function Staff() {
   );
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
-            <UserCheck className="h-6 w-6 text-primary" />
+    <div className="space-y-6 md:space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm shrink-0">
+            <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Staff Members</h1>
-            <p className="text-muted-foreground mt-1">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Staff Members</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">
               Manage staff members for the selected location. Track employment details and DBS certificates.
             </p>
           </div>
@@ -282,15 +283,15 @@ export default function Staff() {
       
       {/* Location Filter */}
       {accessibleLocations.length > 1 && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">Filter by location:</span>
           <Select
             value={filterLocationId?.toString() || "all"}
             onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
           >
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="All accessible locations" />
+            <SelectTrigger className="w-[160px] md:w-[200px]">
+              <SelectValue placeholder="All locations" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Current location</SelectItem>
@@ -304,7 +305,7 @@ export default function Staff() {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         {!canWrite && (
           <Badge variant="secondary" className="text-amber-600 bg-amber-50 border-amber-200">
             <Lock className="h-3 w-3 mr-1" />
@@ -453,7 +454,7 @@ export default function Staff() {
       </div>
 
       {staff && staff.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           {staff.map((staffMember) => (
             <Card key={staffMember.id}>
               <CardHeader>
