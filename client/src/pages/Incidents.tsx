@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { 
   AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText, Download, Loader2,
   User, MapPin, Calendar, AlertCircle, Shield, Phone, Mail, Building, 
-  Stethoscope, ClipboardList, Users, Eye, ChevronRight, Activity
+  Stethoscope, ClipboardList, Users, Eye, ChevronRight, Activity, FileSpreadsheet
 } from "lucide-react";
 import { toast } from "sonner";
 import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
@@ -107,6 +107,16 @@ export default function Incidents() {
     },
     onError: (error) => {
       toast.error(`Failed to generate PDF: ${error.message}`);
+    },
+  });
+
+  const generateExcelMutation = trpc.incidents.generateExcel.useMutation({
+    onSuccess: (data) => {
+      window.open(data.url, "_blank");
+      toast.success("Excel report generated successfully");
+    },
+    onError: (error) => {
+      toast.error(`Failed to generate Excel: ${error.message}`);
     },
   });
 
@@ -328,7 +338,20 @@ export default function Incidents() {
             ) : (
               <Download className="mr-2 h-4 w-4" />
             )}
-            Export Report
+            Export PDF
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => generateExcelMutation.mutate({})}
+            disabled={generateExcelMutation.isPending}
+            className="shadow-sm"
+          >
+            {generateExcelMutation.isPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+            )}
+            Export Excel
           </Button>
           <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>

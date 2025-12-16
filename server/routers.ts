@@ -1451,6 +1451,54 @@ export const appRouter = router({
         return { url, filename };
       }),
 
+    // Generate Excel export for incidents
+    generateExcel: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number().optional(),
+          severity: z.string().optional(),
+          status: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        
+        let locationName: string | undefined;
+        if (input.locationId) {
+          const location = await db.getLocationById(input.locationId);
+          locationName = location?.name;
+        }
+        
+        let incidents = await db.getIncidentsByTenant(ctx.user.tenantId);
+        
+        // Apply filters
+        if (input.locationId) {
+          incidents = incidents.filter(i => i.locationId === input.locationId);
+        }
+        if (input.severity && input.severity !== "all") {
+          incidents = incidents.filter(i => i.severity === input.severity);
+        }
+        if (input.status && input.status !== "all") {
+          incidents = incidents.filter(i => i.status === input.status);
+        }
+        
+        const { generateIncidentExcel } = await import("./services/incidentExcelService");
+        const excelBuffer = await generateIncidentExcel({
+          incidents,
+          companyName: company.name,
+          locationName,
+          generatedBy: ctx.user.name || ctx.user.email,
+        });
+        
+        const filename = `incident-report-${Date.now()}.xlsx`;
+        const { url } = await storagePut(`reports/incidents/${filename}`, excelBuffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        
+        return { url, filename };
+      }),
+
     // ============ Attachments ============
     
     // Get attachments for an incident

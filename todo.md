@@ -1469,3 +1469,8 @@
 
 ## PDF Signature Title Fix (Dec 16, 2025)
 - [x] Fix title before signature section not showing properly - increased spacing between label and signature image
+
+
+## GitHub Push & Excel Export (Dec 16, 2025)
+- [x] Push all PDF fixes to GitHub
+- [x] Add incident export to Excel feature for bulk data export
