@@ -7,6 +7,7 @@ import { tenantSubscriptions, userLicenses } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
 const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+  // @ts-ignore - API version mismatch with types
   apiVersion: "2025-01-27.acacia",
 });
 

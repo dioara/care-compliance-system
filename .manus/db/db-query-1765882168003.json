@@ -1,0 +1,9 @@
+{
+  "query": "UPDATE tenantSubscriptions SET isTrial = 1, trialEndsAt = DATE_ADD(NOW(), INTERVAL 30 DAY), trialLicensesCount = 5, licensesCount = 5, status = 'trialing' WHERE tenantId = 30002;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute UPDATE tenantSubscriptions SET isTrial = 1, trialEndsAt = DATE_ADD(NOW(), INTERVAL 30 DAY), trialLicensesCount = 5, licensesCount = 5, status = 'trialing' WHERE tenantId = 30002;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 64
+}

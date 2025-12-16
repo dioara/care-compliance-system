@@ -2098,9 +2098,6 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
-
-  // Subscription and license management
-  subscription: subscriptionRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "b5c571f7-38b2-4318-ab55-ef94e56d2bfe",
+  "id": "0d9e01c9-3bee-430d-ba46-4452d096e337",
   "prevId": "bc41da31-414a-494c-9dd9-46a8fdf77b19",
   "tables": {
     "aiAuditSchedules": {

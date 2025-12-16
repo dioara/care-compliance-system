@@ -11,6 +11,7 @@ import { calculateTotalPrice, calculatePricePerLicense, formatPrice, PRICING_CON
 import { checkExpiringSubscriptions } from "./services/licenseExpirationService";
 
 const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+  // @ts-ignore - API version mismatch with types
   apiVersion: "2025-01-27.acacia",
 });
 
@@ -357,7 +358,8 @@ export const subscriptionRouter = router({
 
       try {
         // Get Stripe preview
-        const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
+        // @ts-ignore - Stripe types mismatch
+        const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId) as any;
         const currentPriceId = stripeSubscription.items.data[0]?.price?.id;
         
         if (!currentPriceId) {

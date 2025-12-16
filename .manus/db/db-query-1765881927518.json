@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, tenantId, status, licensesCount, isTrial, trialEndsAt, trialLicensesCount FROM tenantSubscriptions WHERE tenantId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, tenantId, status, licensesCount, isTrial, trialEndsAt, trialLicensesCount FROM tenantSubscriptions WHERE tenantId = 1;",
+  "rows": [
+    {
+      "id": "30001",
+      "tenantId": "1",
+      "status": "trialing",
+      "licensesCount": "5",
+      "isTrial": "1",
+      "trialEndsAt": "2026-01-15 10:36:29",
+      "trialLicensesCount": "5"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttenantId\tstatus\tlicensesCount\tisTrial\ttrialEndsAt\ttrialLicensesCount\n30001\t1\ttrialing\t5\t1\t2026-01-15 10:36:29\t5\n",
+  "stderr": "",
+  "execution_time_ms": 175
+}

@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO tenantSubscriptions (tenantId, stripeCustomerId, stripeSubscriptionId, status, licensesCount, billingInterval, currentPeriodEnd, isTrial, trialEndsAt, trialLicensesCount, createdAt, updatedAt) VALUES (1, NULL, NULL, 'trialing', 5, 'monthly', DATE_ADD(NOW(), INTERVAL 30 DAY), 1, DATE_ADD(NOW(), INTERVAL 30 DAY), 5, NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute INSERT INTO tenantSubscriptions (tenantId, stripeCustomerId, stripeSubscriptionId, status, licensesCount, billingInterval, currentPeriodEnd, isTrial, trialEndsAt, trialLicensesCount, createdAt, updatedAt) VALUES (1, NULL, NULL, 'trialing', 5, 'monthly', DATE_ADD(NOW(), INTERVAL 30 DAY), 1, DATE_ADD(NOW(), INTERVAL 30 DAY), 5, NOW(), NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 80
+}
