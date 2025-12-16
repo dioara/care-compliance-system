@@ -1422,3 +1422,7 @@
 - [x] Make license badge dynamic - updated getUsersByTenant to include hasLicense from userLicenses table
 - [x] Auto-assign license to admin - assigned license to admin user in database
 - [x] License count updates in real-time - refetchUsers() is already called after assign/unassign
+
+
+## Bug Fixes (Dec 16, 2025 - Session 4)
+- [x] Fix license badge showing "No License" - added missing userLicenses import to db.ts

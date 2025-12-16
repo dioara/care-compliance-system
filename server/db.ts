@@ -36,6 +36,7 @@ import {
   emailRecipients,
   emailTemplates,
   passwordResetTokens,
+  userLicenses,
   type InsertUser,
   type InsertPasswordResetToken,
   type InsertAiAudit,
