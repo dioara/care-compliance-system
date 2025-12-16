@@ -732,6 +732,44 @@ export const appRouter = router({
       return db.getAllAuditTypes();
     }),
 
+    // List audit types (alias for calendar)
+    listTypes: protectedProcedure.query(async () => {
+      return db.getAllAuditTypes();
+    }),
+
+    // List audits with optional date range filter
+    list: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number().optional(),
+          startDate: z.string().optional(),
+          endDate: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Get all audits for the tenant
+        let audits = await db.getAllAuditInstances(ctx.user.tenantId);
+        
+        // Filter by location if provided
+        if (input.locationId) {
+          audits = audits.filter(a => a.locationId === input.locationId);
+        }
+        
+        // Filter by date range if provided
+        if (input.startDate && input.endDate) {
+          const start = new Date(input.startDate);
+          const end = new Date(input.endDate);
+          audits = audits.filter(a => {
+            const auditDate = new Date(a.scheduledDate);
+            return auditDate >= start && auditDate <= end;
+          });
+        }
+        
+        return audits;
+      }),
+
     // Get audit type by ID
     getAuditType: protectedProcedure
       .input(z.object({ id: z.number() }))
@@ -1215,6 +1253,78 @@ export const appRouter = router({
         return db.getAuditEvidence(input.auditInstanceId);
       }),
 
+    // Generate auto-schedule suggestions for next 12 months
+    generateScheduleSuggestions: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        // Get all audit types
+        const auditTypes = await db.getAllAuditTypes();
+        
+        // Get existing audits for this location
+        const existingAudits = await db.getAllAuditInstances(ctx.user.tenantId);
+        const locationAudits = existingAudits.filter(a => a.locationId === input.locationId);
+        
+        // Generate suggestions
+        const { generateAuditSchedule } = await import("./services/auditSchedulingService");
+        const suggestions = generateAuditSchedule(
+          auditTypes,
+          locationAudits.map(a => ({
+            id: a.id,
+            auditTypeId: a.auditTypeId,
+            scheduledDate: a.scheduledDate,
+          })),
+          input.locationId
+        );
+        
+        return suggestions;
+      }),
+
+    // Accept and create audits from schedule suggestions
+    acceptScheduleSuggestions: protectedProcedure
+      .input(
+        z.object({
+          locationId: z.number(),
+          suggestions: z.array(
+            z.object({
+              auditTypeId: z.number(),
+              suggestedDate: z.string(), // ISO date string
+            })
+          ),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        const createdAudits = [];
+        
+        // Create audit instances for each accepted suggestion
+        for (const suggestion of input.suggestions) {
+          const template = await db.getAuditTemplateByAuditTypeId(suggestion.auditTypeId);
+          if (!template) continue;
+          
+          const instanceId = await db.createAuditInstance({
+            tenantId: ctx.user.tenantId,
+            locationId: input.locationId,
+            auditTypeId: suggestion.auditTypeId,
+            auditTemplateId: template.id,
+            auditDate: new Date(suggestion.suggestedDate),
+            auditorId: ctx.user.id,
+            auditorName: ctx.user.name || undefined,
+            auditorRole: ctx.user.role || undefined,
+            status: 'scheduled',
+          });
+          
+          createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId });
+        }
+        
+        return { success: true, count: createdAudits.length, audits: createdAudits };
+      }),
 
   }),
 

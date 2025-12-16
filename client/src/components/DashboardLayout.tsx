@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard, Menu } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard, Menu, Calendar } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 // LocationSwitcher removed from header per user request
@@ -72,7 +72,7 @@ const menuItems = [
   { icon: Heart, label: "Service Users", path: "/service-users", description: "Manage residents" },
   { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
   { icon: ClipboardList, label: "Audits", path: "/audits", description: "Compliance audits" },
-
+  { icon: Calendar, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
   { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
   { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },

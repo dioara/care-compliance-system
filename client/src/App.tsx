@@ -26,6 +26,7 @@ import AuditSchedules from "@/pages/AuditSchedules";
 import ConductAudit from "./pages/ConductAudit";
 import AuditResults from "./pages/AuditResults";
 import AIAudits from "./pages/AIAudits";
+import AuditCalendar from "./pages/AuditCalendar";
 import Incidents from "./pages/Incidents";
 import Reports from "./pages/Reports";
 import ServiceUsers from "./pages/ServiceUsers";
@@ -181,6 +182,12 @@ function Router() {
       <Route path="/ai-audits">
         <DashboardLayout>
           <AIAudits />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/audit-calendar">
+        <DashboardLayout>
+          <AuditCalendar />
         </DashboardLayout>
       </Route>
       

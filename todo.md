@@ -1609,3 +1609,19 @@
 - [x] Verify all 40 audit types now have templates - 0 missing templates
 - [ ] Test scheduling audits for all audit types
 - [ ] Verify no "Audit template not found" errors in production
+
+
+## Fix Audit Question Types
+- [x] Update all audit template questions from yes_no to yes_no_na type
+- [x] Verify all questions now show Yes/No/N/A options
+
+## Audit Calendar Implementation
+- [x] Create Audit Calendar page with monthly view
+- [x] Display scheduled audits on calendar
+- [x] Add Audit Calendar navigation link to sidebar
+- [x] Create backend tRPC procedures (list, listTypes)
+- [x] Implement auto-scheduling service with intelligent date distribution
+- [x] Add backend procedures (generateScheduleSuggestions, acceptScheduleSuggestions)
+- [ ] Add UI dialog to show and accept/modify suggested schedule
+- [ ] Set up email reminders 1 day before audits are due
+- [ ] Test calendar functionality and email delivery

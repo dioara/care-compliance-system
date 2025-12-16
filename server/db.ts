@@ -1210,6 +1210,31 @@ export async function getAuditInstanceById(id: number) {
   return instance || null;
 }
 
+export async function getAllAuditInstances(tenantId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select({
+      id: auditInstances.id,
+      auditTypeId: auditInstances.auditTypeId,
+      auditName: auditTypes.auditName,
+      auditTypeName: auditTypes.auditName,
+      locationId: auditInstances.locationId,
+      locationName: locations.name,
+      scheduledDate: auditInstances.auditDate,
+      completedAt: auditInstances.completedAt,
+      status: auditInstances.status,
+      overallScore: auditInstances.overallScore,
+      auditorName: auditInstances.auditorName,
+      recommendedFrequency: auditTypes.recommendedFrequency,
+    })
+    .from(auditInstances)
+    .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+    .leftJoin(locations, eq(auditInstances.locationId, locations.id))
+    .where(eq(auditInstances.tenantId, tenantId))
+    .orderBy(desc(auditInstances.auditDate));
+}
+
 export async function getAuditInstancesByLocation(locationId: number, limit = 50) {
   const db = await getDb();
   if (!db) return [];
