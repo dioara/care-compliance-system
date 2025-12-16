@@ -1446,3 +1446,7 @@
 - [x] Fix Maximum call stack size exceeded error - removed recursive addPage override
 - [x] Fix missing company.listLocations procedure - added to company router
 - [x] Fix missing actionPlans.list procedure - removed unused query from NotificationCenter
+
+
+## PDF Spacing Fix (Dec 16, 2025)
+- [x] Fix text spacing in incident PDF report - updated renderField to use proper column layout

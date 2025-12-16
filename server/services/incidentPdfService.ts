@@ -514,10 +514,11 @@ function renderSection(doc: PDFKit.PDFDocument, title: string, y: number, margin
 
 function renderField(doc: PDFKit.PDFDocument, label: string, value: string, y: number, margin: number, contentWidth: number): number {
   doc.fontSize(10).font("Helvetica-Bold").fillColor(COLORS.text);
-  doc.text(`${label}:`, margin, y, { continued: true, width: 150 });
+  doc.text(`${label}: `, margin, y, { continued: false });
   doc.font("Helvetica").fillColor(COLORS.textLight);
-  doc.text(` ${value}`, { continued: false });
-  return y + 18;
+  doc.text(value, margin + 150, y, { width: contentWidth - 150 });
+  const textHeight = doc.heightOfString(value, { width: contentWidth - 150 });
+  return y + Math.max(18, textHeight + 8);
 }
 
 function renderTextBlock(doc: PDFKit.PDFDocument, text: string, y: number, margin: number, contentWidth: number): number {

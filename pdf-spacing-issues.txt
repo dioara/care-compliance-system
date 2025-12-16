@@ -1,0 +1,8 @@
+PDF Spacing Issues Identified:
+
+1. "Date of Incident: 13 December 2025" and "Time of Incident: 17:22" are on the same line - the date wraps and runs into Time
+2. "Date Reported: 15 December 2025" and "Closed By: Not specified" are on the same line
+3. "Last Updated: 15 December 2025" wraps incorrectly
+
+The issue is that the text fields are not getting proper line breaks between them.
+Need to add more vertical spacing (y += value) after each field.
