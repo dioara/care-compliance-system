@@ -28,6 +28,7 @@ interface IncidentData {
   updatedAt: Date | string | null;
   incidentType: string | null;
   locationDescription: string | null;
+  serviceUserName: string | null;
 }
 
 interface IncidentExportData {
@@ -121,7 +122,7 @@ export async function generateIncidentExcel(data: IncidentExportData): Promise<B
       severity: incident.severity || '',
       status: incident.status || '',
       affectedPersonType: incident.affectedPersonType || '',
-      affectedPersonName: incident.affectedPersonName || '',
+      affectedPersonName: incident.serviceUserName || incident.affectedPersonName || '',
       staffInvolved: stripHtml(incident.staffInvolved),
       description: stripHtml(incident.description),
       immediateActions: stripHtml(incident.immediateActions),

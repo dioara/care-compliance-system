@@ -1,0 +1,24 @@
+{
+  "query": "SELECT id, incidentNumber, serviceUserId, affectedPersonName, affectedPersonType FROM incidents LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, incidentNumber, serviceUserId, affectedPersonName, affectedPersonType FROM incidents LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "incidentNumber": "INC-1765793865393",
+      "serviceUserId": "1",
+      "affectedPersonName": "NULL",
+      "affectedPersonType": "service_user"
+    },
+    {
+      "id": "30001",
+      "incidentNumber": "INC-1765819339774",
+      "serviceUserId": "2",
+      "affectedPersonName": "NULL",
+      "affectedPersonType": "service_user"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tincidentNumber\tserviceUserId\taffectedPersonName\taffectedPersonType\n1\tINC-1765793865393\t1\tNULL\tservice_user\n30001\tINC-1765819339774\t2\tNULL\tservice_user\n",
+  "stderr": "",
+  "execution_time_ms": 101
+}

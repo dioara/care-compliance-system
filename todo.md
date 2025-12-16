@@ -1478,3 +1478,5 @@
 
 ## Excel Export Fix (Dec 16, 2025)
 - [x] Fix missing fields in Excel export - mapped all database field names correctly
+
+- [x] Fix service user name not showing in Person Name column - joined serviceUsers table in getIncidentsByTenant

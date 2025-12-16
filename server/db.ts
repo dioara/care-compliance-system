@@ -1505,12 +1505,47 @@ export async function getIncidentsByTenant(tenantId: number, limit = 100) {
   const db = await getDb();
   if (!db) return [];
   
-  return db
-    .select()
+  const results = await db
+    .select({
+      id: incidents.id,
+      tenantId: incidents.tenantId,
+      locationId: incidents.locationId,
+      incidentNumber: incidents.incidentNumber,
+      incidentDate: incidents.incidentDate,
+      incidentTime: incidents.incidentTime,
+      incidentType: incidents.incidentType,
+      severity: incidents.severity,
+      status: incidents.status,
+      locationDescription: incidents.locationDescription,
+      affectedPersonType: incidents.affectedPersonType,
+      serviceUserId: incidents.serviceUserId,
+      affectedStaffId: incidents.affectedStaffId,
+      affectedPersonName: incidents.affectedPersonName,
+      staffInvolved: incidents.staffInvolved,
+      description: incidents.description,
+      immediateActions: incidents.immediateActions,
+      witnessStatements: incidents.witnessStatements,
+      reportedToCqc: incidents.reportedToCqc,
+      reportedToCouncil: incidents.reportedToCouncil,
+      reportedToPolice: incidents.reportedToPolice,
+      familyNotified: incidents.familyNotified,
+      reportedToIco: incidents.reportedToIco,
+      requiresInvestigation: incidents.requiresInvestigation,
+      investigationNotes: incidents.investigationNotes,
+      actionsRequired: incidents.actionsRequired,
+      lessonsLearned: incidents.lessonsLearned,
+      reportedBy: incidents.reportedBy,
+      createdAt: incidents.createdAt,
+      updatedAt: incidents.updatedAt,
+      serviceUserName: serviceUsers.name,
+    })
     .from(incidents)
+    .leftJoin(serviceUsers, eq(incidents.serviceUserId, serviceUsers.id))
     .where(eq(incidents.tenantId, tenantId))
     .orderBy(desc(incidents.incidentDate))
     .limit(limit);
+  
+  return results;
 }
 
 export async function getIncidentById(id: number) {
