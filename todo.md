@@ -1743,3 +1743,10 @@
 - [x] Fix Select.Item with empty string value in ScheduleAuditForm
 - [x] Replace empty string with placeholder option or remove placeholder item
 - [x] Test schedule audit form
+
+
+## BUG: Schedule Audit Form Dropdowns Not Showing Names
+- [x] Diagnose why auditor and service user dropdowns are empty
+- [x] Check if data is being fetched correctly
+- [x] Fix field mapping (firstName/lastName vs name)
+- [x] Test dropdown population

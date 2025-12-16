@@ -73,7 +73,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
           <SelectContent>
             {(auditTypes || []).map((type) => (
               <SelectItem key={type.id} value={type.id.toString()}>
-                {type.name}
+                {type.auditName || type.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -107,7 +107,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
             <SelectItem value="none">None</SelectItem>
             {(staff || []).map((member) => (
               <SelectItem key={member.id} value={member.id.toString()}>
-                {member.firstName} {member.lastName}
+                {member.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -127,7 +127,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
             <SelectItem value="none">None</SelectItem>
             {(serviceUsers || []).map((user) => (
               <SelectItem key={user.id} value={user.id.toString()}>
-                {user.firstName} {user.lastName}
+                {user.name}
               </SelectItem>
             ))}
           </SelectContent>
