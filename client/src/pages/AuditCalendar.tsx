@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2 } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay, startOfWeek, endOfWeek, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
@@ -122,6 +122,28 @@ export default function AuditCalendar() {
 
   const handleToday = () => {
     setCurrentMonth(new Date());
+  };
+
+  const exportPdf = trpc.audits.exportCalendarPdf.useMutation();
+
+  const handlePrintCalendar = async () => {
+    if (!activeLocationId) return;
+
+    try {
+      const result = await exportPdf.mutateAsync({
+        locationId: activeLocationId,
+        startDate: format(dateRange.start, 'yyyy-MM-dd'),
+        endDate: format(dateRange.end, 'yyyy-MM-dd'),
+        viewType: calendarView,
+      });
+
+      // Open PDF in new tab
+      window.open(result.url, '_blank');
+      toast.success('Calendar PDF generated successfully!');
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      toast.error('Failed to generate calendar PDF. Please try again.');
+    }
   };
 
   const getAuditsForDate = (date: Date) => {
@@ -379,6 +401,10 @@ export default function AuditCalendar() {
               </div>
               <Button variant="outline" onClick={handleToday}>
                 Today
+              </Button>
+              <Button variant="outline" onClick={handlePrintCalendar}>
+                <Printer className="h-4 w-4 mr-2" />
+                Print Calendar
               </Button>
             </div>
           </div>

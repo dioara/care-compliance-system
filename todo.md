@@ -1789,3 +1789,13 @@
 - [x] Persist selected view preference in localStorage
 - [x] Update audit display logic for each view type
 - [x] Test switching between all three views
+
+
+## Calendar Print/Export to PDF
+- [x] Add Print button to calendar header
+- [x] Create backend endpoint to generate PDF from calendar data
+- [x] Format PDF for printing (A4 landscape, proper margins)
+- [x] Include location name, date range, and audit details in PDF
+- [x] Add color coding for audit statuses in PDF
+- [x] Test PDF generation for all three views (month, week, day)
+- [x] Add download functionality for generated PDF

@@ -1523,6 +1523,77 @@ export const appRouter = router({
         return { success: true, auditId: instanceId };
       }),
 
+    // Export calendar to PDF
+    exportCalendarPdf: protectedProcedure
+      .input(z.object({
+        locationId: z.number(),
+        startDate: z.string(),
+        endDate: z.string(),
+        viewType: z.enum(['month', 'week', 'day']),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { generateCalendarPdf } = await import('./services/calendarPdfService');
+        
+        // Get location details
+        const location = await db.getLocationById(input.locationId);
+        if (!location) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Location not found' });
+        }
+
+        // Get audits for the date range
+        const database = await db.getDb();
+        const audits = await database
+          .select({
+            id: auditInstances.id,
+            auditName: auditTypes.auditName,
+            scheduledDate: auditInstances.scheduledDate,
+            status: auditInstances.status,
+            auditorName: sql<string | null>`auditor.name`,
+            serviceUserName: sql<string | null>`service_user.name`,
+          })
+          .from(auditInstances)
+          .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+          .leftJoin(
+            staffMembers.as('auditor'),
+            eq(auditInstances.assignedAuditorId, staffMembers.id)
+          )
+          .leftJoin(
+            serviceUsers.as('service_user'),
+            eq(auditInstances.serviceUserId, serviceUsers.id)
+          )
+          .where(
+            and(
+              eq(auditInstances.locationId, input.locationId),
+              gte(auditInstances.scheduledDate, new Date(input.startDate)),
+              lte(auditInstances.scheduledDate, new Date(input.endDate))
+            )
+          )
+          .orderBy(auditInstances.scheduledDate);
+
+        // Generate PDF
+        const pdfBuffer = await generateCalendarPdf({
+          locationName: location.name,
+          startDate: new Date(input.startDate),
+          endDate: new Date(input.endDate),
+          audits: audits.map(a => ({
+            ...a,
+            scheduledDate: a.scheduledDate.toISOString(),
+          })),
+          viewType: input.viewType,
+        });
+
+        // Upload to S3
+        const { storagePut } = await import('./storage');
+        const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+        const { url } = await storagePut(
+          `reports/calendars/${filename}`,
+          pdfBuffer,
+          'application/pdf'
+        );
+
+        return { url, filename };
+      }),
+
     // Send audit reminders manually (admin only)
     sendReminders: adminProcedure
       .mutation(async () => {
