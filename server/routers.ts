@@ -853,7 +853,9 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
+        console.log('[saveResponse] Saving audit response:', JSON.stringify(input, null, 2));
         const responseId = await db.saveAuditResponse(input);
+        console.log('[saveResponse] Saved with ID:', responseId);
         return { id: responseId };
       }),
 
@@ -1072,11 +1074,13 @@ export const appRouter = router({
               break;
             }
           }
+          const responseValue = r.responseValue || r.response;
+          console.log(`[generatePdf] Question ${questionNumber}: responseValue='${r.responseValue}', response='${r.response}', final='${responseValue}'`);
           return {
             questionId: r.auditTemplateQuestionId,
             questionNumber,
             questionText,
-            response: r.responseValue || r.response, // Use responseValue first, fallback to response
+            response: responseValue, // Use responseValue first, fallback to response
             observations: r.observations,
             actionRequired: r.actionRequired,
           };
