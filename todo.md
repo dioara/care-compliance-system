@@ -1656,3 +1656,8 @@
 - [x] Debug why location dropdown is not showing on Audit Calendar page - Blocking early return prevented rendering
 - [x] Fix the "No Location Selected" blocking message - Moved dropdown outside conditional
 - [x] Ensure dropdown renders and functions properly - Now shows dropdown even when no location selected
+
+
+## BUG: Select Component Not Imported in AuditCalendar
+- [x] Add Select component imports to AuditCalendar.tsx
+- [x] Test that page loads without errors
