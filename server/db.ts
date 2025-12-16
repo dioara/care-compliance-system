@@ -26,7 +26,6 @@ import {
   auditActionPlans,
   auditEvidence,
   auditSchedules,
-  auditCalendarEvents,
   incidents,
   incidentAttachments,
   incidentSignatures,
@@ -55,7 +54,6 @@ import {
   type InsertStaffMember,
   type InsertEmailRecipient,
   type InsertEmailTemplate,
-  type InsertAuditCalendarEvent,
 } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2735,82 +2733,4 @@ export async function deleteIncidentSignature(id: number, tenantId: number) {
         eq(incidentSignatures.tenantId, tenantId)
       )
     );
-}
-
-
-// ============================================
-// Audit Calendar Events Management
-// ============================================
-
-export async function getAuditCalendarEvents(tenantId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  return db.select({
-    id: auditCalendarEvents.id,
-    tenantId: auditCalendarEvents.tenantId,
-    locationId: auditCalendarEvents.locationId,
-    auditTypeId: auditCalendarEvents.auditTypeId,
-    auditTypeName: auditCalendarEvents.auditTypeName,
-    locationName: auditCalendarEvents.locationName,
-    scheduledDate: auditCalendarEvents.scheduledDate,
-    status: auditCalendarEvents.status,
-    assignedToId: auditCalendarEvents.assignedToId,
-    assignedToName: auditCalendarEvents.assignedToName,
-    reminderSent: auditCalendarEvents.reminderSent,
-    reminderSentAt: auditCalendarEvents.reminderSentAt,
-    createdAt: auditCalendarEvents.createdAt,
-  })
-    .from(auditCalendarEvents)
-    .where(eq(auditCalendarEvents.tenantId, tenantId))
-    .orderBy(auditCalendarEvents.scheduledDate);
-}
-
-export async function createAuditCalendarEvent(data: InsertAuditCalendarEvent) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  const result = await db.insert(auditCalendarEvents).values(data);
-  return { id: Number((result as any)[0].insertId), ...data };
-}
-
-export async function deleteAuditCalendarEvent(eventId: number, tenantId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.delete(auditCalendarEvents)
-    .where(and(
-      eq(auditCalendarEvents.id, eventId),
-      eq(auditCalendarEvents.tenantId, tenantId)
-    ));
-}
-
-export async function getUpcomingAuditCalendarEvents(tenantId: number, daysAhead: number = 1) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + daysAhead);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
-  
-  return db.select()
-    .from(auditCalendarEvents)
-    .where(and(
-      eq(auditCalendarEvents.tenantId, tenantId),
-      eq(auditCalendarEvents.status, "scheduled"),
-      eq(auditCalendarEvents.reminderSent, false),
-      sql`DATE(${auditCalendarEvents.scheduledDate}) = ${tomorrowStr}`
-    ));
-}
-
-export async function markReminderSent(eventId: number) {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  
-  await db.update(auditCalendarEvents)
-    .set({ 
-      reminderSent: true, 
-      reminderSentAt: new Date() 
-    })
-    .where(eq(auditCalendarEvents.id, eventId));
 }
