@@ -1705,3 +1705,19 @@
 - [x] Add function to check if date is UK bank holiday
 - [x] Update scheduling logic to skip non-working days
 - [ ] Test that suggestions only include weekdays (Mon-Fri) excluding bank holidays
+
+
+## Feature: Delete All Audits with Confirmation
+- [ ] Add audit trail table to schema for tracking deletions
+- [ ] Create "Delete All" button on calendar page
+- [ ] Add confirmation dialog requiring user to type "CONFIRM"
+- [ ] Log deletion details (who, when, count) to audit trail
+- [ ] Create backend mutation to delete all audits and log action
+
+## Feature: Schedule Audit Dialog
+- [ ] Create schedule audit dialog component with form fields
+- [ ] Add fields: audit type dropdown, date picker, assigned auditor, service user
+- [ ] Wire "Schedule Audit" button in calendar header to open dialog
+- [ ] Wire "Schedule Audit for This Date" button in date dialog to open form with pre-filled date
+- [ ] Create backend mutation to create new audit instance
+- [ ] Test audit creation and calendar refresh

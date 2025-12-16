@@ -8,6 +8,8 @@ import * as db from "./db";
 import { storagePut } from "./storage";
 import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
 import { subscriptionRouter } from "./subscription";
+import { auditInstances, auditTrail } from "../drizzle/schema";
+import { eq, and } from "drizzle-orm";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -1341,6 +1343,86 @@ export const appRouter = router({
         }
         
         return { success: true, count: createdAudits.length, audits: createdAudits };
+      }),
+
+    // Delete all audits for a location with audit trail
+    deleteAll: protectedProcedure
+      .input(z.object({
+        locationId: z.number(),
+        confirmation: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Validate confirmation
+        if (input.confirmation !== 'CONFIRM') {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Please type CONFIRM to delete all audits',
+          });
+        }
+
+        // Count audits before deletion
+        const audits = await db.getAuditInstancesByLocation(input.locationId);
+        const count = audits.length;
+
+        // Delete all audits
+        await ctx.db.delete(auditInstances)
+          .where(and(
+            eq(auditInstances.tenantId, ctx.user.tenantId),
+            eq(auditInstances.locationId, input.locationId)
+          ));
+
+        // Log to audit trail
+        await ctx.db.insert(auditTrail).values({
+          tenantId: ctx.user.tenantId,
+          userId: ctx.user.id,
+          entityType: 'audit_bulk_delete',
+          action: 'delete_all',
+          description: `Deleted all ${count} audits for location ${input.locationId}`,
+          metadata: JSON.stringify({
+            locationId: input.locationId,
+            deletedCount: count,
+            deletedBy: ctx.user.name,
+            deletedAt: new Date().toISOString(),
+          }),
+        });
+
+        return { success: true, deletedCount: count };
+      }),
+
+    // Schedule a new audit
+    scheduleAudit: protectedProcedure
+      .input(z.object({
+        locationId: z.number(),
+        auditTypeId: z.number(),
+        scheduledDate: z.string(),
+        auditorId: z.number().optional(),
+        serviceUserId: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get audit template for this type
+        const template = await db.getAuditTemplateByAuditTypeId(input.auditTypeId);
+        if (!template) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Audit template not found for this audit type',
+          });
+        }
+
+        // Create audit instance
+        const instanceId = await db.createAuditInstance({
+          tenantId: ctx.user.tenantId,
+          locationId: input.locationId,
+          auditTypeId: input.auditTypeId,
+          auditTemplateId: template.id,
+          auditDate: new Date(input.scheduledDate),
+          auditorId: input.auditorId || ctx.user.id,
+          auditorName: ctx.user.name || undefined,
+          auditorRole: ctx.user.role || undefined,
+          serviceUserId: input.serviceUserId,
+          status: 'in_progress',
+        });
+
+        return { success: true, auditId: instanceId };
       }),
 
   }),

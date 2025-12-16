@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay } from 'date-fns';
+import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
 
 export default function AuditCalendar() {
   const { activeLocationId, setActiveLocationId } = useLocation();
@@ -20,6 +21,10 @@ export default function AuditCalendar() {
   const [showAutoScheduleDialog, setShowAutoScheduleDialog] = useState(false);
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
   const [scheduleStartDate, setScheduleStartDate] = useState<Date>(new Date());
+  const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+  const [scheduleFormDate, setScheduleFormDate] = useState<Date | null>(null);
+  const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
 
   // Fetch audits for the current month
   const monthStart = startOfMonth(currentMonth);
@@ -44,6 +49,8 @@ export default function AuditCalendar() {
   // Auto-schedule mutations
   const generateSuggestions = trpc.audits.generateScheduleSuggestions.useMutation();
   const acceptSuggestions = trpc.audits.acceptScheduleSuggestions.useMutation();
+  const scheduleAudit = trpc.audits.scheduleAudit.useMutation();
+  const deleteAll = trpc.audits.deleteAll.useMutation();
   const utils = trpc.useUtils();
 
   // Get days in the current month
@@ -145,6 +152,42 @@ export default function AuditCalendar() {
     }
   };
 
+  const handleScheduleAuditClick = (date?: Date) => {
+    if (!activeLocationId) {
+      toast.error('Please select a location first');
+      return;
+    }
+    setScheduleFormDate(date || null);
+    setShowScheduleDialog(true);
+  };
+
+  const handleDeleteAllClick = () => {
+    if (!activeLocationId) {
+      toast.error('Please select a location first');
+      return;
+    }
+    setShowDeleteAllDialog(true);
+    setDeleteConfirmation('');
+  };
+
+  const handleDeleteAllConfirm = async () => {
+    if (!activeLocationId) return;
+
+    try {
+      const result = await deleteAll.mutateAsync({
+        locationId: activeLocationId,
+        confirmation: deleteConfirmation,
+      });
+      
+      toast.success(`Successfully deleted ${result.deletedCount} audits`);
+      setShowDeleteAllDialog(false);
+      setDeleteConfirmation('');
+      utils.audits.list.invalidate();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete audits');
+    }
+  };
+
   const handleToggleSuggestion = (index: number) => {
     const newSelected = new Set(selectedSuggestions);
     if (newSelected.has(index)) {
@@ -226,9 +269,12 @@ export default function AuditCalendar() {
                 <Sparkles className="h-4 w-4 mr-2" />
                 Auto-Schedule
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={() => handleScheduleAuditClick()}>
                 <Plus className="h-4 w-4 mr-2" />
                 Schedule Audit
+              </Button>
+              <Button size="sm" variant="destructive" onClick={handleDeleteAllClick}>
+                Delete All
               </Button>
             </>
           )}
@@ -496,8 +542,8 @@ export default function AuditCalendar() {
               <div>
                 <h3 className="font-semibold mb-2">Schedule New Audit</h3>
                 <Button onClick={() => {
-                  // Navigate to schedule audit with pre-filled date
-                  window.location.href = `/audits?date=${format(selectedDate, 'yyyy-MM-dd')}`;
+                  setSelectedDate(null);
+                  handleScheduleAuditClick(selectedDate);
                 }}>
                   <Plus className="h-4 w-4 mr-2" />
                   Schedule Audit for This Date
@@ -509,6 +555,76 @@ export default function AuditCalendar() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setSelectedDate(null)}>
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Audit Dialog */}
+      <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Schedule New Audit</DialogTitle>
+            <DialogDescription>
+              Schedule an audit for a specific date with assigned auditor and service user
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScheduleAuditForm
+            locationId={activeLocationId!}
+            prefilledDate={scheduleFormDate}
+            onSuccess={() => {
+              setShowScheduleDialog(false);
+              utils.audits.list.invalidate();
+              toast.success('Audit scheduled successfully');
+            }}
+            onCancel={() => setShowScheduleDialog(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete All Audits Dialog */}
+      <Dialog open={showDeleteAllDialog} onOpenChange={setShowDeleteAllDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete All Audits</DialogTitle>
+            <DialogDescription>
+              This will permanently delete all audits for the selected location. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm font-medium text-destructive">
+                ⚠️ Warning: This will delete all audits for {activeLocation?.name}
+              </p>
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Type <span className="font-mono bg-muted px-1 rounded">CONFIRM</span> to proceed:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmation}
+                onChange={(e) => setDeleteConfirmation(e.target.value)}
+                placeholder="Type CONFIRM"
+                className="w-full px-3 py-2 border rounded-md"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteAllDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleDeleteAllConfirm}
+              disabled={deleteConfirmation !== 'CONFIRM' || deleteAll.isPending}
+            >
+              {deleteAll.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Delete All Audits
             </Button>
           </DialogFooter>
         </DialogContent>
