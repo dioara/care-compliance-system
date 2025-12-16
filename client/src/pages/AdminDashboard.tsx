@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
+import { SecurityMetrics } from "@/components/SecurityMetrics";
 
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -104,6 +105,9 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Security Metrics Widget */}
+      <SecurityMetrics />
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Users by Role */}

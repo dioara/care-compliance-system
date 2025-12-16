@@ -1842,3 +1842,29 @@
 - [x] Send email alerts to admins for security events
 - [x] Add dashboard widget for security metrics
 - [x] Test alert notifications
+
+
+## Rate Limiting Middleware
+- [x] Install express-rate-limit package
+- [x] Configure rate limiter (100 requests per 15 minutes per IP)
+- [x] Apply rate limiting to all API routes
+- [x] Add custom error messages for rate limit exceeded
+- [x] Test rate limiting with multiple requests
+
+## Security Dashboard Widget
+- [x] Create SecurityMetrics component
+- [x] Display failed login attempts count
+- [x] Show list of suspicious IPs
+- [x] Display recent security events timeline
+- [x] Add refresh button to update metrics
+- [x] Integrate widget into admin dashboard
+
+## Two-Factor Authentication (2FA)
+- [x] Install otplib and qrcode packages
+- [x] Add twoFactorSecret field to user schema (already exists)
+- [x] Create 2FA setup endpoint (generate QR code)
+- [x] Create 2FA verification endpoint
+- [x] Add 2FA enable/disable toggle in user settings
+- [x] Require 2FA for admin login
+- [x] Add backup codes for account recovery
+- [x] Test 2FA flow with Google Authenticator

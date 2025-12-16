@@ -3,6 +3,7 @@ import express from "express";
 import { createServer } from "http";
 import net from "net";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createCustomContext } from "../customContext";
@@ -30,11 +31,34 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Trust proxy to get real IP addresses behind reverse proxies
+  app.set('trust proxy', 1);
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // Cookie parser for auth tokens
   app.use(cookieParser());
+  
+  // Rate limiting middleware - 100 requests per 15 minutes per IP
+  const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: {
+      error: "Too many requests from this IP, please try again later.",
+      retryAfter: "15 minutes"
+    },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    // Skip rate limiting for health check endpoint
+    skip: (req) => req.path === "/api/trpc/system.health",
+  });
+  
+  // Apply rate limiter to all API routes
+  app.use("/api", limiter);
+  
+  console.log("[SECURITY] Rate limiting enabled: 100 requests per 15 minutes per IP");
   // Staff invitation validation endpoint
   app.get("/api/auth/validate-invitation", async (req, res) => {
     try {

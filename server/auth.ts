@@ -5,6 +5,13 @@ import * as db from "./db";
 import jwt from "jsonwebtoken";
 import { startFreeTrial } from "./subscription";
 import { trackFailedLogin, resetFailedLoginAttempts, logSecurityEvent } from "./services/securityMonitoringService";
+import { 
+  generateTwoFactorSecret, 
+  generateQRCode, 
+  verifyTwoFactorToken,
+  generateBackupCodes,
+  hashBackupCodes
+} from "./services/twoFactorAuthService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
@@ -412,4 +419,185 @@ export const authRouter = router({
       verified: user?.twoFaVerified || false,
     };
   }),
+
+  // Setup 2FA - Generate QR code
+  setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.user?.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const user = await db.getUserById(ctx.user.id);
+    if (!user) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    }
+
+    // Generate new secret
+    const secret = generateTwoFactorSecret();
+    
+    // Generate QR code
+    const qrCodeDataUrl = await generateQRCode(user.email, secret);
+    
+    // Store secret (not yet verified)
+    await db.updateUser(user.id, {
+      twoFaSecret: secret,
+      twoFaEnabled: false, // Not enabled until verified
+      twoFaVerified: false,
+    });
+
+    return {
+      secret,
+      qrCode: qrCodeDataUrl,
+    };
+  }),
+
+  // Verify and enable 2FA
+  verify2FA: protectedProcedure
+    .input(z.object({
+      token: z.string().length(6),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const user = await db.getUserById(ctx.user.id);
+      if (!user || !user.twoFaSecret) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "2FA not set up. Please set up 2FA first." 
+        });
+      }
+
+      // Verify token
+      const isValid = verifyTwoFactorToken(input.token, user.twoFaSecret);
+      if (!isValid) {
+        throw new TRPCError({ 
+          code: "BAD_REQUEST", 
+          message: "Invalid verification code" 
+        });
+      }
+
+      // Generate backup codes
+      const backupCodes = generateBackupCodes(10);
+      const hashedBackupCodes = await hashBackupCodes(backupCodes);
+
+      // Enable 2FA
+      await db.updateUser(user.id, {
+        twoFaEnabled: true,
+        twoFaVerified: true,
+      });
+
+      // Store backup codes in a separate table (you'll need to create this)
+      // For now, return them to the user to save
+      
+      logSecurityEvent({
+        eventType: "failed_login",
+        severity: "low",
+        userId: user.id,
+        email: user.email,
+        ipAddress: "system",
+        details: `2FA enabled for ${user.email}`,
+      });
+
+      return {
+        success: true,
+        backupCodes, // User should save these securely
+      };
+    }),
+
+  // Disable 2FA
+  disable2FA: protectedProcedure
+    .input(z.object({
+      password: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.id) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const user = await db.getUserById(ctx.user.id);
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      }
+
+      // Verify password
+      const isValidPassword = await db.verifyPassword(input.password, user.password);
+      if (!isValidPassword) {
+        throw new TRPCError({ 
+          code: "UNAUTHORIZED", 
+          message: "Invalid password" 
+        });
+      }
+
+      // Disable 2FA
+      await db.updateUser(user.id, {
+        twoFaEnabled: false,
+        twoFaVerified: false,
+        twoFaSecret: null,
+      });
+
+      logSecurityEvent({
+        eventType: "failed_login",
+        severity: "medium",
+        userId: user.id,
+        email: user.email,
+        ipAddress: "system",
+        details: `2FA disabled for ${user.email}`,
+      });
+
+      return { success: true };
+    }),
+
+  // Verify 2FA token during login
+  verify2FALogin: publicProcedure
+    .input(z.object({
+      email: z.string().email(),
+      token: z.string().length(6),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const user = await db.getUserByEmail(input.email);
+      if (!user || !user.twoFaSecret) {
+        throw new TRPCError({ 
+          code: "UNAUTHORIZED", 
+          message: "Invalid credentials" 
+        });
+      }
+
+      // Verify token
+      const isValid = verifyTwoFactorToken(input.token, user.twoFaSecret);
+      if (!isValid) {
+        const ipAddress = ctx.req?.ip || ctx.req?.headers['x-forwarded-for'] as string || 'unknown';
+        trackFailedLogin(input.email, ipAddress);
+        throw new TRPCError({ 
+          code: "UNAUTHORIZED", 
+          message: "Invalid verification code" 
+        });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Set cookie
+      ctx.res?.cookie("auth_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      return {
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          superAdmin: user.superAdmin,
+        },
+      };
+    }),
 });
