@@ -1779,3 +1779,13 @@
 - [x] Check if Audit History link appears in sidebar navigation
 - [x] Verify route is properly configured
 - [x] Test navigation to /audit-history works
+
+
+## Calendar View Options (Month/Week/Day)
+- [x] Add view toggle buttons (Month, Week, Day) to calendar header
+- [x] Implement month view (existing view)
+- [x] Implement week view showing 7 days
+- [x] Implement day view showing single day
+- [x] Persist selected view preference in localStorage
+- [x] Update audit display logic for each view type
+- [x] Test switching between all three views

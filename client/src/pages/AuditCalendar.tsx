@@ -10,7 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay, startOfWeek, endOfWeek, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
 
 export default function AuditCalendar() {
@@ -25,21 +25,48 @@ export default function AuditCalendar() {
   const [scheduleFormDate, setScheduleFormDate] = useState<Date | null>(null);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>(
+    (localStorage.getItem('calendarView') as 'month' | 'week' | 'day') || 'month'
+  );
 
-  // Fetch audits for the current month
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(currentMonth);
-  
+  // Save view preference to localStorage
+  const handleViewChange = (view: 'month' | 'week' | 'day') => {
+    setCalendarView(view);
+    localStorage.setItem('calendarView', view);
+  };
+
   // Fetch locations for dropdown
   const { data: locations } = trpc.locations.list.useQuery();
   
   // Get current location details
   const activeLocation = locations?.find(l => l.id === activeLocationId);
 
+  // Get date range based on view
+  const getDateRange = () => {
+    if (calendarView === 'month') {
+      return {
+        start: startOfMonth(currentMonth),
+        end: endOfMonth(currentMonth),
+      };
+    } else if (calendarView === 'week') {
+      return {
+        start: startOfWeek(currentMonth),
+        end: endOfWeek(currentMonth),
+      };
+    } else {
+      return {
+        start: startOfDay(currentMonth),
+        end: startOfDay(currentMonth),
+      };
+    }
+  };
+
+  const dateRange = getDateRange();
+
   const { data: auditData, isLoading } = trpc.audits.list.useQuery({
     locationId: activeLocationId || 0,
-    startDate: monthStart.toISOString(),
-    endDate: monthEnd.toISOString(),
+    startDate: dateRange.start.toISOString(),
+    endDate: dateRange.end.toISOString(),
   }, {
     enabled: !!activeLocationId,
   });
@@ -56,14 +83,14 @@ export default function AuditCalendar() {
   const deleteAll = trpc.audits.deleteAll.useMutation();
   const utils = trpc.useUtils();
 
-  // Get days in the current month
-  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  // Get days to display based on view
+  const daysToShow = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
   
-  // Get the day of week for the first day (0 = Sunday, 1 = Monday, etc.)
-  const firstDayOfWeek = monthStart.getDay();
+  // For month view, get the day of week for the first day (0 = Sunday, 1 = Monday, etc.)
+  const firstDayOfWeek = calendarView === 'month' ? dateRange.start.getDay() : 0;
   
-  // Create empty cells for days before the month starts
-  const emptyDays = Array(firstDayOfWeek).fill(null);
+  // Create empty cells for days before the month starts (month view only)
+  const emptyDays = calendarView === 'month' ? Array(firstDayOfWeek).fill(null) : [];
 
   // Group audits by date
   const auditsByDate = (audits || []).reduce((acc, audit) => {
@@ -73,12 +100,24 @@ export default function AuditCalendar() {
     return acc;
   }, {} as Record<string, typeof audits>);
 
-  const handlePreviousMonth = () => {
-    setCurrentMonth(subMonths(currentMonth, 1));
+  const handlePrevious = () => {
+    if (calendarView === 'month') {
+      setCurrentMonth(subMonths(currentMonth, 1));
+    } else if (calendarView === 'week') {
+      setCurrentMonth(subWeeks(currentMonth, 1));
+    } else {
+      setCurrentMonth(subDays(currentMonth, 1));
+    }
   };
 
-  const handleNextMonth = () => {
-    setCurrentMonth(addMonths(currentMonth, 1));
+  const handleNext = () => {
+    if (calendarView === 'month') {
+      setCurrentMonth(addMonths(currentMonth, 1));
+    } else if (calendarView === 'week') {
+      setCurrentMonth(addWeeks(currentMonth, 1));
+    } else {
+      setCurrentMonth(addDays(currentMonth, 1));
+    }
   };
 
   const handleToday = () => {
@@ -298,26 +337,61 @@ export default function AuditCalendar() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon" onClick={handlePreviousMonth}>
+              <Button variant="outline" size="icon" onClick={handlePrevious}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <h2 className="text-2xl font-semibold min-w-[200px] text-center">
-                {format(currentMonth, 'MMMM yyyy')}
+                {calendarView === 'month' && format(currentMonth, 'MMMM yyyy')}
+                {calendarView === 'week' && `Week of ${format(startOfWeek(currentMonth), 'MMM d, yyyy')}`}
+                {calendarView === 'day' && format(currentMonth, 'MMMM d, yyyy')}
               </h2>
-              <Button variant="outline" size="icon" onClick={handleNextMonth}>
+              <Button variant="outline" size="icon" onClick={handleNext}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <Button variant="outline" onClick={handleToday}>
-              Today
-            </Button>
+            <div className="flex items-center gap-2">
+              {/* View Toggle */}
+              <div className="flex border rounded-lg overflow-hidden">
+                <Button
+                  variant={calendarView === 'month' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleViewChange('month')}
+                  className="rounded-none"
+                >
+                  Month
+                </Button>
+                <Button
+                  variant={calendarView === 'week' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleViewChange('week')}
+                  className="rounded-none border-x"
+                >
+                  Week
+                </Button>
+                <Button
+                  variant={calendarView === 'day' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleViewChange('day')}
+                  className="rounded-none"
+                >
+                  Day
+                </Button>
+              </div>
+              <Button variant="outline" onClick={handleToday}>
+                Today
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className={`grid gap-2 ${
+            calendarView === 'month' ? 'grid-cols-7' : 
+            calendarView === 'week' ? 'grid-cols-7' : 
+            'grid-cols-1'
+          }`}>
             {/* Day headers */}
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            {calendarView !== 'day' && ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
               <div key={day} className="text-center font-semibold text-sm text-muted-foreground py-2">
                 {day}
               </div>
@@ -328,8 +402,8 @@ export default function AuditCalendar() {
               <div key={`empty-${index}`} className="min-h-[120px] border rounded-lg bg-muted/20" />
             ))}
             
-            {/* Days of the month */}
-            {daysInMonth.map((date) => {
+            {/* Days to display */}
+            {daysToShow.map((date) => {
               const dayAudits = getAuditsForDate(date);
               const isCurrentDay = isToday(date);
               const isPast = isBefore(date, startOfDay(new Date())) && !isToday(date);
@@ -340,12 +414,13 @@ export default function AuditCalendar() {
                   onClick={() => setSelectedDate(date)}
                   className={`min-h-[120px] border rounded-lg p-2 transition-colors cursor-pointer ${
                     isCurrentDay ? 'border-primary border-2 bg-primary/5' : 'hover:bg-muted/50'
-                  } ${isPast ? 'bg-muted/20' : 'bg-background'}`}
+                  } ${isPast ? 'opacity-60' : ''} ${
+                    !isSameMonth(date, currentMonth) && calendarView === 'month' ? 'bg-muted/30' : ''
+                  }`}
                 >
-                  <div className={`text-sm font-semibold mb-2 ${isCurrentDay ? 'text-primary' : isPast ? 'text-muted-foreground' : ''}`}>
-                    {format(date, 'd')}
-                  </div>
-                  <div className="space-y-1">
+                  <div className="text-sm font-medium mb-1">
+                    {calendarView === 'day' ? format(date, 'EEEE, MMMM d') : format(date, 'd')}
+                  </div>             <div className="space-y-1">
                     {dayAudits.slice(0, 3).map((audit) => (
                       <div
                         key={audit.id}
