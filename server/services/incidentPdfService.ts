@@ -125,6 +125,7 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
         size: "A4",
         layout: "portrait",
         margin: 50,
+        bufferPages: true, // Enable page buffering for page numbers
         info: {
           Title: `Incident Report - ${data.companyName}`,
           Author: data.companyName,
@@ -156,6 +157,19 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
           contentWidth,
         });
       });
+
+      // Add page numbers to all pages
+      const range = doc.bufferedPageRange();
+      const totalPages = range.start + range.count;
+      for (let i = range.start; i < range.start + range.count; i++) {
+        doc.switchToPage(i);
+        
+        // Footer with page numbers
+        const footerY = pageHeight - 35;
+        doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
+        doc.text(`${data.companyName} - Confidential`, margin, footerY, { width: contentWidth / 2 });
+        doc.text(`Page ${i + 1} of ${totalPages}`, pageWidth - margin - 100, footerY, { width: 100, align: "right" });
+      }
 
       doc.end();
     } catch (error) {

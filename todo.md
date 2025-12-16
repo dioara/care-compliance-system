@@ -1450,3 +1450,8 @@
 
 ## PDF Spacing Fix (Dec 16, 2025)
 - [x] Fix text spacing in incident PDF report - updated renderField to use proper column layout
+
+
+## Page Numbers & GitHub Push (Dec 16, 2025)
+- [x] Add page numbers (Page X of Y) to PDF footer - using bufferPages option
+- [ ] Push all changes to GitHub
