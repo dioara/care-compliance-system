@@ -26,6 +26,8 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 // LocationSwitcher removed from header per user request
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { GlobalSearch } from './GlobalSearch';
+import { QuickActions } from './QuickActions';
 import { Button } from "./ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
@@ -383,19 +385,16 @@ function DashboardLayoutContent({
         <TrialBanner />
         {/* Unified header for all screen sizes */}
         <header className="flex border-b h-14 items-center justify-between bg-background/95 px-3 md:px-4 backdrop-blur supports-[backdrop-filter]:backdrop-blur sticky top-0 z-40">
-          {/* Left side - mobile menu trigger and page title */}
-          <div className="flex items-center gap-2 md:hidden">
-            <SidebarTrigger className="h-9 w-9 rounded-lg" />
-            <span className="font-medium text-sm truncate">
-              {activeMenuItem?.label ?? "Menu"}
-            </span>
+          {/* Left side - mobile menu trigger and breadcrumb */}
+          <div className="flex items-center gap-2 md:gap-4 flex-1 min-w-0">
+            <SidebarTrigger className="h-9 w-9 rounded-lg md:hidden" />
+            {children && (children as any).props?.breadcrumb}
           </div>
           
-          {/* Spacer for desktop to push location switcher to right */}
-          <div className="hidden md:block" />
-          
-          {/* Right side - notifications */}
-          <div className="flex items-center gap-2 md:gap-3">
+          {/* Right side - quick actions, search, notifications */}
+          <div className="flex items-center gap-1 md:gap-2">
+            <QuickActions />
+            <GlobalSearch />
             <NotificationCenter />
           </div>
         </header>

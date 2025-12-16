@@ -51,8 +51,8 @@ const COLORS = {
   text: "#1f2937",
   textLight: "#6b7280",
   border: "#e5e7eb",
-  headerBg: "#1e3a8a",
-  rowAlt: "#f9fafb",
+  headerBg: "#ffffff", // Changed to white for glossy white background
+  rowAlt: "#fafafa", // Very light gray for alternating rows
   greenBg: "#dcfce7",
   redBg: "#fee2e2",
   amberBg: "#fef3c7",
@@ -128,8 +128,8 @@ export async function generateAuditReportPDF(data: AuditReportData): Promise<Buf
 }
 
 function drawHeader(doc: PDFKit.PDFDocument, data: AuditReportData, contentWidth: number, margin: number, logoBuffer: Buffer | null, pageWidth: number) {
-  // Header background
-  doc.rect(0, 0, pageWidth, 100).fill(COLORS.headerBg);
+  // Header background - white with border
+  doc.rect(0, 0, pageWidth, 100).fillAndStroke(COLORS.headerBg, COLORS.border);
 
   let textStartX = margin;
   
@@ -144,15 +144,15 @@ function drawHeader(doc: PDFKit.PDFDocument, data: AuditReportData, contentWidth
   }
 
   // Company name
-  doc.fontSize(22).font("Helvetica-Bold").fillColor("#ffffff");
+  doc.fontSize(22).font("Helvetica-Bold").fillColor(COLORS.text);
   doc.text(data.companyName, textStartX, 25, { width: contentWidth - 100 - (textStartX - margin) });
 
   // Report title
-  doc.fontSize(14).font("Helvetica").fillColor("#93c5fd");
+  doc.fontSize(14).font("Helvetica").fillColor(COLORS.primary);
   doc.text("Audit Report", textStartX, 55);
 
   // Date on the right
-  doc.fontSize(10).fillColor("#ffffff");
+  doc.fontSize(10).fillColor(COLORS.text);
   const dateStr = new Date(data.auditDate).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
@@ -266,15 +266,15 @@ function drawResponses(doc: PDFKit.PDFDocument, data: AuditReportData, contentWi
       doc.y = 50;
     }
 
-    // Section header
+    // Section header - white background with border
     const sectionY = doc.y;
-    doc.rect(margin, sectionY, contentWidth, 28).fill(COLORS.primary);
-    doc.fontSize(11).font("Helvetica-Bold").fillColor("#ffffff");
+    doc.rect(margin, sectionY, contentWidth, 28).fillAndStroke("#f8fafc", COLORS.primary);
+    doc.fontSize(11).font("Helvetica-Bold").fillColor(COLORS.primary);
     doc.text(section.sectionTitle, margin + 10, sectionY + 8, { width: contentWidth - 100 });
     
     // Question count badge
     const answeredInSection = section.questions.filter(q => responseMap.has(q.id)).length;
-    doc.fontSize(9).font("Helvetica").fillColor("#93c5fd");
+    doc.fontSize(9).font("Helvetica").fillColor(COLORS.textLight);
     doc.text(`${answeredInSection}/${section.questions.length} answered`, margin + contentWidth - 100, sectionY + 10, { width: 90, align: "right" });
 
     doc.y = sectionY + 35;

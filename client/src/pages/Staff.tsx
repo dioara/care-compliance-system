@@ -11,6 +11,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { useLocation as useRouter } from "wouter";
+import { Breadcrumb } from "@/components/Breadcrumb";
+import { PageHeader } from "@/components/PageHeader";
 
 export default function Staff() {
   const { activeLocationId, canWrite, permissions } = useLocation();
@@ -265,7 +267,10 @@ export default function Staff() {
   );
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <PageHeader 
+      breadcrumb={<Breadcrumb items={[{ label: "Staff" }]} />}
+    >
+      <div className="space-y-6 md:space-y-8">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3 md:gap-4">
@@ -837,6 +842,7 @@ export default function Staff() {
           <p className="text-sm font-medium">Read-only access to this location</p>
         </div>
       )}
-    </div>
+      </div>
+    </PageHeader>
   );
 }

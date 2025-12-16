@@ -1510,3 +1510,14 @@
 
 ## Header Location Filter Removal (Dec 16, 2025)
 - [x] Remove LocationSwitcher from header in DashboardLayout
+
+## Header Enhancements (Dec 16, 2025)
+- [x] Add breadcrumb navigation to show current location in app hierarchy
+- [x] Implement global search with command palette (Ctrl+K) for staff, incidents, audits
+- [x] Add quick action buttons for common tasks (Report Incident, Add Staff)
+
+## Master Audit Report PDF Fixes (Dec 16, 2025)
+- [x] Change background to glossy white instead of colored
+- [x] Remove extra blank pages caused by headers/footers
+- [x] Ensure all audit fields are displayed in the PDF
+- [x] Keep tabular format for better readability
