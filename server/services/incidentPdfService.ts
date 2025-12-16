@@ -157,20 +157,6 @@ export async function generateIncidentPDF(data: IncidentReportData): Promise<Buf
         });
       });
 
-      // Add page numbers to all pages
-      const pageCount = doc.bufferedPageRange().count;
-      for (let i = 0; i < pageCount; i++) {
-        doc.switchToPage(i);
-        
-        // Footer
-        const footerY = pageHeight - 40;
-        doc.moveTo(margin, footerY - 10).lineTo(pageWidth - margin, footerY - 10).strokeColor(COLORS.border).stroke();
-        
-        doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
-        doc.text(`${data.companyName} - Confidential Incident Report`, margin, footerY, { width: contentWidth / 2 });
-        doc.text(`Page ${i + 1} of ${pageCount}`, pageWidth - margin - 100, footerY, { width: 100, align: "right" });
-      }
-
       doc.end();
     } catch (error) {
       reject(error);
@@ -185,8 +171,26 @@ function renderIncidentReport(
   logoBuffer: Buffer | null,
   dims: { pageWidth: number; pageHeight: number; margin: number; contentWidth: number }
 ) {
-  const { pageWidth, margin, contentWidth } = dims;
+  const { pageWidth, pageHeight, margin, contentWidth } = dims;
   let y = margin;
+
+  // Add footer to current page
+  const addFooter = () => {
+    const footerY = pageHeight - 40;
+    doc.fontSize(8).font("Helvetica").fillColor(COLORS.textMuted);
+    doc.text(`${data.companyName} - Confidential Incident Report`, margin, footerY, { width: contentWidth / 2 });
+  };
+  
+  // Add footer to first page
+  addFooter();
+  
+  // Override addPage to add footer to new pages
+  const originalAddPage = doc.addPage.bind(doc);
+  doc.addPage = function(...args: any[]) {
+    const result = originalAddPage(...args);
+    addFooter();
+    return result;
+  };
 
   // ===== HEADER (White background) =====
   // Logo and company name

@@ -1436,3 +1436,7 @@
 - [x] Use non-tabular, narrative format for better readability
 - [x] Include all incident fields: description, witnesses, immediate actions, investigation, notifications, actions, lessons learned
 - [x] Make report professional and easily printable with signature section
+
+
+## Bug Fix - PDF Generation Error (Dec 16, 2025)
+- [x] Fix "switchToPage(0) out of bounds" error - removed page switching code, added footer to each page directly
