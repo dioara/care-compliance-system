@@ -8,8 +8,9 @@ import * as db from "./db";
 import { storagePut } from "./storage";
 import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
 import { subscriptionRouter } from "./subscription";
-import { auditInstances, auditTrail } from "../drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { auditInstances, auditTrail, auditTypes, staffMembers, serviceUsers } from "../drizzle/schema";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
+import { format } from "date-fns";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
@@ -1567,16 +1568,22 @@ export const appRouter = router({
         viewType: z.enum(['month', 'week', 'day']),
       }))
       .mutation(async ({ input, ctx }) => {
-        const { generateCalendarPdf } = await import('./services/calendarPdfService');
-        
-        // Get location details
-        const location = await db.getLocationById(input.locationId);
-        if (!location) {
-          throw new TRPCError({ code: 'NOT_FOUND', message: 'Location not found' });
-        }
+        try {
+          const { generateCalendarPdf } = await import('./services/calendarPdfService');
+          
+          // Get location details
+          const location = await db.getLocationById(input.locationId);
+          if (!location) {
+            throw new TRPCError({ code: 'NOT_FOUND', message: 'Location not found' });
+          }
 
         // Get audits for the date range
         const database = await db.getDb();
+        if (!database) {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
+        }
+        
+        console.log('[PDF Export] Fetching audits for location:', input.locationId, 'from', input.startDate, 'to', input.endDate);
         const audits = await database
           .select({
             id: auditInstances.id,
@@ -1605,7 +1612,10 @@ export const appRouter = router({
           )
           .orderBy(auditInstances.scheduledDate);
 
+        console.log('[PDF Export] Found', audits.length, 'audits');
+        
         // Generate PDF
+        console.log('[PDF Export] Generating PDF...');
         const pdfBuffer = await generateCalendarPdf({
           locationName: location.name,
           startDate: new Date(input.startDate),
@@ -1618,6 +1628,7 @@ export const appRouter = router({
         });
 
         // Upload to S3
+        console.log('[PDF Export] PDF generated, uploading to S3...');
         const { storagePut } = await import('./storage');
         const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
         const { url } = await storagePut(
@@ -1626,7 +1637,15 @@ export const appRouter = router({
           'application/pdf'
         );
 
+        console.log('[PDF Export] Success! URL:', url);
         return { url, filename };
+        } catch (error) {
+          console.error('[PDF Export Error]', error);
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: error instanceof Error ? error.message : 'Failed to generate calendar PDF',
+          });
+        }
       }),
 
     // Send audit reminders manually (admin only)

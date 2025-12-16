@@ -1895,3 +1895,8 @@
 - [x] Update tour to include all new features
 - [x] Add 2FA setup step in tour (with skip option)
 - [x] Test tour flow end-to-end
+
+## BUG: Calendar PDF Generation Failing
+- [x] Investigate error when clicking Print Calendar button
+- [x] Fix PDF generation service (added missing imports: auditTypes, staffMembers, serviceUsers, format)
+- [x] Test calendar PDF export works correctly
