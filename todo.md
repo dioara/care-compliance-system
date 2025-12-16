@@ -1625,3 +1625,22 @@
 - [ ] Add UI dialog to show and accept/modify suggested schedule
 - [ ] Set up email reminders 1 day before audits are due
 - [ ] Test calendar functionality and email delivery
+
+
+## BUG: Incidents Page 404 Error
+- [x] Add Incidents route to App.tsx
+- [x] Verify Incidents page is accessible from navigation
+
+## Feature: Location Filters
+- [x] Add location filter dropdown to Dashboard page - Already implemented via LocationContext
+- [x] Add location filter dropdown to Audit Calendar page - Already implemented via LocationContext
+- [x] Ensure filters persist when switching between pages - Handled by LocationContext
+
+## Feature: Auto-Schedule UI Dialog
+- [x] Create dialog component to show schedule suggestions
+- [x] Display suggestions in a table with audit type, date, frequency, and reason
+- [x] Add checkboxes to select/deselect suggestions
+- [x] Add "Accept Selected" button to create audits from suggestions
+- [x] Show loading state while generating suggestions
+- [x] Show success message after accepting suggestions
+- [x] Add Select All / Deselect All functionality

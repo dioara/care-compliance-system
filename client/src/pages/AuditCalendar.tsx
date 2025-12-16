@@ -4,7 +4,10 @@ import { useLocation } from '@/contexts/LocationContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay } from 'date-fns';
 
@@ -13,6 +16,8 @@ export default function AuditCalendar() {
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showAutoScheduleDialog, setShowAutoScheduleDialog] = useState(false);
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
 
   // Fetch audits for the current month
   const monthStart = startOfMonth(currentMonth);
@@ -27,6 +32,11 @@ export default function AuditCalendar() {
   });
 
   const { data: auditTypes } = trpc.audits.listTypes.useQuery();
+
+  // Auto-schedule mutations
+  const generateSuggestions = trpc.audits.generateScheduleSuggestions.useMutation();
+  const acceptSuggestions = trpc.audits.acceptScheduleSuggestions.useMutation();
+  const utils = trpc.useUtils();
 
   // Get days in the current month
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -90,6 +100,73 @@ export default function AuditCalendar() {
     }
   };
 
+  const handleAutoSchedule = async () => {
+    if (!activeLocation?.id) {
+      toast.error('Please select a location first');
+      return;
+    }
+    
+    setShowAutoScheduleDialog(true);
+    setSelectedSuggestions(new Set());
+    
+    try {
+      await generateSuggestions.mutateAsync({
+        locationId: activeLocation.id,
+      });
+    } catch (error) {
+      toast.error('Failed to generate schedule suggestions');
+      setShowAutoScheduleDialog(false);
+    }
+  };
+
+  const handleToggleSuggestion = (index: number) => {
+    const newSelected = new Set(selectedSuggestions);
+    if (newSelected.has(index)) {
+      newSelected.delete(index);
+    } else {
+      newSelected.add(index);
+    }
+    setSelectedSuggestions(newSelected);
+  };
+
+  const handleToggleAll = () => {
+    if (selectedSuggestions.size === (generateSuggestions.data?.length || 0)) {
+      setSelectedSuggestions(new Set());
+    } else {
+      setSelectedSuggestions(new Set(generateSuggestions.data?.map((_, i) => i) || []));
+    }
+  };
+
+  const handleAcceptSelected = async () => {
+    if (!activeLocation?.id || !generateSuggestions.data) return;
+    
+    const selectedItems = Array.from(selectedSuggestions)
+      .map(index => generateSuggestions.data[index])
+      .filter(Boolean)
+      .map(suggestion => ({
+        auditTypeId: suggestion.auditTypeId,
+        suggestedDate: suggestion.suggestedDate.toISOString(),
+      }));
+    
+    if (selectedItems.length === 0) {
+      toast.error('Please select at least one suggestion');
+      return;
+    }
+    
+    try {
+      const result = await acceptSuggestions.mutateAsync({
+        locationId: activeLocation.id,
+        suggestions: selectedItems,
+      });
+      
+      toast.success(`Successfully scheduled ${result.count} audits`);
+      setShowAutoScheduleDialog(false);
+      utils.audits.list.invalidate();
+    } catch (error) {
+      toast.error('Failed to schedule audits');
+    }
+  };
+
   if (!activeLocation) {
     return (
       <div className="container py-8">
@@ -111,7 +188,7 @@ export default function AuditCalendar() {
           <p className="text-muted-foreground">Schedule and track audits for {activeLocation.locationName}</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleAutoSchedule}>
             <Sparkles className="h-4 w-4 mr-2" />
             Auto-Schedule
           </Button>
@@ -237,6 +314,81 @@ export default function AuditCalendar() {
           </CardContent>
         </Card>
       )}
+
+      {/* Auto-Schedule Dialog */}
+      <Dialog open={showAutoScheduleDialog} onOpenChange={setShowAutoScheduleDialog}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Auto-Schedule Audits</DialogTitle>
+            <DialogDescription>
+              Review and select suggested audit dates for the next 12 months. The system intelligently distributes audits based on recommended frequencies.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {generateSuggestions.isPending && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <span className="ml-3 text-muted-foreground">Generating schedule suggestions...</span>
+            </div>
+          )}
+          
+          {generateSuggestions.data && (
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  {generateSuggestions.data.length} suggestions generated
+                </p>
+                <Button variant="outline" size="sm" onClick={handleToggleAll}>
+                  {selectedSuggestions.size === generateSuggestions.data.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              </div>
+              
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12"></TableHead>
+                    <TableHead>Audit Type</TableHead>
+                    <TableHead>Suggested Date</TableHead>
+                    <TableHead>Frequency</TableHead>
+                    <TableHead>Reason</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {generateSuggestions.data.map((suggestion, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedSuggestions.has(index)}
+                          onCheckedChange={() => handleToggleSuggestion(index)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">{suggestion.auditTypeName}</TableCell>
+                      <TableCell>{format(suggestion.suggestedDate, 'MMM d, yyyy')}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{suggestion.frequency}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{suggestion.reason}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAutoScheduleDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAcceptSelected}
+              disabled={selectedSuggestions.size === 0 || acceptSuggestions.isPending}
+            >
+              {acceptSuggestions.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Accept Selected ({selectedSuggestions.size})
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Legend */}
       <Card className="mt-6">

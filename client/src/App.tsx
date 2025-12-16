@@ -149,6 +149,12 @@ function Router() {
           <ActionLog />
         </DashboardLayout>
       </Route>
+
+      <Route path="/incidents">
+        <DashboardLayout>
+          <Incidents />
+        </DashboardLayout>
+      </Route>
       <Route path="/email-settings">
         <DashboardLayout>
           <EmailSettings />
