@@ -150,7 +150,21 @@ export async function getUsersByTenant(tenantId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(users).where(eq(users.tenantId, tenantId));
+  // Get all users for the tenant
+  const allUsers = await db.select().from(users).where(eq(users.tenantId, tenantId));
+  
+  // Get all active licenses for the tenant
+  const activeLicenses = await db.select().from(userLicenses)
+    .where(and(eq(userLicenses.tenantId, tenantId), eq(userLicenses.isActive, true)));
+  
+  // Create a set of user IDs that have licenses
+  const licensedUserIds = new Set(activeLicenses.filter(l => l.userId).map(l => l.userId));
+  
+  // Add hasLicense field to each user
+  return allUsers.map(user => ({
+    ...user,
+    hasLicense: user.superAdmin || licensedUserIds.has(user.id)
+  }));
 }
 
 export async function updateUserRole(userId: number, role: "admin" | "quality_officer" | "manager" | "staff") {

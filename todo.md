@@ -1415,3 +1415,10 @@
 - [x] Add license assign/unassign buttons to User Management Actions column (already implemented)
 - [x] Show license availability counter in User Management header (already implemented)
 - [x] Create 5 trial licenses for tenant 30002 in database
+
+
+## Bug Fixes (Dec 16, 2025 - Session 3)
+- [x] Fix duplicate trial banner - removed DashboardLayout wrapper from UserManagement (was double-wrapped)
+- [x] Make license badge dynamic - updated getUsersByTenant to include hasLicense from userLicenses table
+- [x] Auto-assign license to admin - assigned license to admin user in database
+- [x] License count updates in real-time - refetchUsers() is already called after assign/unassign

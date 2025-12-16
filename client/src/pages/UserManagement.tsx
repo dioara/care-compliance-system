@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -39,7 +38,6 @@ export default function UserManagement() {
   // Check if user is super admin
   if (!currentUser?.superAdmin) {
     return (
-      <DashboardLayout>
         <div className="flex items-center justify-center h-[60vh]">
           <Card className="max-w-md">
             <CardHeader>
@@ -53,7 +51,6 @@ export default function UserManagement() {
             </CardHeader>
           </Card>
         </div>
-      </DashboardLayout>
     );
   }
 
@@ -185,7 +182,6 @@ export default function UserManagement() {
   };
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -601,6 +597,5 @@ export default function UserManagement() {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardLayout>
   );
 }
