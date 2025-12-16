@@ -54,8 +54,8 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
       auditTypeId: parseInt(auditTypeId),
       locationId,
       scheduledDate: new Date(scheduledDate).toISOString(),
-      auditorId: auditorId ? parseInt(auditorId) : undefined,
-      serviceUserId: serviceUserId ? parseInt(serviceUserId) : undefined,
+      auditorId: auditorId && auditorId !== 'none' ? parseInt(auditorId) : undefined,
+      serviceUserId: serviceUserId && serviceUserId !== 'none' ? parseInt(serviceUserId) : undefined,
     });
   };
 
@@ -104,7 +104,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
             <SelectValue placeholder="Select auditor" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             {(staff || []).map((member) => (
               <SelectItem key={member.id} value={member.id.toString()}>
                 {member.firstName} {member.lastName}
@@ -124,7 +124,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
             <SelectValue placeholder="Select service user" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">None</SelectItem>
+            <SelectItem value="none">None</SelectItem>
             {(serviceUsers || []).map((user) => (
               <SelectItem key={user.id} value={user.id.toString()}>
                 {user.firstName} {user.lastName}

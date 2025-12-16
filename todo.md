@@ -1737,3 +1737,9 @@
 - [x] Fix "Cannot read properties of undefined (reading 'delete')" error in deleteAll mutation
 - [x] Ensure ctx.db is properly passed to the mutation
 - [x] Test delete all functionality
+
+
+## BUG: Select.Item Empty Value Error
+- [x] Fix Select.Item with empty string value in ScheduleAuditForm
+- [x] Replace empty string with placeholder option or remove placeholder item
+- [x] Test schedule audit form
