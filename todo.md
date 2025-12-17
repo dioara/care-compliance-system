@@ -2024,3 +2024,12 @@
 - [ ] Document database setup steps
 - [ ] Document custom domain setup (ccms.co.uk)
 - [ ] Provide step-by-step deployment instructions
+
+
+## BUG: Application Crash Due to Missing Stripe Configuration
+- [ ] Diagnose Stripe-related crash on application startup
+- [ ] Make Stripe integration optional (not required for core functionality)
+- [ ] Add graceful fallbacks when Stripe credentials are missing
+- [ ] Ensure app starts successfully without STRIPE_SECRET_KEY
+- [ ] Test subscription management page handles missing Stripe gracefully
+- [ ] Save checkpoint with fix

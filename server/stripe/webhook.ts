@@ -6,10 +6,18 @@ import { getDb } from "../db";
 import { tenantSubscriptions, userLicenses } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 
-const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
-  // @ts-ignore - API version mismatch with types
-  apiVersion: "2025-01-27.acacia",
-});
+// Initialize Stripe only if credentials are available
+let stripe: Stripe | null = null;
+try {
+  if (ENV.STRIPE_SECRET_KEY && ENV.STRIPE_SECRET_KEY !== 'your-stripe-secret-key-here') {
+    stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+      // @ts-ignore - API version mismatch with types
+      apiVersion: "2025-01-27.acacia",
+    });
+  }
+} catch (error) {
+  console.error('[STRIPE WEBHOOK] Initialization failed:', error);
+}
 
 async function requireDb() {
   const db = await getDb();
@@ -20,6 +28,11 @@ async function requireDb() {
 export const stripeWebhookRouter = Router();
 
 stripeWebhookRouter.post("/webhook", raw({ type: "application/json" }), async (req, res) => {
+  if (!stripe) {
+    console.log('[STRIPE WEBHOOK] Skipped - Stripe not configured');
+    return res.status(200).send('Stripe not configured');
+  }
+  
   const sig = req.headers["stripe-signature"];
   if (!sig) {
     console.error("[Stripe Webhook] Missing signature");

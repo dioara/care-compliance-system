@@ -901,6 +901,26 @@ export const userLicenses = mysqlTable("userLicenses", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+// Relations for tenantSubscriptions
+export const tenantSubscriptionsRelations = relations(tenantSubscriptions, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [tenantSubscriptions.tenantId],
+    references: [tenants.id],
+  }),
+}));
+
+// Relations for userLicenses
+export const userLicensesRelations = relations(userLicenses, ({ one }) => ({
+  tenant: one(tenants, {
+    fields: [userLicenses.tenantId],
+    references: [tenants.id],
+  }),
+  user: one(users, {
+    fields: [userLicenses.userId],
+    references: [users.id],
+  }),
+}));
+
 export type InsertTenantSubscription = typeof tenantSubscriptions.$inferInsert;
 export type SelectTenantSubscription = typeof tenantSubscriptions.$inferSelect;
 export type InsertUserLicense = typeof userLicenses.$inferInsert;

@@ -10,10 +10,25 @@ import { eq, and, isNull, sql } from "drizzle-orm";
 import { calculateTotalPrice, calculatePricePerLicense, formatPrice, PRICING_CONFIG } from "./stripe/products";
 import { checkExpiringSubscriptions } from "./services/licenseExpirationService";
 
-const stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
-  // @ts-ignore - API version mismatch with types
-  apiVersion: "2025-01-27.acacia",
-});
+// Initialize Stripe only if credentials are available
+let stripe: Stripe | null = null;
+try {
+  if (ENV.STRIPE_SECRET_KEY && 
+      ENV.STRIPE_SECRET_KEY !== 'not-configured' && 
+      ENV.STRIPE_SECRET_KEY !== 'your-stripe-secret-key-here' &&
+      ENV.STRIPE_SECRET_KEY.startsWith('sk_')) {
+    stripe = new Stripe(ENV.STRIPE_SECRET_KEY, {
+      // @ts-ignore - API version mismatch with types
+      apiVersion: "2025-01-27.acacia",
+    });
+    console.log('[STRIPE] ✅ Initialized successfully');
+  } else {
+    console.log('[STRIPE] ⚠️  Skipped - credentials not configured (subscription features disabled)');
+  }
+} catch (error) {
+  console.error('[STRIPE] ❌ Initialization failed:', error);
+  stripe = null;
+}
 
 // Helper to get database connection
 async function requireDb() {
@@ -24,6 +39,13 @@ async function requireDb() {
 
 // Helper to get or create Stripe customer
 async function getOrCreateStripeCustomer(tenantId: number, email: string, name: string): Promise<string> {
+  if (!stripe) {
+    throw new TRPCError({ 
+      code: "PRECONDITION_FAILED", 
+      message: "Stripe is not configured. Please contact support to enable subscription features." 
+    });
+  }
+  
   const db = await requireDb();
   
   const [subscription] = await db
@@ -173,6 +195,12 @@ export const subscriptionRouter = router({
   createCheckoutSession: adminProcedure
     .input(z.object({ quantity: z.number().min(1), billingInterval: z.enum(["monthly", "annual"]) }))
     .mutation(async ({ ctx, input }) => {
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Subscription features are not available. Stripe is not configured." 
+        });
+      }
       if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
 
       const customerId = await getOrCreateStripeCustomer(ctx.user.tenantId, ctx.user.email, ctx.user.name || "Care Compliance Customer");
@@ -407,6 +435,18 @@ export const subscriptionRouter = router({
   cancelSubscription: adminProcedure
     .input(z.object({ cancelImmediately: z.boolean().default(false) }))
     .mutation(async ({ ctx, input }) => {
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Subscription features are not available. Stripe is not configured." 
+        });
+      }
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Subscription features are not available. Stripe is not configured." 
+        });
+      }
       if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
       const db = await requireDb();
 
@@ -429,6 +469,18 @@ export const subscriptionRouter = router({
     }),
 
   reactivateSubscription: adminProcedure.mutation(async ({ ctx }) => {
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Subscription features are not available. Stripe is not configured." 
+        });
+      }
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Subscription features are not available. Stripe is not configured." 
+        });
+      }
     if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
     const db = await requireDb();
 
