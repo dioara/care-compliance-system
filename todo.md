@@ -2099,3 +2099,7 @@
 - [x] Enhance search and category filtering UI
 - [ ] Test redesigned help center
 - [ ] Create checkpoint
+
+## Help Center Design Improvements
+- [x] Redesign Help Center page with better structure and visual hierarchy
+- [x] Redesign Help Article page with improved content presentation and readability

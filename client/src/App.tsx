@@ -48,6 +48,7 @@ import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ErrorMonitoring from "./pages/ErrorMonitoring";
 import Notifications from "./pages/Notifications";
 import HelpCenter from "./pages/HelpCenter";
+import HelpArticle from "./pages/HelpArticle";
 
 function Router() {
   return (
@@ -95,6 +96,7 @@ function Router() {
       </Route>
       
       <Route path="/help" component={HelpCenter} />
+      <Route path="/help/:id" component={HelpArticle} />
       
       <Route path="/admin-dashboard">
         <DashboardLayout>
