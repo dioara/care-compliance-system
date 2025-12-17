@@ -1,76 +1,48 @@
 import mysql from 'mysql2/promise';
-import fs from 'fs/promises';
-import 'dotenv/config';
+import fs from 'fs';
 
-const conn = await mysql.createConnection(process.env.DATABASE_URL);
+const DATABASE_URL = process.env.DATABASE_URL;
 
-console.log('Exporting database to SQL file...\n');
-
-const tables = [
-  'complianceSections',
-  'complianceQuestions',
-  'locations',
-  'serviceUsers',
-  'staffMembers',
-  'complianceAssessments'
-];
-
-let sqlDump = `-- Care Compliance System Database Export
--- Generated: ${new Date().toISOString()}
--- 
--- This file contains the complete database schema and data
--- To restore: mysql -u username -p database_name < export.sql
-
-SET FOREIGN_KEY_CHECKS=0;
-
-`;
-
-for (const table of tables) {
-  console.log(`Exporting table: ${table}`);
+async function exportDatabase() {
+  const connection = await mysql.createConnection(DATABASE_URL);
   
-  // Get table structure
-  const [createTable] = await conn.query(`SHOW CREATE TABLE ${table}`);
-  sqlDump += `\n-- Table: ${table}\n`;
-  sqlDump += `DROP TABLE IF EXISTS \`${table}\`;\n`;
-  sqlDump += createTable[0]['Create Table'] + ';\n\n';
+  console.log('🔍 Fetching all tables...');
+  const [tables] = await connection.query('SHOW TABLES');
   
-  // Get table data
-  const [rows] = await conn.query(`SELECT * FROM ${table}`);
+  let sqlDump = '-- CCMS Database Export\n';
+  sqlDump += `-- Generated: ${new Date().toISOString()}\n\n`;
+  sqlDump += 'SET FOREIGN_KEY_CHECKS=0;\n\n';
   
-  if (rows.length > 0) {
-    sqlDump += `-- Data for table: ${table}\n`;
+  for (const tableRow of tables) {
+    const tableName = Object.values(tableRow)[0];
+    console.log(`📦 Exporting table: ${tableName}`);
     
-    // Get column names
-    const columns = Object.keys(rows[0]);
-    const columnList = columns.map(c => `\`${c}\``).join(', ');
+    const [rows] = await connection.query(`SELECT * FROM \`${tableName}\``);
     
-    // Insert data in batches
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const values = columns.map(col => {
-        const val = row[col];
-        if (val === null) return 'NULL';
-        if (typeof val === 'string') return `'${val.replace(/'/g, "''")}'`;
-        if (val instanceof Date) return `'${val.toISOString().slice(0, 19).replace('T', ' ')}'`;
-        return val;
-      }).join(', ');
+    if (rows.length > 0) {
+      sqlDump += `-- Data for table ${tableName}\n`;
       
-      sqlDump += `INSERT INTO \`${table}\` (${columnList}) VALUES (${values});\n`;
+      for (const row of rows) {
+        const columns = Object.keys(row).map(k => `\`${k}\``).join(', ');
+        const values = Object.values(row).map(v => {
+          if (v === null) return 'NULL';
+          if (v instanceof Date) return `'${v.toISOString().slice(0, 19).replace('T', ' ')}'`;
+          if (typeof v === 'string') return `'${v.replace(/'/g, "''")}'`;
+          return v;
+        }).join(', ');
+        
+        sqlDump += `INSERT INTO \`${tableName}\` (${columns}) VALUES (${values});\n`;
+      }
+      sqlDump += '\n';
     }
-    
-    sqlDump += '\n';
   }
   
-  console.log(`  ✓ Exported ${rows.length} rows`);
+  sqlDump += 'SET FOREIGN_KEY_CHECKS=1;\n';
+  
+  fs.writeFileSync('database-export-full.sql', sqlDump);
+  console.log('✅ Database exported to database-export-full.sql');
+  
+  await connection.end();
 }
 
-sqlDump += '\nSET FOREIGN_KEY_CHECKS=1;\n';
-
-// Write to file
-const filename = `database-export-${Date.now()}.sql`;
-await fs.writeFile(filename, sqlDump);
-
-console.log(`\n✅ Database exported to: ${filename}`);
-console.log(`   File size: ${(sqlDump.length / 1024 / 1024).toFixed(2)} MB`);
-
-await conn.end();
+exportDatabase().catch(console.error);

@@ -2033,3 +2033,13 @@
 - [ ] Ensure app starts successfully without STRIPE_SECRET_KEY
 - [ ] Test subscription management page handles missing Stripe gracefully
 - [ ] Save checkpoint with fix
+
+
+## Railway Deployment - Remove Manus Dependencies (Dec 2025)
+- [x] Identify all Manus OAuth code locations
+- [x] Remove Manus OAuth authentication code
+- [x] Make Manus environment variables optional with fallbacks
+- [x] Ensure traditional email/password login works standalone
+- [ ] Test authentication flow without Manus
+- [ ] Push changes to GitHub
+- [ ] Verify Railway deployment works without Manus variables
