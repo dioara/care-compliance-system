@@ -34,16 +34,15 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
     doc.on('error', reject);
 
     // Header
-    doc.fontSize(20).font('Helvetica-Bold').text('Audit Calendar', { align: 'center' });
+    const startY = doc.y;
+    doc.fontSize(20).font('Helvetica-Bold').text('Audit Calendar', 40, startY, { align: 'center', width: doc.page.width - 80 });
     doc.moveDown(0.5);
-    doc.fontSize(14).font('Helvetica').text(locationName, { align: 'center' });
+    doc.fontSize(14).font('Helvetica').text(locationName, { align: 'center', width: doc.page.width - 80 });
     doc.moveDown(0.3);
     
     // Date range
-    const dateRangeText = viewType === 'day' 
-      ? format(startDate, 'MMMM d, yyyy')
-      : `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`;
-    doc.fontSize(12).text(dateRangeText, { align: 'center' });
+    const dateRangeText = `Full Year ${format(startDate, 'yyyy')} Calendar`;
+    doc.fontSize(12).text(dateRangeText, { align: 'center', width: doc.page.width - 80 });
     doc.moveDown(1);
 
     // Group audits by date
@@ -66,8 +65,8 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
       const date = new Date(dateKey);
       const dayAudits = auditsByDate[dateKey];
 
-      // Check if we need a new page
-      if (index > 0 && doc.y > 500) {
+      // Check if we need a new page (leave space for footer)
+      if (doc.y > doc.page.height - 100) {
         doc.addPage();
       }
 
@@ -120,15 +119,18 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
         .text('No audits scheduled for this period.', { align: 'center' });
     }
 
-    // Footer
-    doc.fontSize(8)
-      .fillColor('#9ca3af')
-      .text(
-        `Generated on ${format(new Date(), 'MMM d, yyyy HH:mm')}`,
-        40,
-        doc.page.height - 30,
-        { align: 'center' }
-      );
+    // Footer - add on current page without creating new page
+    const footerY = doc.page.height - 30;
+    if (doc.y < footerY - 20) {
+      doc.fontSize(8)
+        .fillColor('#9ca3af')
+        .text(
+          `Generated on ${format(new Date(), 'MMM d, yyyy HH:mm')}`,
+          40,
+          footerY,
+          { align: 'center', width: doc.page.width - 80 }
+        );
+    }
 
     doc.end();
   });

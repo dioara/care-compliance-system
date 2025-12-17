@@ -130,11 +130,22 @@ export default function AuditCalendar() {
     if (!activeLocationId) return;
 
     try {
+      // Export full year instead of just current view
+      const currentYear = new Date().getFullYear();
+      const yearStart = new Date(currentYear, 0, 1); // January 1st
+      const yearEnd = new Date(currentYear, 11, 31); // December 31st
+      
+      console.log('[Calendar PDF] Exporting full year:', {
+        yearStart: format(yearStart, 'yyyy-MM-dd'),
+        yearEnd: format(yearEnd, 'yyyy-MM-dd'),
+        currentYear
+      });
+      
       const result = await exportPdf.mutateAsync({
         locationId: activeLocationId,
-        startDate: format(dateRange.start, 'yyyy-MM-dd'),
-        endDate: format(dateRange.end, 'yyyy-MM-dd'),
-        viewType: calendarView,
+        startDate: format(yearStart, 'yyyy-MM-dd'),
+        endDate: format(yearEnd, 'yyyy-MM-dd'),
+        viewType: 'month', // Always use month view for full year export
       });
 
       // Open PDF in new tab

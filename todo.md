@@ -1900,3 +1900,8 @@
 - [x] Investigate error when clicking Print Calendar button
 - [x] Fix PDF generation service (added missing imports: auditTypes, staffMembers, serviceUsers, format)
 - [x] Test calendar PDF export works correctly
+
+## PDF Export Issues
+- [x] Fix calendar PDF showing only one month instead of full year (now exports full current year)
+- [x] Fix header/footer creating separate pages in calendar PDF
+- [ ] Fix header/footer creating separate pages in action log PDF (action log uses different approach, needs separate fix if issue persists)

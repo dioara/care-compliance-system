@@ -1592,49 +1592,46 @@ export const appRouter = router({
           .where(
             and(
               eq(auditInstances.locationId, input.locationId),
-              gte(auditInstances.scheduledDate, new Date(input.startDate)),
-              lte(auditInstances.scheduledDate, new Date(input.endDate))
+              gte(auditInstances.auditDate, new Date(input.startDate)),
+              lte(auditInstances.auditDate, new Date(input.endDate))
             )
           )
-          .orderBy(auditInstances.scheduledDate);
+          .orderBy(auditInstances.auditDate);
 
         console.log('[PDF Export] Found', auditInstancesData.length, 'audit instances');
         
-        // Enrich with audit type names and user names
-        const auditsWithNames = await Promise.all(
-          auditInstancesData.map(async (instance) => {
-            let auditName = 'Unknown Audit';
-            let auditorName: string | null = null;
-            let serviceUserName: string | null = null;
-            
-            // Get audit type name
-            if (instance.auditTypeId) {
-              const auditType = await db.getAuditTypeById(instance.auditTypeId);
-              auditName = auditType?.auditName || 'Unknown Audit';
-            }
-            
-            // Get auditor name
-            if (instance.assignedAuditorId) {
-              const auditor = await db.getStaffMemberById(instance.assignedAuditorId);
-              auditorName = auditor?.name || null;
-            }
-            
-            // Get service user name
-            if (instance.serviceUserId) {
-              const serviceUser = await db.getServiceUserById(instance.serviceUserId);
-              serviceUserName = serviceUser?.name || null;
-            }
-            
-            return {
-              id: instance.id,
-              auditName,
-              scheduledDate: instance.scheduledDate,
-              status: instance.status,
-              auditorName,
-              serviceUserName,
-            };
-          })
-        );
+        // Fetch all related data in bulk
+        const auditTypeIds = [...new Set(auditInstancesData.map(a => a.auditTypeId).filter(Boolean))];
+        const auditorIds = [...new Set(auditInstancesData.map(a => a.assignedAuditorId).filter(Boolean))];
+        const serviceUserIds = [...new Set(auditInstancesData.map(a => a.serviceUserId).filter(Boolean))];
+        
+        // Fetch audit types
+        const auditTypesData = auditTypeIds.length > 0 
+          ? await database.select().from(auditTypes).where(sql`${auditTypes.id} IN (${sql.join(auditTypeIds.map(id => sql`${id}`), sql`, `)})`)
+          : [];
+        const auditTypeMap = new Map(auditTypesData.map(at => [at.id, at.auditName]));
+        
+        // Fetch staff members
+        const staffData = auditorIds.length > 0
+          ? await database.select().from(staffMembers).where(sql`${staffMembers.id} IN (${sql.join(auditorIds.map(id => sql`${id}`), sql`, `)})`)
+          : [];
+        const staffMap = new Map(staffData.map(s => [s.id, s.name]));
+        
+        // Fetch service users
+        const serviceUsersData = serviceUserIds.length > 0
+          ? await database.select().from(serviceUsers).where(sql`${serviceUsers.id} IN (${sql.join(serviceUserIds.map(id => sql`${id}`), sql`, `)})`)
+          : [];
+        const serviceUserMap = new Map(serviceUsersData.map(su => [su.id, su.name]));
+        
+        // Map data to audits
+        const auditsWithNames = auditInstancesData.map(instance => ({
+          id: instance.id,
+          auditName: auditTypeMap.get(instance.auditTypeId) || 'Unknown Audit',
+          scheduledDate: instance.auditDate,
+          status: instance.status,
+          auditorName: instance.assignedAuditorId ? (staffMap.get(instance.assignedAuditorId) || null) : null,
+          serviceUserName: instance.serviceUserId ? (serviceUserMap.get(instance.serviceUserId) || null) : null,
+        }));
         
         console.log('[PDF Export] Enriched', auditsWithNames.length, 'audits with names');
         
