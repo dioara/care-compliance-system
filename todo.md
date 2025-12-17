@@ -2175,3 +2175,13 @@
 - [ ] Test all AI audit features
 - [ ] Test email notifications
 - [ ] Create health check endpoint for monitoring
+
+
+## CRITICAL: Production Bugs After Deployment
+- [ ] Fix PDF generation not working in production (500 errors)
+- [ ] Fix Excel/CSV generation not working in production
+- [ ] Fix logout functionality not working
+- [x] Add comprehensive error logging to PDF generation endpoints
+- [ ] Check Railway production logs for actual error messages
+- [ ] Fix root cause based on error logs
+- [ ] Test all fixes in production environment

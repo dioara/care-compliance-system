@@ -1704,9 +1704,12 @@ export const appRouter = router({
         return { url, filename };
         } catch (error) {
           console.error('[PDF Export Error]', error);
+          console.error('[PDF Export Error] Stack:', error instanceof Error ? error.stack : 'No stack trace');
+          console.error('[PDF Export Error] Details:', JSON.stringify(error, null, 2));
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
             message: error instanceof Error ? error.message : 'Failed to generate calendar PDF',
+            cause: error
           });
         }
       }),
@@ -1887,43 +1890,62 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
-        
-        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
-        if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
-        
-        let locationName: string | undefined;
-        if (input.locationId) {
-          const location = await db.getLocationById(input.locationId);
-          locationName = location?.name;
+        try {
+          console.log('[PDF Generation] Starting incidents PDF generation...');
+          
+          if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+          
+          const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+          if (!company) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+          
+          let locationName: string | undefined;
+          if (input.locationId) {
+            const location = await db.getLocationById(input.locationId);
+            locationName = location?.name;
+          }
+          
+          let incidents = await db.getIncidentsByTenant(ctx.user.tenantId);
+          console.log(`[PDF Generation] Found ${incidents.length} incidents`);
+          
+          // Apply filters
+          if (input.locationId) {
+            incidents = incidents.filter(i => i.locationId === input.locationId);
+          }
+          if (input.severity && input.severity !== "all") {
+            incidents = incidents.filter(i => i.severity === input.severity);
+          }
+          if (input.status && input.status !== "all") {
+            incidents = incidents.filter(i => i.status === input.status);
+          }
+          
+          console.log('[PDF Generation] Importing PDF service...');
+          const { generateIncidentPDF } = await import("./services/incidentPdfService");
+          
+          console.log('[PDF Generation] Generating PDF buffer...');
+          const pdfBuffer = await generateIncidentPDF({
+            incidents,
+            companyName: company.name,
+            companyLogo: company.logoUrl || undefined,
+            locationName,
+            generatedBy: ctx.user.name || ctx.user.email,
+          });
+          
+          console.log('[PDF Generation] Uploading to storage...');
+          const filename = `incident-report-${Date.now()}.pdf`;
+          const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
+          
+          console.log('[PDF Generation] Success! URL:', url);
+          return { url, filename };
+        } catch (error) {
+          console.error('[PDF Generation] Error:', error);
+          console.error('[PDF Generation] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+          console.error('[PDF Generation] Error details:', JSON.stringify(error, null, 2));
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: error instanceof Error ? error.message : "Failed to generate PDF",
+            cause: error
+          });
         }
-        
-        let incidents = await db.getIncidentsByTenant(ctx.user.tenantId);
-        
-        // Apply filters
-        if (input.locationId) {
-          incidents = incidents.filter(i => i.locationId === input.locationId);
-        }
-        if (input.severity && input.severity !== "all") {
-          incidents = incidents.filter(i => i.severity === input.severity);
-        }
-        if (input.status && input.status !== "all") {
-          incidents = incidents.filter(i => i.status === input.status);
-        }
-        
-        const { generateIncidentPDF } = await import("./services/incidentPdfService");
-        const pdfBuffer = await generateIncidentPDF({
-          incidents,
-          companyName: company.name,
-          companyLogo: company.logoUrl || undefined,
-          locationName,
-          generatedBy: ctx.user.name || ctx.user.email,
-        });
-        
-        const filename = `incident-report-${Date.now()}.pdf`;
-        const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
-        
-        return { url, filename };
       }),
 
     // Generate PDF report for a single incident
