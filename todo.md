@@ -2126,3 +2126,51 @@
 - [x] Fix router name corrections (companyProfile → company, locations.getByTenant → list)
 - [ ] Continue fixing remaining 139 TypeScript errors (complex type conversions, Drizzle ORM timestamp issues)
 - [ ] Test all functionality after fixes
+
+
+## TypeScript Cleanup - Fix Remaining 139 Errors
+- [ ] Analyze and categorize all 139 remaining errors by type
+- [ ] Fix audit scheduling Date and boolean conversions (nextAuditDue, isActive)
+- [ ] Fix PDF generation type issues (AuditType[], AuditForPdf[] interfaces)
+- [ ] Fix Drizzle ORM timestamp comparison issues (currentPeriodEnd, Date vs string)
+- [ ] Fix implicit any types in callbacks and event handlers
+- [ ] Fix optional chaining and nullable property access issues
+- [ ] Fix client-side component type errors (GlobalSearch, SecurityMetrics, PageHeader)
+- [ ] Fix Set iteration issues (--downlevelIteration flag or Array.from())
+- [ ] Fix missing properties (assignedAuditorId, reminderDays, description)
+- [ ] Run final TypeScript check to verify 0 errors
+- [ ] Test all functionality after fixes
+
+
+## BUG: PDF Generation Not Working in Production
+- [x] Verify CSV/Excel export works in dev environment (✅ Working)
+- [x] Verify PDF generation works in dev environment (✅ Working - generates 4-page PDF)
+- [ ] Test PDF generation in production environment (Railway: https://care-compliance-system-production.up.railway.app/)
+- [ ] Investigate why PDF generation fails in production but works in dev
+- [ ] Check for missing PDFKit dependencies or fonts in Railway deployment
+- [ ] Check PDF service logs for production errors
+- [ ] Add proper error handling and logging to PDF generation
+- [ ] Test all PDF generation endpoints (action log, audit reports, compliance reports)
+- [ ] Fix production PDF generation issues
+- [ ] Verify all export formats work in production
+
+## BUG: Site Becomes Unresponsive After Inactivity
+- [ ] Reproduce the issue - site becomes unclickable after period of inactivity
+- [ ] Check for session timeout issues
+- [ ] Check for WebSocket/tRPC connection issues
+- [ ] Check for React Query stale connection handling
+- [ ] Add proper connection recovery logic
+- [ ] Add session keepalive mechanism if needed
+- [ ] Test fix with extended inactivity period
+
+## PRODUCTION: Railway Deployment Issues
+- [x] Create comprehensive external dependencies audit (PRODUCTION_ISSUES.md)
+- [x] Create nixpacks.toml with required system packages (cairo, pango, fonts)
+- [x] Add comprehensive error logging to PDF generation service
+- [x] Create Railway deployment guide (RAILWAY_DEPLOYMENT.md)
+- [ ] Push all fixes to GitHub for Railway deployment
+- [ ] Test PDF generation after nixpacks deployment
+- [ ] Test document upload/processing (Word, PDF)
+- [ ] Test all AI audit features
+- [ ] Test email notifications
+- [ ] Create health check endpoint for monitoring

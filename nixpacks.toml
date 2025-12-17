@@ -1,0 +1,25 @@
+# Railway Nixpacks Configuration
+# This file specifies system-level dependencies required for the application
+
+[phases.setup]
+# System packages required for PDFKit and other native dependencies
+nixPkgs = [
+  "cairo",           # Required for PDFKit canvas operations
+  "pango",           # Required for PDFKit text rendering
+  "giflib",          # Image format support
+  "librsvg",         # SVG support
+  "pixman",          # Low-level pixel manipulation
+  "fontconfig",      # Font configuration
+  "freetype",        # Font rendering
+  "libjpeg",         # JPEG support
+  "libpng",          # PNG support
+]
+
+[phases.install]
+cmds = ["pnpm install"]
+
+[phases.build]
+cmds = ["pnpm build"]
+
+[start]
+cmd = "pnpm start"

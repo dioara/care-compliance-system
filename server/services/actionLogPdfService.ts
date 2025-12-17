@@ -45,22 +45,33 @@ const COLORS = {
  * Generate a PDF report for the Action Log
  */
 export async function generateActionLogPDF(data: ActionLogReportData): Promise<Buffer> {
+  console.log('[PDF Service] Starting action log PDF generation', {
+    actionCount: data.actions.length,
+    companyName: data.companyName,
+    hasLogo: !!data.companyLogo,
+  });
+
   // Pre-fetch logo if provided
   let logoBuffer: Buffer | null = null;
   if (data.companyLogo) {
     try {
+      console.log('[PDF Service] Fetching company logo:', data.companyLogo);
       const response = await fetch(data.companyLogo);
       if (response.ok) {
         const arrayBuffer = await response.arrayBuffer();
         logoBuffer = Buffer.from(arrayBuffer);
+        console.log('[PDF Service] Logo fetched successfully, size:', logoBuffer.length);
+      } else {
+        console.warn('[PDF Service] Logo fetch failed with status:', response.status);
       }
     } catch (e) {
-      console.error("Failed to fetch company logo:", e);
+      console.error("[PDF Service] Failed to fetch company logo:", e);
     }
   }
 
   return new Promise((resolve, reject) => {
     try {
+      console.log('[PDF Service] Initializing PDFDocument');
       const doc = new PDFDocument({
         size: "A4",
         layout: "landscape",
@@ -72,11 +83,19 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
           Creator: "Care Compliance Management System",
         },
       });
+      console.log('[PDF Service] PDFDocument initialized successfully');
 
       const chunks: Buffer[] = [];
       doc.on("data", (chunk: Buffer) => chunks.push(chunk));
-      doc.on("end", () => resolve(Buffer.concat(chunks)));
-      doc.on("error", reject);
+      doc.on("end", () => {
+        const finalBuffer = Buffer.concat(chunks);
+        console.log('[PDF Service] PDF generation completed successfully, size:', finalBuffer.length);
+        resolve(finalBuffer);
+      });
+      doc.on("error", (err) => {
+        console.error('[PDF Service] PDFDocument error event:', err);
+        reject(err);
+      });
 
       const pageWidth = 841.89; // A4 landscape width
       const pageHeight = 595.28; // A4 landscape height
@@ -99,8 +118,13 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
         drawFooter(doc, data, pageWidth, pageHeight, margin, i + 1, pageCount);
       }
 
+      console.log('[PDF Service] Finalizing document');
       doc.end();
     } catch (error) {
+      console.error('[PDF Service] Error during PDF generation:', error);
+      if (error instanceof Error) {
+        console.error('[PDF Service] Error stack:', error.stack);
+      }
       reject(error);
     }
   });
