@@ -1585,17 +1585,10 @@ export const appRouter = router({
         
         console.log('[PDF Export] Fetching audits for location:', input.locationId, 'from', input.startDate, 'to', input.endDate);
         
-        const audits = await database
-          .select({
-            id: auditInstances.id,
-            auditName: auditTypes.auditName,
-            scheduledDate: auditInstances.scheduledDate,
-            status: auditInstances.status,
-            auditorId: auditInstances.assignedAuditorId,
-            serviceUserId: auditInstances.serviceUserId,
-          })
+        // Fetch audit instances
+        const auditInstancesData = await database
+          .select()
           .from(auditInstances)
-          .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
           .where(
             and(
               eq(auditInstances.locationId, input.locationId),
@@ -1605,36 +1598,45 @@ export const appRouter = router({
           )
           .orderBy(auditInstances.scheduledDate);
 
-        console.log('[PDF Export] Found', audits.length, 'audits');
+        console.log('[PDF Export] Found', auditInstancesData.length, 'audit instances');
         
-        // Fetch names separately for auditors and service users
+        // Enrich with audit type names and user names
         const auditsWithNames = await Promise.all(
-          audits.map(async (audit) => {
+          auditInstancesData.map(async (instance) => {
+            let auditName = 'Unknown Audit';
             let auditorName: string | null = null;
             let serviceUserName: string | null = null;
             
-            if (audit.auditorId) {
-              const auditor = await db.getStaffMemberById(audit.auditorId);
+            // Get audit type name
+            if (instance.auditTypeId) {
+              const auditType = await db.getAuditTypeById(instance.auditTypeId);
+              auditName = auditType?.auditName || 'Unknown Audit';
+            }
+            
+            // Get auditor name
+            if (instance.assignedAuditorId) {
+              const auditor = await db.getStaffMemberById(instance.assignedAuditorId);
               auditorName = auditor?.name || null;
             }
             
-            if (audit.serviceUserId) {
-              const serviceUser = await db.getServiceUserById(audit.serviceUserId);
+            // Get service user name
+            if (instance.serviceUserId) {
+              const serviceUser = await db.getServiceUserById(instance.serviceUserId);
               serviceUserName = serviceUser?.name || null;
             }
             
             return {
-              id: audit.id,
-              auditName: audit.auditName,
-              scheduledDate: audit.scheduledDate,
-              status: audit.status,
+              id: instance.id,
+              auditName,
+              scheduledDate: instance.scheduledDate,
+              status: instance.status,
               auditorName,
               serviceUserName,
             };
           })
         );
         
-        console.log('[PDF Export] Enriched with names');
+        console.log('[PDF Export] Enriched', auditsWithNames.length, 'audits with names');
         
         // Generate PDF
         console.log('[PDF Export] Generating PDF...');
