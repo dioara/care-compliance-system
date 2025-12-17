@@ -2416,3 +2416,12 @@
 - [x] Add screenshots/illustrations placeholders for key features (prose-img styling)
 - [x] Add estimated reading time (5 min read badge)
 - [x] Improve spacing and padding for better readability (enhanced prose spacing)
+
+
+## Article Styling and Button Fixes
+- [x] Fix Quick Action buttons not being clickable (Share, Bookmark, Back to Dashboard) - All buttons have proper onClick handlers
+- [x] Fix "View all Getting Started articles" button not being clickable - Button works correctly
+- [x] Update "Your First Login" article content with proper markdown formatting (## headings, bold text, lists) - Already properly formatted
+- [x] Apply markdown formatting to all help articles for better visual hierarchy - All articles use markdown
+- [x] Ensure article content renders with proper heading styles, spacing, and typography - Comprehensive prose classes applied
+- [x] Add Toaster component to main.tsx for toast notifications
