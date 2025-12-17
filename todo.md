@@ -2347,8 +2347,19 @@
 
 ## Fix Sign Out Auto-Login Issue
 - [x] Investigate why user is automatically logged back in after logout
-- [x] Found that cookies were not being cleared properly during logout
-- [x] Fix logout flow to clear all cookies (not just localStorage)
-- [x] Added aggressive cookie clearing to logout function
-- [x] Changed window.location.replace to window.location.href for better redirect
+- [x] Found that DashboardLayout uses core useAuth hook, not custom one
+- [x] Fixed BOTH useAuth hooks (custom and core) to clear cookies
+- [x] Updated core hook (client/src/_core/hooks/useAuth.ts) with cookie clearing
+- [x] Updated custom hook (client/src/hooks/useAuth.ts) with cookie clearing
+- [x] Both hooks now clear localStorage, sessionStorage, and all cookies
+- [x] Both hooks redirect to /login after logout
 - [ ] Test logout behavior
+
+## Fix Terms Page Pricing Wording
+- [x] Update terms page to state £70 per license (not per organisation)
+- [x] Clarify that organisations can purchase multiple licenses
+
+## Fix Privacy Policy Page Duplicate Header/Footer
+- [x] Found that PrivacyPolicy component was wrapped in DashboardLayout twice (once in route, once in component)
+- [x] Removed DashboardLayout wrapper from PrivacyPolicy component
+- [x] Route in App.tsx already provides DashboardLayout wrapper

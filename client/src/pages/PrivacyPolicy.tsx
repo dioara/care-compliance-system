@@ -1,4 +1,3 @@
-import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Shield, Lock, Eye, FileText, Users, Globe, Mail, Clock } from "lucide-react";
@@ -9,8 +8,7 @@ export default function PrivacyPolicy() {
   const contactEmail = "privacy@carecompliancesystem.co.uk";
 
   return (
-    <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Privacy Policy</h1>
           <p className="text-muted-foreground">
@@ -425,6 +423,5 @@ export default function PrivacyPolicy() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

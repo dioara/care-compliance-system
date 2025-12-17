@@ -38,6 +38,22 @@ export function useAuth(options?: UseAuthOptions) {
     } finally {
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
+      
+      // Clear all localStorage
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('trpc-cache');
+      localStorage.removeItem('manus-runtime-user-info');
+      sessionStorage.clear();
+      
+      // Clear all cookies
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      // Redirect to login
+      window.location.href = '/login';
     }
   }, [logoutMutation, utils]);
 

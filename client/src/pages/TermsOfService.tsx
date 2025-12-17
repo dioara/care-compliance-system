@@ -44,9 +44,10 @@ export default function TermsOfService() {
               <h2 className="text-xl font-semibold mb-4">2. Subscription and Pricing</h2>
               <h3 className="text-lg font-medium mb-2">2.1 Subscription Fee</h3>
               <p className="text-muted-foreground mb-4">
-                The Service is provided on a subscription basis at <strong>£70 per month</strong> per organisation. 
-                This fee covers access to all core features including compliance assessments, audit management, 
-                staff and service user management, reporting, and standard support.
+                The Service is provided on a subscription basis at <strong>£70 per month per license</strong>. 
+                Organisations can purchase multiple licenses as needed. Each license covers access to all core 
+                features including compliance assessments, audit management, staff and service user management, 
+                reporting, and standard support.
               </p>
               
               <h3 className="text-lg font-medium mb-2">2.2 AI-Powered Features</h3>
