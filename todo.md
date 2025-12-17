@@ -1961,3 +1961,38 @@
 - [x] Add Last Week and Next Week options
 - [x] Add Last Year and Next Year options
 - [ ] Test all new date range options (needs user testing)
+
+## Feature: Calendar Grid PDF Layout
+- [x] Redesign PDF to use traditional calendar grid (7 columns for days)
+- [x] Group multiple instances of same audit type on same day with count
+- [x] Color-code audits by status (Scheduled, In Progress, Completed, Overdue)
+- [x] Add color legend to PDF
+- [x] Handle multi-week/month layouts with proper page breaks
+- [ ] Test with different date ranges (week, month, quarter, year)
+
+## BUG: Calendar Not Showing Manually Scheduled Audits
+- [x] Debug why audits created via "Schedule Audit" button don't appear on calendar (missing query invalidation)
+- [x] Check if calendar is filtering/querying correctly (working correctly)
+- [x] Verify audit creation saves correct date format (correct)
+- [x] Added query invalidation to ScheduleAuditForm to refresh calendar after creating audit
+- [ ] Test calendar refresh after creating new audit (needs user testing)
+
+## BUG: Collapsed Sidebar Icon Spacing
+- [x] Fix icon spacing when sidebar is collapsed (added justify-center and px-2)
+- [x] Ensure icons are properly centered and have adequate padding
+- [ ] Test collapsed state on different screen sizes (needs user testing)
+
+## Feature: CQC Compliance Reports
+- [ ] Research CQC (Care Quality Commission) report requirements
+- [ ] Identify all required compliance report types
+- [ ] Implement report generation for each CQC report type
+- [ ] Add PDF export functionality for reports
+- [ ] Create reports page UI with filters and date ranges
+- [ ] Test report accuracy and completeness
+
+## Feature: AI Audit UI Improvements
+- [ ] Replace basic text fields with rich text editors
+- [ ] Add formatting toolbar (bold, italic, lists, etc.)
+- [ ] Improve layout and visual design of AI Audit page
+- [ ] Add proper validation and error handling
+- [ ] Test rich text editor functionality

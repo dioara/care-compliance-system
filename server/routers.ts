@@ -1571,7 +1571,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         try {
-          const { generateCalendarPdf } = await import('./services/calendarPdfService');
+          const { generateCalendarGridPdf } = await import('./services/calendarGridPdfService');
           
           // Get location details
           const location = await db.getLocationById(input.locationId);
@@ -1639,16 +1639,15 @@ export const appRouter = router({
         
         // Generate PDF
         console.log('[PDF Export] Generating PDF...');
-        const pdfBuffer = await generateCalendarPdf({
-          locationName: location.name,
-          startDate: new Date(input.startDate),
-          endDate: new Date(input.endDate),
-          audits: auditsWithNames.map(a => ({
+        const pdfBuffer = await generateCalendarGridPdf(
+          location.name,
+          new Date(input.startDate),
+          new Date(input.endDate),
+          auditsWithNames.map(a => ({
             ...a,
-            scheduledDate: a.scheduledDate.toISOString(),
-          })),
-          viewType: input.viewType,
-        });
+            scheduledDate: a.scheduledDate,
+          }))
+        );
 
         // Upload to S3
         console.log('[PDF Export] PDF generated, uploading to S3...');

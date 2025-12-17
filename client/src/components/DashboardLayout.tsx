@@ -221,7 +221,7 @@ function DashboardLayoutContent({
         isActive={isActive}
         onClick={() => setLocation(item.path)}
         tooltip={item.label}
-        className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
+        className={`h-11 transition-all duration-200 font-normal rounded-xl group ${isCollapsed ? 'justify-center px-2' : ''} ${isActive ? "bg-primary/10 text-primary font-medium shadow-sm" : "hover:bg-accent"}`}
       >
         <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all shrink-0 ${isActive ? "bg-primary text-white shadow-sm" : "bg-muted/50 group-hover:bg-muted"}`}>
           <item.icon className="h-4 w-4" />

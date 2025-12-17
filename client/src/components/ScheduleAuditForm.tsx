@@ -36,9 +36,15 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
   // Fetch service users
   const { data: serviceUsers } = trpc.serviceUsers.list.useQuery({ locationId });
 
+  // Get utils for invalidation
+  const utils = trpc.useUtils();
+
   // Schedule mutation
   const scheduleMutation = trpc.audits.scheduleAudit.useMutation({
     onSuccess: () => {
+      // Invalidate audit list to refresh calendar
+      utils.audits.list.invalidate();
+      utils.audits.listTypes.invalidate();
       onSuccess();
     },
   });
