@@ -2338,3 +2338,9 @@
 - [x] Frontend updates selectedIncident state with returned data
 - [x] Display proper toggle state instead of "0" for notifications
 - [ ] Test notification logging for all types (CQC, Council, Police, Family, ICO)
+
+## Hide Reports Tab and Fix Sign Out
+- [x] Hide Reports navigation item from sidebar (commented out in DashboardLayout)
+- [x] Verified sign out button is working correctly (logs show token cleared)
+- [x] Reviewed errors - only SendGrid email verification warnings (expected, not critical)
+- [x] TypeScript errors are from template dependencies, not user code
