@@ -183,7 +183,10 @@ export async function updateUserLastSignIn(userId: number) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
-  await db.update(users).set({ lastSignedIn: new Date().toISOString() }).where(eq(users.id, userId));
+  // Format date as MySQL datetime: 'YYYY-MM-DD HH:MM:SS'
+  const now = new Date();
+  const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+  await db.update(users).set({ lastSignedIn: mysqlDatetime }).where(eq(users.id, userId));
 }
 
 export async function verifyPassword(password: string, hashedPassword: string) {

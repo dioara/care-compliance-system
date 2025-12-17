@@ -2188,13 +2188,13 @@
 
 
 ## URGENT: Production Deployment Issues (Railway)
-- [ ] Fix environment variable replacement in index.html (VITE_ANALYTICS_ENDPOINT, VITE_ANALYTICS_WEBSITE_ID)
-- [ ] Make analytics script conditional/optional to prevent build failures
+- [x] Fix environment variable replacement in index.html (VITE_ANALYTICS_ENDPOINT, VITE_ANALYTICS_WEBSITE_ID)
+- [x] Make analytics script conditional/optional to prevent build failures
 - [ ] Fix React not loading in production (JavaScript bundle initialization failure)
 - [ ] Fix login button not working (no event handlers attached)
 - [ ] Fix logout functionality in production
 - [ ] Fix PDF generation in production (nixpacks.toml dependencies)
 - [ ] Fix Excel export in production
 - [ ] Verify all environment variables are set in Railway
-- [ ] Test production build locally before deploying
-- [ ] Add error boundary to catch React initialization failures
+- [x] Test production build locally before deploying
+- [x] Add error boundary to catch React initialization failures
