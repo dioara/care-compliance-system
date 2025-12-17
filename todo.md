@@ -2319,3 +2319,14 @@
 - [x] Fix createdAt datetime format in createIncident function
 - [x] Change from ISO format to MySQL datetime format (toMySQLDatetime)
 - [ ] Test incident creation with various data
+
+## Fix Incident Form Validation and Submission
+- [x] Add required field validation before allowing navigation to next step
+- [x] Show alert/toast when mandatory fields are not filled
+- [x] Move submission logic to only trigger on final modal step (step 4)
+- [x] Prevent form submission from step 3 (now validates and moves to next step)
+- [x] Added validateStep function to check required fields per step
+- [x] Step 1 requires: location, incidentType, severity, incidentDate
+- [x] Step 2 requires: description
+- [x] Steps 3 and 4 are optional (no required fields)
+- [ ] Test validation with missing required fields

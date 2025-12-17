@@ -268,8 +268,58 @@ export default function Incidents() {
     setFormStep(1);
   };
 
+  // Validate current step before moving to next
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (!formData.locationId) {
+          toast.error("Please select a location");
+          return false;
+        }
+        if (!formData.incidentType) {
+          toast.error("Please select an incident type");
+          return false;
+        }
+        if (!formData.severity) {
+          toast.error("Please select a severity level");
+          return false;
+        }
+        if (!formData.incidentDate) {
+          toast.error("Please enter the incident date");
+          return false;
+        }
+        return true;
+      case 2:
+        if (!formData.description) {
+          toast.error("Please provide an incident description");
+          return false;
+        }
+        return true;
+      case 3:
+        // Step 3 is optional (injuries), no required fields
+        return true;
+      case 4:
+        // Step 4 is optional (follow-up), no required fields
+        return true;
+      default:
+        return true;
+    }
+  };
+
+  const handleNextStep = () => {
+    if (validateStep(formStep)) {
+      setFormStep(formStep + 1);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Only allow submission on step 4
+    if (formStep !== 4) {
+      handleNextStep();
+      return;
+    }
     
     if (!formData.locationId || !formData.incidentType || !formData.severity) {
       toast.error("Please fill in all required fields");
@@ -953,7 +1003,7 @@ export default function Incidents() {
                   {formStep < 4 ? (
                     <Button
                       type="button"
-                      onClick={() => setFormStep(formStep + 1)}
+                      onClick={handleNextStep}
                     >
                       Next
                       <ChevronRight className="ml-2 h-4 w-4" />
