@@ -1,3 +1,4 @@
+console.log('[CCMS] main.tsx loading - v1.0.1');
 import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -89,10 +90,24 @@ const trpcClient = trpc.createClient({
   ],
 });
 
-createRoot(document.getElementById("root")!).render(
-  <trpc.Provider client={trpcClient} queryClient={queryClient}>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </trpc.Provider>
-);
+console.log('[CCMS] Starting React render');
+try {
+  const rootElement = document.getElementById("root");
+  console.log('[CCMS] Root element:', rootElement);
+  
+  if (!rootElement) {
+    throw new Error('Root element not found!');
+  }
+  
+  createRoot(rootElement).render(
+    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </trpc.Provider>
+  );
+  console.log('[CCMS] React render complete');
+} catch (error) {
+  console.error('[CCMS] Fatal error during React initialization:', error);
+  document.body.innerHTML = `<div style="padding: 20px; color: red;">Error loading application: ${error}</div>`;
+}
