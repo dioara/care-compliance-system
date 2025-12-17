@@ -1,0 +1,22 @@
+{
+  "query": "SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME LIKE '%article%' OR TABLE_NAME LIKE '%support%');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND (TABLE_NAME LIKE '%article%' OR TABLE_NAME LIKE '%support%');",
+  "rows": [
+    {
+      "TABLE_NAME": "supportingDocuments"
+    },
+    {
+      "TABLE_NAME": "supportTickets"
+    },
+    {
+      "TABLE_NAME": "articleFeedback"
+    },
+    {
+      "TABLE_NAME": "articleBookmarks"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\nsupportingDocuments\nsupportTickets\narticleFeedback\narticleBookmarks\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

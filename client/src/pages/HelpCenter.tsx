@@ -10,7 +10,11 @@ import { useLocation } from "wouter";
 export default function HelpCenter() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => {
+    // Read category from URL params on mount
+    const params = new URLSearchParams(window.location.search);
+    return params.get('category');
+  });
 
   // Filter articles based on search and category
   const filteredArticles = useMemo(() => {

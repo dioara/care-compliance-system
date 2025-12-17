@@ -2432,3 +2432,10 @@
 - [x] Create articleFeedback table in production database
 - [x] Create articleBookmarks table in production database
 - [x] Verify tables exist (4 tables found) and Help Center features work in production
+
+
+## Help Center UI Fixes (Current)
+- [x] Fix Quick Actions buttons not working (Share, Bookmark, Back to Dashboard) - All have proper onClick handlers
+- [x] Fix article text styling - Enhanced prose classes with better spacing (h2:mt-14, p:mb-7, strong:block)
+- [x] Fix "View all Getting Started articles" button to filter articles correctly - Now navigates to /help?category=getting-started
+- [x] Add URL parameter reading to HelpCenter component to support category filtering from URL

@@ -212,15 +212,15 @@ export default function HelpArticle() {
               <div className="p-10 md:p-12">
               <div className="prose prose-lg prose-indigo max-w-none
                 prose-headings:font-bold prose-headings:text-gray-900 prose-headings:scroll-mt-20 prose-headings:tracking-tight
-                prose-h1:text-4xl prose-h1:mt-12 prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-indigo-200 prose-h1:leading-tight
-                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-gray-200 prose-h2:leading-tight
-                prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-5 prose-h3:leading-snug
-                prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-4 prose-h4:leading-snug
-                prose-p:text-gray-700 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[18px]
-                prose-strong:text-gray-900 prose-strong:font-bold
-                prose-ul:my-8 prose-ul:space-y-3 prose-ul:pl-6
-                prose-ol:my-8 prose-ol:space-y-3 prose-ol:pl-6
-                prose-li:text-gray-700 prose-li:text-[18px] prose-li:leading-[1.8] prose-li:pl-2
+                prose-h1:text-4xl prose-h1:mt-0 prose-h1:mb-8 prose-h1:pb-5 prose-h1:border-b-2 prose-h1:border-indigo-200 prose-h1:leading-tight
+                prose-h2:text-3xl prose-h2:mt-14 prose-h2:mb-6 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-gray-200 prose-h2:leading-tight
+                prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-5 prose-h3:leading-snug
+                prose-h4:text-xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:leading-snug
+                prose-p:text-gray-700 prose-p:leading-[1.9] prose-p:mb-7 prose-p:text-[18px]
+                prose-strong:text-gray-900 prose-strong:font-bold prose-strong:block prose-strong:mt-6 prose-strong:mb-2
+                prose-ul:my-8 prose-ul:space-y-4 prose-ul:pl-6
+                prose-ol:my-8 prose-ol:space-y-4 prose-ol:pl-6
+                prose-li:text-gray-700 prose-li:text-[18px] prose-li:leading-[1.9] prose-li:pl-2
                 prose-a:text-indigo-600 prose-a:font-semibold prose-a:no-underline prose-a:underline-offset-4 hover:prose-a:underline hover:prose-a:text-indigo-700 prose-a:transition-colors
                 prose-code:text-sm prose-code:bg-indigo-50 prose-code:text-indigo-700 prose-code:px-2.5 prose-code:py-1 prose-code:rounded-md prose-code:font-mono prose-code:font-semibold prose-code:before:content-none prose-code:after:content-none prose-code:border prose-code:border-indigo-100
                 prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700 prose-pre:p-6 prose-pre:my-8
@@ -376,7 +376,7 @@ export default function HelpArticle() {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => setLocation("/help")}
+                  onClick={() => setLocation(`/help?category=${category.id}`)}
                   className="w-full bg-white hover:bg-indigo-600 hover:text-white transition-all"
                 >
                   View all {category.name} articles

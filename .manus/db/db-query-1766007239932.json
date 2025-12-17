@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS `articleFeedback` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `articleId` varchar(255) NOT NULL,\n  `userId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `helpful` tinyint NOT NULL,\n  `feedbackText` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  KEY `idx_article_user` (`articleId`, `userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE IF NOT EXISTS `articleFeedback` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `articleId` varchar(255) NOT NULL,\n  `userId` int NOT NULL,\n  `tenantId` int NOT NULL,\n  `helpful` tinyint NOT NULL,\n  `feedbackText` text,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  PRIMARY KEY (`id`),\n  KEY `idx_article_user` (`articleId`, `userId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 189
+}
