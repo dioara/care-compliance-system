@@ -47,6 +47,7 @@ import AcceptInvitation from "./pages/AcceptInvitation";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ErrorMonitoring from "./pages/ErrorMonitoring";
 import Notifications from "./pages/Notifications";
+import HelpCenter from "./pages/HelpCenter";
 
 function Router() {
   return (
@@ -92,6 +93,8 @@ function Router() {
           <Notifications />
         </DashboardLayout>
       </Route>
+      
+      <Route path="/help" component={HelpCenter} />
       
       <Route path="/admin-dashboard">
         <DashboardLayout>

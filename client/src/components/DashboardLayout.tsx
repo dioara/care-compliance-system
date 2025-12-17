@@ -401,6 +401,36 @@ function DashboardLayoutContent({
         </header>
         
         <main className="flex-1 p-3 md:p-4 lg:p-6">{children}</main>
+        
+        <footer className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <span>© 2025 Care Compliance Management System</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <a
+                href="/help"
+                className="hover:text-primary transition-colors flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+                Help Center
+              </a>
+              <a
+                href="/privacy-policy"
+                className="hover:text-primary transition-colors"
+              >
+                Privacy
+              </a>
+              <a
+                href="/terms-of-service"
+                className="hover:text-primary transition-colors"
+              >
+                Terms
+              </a>
+            </div>
+          </div>
+        </footer>
+        
         <OnboardingTour />
       </SidebarInset>
     </>

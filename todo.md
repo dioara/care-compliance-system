@@ -2071,3 +2071,22 @@
 - [x] Fixed Audits.tsx card click to use /conduct-audit/:id for non-completed audits
 - [x] Fixed AuditResults.tsx Continue button
 - [ ] Create checkpoint with fix
+
+
+## BUG: Notifications 500 Error Blocking Logout (Dec 2025)
+- [ ] Investigate notifications.list and notifications.getUnreadCount 500 error
+- [ ] Check if notifications table exists in Railway database
+- [ ] Create migration script to add notifications table to Railway
+- [ ] Test notifications API after migration
+- [ ] Verify logout works after fixing notifications
+- [ ] Create checkpoint with fix
+
+
+## Help Center / User Guide (Dec 2025)
+- [x] Design help center structure and categories
+- [x] Write comprehensive user documentation for all features
+- [x] Create Help Center page component with search
+- [x] Add navigation and category filtering
+- [x] Add footer link to Help Center
+- [ ] Test help center functionality
+- [ ] Create checkpoint
