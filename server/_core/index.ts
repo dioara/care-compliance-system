@@ -42,24 +42,26 @@ async function startServer() {
   // Cookie parser for auth tokens
   app.use(cookieParser());
   
-  // Rate limiting middleware - 100 requests per 15 minutes per IP
-  const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-    message: {
-      error: "Too many requests from this IP, please try again later.",
-      retryAfter: "15 minutes"
-    },
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    // Skip rate limiting for health check endpoint
-    skip: (req) => req.path === "/api/trpc/system.health",
-  });
+  // Rate limiting middleware - TEMPORARILY DISABLED for Railway debugging
+  // const limiter = rateLimit({
+  //   windowMs: 15 * 60 * 1000, // 15 minutes
+  //   max: 100, // Limit each IP to 100 requests per windowMs
+  //   message: {
+  //     error: "Too many requests from this IP, please try again later.",
+  //     retryAfter: "15 minutes"
+  //   },
+  //   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  //   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  //   // Explicitly use memory store (not Redis)
+  //   store: undefined, // Use default memory store
+  //   // Skip rate limiting for health check endpoint
+  //   skip: (req) => req.path === "/api/trpc/system.health",
+  // });
   
   // Apply rate limiter to all API routes
-  app.use("/api", limiter);
+  // app.use("/api", limiter);
   
-  console.log("[SECURITY] Rate limiting enabled: 100 requests per 15 minutes per IP");
+  console.log("[SECURITY] Rate limiting temporarily disabled for Railway deployment");
   // Staff invitation validation endpoint
   app.get("/api/auth/validate-invitation", async (req, res) => {
     try {
