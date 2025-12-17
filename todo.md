@@ -2314,3 +2314,8 @@
 - [x] Install recharts library for charts
 - [x] Add route to App.tsx
 - [ ] Test dashboard with real incident data
+
+## Fix Incident Creation Datetime Error
+- [x] Fix createdAt datetime format in createIncident function
+- [x] Change from ISO format to MySQL datetime format (toMySQLDatetime)
+- [ ] Test incident creation with various data

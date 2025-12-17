@@ -1542,7 +1542,7 @@ export async function createIncident(data: {
   const [result] = await db.insert(incidents).values({
     ...data,
     status: "open",
-    createdAt: new Date().toISOString(),
+    createdAt: toMySQLDatetime(new Date()),
   }).$returningId();
   
   return result;
