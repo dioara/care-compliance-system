@@ -2055,3 +2055,11 @@
 - [x] Update notification count to show only unread
 - [ ] Test mark as read functionality
 - [ ] Create checkpoint
+
+
+## BUG: Logout and Responsive Mode Issues (Dec 2025)
+- [x] Fix logout button not working (still redirecting but not clearing session)
+- [x] Fix screen becoming unclickable in responsive/mobile mode after some time
+- [ ] Test logout flow end-to-end on desktop and mobile
+- [ ] Test responsive mode for z-index and event handler issues
+- [ ] Create checkpoint with fixes
