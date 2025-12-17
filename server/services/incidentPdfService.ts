@@ -23,23 +23,23 @@ interface IncidentItem {
   immediateActions?: string | null;
   witnessStatements?: string | null;
   // Notifications
-  reportedToCqc?: boolean | null;
+  reportedToCqc?: number | null;
   cqcNotifiedAt?: Date | string | null;
   cqcNotificationDetails?: string | null;
-  reportedToCouncil?: boolean | null;
+  reportedToCouncil?: number | null;
   councilNotifiedAt?: Date | string | null;
   councilNotificationDetails?: string | null;
-  reportedToPolice?: boolean | null;
+  reportedToPolice?: number | null;
   policeNotifiedAt?: Date | string | null;
   policeNotificationDetails?: string | null;
-  reportedToFamily?: boolean | null;
+  reportedToFamily?: number | null;
   familyNotifiedAt?: Date | string | null;
   familyNotificationDetails?: string | null;
-  reportedToIco?: boolean | null;
+  reportedToIco?: number | null;
   icoNotifiedAt?: Date | string | null;
   icoNotificationDetails?: string | null;
   // Investigation
-  investigationRequired?: boolean | null;
+  investigationRequired?: number | null;
   investigationNotes?: string | null;
   investigationCompletedAt?: Date | string | null;
   // Actions and follow-up

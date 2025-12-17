@@ -2109,3 +2109,5 @@
 - [x] Fix PDF generation failures across all features (calendar, incidents, audits, action log)
 - [ ] Fix Stripe integration errors preventing subscription management
 - [x] Improve help article text styling and readability
+- [x] Fix incidents.generateSinglePDF 500 error
+- [x] Fix notifications.list and notifications.getUnreadCount 500 errors
