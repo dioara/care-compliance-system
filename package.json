@@ -15,7 +15,9 @@
     "seed:import": "node import-to-railway.mjs",
     "seed:complete": "node import-complete-to-railway.mjs",
     "seed:templates": "node import-all-templates.mjs",
-    "fix:audits": "node fix-audit-template-ids.mjs"
+    "fix:audits": "node fix-audit-template-ids.mjs",
+    "fix:empty-templates": "node fix-empty-template-audits.mjs",
+    "check:empty-templates": "node find-empty-templates.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
