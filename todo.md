@@ -2063,3 +2063,11 @@
 - [ ] Test logout flow end-to-end on desktop and mobile
 - [ ] Test responsive mode for z-index and event handler issues
 - [ ] Create checkpoint with fixes
+
+
+## BUG: Continue Audit Navigation (Dec 2025)
+- [x] Fix Continue Audit button navigating to /audits/:id/results instead of /conduct-audit/:id
+- [x] Fixed AuditHistory.tsx to route based on status (in-progress → /conduct-audit/:id)
+- [x] Fixed Audits.tsx card click to use /conduct-audit/:id for non-completed audits
+- [x] Fixed AuditResults.tsx Continue button
+- [ ] Create checkpoint with fix

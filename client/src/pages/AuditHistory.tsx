@@ -317,10 +317,17 @@ export default function AuditHistory() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setLocation(`/audits/${audit.id}/results`)}
+                          onClick={() => {
+                            // Route based on audit status
+                            if (audit.status === 'in_progress' || audit.status === 'scheduled') {
+                              setLocation(`/conduct-audit/${audit.id}`);
+                            } else {
+                              setLocation(`/audits/${audit.id}/results`);
+                            }
+                          }}
                         >
                           <FileText className="h-4 w-4 mr-2" />
-                          View
+                          {audit.status === 'in_progress' || audit.status === 'scheduled' ? 'Continue' : 'View'}
                         </Button>
                       </TableCell>
                     </TableRow>

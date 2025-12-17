@@ -452,7 +452,7 @@ export default function Audits() {
                     if (audit.status === 'completed' || audit.status === 'reviewed' || audit.status === 'archived') {
                       setLocation(`/audits/${audit.id}/results`);
                     } else {
-                      setLocation(`/audits/${audit.id}`);
+                      setLocation(`/conduct-audit/${audit.id}`);
                     }
                   }}
                 >

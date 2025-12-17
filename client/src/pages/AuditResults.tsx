@@ -230,7 +230,7 @@ export default function AuditResults() {
         </div>
         <div className="flex items-center gap-3">
           {auditInstance.status === "in_progress" && (
-            <Button onClick={() => setLocation(`/audits/${auditId}`)}>Continue Audit</Button>
+            <Button onClick={() => setLocation(`/conduct-audit/${auditId}`)}>Continue Audit</Button>
           )}
           <Button 
             variant="outline" 
