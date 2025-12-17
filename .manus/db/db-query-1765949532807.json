@@ -1,0 +1,130 @@
+{
+  "query": "SELECT \n  at.id,\n  at.auditName,\n  at.auditCategory,\n  COUNT(DISTINCT atem.id) as templateCount\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nGROUP BY at.id, at.auditName, at.auditCategory\nORDER BY at.auditCategory, at.auditName\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  at.id,\n  at.auditName,\n  at.auditCategory,\n  COUNT(DISTINCT atem.id) as templateCount\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nGROUP BY at.id, at.auditName, at.auditCategory\nORDER BY at.auditCategory, at.auditName\nLIMIT 20;",
+  "rows": [
+    {
+      "id": "30041",
+      "auditName": "Contingency Planning Audit",
+      "auditCategory": "annual",
+      "templateCount": "1"
+    },
+    {
+      "id": "30042",
+      "auditName": "Data Protection/Confidentiality Audit",
+      "auditCategory": "annual",
+      "templateCount": "1"
+    },
+    {
+      "id": "30040",
+      "auditName": "LOLER Equipment Testing Audit",
+      "auditCategory": "annual",
+      "templateCount": "1"
+    },
+    {
+      "id": "30004",
+      "auditName": "Accidents and Incidents Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "1",
+      "auditName": "Care Plan Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30008",
+      "auditName": "Care Plan Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30009",
+      "auditName": "Care Records Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "2"
+    },
+    {
+      "id": "30011",
+      "auditName": "Dependency Tool/Staffing Levels Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30005",
+      "auditName": "Falls Prevention Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30003",
+      "auditName": "Fire Safety Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30006",
+      "auditName": "First Aid Equipment Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "5",
+      "auditName": "Infection Control Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30001",
+      "auditName": "Infection Prevention and Control (IPC) Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30012",
+      "auditName": "Maintenance Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "2",
+      "auditName": "Medication Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30002",
+      "auditName": "Medication Management Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30015",
+      "auditName": "Resident Finances Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "30014",
+      "auditName": "Restraint and Restrictive Practice Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    },
+    {
+      "id": "4",
+      "auditName": "Staff File Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateCount": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\tauditCategory\ttemplateCount\n30041\tContingency Planning Audit\tannual\t1\n30042\tData Protection/Confidentiality Audit\tannual\t1\n30040\tLOLER Equipment Testing Audit\tannual\t1\n30004\tAccidents and Incidents Audit\tmandatory_monthly\t1\n1\tCare Plan Audit\tmandatory_monthly\t1\n30008\tCare Plan Audit\tmandatory_monthly\t1\n30009\tCare Records Audit\tmandatory_monthly\t1\n3\tDaily Notes Audit\tmandatory_monthly\t2\n30011\tDependency Tool/Staffing Levels Audit\tmandatory_monthly\t1\n30005\tFalls Prevention Audit\tmandatory_monthly\t1\n30003\tFire Safety Audit\tmandatory_monthly\t1\n30006\tFirst Aid Equipment Audit\tmandatory_monthly\t1\n5\tInfection Control Audit\tmandatory_monthly\t1\n30001\tInfection Prevention and Control (IPC) Audit\tmandatory_monthly\t1\n30012\tMaintenance Audit\tmandatory_monthly\t1\n2\tMedication Audit\tmandatory_monthly\t1\n30002\tMedication Management Audit\tmandatory_monthly\t1\n30015\tResident Finances Audit\tmandatory_monthly\t1\n30014\tRestraint and Restrictive Practice Audit\tmandatory_monthly\t1\n4\tStaff File Audit\tmandatory_monthly\t1\n",
+  "stderr": "",
+  "execution_time_ms": 51
+}

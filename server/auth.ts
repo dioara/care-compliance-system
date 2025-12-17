@@ -160,12 +160,23 @@ export const authRouter = router({
 
   // Logout
   logout: publicProcedure.mutation(({ ctx }) => {
-    ctx.res.clearCookie("auth_token", {
+    // Clear cookie with all possible configurations to ensure it's removed
+    const cookieOptions = {
       httpOnly: true,
-      secure: ctx.req.protocol === "https",
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
       path: "/",
+    };
+    
+    ctx.res.clearCookie("auth_token", cookieOptions);
+    
+    // Also try clearing without httpOnly in case cookie was set differently
+    ctx.res.clearCookie("auth_token", {
+      ...cookieOptions,
+      httpOnly: false,
     });
+    
+    console.log('[Logout] Cookies cleared');
     return { success: true };
   }),
 

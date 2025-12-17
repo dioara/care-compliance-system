@@ -1,0 +1,31 @@
+{
+  "query": "SELECT \n  ai.id,\n  ai.auditTypeId,\n  at.auditName,\n  ai.auditTemplateId,\n  atem.templateName\nFROM auditInstances ai\nJOIN auditTypes at ON ai.auditTypeId = at.id\nLEFT JOIN auditTemplates atem ON ai.auditTemplateId = atem.id\nWHERE at.auditName LIKE '%Daily%'\nORDER BY ai.createdAt DESC\nLIMIT 3;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  ai.id,\n  ai.auditTypeId,\n  at.auditName,\n  ai.auditTemplateId,\n  atem.templateName\nFROM auditInstances ai\nJOIN auditTypes at ON ai.auditTypeId = at.id\nLEFT JOIN auditTemplates atem ON ai.auditTemplateId = atem.id\nWHERE at.auditName LIKE '%Daily%'\nORDER BY ai.createdAt DESC\nLIMIT 3;",
+  "rows": [
+    {
+      "id": "391276",
+      "auditTypeId": "3",
+      "auditName": "Daily Notes Audit",
+      "auditTemplateId": "120004",
+      "templateName": "Daily Notes Audit"
+    },
+    {
+      "id": "391278",
+      "auditTypeId": "3",
+      "auditName": "Daily Notes Audit",
+      "auditTemplateId": "120004",
+      "templateName": "Daily Notes Audit"
+    },
+    {
+      "id": "391280",
+      "auditTypeId": "3",
+      "auditName": "Daily Notes Audit",
+      "auditTemplateId": "120004",
+      "templateName": "Daily Notes Audit"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditTypeId\tauditName\tauditTemplateId\ttemplateName\n391276\t3\tDaily Notes Audit\t120004\tDaily Notes Audit\n391278\t3\tDaily Notes Audit\t120004\tDaily Notes Audit\n391280\t3\tDaily Notes Audit\t120004\tDaily Notes Audit\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

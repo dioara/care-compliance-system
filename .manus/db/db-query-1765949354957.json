@@ -1,0 +1,24 @@
+{
+  "query": "SELECT at.id, at.auditName, at.auditCategory, atem.id as templateId, atem.templateName \nFROM auditTypes at \nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nWHERE at.auditName LIKE '%daily%' OR at.auditName LIKE '%Daily%'\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT at.id, at.auditName, at.auditCategory, atem.id as templateId, atem.templateName \nFROM auditTypes at \nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nWHERE at.auditName LIKE '%daily%' OR at.auditName LIKE '%Daily%'\nLIMIT 10;",
+  "rows": [
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateId": "120005",
+      "templateName": "Daily Notes Audit"
+    },
+    {
+      "id": "3",
+      "auditName": "Daily Notes Audit",
+      "auditCategory": "mandatory_monthly",
+      "templateId": "120004",
+      "templateName": "Daily Notes Audit"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tauditName\tauditCategory\ttemplateId\ttemplateName\n3\tDaily Notes Audit\tmandatory_monthly\t120005\tDaily Notes Audit\n3\tDaily Notes Audit\tmandatory_monthly\t120004\tDaily Notes Audit\n",
+  "stderr": "",
+  "execution_time_ms": 1113
+}

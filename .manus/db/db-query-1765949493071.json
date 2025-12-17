@@ -1,0 +1,31 @@
+{
+  "query": "SELECT \n  atem.id as templateId,\n  atem.templateName,\n  ats.id as sectionId,\n  ats.sectionTitle,\n  COUNT(atq.id) as questionCount\nFROM auditTemplates atem\nLEFT JOIN auditTemplateSections ats ON atem.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nWHERE atem.templateName LIKE '%Daily%'\nGROUP BY atem.id, atem.templateName, ats.id, ats.sectionTitle\nORDER BY atem.id, ats.displayOrder;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  atem.id as templateId,\n  atem.templateName,\n  ats.id as sectionId,\n  ats.sectionTitle,\n  COUNT(atq.id) as questionCount\nFROM auditTemplates atem\nLEFT JOIN auditTemplateSections ats ON atem.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nWHERE atem.templateName LIKE '%Daily%'\nGROUP BY atem.id, atem.templateName, ats.id, ats.sectionTitle\nORDER BY atem.id, ats.displayOrder;",
+  "rows": [
+    {
+      "templateId": "120004",
+      "templateName": "Daily Notes Audit",
+      "sectionId": "NULL",
+      "sectionTitle": "NULL",
+      "questionCount": "0"
+    },
+    {
+      "templateId": "120005",
+      "templateName": "Daily Notes Audit",
+      "sectionId": "120014",
+      "sectionTitle": "Daily Care Notes Quality",
+      "questionCount": "7"
+    },
+    {
+      "templateId": "120005",
+      "templateName": "Daily Notes Audit",
+      "sectionId": "120015",
+      "sectionTitle": "Record Storage and Access",
+      "questionCount": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "templateId\ttemplateName\tsectionId\tsectionTitle\tquestionCount\n120004\tDaily Notes Audit\tNULL\tNULL\t0\n120005\tDaily Notes Audit\t120014\tDaily Care Notes Quality\t7\n120005\tDaily Notes Audit\t120015\tRecord Storage and Access\t3\n",
+  "stderr": "",
+  "execution_time_ms": 65
+}

@@ -1,0 +1,26 @@
+{
+  "query": "SELECT \n  at.id as auditTypeId,\n  at.auditName,\n  atem.id as templateId,\n  atem.templateName,\n  COUNT(DISTINCT ats.id) as sectionCount,\n  COUNT(atq.id) as questionCount\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nLEFT JOIN auditTemplateSections ats ON atem.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nWHERE at.auditName LIKE '%daily%'\nGROUP BY at.id, at.auditName, atem.id, atem.templateName;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  at.id as auditTypeId,\n  at.auditName,\n  atem.id as templateId,\n  atem.templateName,\n  COUNT(DISTINCT ats.id) as sectionCount,\n  COUNT(atq.id) as questionCount\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId AND atem.isActive = 1\nLEFT JOIN auditTemplateSections ats ON atem.id = ats.auditTemplateId\nLEFT JOIN auditTemplateQuestions atq ON ats.id = atq.auditTemplateSectionId\nWHERE at.auditName LIKE '%daily%'\nGROUP BY at.id, at.auditName, atem.id, atem.templateName;",
+  "rows": [
+    {
+      "auditTypeId": "3",
+      "auditName": "Daily Notes Audit",
+      "templateId": "120005",
+      "templateName": "Daily Notes Audit",
+      "sectionCount": "2",
+      "questionCount": "10"
+    },
+    {
+      "auditTypeId": "3",
+      "auditName": "Daily Notes Audit",
+      "templateId": "120004",
+      "templateName": "Daily Notes Audit",
+      "sectionCount": "0",
+      "questionCount": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "auditTypeId\tauditName\ttemplateId\ttemplateName\tsectionCount\tquestionCount\n3\tDaily Notes Audit\t120005\tDaily Notes Audit\t2\t10\n3\tDaily Notes Audit\t120004\tDaily Notes Audit\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 68
+}

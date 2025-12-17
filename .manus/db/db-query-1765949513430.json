@@ -1,0 +1,9 @@
+{
+  "query": "SELECT \n  at.id as auditTypeId,\n  at.auditName,\n  atem.id as templateId,\n  atem.templateName,\n  atem.isActive,\n  atem.auditTypeId as templateAuditTypeId\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId\nWHERE at.id IN (SELECT DISTINCT auditTypeId FROM auditInstances WHERE auditTemplateId IS NULL)\nLIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT \n  at.id as auditTypeId,\n  at.auditName,\n  atem.id as templateId,\n  atem.templateName,\n  atem.isActive,\n  atem.auditTypeId as templateAuditTypeId\nFROM auditTypes at\nLEFT JOIN auditTemplates atem ON at.id = atem.auditTypeId\nWHERE at.id IN (SELECT DISTINCT auditTypeId FROM auditInstances WHERE auditTemplateId IS NULL)\nLIMIT 10;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 59
+}
