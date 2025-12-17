@@ -2155,13 +2155,14 @@
 - [ ] Verify all export formats work in production
 
 ## BUG: Site Becomes Unresponsive After Inactivity
-- [ ] Reproduce the issue - site becomes unclickable after period of inactivity
-- [ ] Check for session timeout issues
-- [ ] Check for WebSocket/tRPC connection issues
-- [ ] Check for React Query stale connection handling
-- [ ] Add proper connection recovery logic
-- [ ] Add session keepalive mechanism if needed
-- [ ] Test fix with extended inactivity period
+- [x] Reproduce the issue - site becomes unclickable after period of inactivity
+- [x] Check for session timeout issues
+- [x] Check for WebSocket/tRPC connection issues
+- [x] Check for React Query stale connection handling
+- [x] Add proper connection recovery logic (retry with exponential backoff, refetch on focus/reconnect)
+- [x] Add session keepalive mechanism (ping every 5 minutes)
+- [x] Add keepalive to fetch requests
+- [ ] Test fix with extended inactivity period in production
 
 ## PRODUCTION: Railway Deployment Issues
 - [x] Create comprehensive external dependencies audit (PRODUCTION_ISSUES.md)

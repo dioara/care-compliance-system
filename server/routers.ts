@@ -448,7 +448,7 @@ export const appRouter = router({
           dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth).toISOString() : null,
           admissionDate: input.admissionDate ? new Date(input.admissionDate).toISOString() : null,
           dischargeDate: input.dischargeDate ? new Date(input.dischargeDate).toISOString() : null,
-          isActive: input.isActive ?? 1,
+          isActive: input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
         });
 
         return serviceUser;
@@ -575,7 +575,7 @@ export const appRouter = router({
           employmentType: input.employmentType || "permanent_not_sponsored",
           employmentDate: input.employmentDate ? new Date(input.employmentDate).toISOString() : null,
           dbsDate: input.dbsDate ? new Date(input.dbsDate).toISOString() : null,
-          isActive: input.isActive ?? 1,
+          isActive: input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
         });
 
         return staff;
@@ -936,7 +936,7 @@ export const appRouter = router({
           locationId: input.locationId,
           auditTypeId: input.auditTypeId,
           auditTemplateId: template.id,
-          auditDate: input.auditDate,
+          auditDate: input.auditDate.toISOString(),
           auditorId: ctx.user.id,
           auditorName: ctx.user.name || undefined,
           auditorRole: ctx.user.role || undefined,
@@ -984,7 +984,7 @@ export const appRouter = router({
         await db.updateAuditInstanceStatus(
           input.id,
           'completed',
-          new Date(),
+          new Date().toISOString(),
           input.overallScore,
           input.summary,
           input.recommendations

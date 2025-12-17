@@ -49,6 +49,7 @@ import ErrorMonitoring from "./pages/ErrorMonitoring";
 import Notifications from "./pages/Notifications";
 import HelpCenter from "./pages/HelpCenter";
 import HelpArticle from "./pages/HelpArticle";
+import { useSessionKeepalive } from "./hooks/useSessionKeepalive";
 
 function Router() {
   return (
@@ -291,6 +292,9 @@ function Router() {
 }
 
 function App() {
+  // Keep session alive during inactivity (ping every 5 minutes)
+  useSessionKeepalive(5 * 60 * 1000);
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable={true}>

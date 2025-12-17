@@ -8,7 +8,28 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Retry failed queries
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      // Refetch on window focus to recover from stale connections
+      refetchOnWindowFocus: true,
+      // Refetch on reconnect
+      refetchOnReconnect: true,
+      // Keep data fresh
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      // Network mode to handle offline scenarios
+      networkMode: 'online',
+    },
+    mutations: {
+      // Retry failed mutations
+      retry: 1,
+      networkMode: 'online',
+    },
+  },
+});
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
@@ -56,6 +77,12 @@ const trpcClient = trpc.createClient({
           ...(init ?? {}),
           headers,
           credentials: "include",
+          // Add keepalive to prevent connection drops
+          keepalive: true,
+        }).catch((error) => {
+          // Log fetch errors for debugging
+          console.error('[tRPC Fetch Error]', error);
+          throw error;
         });
       },
     }),
