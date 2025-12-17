@@ -2330,3 +2330,11 @@
 - [x] Step 2 requires: description
 - [x] Steps 3 and 4 are optional (no required fields)
 - [ ] Test validation with missing required fields
+
+## Fix Notification Status UI Update
+- [x] Fix notification toggle not updating after logging notification
+- [x] Ensure incident detail refetches after notification logged
+- [x] Backend now returns updated incident from logNotification mutation
+- [x] Frontend updates selectedIncident state with returned data
+- [x] Display proper toggle state instead of "0" for notifications
+- [ ] Test notification logging for all types (CQC, Council, Police, Family, ICO)

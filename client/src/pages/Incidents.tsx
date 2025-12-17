@@ -76,8 +76,12 @@ export default function Incidents() {
   });
 
   const logNotificationMutation = trpc.incidents.logNotification.useMutation({
-    onSuccess: () => {
+    onSuccess: (updatedIncident) => {
       toast.success("Notification logged");
+      // Update the selected incident with the latest data
+      if (selectedIncident && updatedIncident) {
+        setSelectedIncident(updatedIncident);
+      }
       refetch();
     },
   });

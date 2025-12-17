@@ -1826,9 +1826,12 @@ export const appRouter = router({
         notified: z.boolean(),
         details: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
+        if (!ctx.user?.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
         await db.updateIncidentNotificationStatus(input.id, input.notificationType, input.notified, input.details);
-        return { success: true };
+        // Return the updated incident
+        const updatedIncident = await db.getIncidentById(input.id, ctx.user.tenantId);
+        return updatedIncident;
       }),
 
     // Add follow-up action to master action log
