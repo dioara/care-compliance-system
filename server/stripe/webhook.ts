@@ -112,7 +112,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     billingInterval,
   }).where(eq(tenantSubscriptions.tenantId, tenantId));
 
-  const licenses = Array.from({ length: quantity }, () => ({ tenantId, isActive: true }));
+  const licenses = Array.from({ length: quantity }, () => ({ tenantId, isActive: 1 }));
   await db.insert(userLicenses).values(licenses);
   console.log(`[Stripe Webhook] Created ${quantity} license records for tenant ${tenantId}`);
 }
@@ -133,10 +133,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     stripeSubscriptionId: subscription.id,
     status,
     licensesCount: quantity,
-    currentPeriodStart: new Date(subscription.current_period_start * 1000),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    cancelAtPeriodEnd: subscription.cancel_at_period_end,
-    canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+    currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
+    currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
+    canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
   }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
 
   console.log(`[Stripe Webhook] Updated subscription for tenant ${tenantSub.tenantId}: status=${status}, licenses=${quantity}`);
@@ -151,13 +151,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return;
   }
 
-  await db.update(tenantSubscriptions).set({ status: "canceled", canceledAt: new Date() }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
-  await db.update(userLicenses).set({ isActive: false, deactivatedAt: new Date() }).where(eq(userLicenses.tenantId, tenantSub.tenantId));
+  await db.update(tenantSubscriptions).set({ status: "canceled", canceledAt: new Date().toISOString() }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
+  await db.update(userLicenses).set({ isActive: 0, deactivatedAt: new Date().toISOString() }).where(eq(userLicenses.tenantId, tenantSub.tenantId));
   console.log(`[Stripe Webhook] Subscription canceled for tenant ${tenantSub.tenantId}`);
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  if (!invoice.subscription) return;
+  if (!invoice.subscription || !stripe) return;
   const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
   const db = await requireDb();
   const [tenantSub] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.stripeCustomerId, subscription.customer as string));

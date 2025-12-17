@@ -116,27 +116,29 @@ export default function HelpArticle() {
 
               {/* Article content */}
               <div className="p-10 md:p-12">
-                <div className="prose prose-lg prose-indigo max-w-none
-                  prose-headings:font-bold prose-headings:text-gray-900 prose-headings:scroll-mt-20
-                  prose-h1:text-4xl prose-h1:mt-12 prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-gray-200
-                  prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-5 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200
-                  prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4
-                  prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
-                  prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-5 prose-p:text-[17px]
-                  prose-strong:text-gray-900 prose-strong:font-bold
-                  prose-ul:my-6 prose-ul:space-y-3
-                  prose-ol:my-6 prose-ol:space-y-3
-                  prose-li:text-gray-700 prose-li:text-[17px] prose-li:leading-relaxed
-                  prose-a:text-indigo-600 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline hover:prose-a:text-indigo-700
-                  prose-code:text-sm prose-code:bg-indigo-50 prose-code:text-indigo-700 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:font-mono prose-code:font-semibold prose-code:before:content-none prose-code:after:content-none
-                  prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700
-                  prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-6 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-blockquote:text-gray-700
-                  prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
-                  prose-hr:my-10 prose-hr:border-gray-300
-                  prose-table:my-8 prose-table:border-collapse
-                  prose-th:bg-gray-100 prose-th:font-bold prose-th:text-gray-900 prose-th:p-3 prose-th:border prose-th:border-gray-300
-                  prose-td:p-3 prose-td:border prose-td:border-gray-300
-                ">
+              <div className="prose prose-lg prose-indigo max-w-none
+                prose-headings:font-bold prose-headings:text-gray-900 prose-headings:scroll-mt-20 prose-headings:tracking-tight
+                prose-h1:text-4xl prose-h1:mt-12 prose-h1:mb-6 prose-h1:pb-4 prose-h1:border-b-2 prose-h1:border-indigo-200 prose-h1:leading-tight
+                prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-4 prose-h2:border-b-2 prose-h2:border-gray-200 prose-h2:leading-tight
+                prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-5 prose-h3:leading-snug
+                prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-4 prose-h4:leading-snug
+                prose-p:text-gray-700 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-[18px]
+                prose-strong:text-gray-900 prose-strong:font-bold
+                prose-ul:my-8 prose-ul:space-y-3 prose-ul:pl-6
+                prose-ol:my-8 prose-ol:space-y-3 prose-ol:pl-6
+                prose-li:text-gray-700 prose-li:text-[18px] prose-li:leading-[1.8] prose-li:pl-2
+                prose-a:text-indigo-600 prose-a:font-semibold prose-a:no-underline prose-a:underline-offset-4 hover:prose-a:underline hover:prose-a:text-indigo-700 prose-a:transition-colors
+                prose-code:text-sm prose-code:bg-indigo-50 prose-code:text-indigo-700 prose-code:px-2.5 prose-code:py-1 prose-code:rounded-md prose-code:font-mono prose-code:font-semibold prose-code:before:content-none prose-code:after:content-none prose-code:border prose-code:border-indigo-100
+                prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:shadow-lg prose-pre:border prose-pre:border-gray-700 prose-pre:p-6 prose-pre:my-8
+                prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:bg-indigo-50 prose-blockquote:py-5 prose-blockquote:px-7 prose-blockquote:my-8 prose-blockquote:rounded-r-xl prose-blockquote:italic prose-blockquote:text-gray-700 prose-blockquote:text-[17px] prose-blockquote:leading-[1.8] prose-blockquote:shadow-sm
+                prose-img:rounded-xl prose-img:shadow-lg prose-img:my-10 prose-img:border prose-img:border-gray-200
+                prose-hr:my-12 prose-hr:border-gray-300
+                prose-table:my-10 prose-table:border-collapse prose-table:shadow-md prose-table:rounded-lg prose-table:overflow-hidden
+                prose-thead:bg-gradient-to-r prose-thead:from-indigo-50 prose-thead:to-blue-50
+                prose-th:bg-transparent prose-th:font-bold prose-th:text-gray-900 prose-th:p-4 prose-th:border prose-th:border-gray-300 prose-th:text-left
+                prose-td:p-4 prose-td:border prose-td:border-gray-300 prose-td:bg-white
+                prose-tr:transition-colors hover:prose-tr:bg-gray-50
+              ">
                   <Markdown>{article.content}</Markdown>
                 </div>
 

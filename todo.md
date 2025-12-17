@@ -2103,3 +2103,9 @@
 ## Help Center Design Improvements
 - [x] Redesign Help Center page with better structure and visual hierarchy
 - [x] Redesign Help Article page with improved content presentation and readability
+
+## Critical Bug Fixes (User Reported)
+- [x] Fix notifications 500 errors causing system instability
+- [x] Fix PDF generation failures across all features (calendar, incidents, audits, action log)
+- [ ] Fix Stripe integration errors preventing subscription management
+- [x] Improve help article text styling and readability

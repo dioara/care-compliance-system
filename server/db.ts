@@ -159,7 +159,7 @@ export async function getUsersByTenant(tenantId: number) {
   
   // Get all active licenses for the tenant
   const activeLicenses = await db.select().from(userLicenses)
-    .where(and(eq(userLicenses.tenantId, tenantId), eq(userLicenses.isActive, true)));
+    .where(and(eq(userLicenses.tenantId, tenantId), eq(userLicenses.isActive, 1)));
   
   // Create a set of user IDs that have licenses
   const licensedUserIds = new Set(activeLicenses.filter(l => l.userId).map(l => l.userId));
@@ -230,7 +230,7 @@ export async function markPasswordResetTokenUsed(token: string) {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(passwordResetTokens)
-    .set({ usedAt: new Date() })
+    .set({ usedAt: new Date().toISOString() })
     .where(eq(passwordResetTokens.token, token));
 }
 
@@ -240,7 +240,7 @@ export async function resetUserPassword(userId: number, newPassword: string) {
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await db.update(users)
-    .set({ password: hashedPassword, updatedAt: new Date() })
+    .set({ password: hashedPassword, updatedAt: new Date().toISOString() })
     .where(eq(users.id, userId));
 }
 
@@ -748,7 +748,7 @@ export async function markInvitationUsed(token: string) {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(staffInvitationTokens)
-    .set({ usedAt: new Date() })
+    .set({ usedAt: new Date().toISOString() })
     .where(eq(staffInvitationTokens.token, token));
 }
 
@@ -769,7 +769,7 @@ export async function getAllComplianceSections() {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(complianceSections).where(eq(complianceSections.isActive, true)).orderBy(complianceSections.sectionNumber);
+  return await db.select().from(complianceSections).where(eq(complianceSections.isActive, 1)).orderBy(complianceSections.sectionNumber);
 }
 
 export async function getAllComplianceQuestions() {
@@ -825,7 +825,7 @@ export async function createOrUpdateComplianceAssessment(data: any) {
   if (existing) {
     // Update existing
     await db.update(complianceAssessments)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, updatedAt: new Date().toISOString() })
       .where(eq(complianceAssessments.id, existing.id));
     return existing.id;
   } else {
@@ -906,7 +906,7 @@ export async function getStaffComplianceProgress(staffMemberId: number) {
   const staffSections = await db.select().from(complianceSections)
     .where(and(
       eq(complianceSections.sectionType, 'staff'),
-      eq(complianceSections.isActive, true)
+      eq(complianceSections.isActive, 1)
     ));
 
   const totalSections = staffSections.length;
@@ -949,7 +949,7 @@ export async function getServiceUserComplianceProgress(serviceUserId: number) {
   const serviceUserSections = await db.select().from(complianceSections)
     .where(and(
       eq(complianceSections.sectionType, 'service_user'),
-      eq(complianceSections.isActive, true)
+      eq(complianceSections.isActive, 1)
     ));
 
   const totalSections = serviceUserSections.length;
@@ -1030,7 +1030,7 @@ export async function getDashboardStats(tenantId: number, locationId?: number) {
 
   // Count total sections
   const sections = await db.select().from(complianceSections)
-    .where(eq(complianceSections.isActive, true));
+    .where(eq(complianceSections.isActive, 1));
   const totalSections = sections.length;
 
   // Calculate sections with at least one compliant assessment
@@ -1080,7 +1080,7 @@ export async function getAssessmentTemplateByCareSetting(careSettingType: string
   const result = await db.select().from(assessmentTemplates)
     .where(and(
       eq(assessmentTemplates.careSettingType, careSettingType as any),
-      eq(assessmentTemplates.isDefault, true)
+      eq(assessmentTemplates.isDefault, 1)
     ))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;
@@ -1137,7 +1137,7 @@ export async function getAuditTemplateByAuditTypeId(auditTypeId: number) {
   const [template] = await db
     .select()
     .from(auditTemplates)
-    .where(and(eq(auditTemplates.auditTypeId, auditTypeId), eq(auditTemplates.isActive, true)));
+    .where(and(eq(auditTemplates.auditTypeId, auditTypeId), eq(auditTemplates.isActive, 1)));
   return template || null;
 }
 
@@ -1464,7 +1464,7 @@ export async function uploadAuditEvidence(data: {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const [result] = await db.insert(auditEvidence).values({
     ...data,
-    uploadedAt: new Date(),
+    uploadedAt: new Date().toISOString(),
   });
   return result.insertId;
 }
@@ -1509,7 +1509,7 @@ export async function createIncident(data: {
   const [result] = await db.insert(incidents).values({
     ...data,
     status: "open",
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   }).$returningId();
   
   return result;
@@ -1595,7 +1595,7 @@ export async function updateIncident(id: number, tenantId: number, data: Partial
     .update(incidents)
     .set({
       ...data,
-      updatedAt: new Date(),
+      updatedAt: new Date().toISOString(),
     })
     .where(and(eq(incidents.id, id), eq(incidents.tenantId, tenantId)));
 }
@@ -1701,8 +1701,8 @@ export async function closeIncident(id: number, closedById: number) {
     .set({
       status: "closed",
       closedById,
-      closedAt: new Date(),
-      updatedAt: new Date(),
+      closedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     .where(eq(incidents.id, id));
 }
@@ -1945,7 +1945,7 @@ export async function updateAuditSchedule(
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db
     .update(auditSchedules)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(eq(auditSchedules.id, scheduleId));
   return { id: scheduleId, ...data };
 }
@@ -2103,7 +2103,7 @@ export async function updateAiAuditSchedule(id: number, tenantId: number, data: 
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(aiAuditSchedules)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
   return getAiAuditScheduleById(id, tenantId);
 }
@@ -2122,7 +2122,7 @@ export async function getOverdueAiAuditSchedules(tenantId: number) {
   return db.select().from(aiAuditSchedules)
     .where(and(
       eq(aiAuditSchedules.tenantId, tenantId),
-      eq(aiAuditSchedules.isActive, true),
+      eq(aiAuditSchedules.isActive, 1),
       sql`${aiAuditSchedules.nextDueDate} <= ${today}`
     ))
     .orderBy(aiAuditSchedules.nextDueDate);
@@ -2140,7 +2140,7 @@ export async function getUpcomingAiAuditSchedules(tenantId: number, daysAhead: n
   return db.select().from(aiAuditSchedules)
     .where(and(
       eq(aiAuditSchedules.tenantId, tenantId),
-      eq(aiAuditSchedules.isActive, true),
+      eq(aiAuditSchedules.isActive, 1),
       sql`${aiAuditSchedules.nextDueDate} > ${todayStr}`,
       sql`${aiAuditSchedules.nextDueDate} <= ${futureDateStr}`
     ))
@@ -2178,7 +2178,7 @@ export async function updateUserConsent(id: number, userId: number, data: Partia
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(userConsents)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(and(eq(userConsents.id, id), eq(userConsents.userId, userId)));
 }
 
@@ -2186,7 +2186,7 @@ export async function withdrawUserConsent(userId: number, consentType: string) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(userConsents)
-    .set({ consentGiven: false, withdrawnAt: new Date(), updatedAt: new Date() })
+    .set({ consentGiven: false, withdrawnAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
     .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
 }
 
@@ -2221,7 +2221,7 @@ export async function updateDataExportRequest(id: number, data: Partial<InsertDa
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(dataExportRequests)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(eq(dataExportRequests.id, id));
 }
 
@@ -2438,7 +2438,7 @@ export async function getActiveEmailRecipients(tenantId: number, alertType?: 'co
   const recipients = await db.select().from(emailRecipients)
     .where(and(
       eq(emailRecipients.tenantId, tenantId),
-      eq(emailRecipients.isActive, true)
+      eq(emailRecipients.isActive, 1)
     ));
   
   // Filter by alert type if specified
@@ -2464,7 +2464,7 @@ export async function updateEmailRecipient(id: number, tenantId: number, data: P
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(emailRecipients)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(and(eq(emailRecipients.id, id), eq(emailRecipients.tenantId, tenantId)));
 }
 
@@ -2495,7 +2495,7 @@ export async function getEmailTemplateByType(tenantId: number, templateType: str
     .where(and(
       eq(emailTemplates.tenantId, tenantId),
       eq(emailTemplates.templateType, templateType as any),
-      eq(emailTemplates.isActive, true)
+      eq(emailTemplates.isActive, 1)
     ))
     .orderBy(desc(emailTemplates.isDefault))
     .limit(1);
@@ -2514,7 +2514,7 @@ export async function updateEmailTemplate(id: number, tenantId: number, data: Pa
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(emailTemplates)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: new Date().toISOString() })
     .where(and(eq(emailTemplates.id, id), eq(emailTemplates.tenantId, tenantId)));
 }
 
@@ -2557,7 +2557,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
         </div>
       `,
       isDefault: true,
-      isActive: true,
+      isActive: 1,
     },
     {
       tenantId,
@@ -2583,7 +2583,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
         </div>
       `,
       isDefault: true,
-      isActive: true,
+      isActive: 1,
     },
     {
       tenantId,
@@ -2610,7 +2610,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
         </div>
       `,
       isDefault: true,
-      isActive: true,
+      isActive: 1,
     },
   ];
   
@@ -2814,7 +2814,7 @@ export async function getUserNotifications(
   
   const conditions = [eq(notifications.userId, userId)];
   if (unreadOnly) {
-    conditions.push(eq(notifications.isRead, false));
+    conditions.push(eq(notifications.isRead, 0));
   }
   
   return db
@@ -2836,7 +2836,7 @@ export async function getUnreadNotificationCount(userId: number) {
     .where(
       and(
         eq(notifications.userId, userId),
-        eq(notifications.isRead, false)
+        eq(notifications.isRead, 0)
       )
     );
   
@@ -2876,7 +2876,7 @@ export async function markAllNotificationsAsRead(userId: number) {
     .where(
       and(
         eq(notifications.userId, userId),
-        eq(notifications.isRead, false)
+        eq(notifications.isRead, 0)
       )
     );
   

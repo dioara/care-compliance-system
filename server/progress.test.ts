@@ -32,7 +32,7 @@ describe('Compliance Progress Indicators', () => {
       tenantId,
       locationId,
       role: 'Care Assistant',
-      isActive: true,
+      isActive: 1,
     });
     staffMemberId = staff.id;
 

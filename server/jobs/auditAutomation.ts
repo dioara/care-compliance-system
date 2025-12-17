@@ -74,7 +74,7 @@ export async function generateScheduledAudits() {
     const allSchedules = await db
       .select()
       .from(auditSchedules)
-      .where(eq(auditSchedules.isActive, true));
+      .where(eq(auditSchedules.isActive, 1));
     
     const dueSchedules = allSchedules.filter(s => {
       if (!s.nextAuditDue) return false;
@@ -141,7 +141,7 @@ export async function generateScheduledAudits() {
             auditorName: "System",
             auditorRole: "Automated",
             status: "in_progress",
-            createdAt: new Date(),
+            createdAt: new Date().toISOString(),
           })
           .$returningId();
 
@@ -161,7 +161,7 @@ export async function generateScheduledAudits() {
           .set({
             lastAuditDate: schedule.nextAuditDue ? new Date(schedule.nextAuditDue) : null,
             nextAuditDue: new Date(nextDue.toISOString().split('T')[0]),
-            updatedAt: new Date(),
+            updatedAt: new Date().toISOString(),
           })
           .where(eq(auditSchedules.id, schedule.id));
 
@@ -212,7 +212,7 @@ export async function sendAuditReminders() {
       .leftJoin(auditTypes, eq(auditSchedules.auditTypeId, auditTypes.id))
       .leftJoin(locations, eq(auditSchedules.locationId, locations.id))
       .leftJoin(tenants, eq(auditSchedules.tenantId, tenants.id))
-      .where(eq(auditSchedules.isActive, true));
+      .where(eq(auditSchedules.isActive, 1));
 
     console.log(`[AUDIT AUTOMATION] Found ${schedulesNeedingReminders.length} schedules to check for reminders`);
 
@@ -244,7 +244,7 @@ export async function sendAuditReminders() {
             .update(auditSchedules)
             .set({
               lastReminderSent: new Date(today.toISOString().split('T')[0]),
-              updatedAt: new Date(),
+              updatedAt: new Date().toISOString(),
             })
             .where(eq(auditSchedules.id, schedule.id));
 

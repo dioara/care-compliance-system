@@ -83,8 +83,9 @@ async function getOrCreateStripeCustomer(tenantId: number, email: string, name: 
 // Start free trial for a tenant (called during signup)
 export async function startFreeTrial(tenantId: number): Promise<void> {
   const db = await requireDb();
-  const trialEndsAt = new Date();
-  trialEndsAt.setDate(trialEndsAt.getDate() + 30); // 30 days trial
+  const trialEndsAtDate = new Date();
+  trialEndsAtDate.setDate(trialEndsAtDate.getDate() + 30); // 30 days trial
+  const trialEndsAt = trialEndsAtDate.toISOString();
 
   // Check if subscription already exists
   const [existing] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, tenantId));
@@ -92,7 +93,7 @@ export async function startFreeTrial(tenantId: number): Promise<void> {
   if (existing) {
     // Update existing to trial
     await db.update(tenantSubscriptions).set({
-      isTrial: true,
+      isTrial: 1,
       trialEndsAt,
       trialLicensesCount: 5,
       licensesCount: 5,
@@ -102,7 +103,7 @@ export async function startFreeTrial(tenantId: number): Promise<void> {
     // Create new trial subscription
     await db.insert(tenantSubscriptions).values({
       tenantId,
-      isTrial: true,
+      isTrial: 1,
       trialEndsAt,
       trialLicensesCount: 5,
       licensesCount: 5,
@@ -113,7 +114,7 @@ export async function startFreeTrial(tenantId: number): Promise<void> {
   // Create 5 unassigned trial licenses
   const licenseValues = Array.from({ length: 5 }, () => ({
     tenantId,
-    isActive: true,
+    isActive: 1,
   }));
   await db.insert(userLicenses).values(licenseValues);
 }
@@ -165,7 +166,7 @@ export const subscriptionRouter = router({
         unassigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NULL THEN 1 ELSE 0 END)`,
       })
       .from(userLicenses)
-      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, 1)));
 
     return {
       ...subscription,
@@ -255,6 +256,13 @@ export const subscriptionRouter = router({
       if (!ctx.user?.tenantId) throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
       const db = await requireDb();
 
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Stripe is not configured. Please contact support to enable subscription features." 
+        });
+      }
+
       const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
       if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No active subscription found" });
 
@@ -267,7 +275,7 @@ export const subscriptionRouter = router({
         proration_behavior: "create_prorations",
       });
 
-      const newLicenses = Array.from({ length: input.additionalLicenses }, () => ({ tenantId: ctx.user.tenantId!, isActive: true }));
+      const newLicenses = Array.from({ length: input.additionalLicenses }, () => ({ tenantId: ctx.user.tenantId!, isActive: 1 }));
       await db.insert(userLicenses).values(newLicenses);
       await db.update(tenantSubscriptions).set({ licensesCount: newQuantity }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
 
@@ -291,7 +299,7 @@ export const subscriptionRouter = router({
           assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
         })
         .from(userLicenses)
-        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, 1)));
 
       const currentTotal = Number(licenseStats?.total || 0);
       const assignedCount = Number(licenseStats?.assigned || 0);
@@ -305,6 +313,12 @@ export const subscriptionRouter = router({
       }
 
       // Update Stripe subscription
+      if (!stripe) {
+        throw new TRPCError({ 
+          code: "PRECONDITION_FAILED", 
+          message: "Stripe is not configured. Please contact support to enable subscription features." 
+        });
+      }
       const stripeSubscription = await stripe.subscriptions.retrieve(subscription.stripeSubscriptionId);
       await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
         items: [{ id: stripeSubscription.items.data[0].id, quantity: input.newQuantity }],
@@ -315,7 +329,7 @@ export const subscriptionRouter = router({
       if (input.newQuantity > currentTotal) {
         // Upgrading: add new licenses
         const licensesToAdd = input.newQuantity - currentTotal;
-        const newLicenses = Array.from({ length: licensesToAdd }, () => ({ tenantId: ctx.user.tenantId!, isActive: true }));
+        const newLicenses = Array.from({ length: licensesToAdd }, () => ({ tenantId: ctx.user.tenantId!, isActive: 1 }));
         await db.insert(userLicenses).values(newLicenses);
       } else if (input.newQuantity < currentTotal) {
         // Downgrading: remove unassigned licenses
@@ -325,14 +339,14 @@ export const subscriptionRouter = router({
           .from(userLicenses)
           .where(and(
             eq(userLicenses.tenantId, ctx.user.tenantId),
-            eq(userLicenses.isActive, true),
+            eq(userLicenses.isActive, 1),
             isNull(userLicenses.userId)
           ))
           .limit(licensesToRemove);
 
         for (const license of unassignedLicenses) {
           await db.update(userLicenses)
-            .set({ isActive: false })
+            .set({ isActive: 0 })
             .where(eq(userLicenses.id, license.id));
         }
       }
@@ -369,7 +383,7 @@ export const subscriptionRouter = router({
           assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
         })
         .from(userLicenses)
-        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, 1)));
 
       const currentTotal = Number(licenseStats?.total || 0);
       const assignedCount = Number(licenseStats?.assigned || 0);
@@ -395,6 +409,9 @@ export const subscriptionRouter = router({
         }
 
         // Create invoice preview
+        if (!stripe) {
+          return { available: false, message: "Stripe is not configured" };
+        }
         const preview = await stripe.invoices.createPreview({
           customer: subscription.stripeCustomerId!,
           subscription: subscription.stripeSubscriptionId,
@@ -460,8 +477,8 @@ export const subscriptionRouter = router({
       }
 
       await db.update(tenantSubscriptions).set({
-        cancelAtPeriodEnd: !input.cancelImmediately,
-        canceledAt: input.cancelImmediately ? new Date() : null,
+        cancelAtPeriodEnd: input.cancelImmediately ? 0 : 1,
+        canceledAt: input.cancelImmediately ? new Date().toISOString() : null,
         status: input.cancelImmediately ? "canceled" : subscription.status,
       }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
 
@@ -488,7 +505,7 @@ export const subscriptionRouter = router({
     if (!subscription?.stripeSubscriptionId) throw new TRPCError({ code: "BAD_REQUEST", message: "No subscription found" });
 
     await stripe.subscriptions.update(subscription.stripeSubscriptionId, { cancel_at_period_end: false });
-    await db.update(tenantSubscriptions).set({ cancelAtPeriodEnd: false }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
+    await db.update(tenantSubscriptions).set({ cancelAtPeriodEnd: 0 }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
 
     return { success: true };
   }),
@@ -508,7 +525,7 @@ export const subscriptionRouter = router({
       })
       .from(userLicenses)
       .leftJoin(users, eq(userLicenses.userId, users.id))
-      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true)));
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, 1)));
   }),
 
   assignLicense: adminProcedure
@@ -518,14 +535,14 @@ export const subscriptionRouter = router({
       const db = await requireDb();
 
       const [existingLicense] = await db.select().from(userLicenses)
-        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, input.userId), eq(userLicenses.isActive, true)));
+        .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, input.userId), eq(userLicenses.isActive, 1)));
       if (existingLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "User already has a license assigned" });
 
       const [license] = await db.select().from(userLicenses)
-        .where(and(eq(userLicenses.id, input.licenseId), eq(userLicenses.tenantId, ctx.user.tenantId), isNull(userLicenses.userId), eq(userLicenses.isActive, true)));
+        .where(and(eq(userLicenses.id, input.licenseId), eq(userLicenses.tenantId, ctx.user.tenantId), isNull(userLicenses.userId), eq(userLicenses.isActive, 1)));
       if (!license) throw new TRPCError({ code: "BAD_REQUEST", message: "License not available" });
 
-      await db.update(userLicenses).set({ userId: input.userId, assignedAt: new Date(), assignedById: ctx.user.id }).where(eq(userLicenses.id, input.licenseId));
+      await db.update(userLicenses).set({ userId: input.userId, assignedAt: new Date().toISOString(), assignedById: ctx.user.id }).where(eq(userLicenses.id, input.licenseId));
       return { success: true };
     }),
 
@@ -546,7 +563,7 @@ export const subscriptionRouter = router({
     
     const db = await requireDb();
     const [license] = await db.select().from(userLicenses)
-      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, ctx.user.id), eq(userLicenses.isActive, true)));
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.userId, ctx.user.id), eq(userLicenses.isActive, 1)));
 
     if (license) return { hasLicense: true, reason: "License assigned" };
     return { hasLicense: false, reason: "No license assigned. Please contact your administrator to assign a license to your account." };
@@ -560,7 +577,7 @@ export const subscriptionRouter = router({
       .from(users).where(eq(users.tenantId, ctx.user.tenantId));
 
     const usersWithLicenses = await db.select({ userId: userLicenses.userId }).from(userLicenses)
-      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, true), sql`${userLicenses.userId} IS NOT NULL`));
+      .where(and(eq(userLicenses.tenantId, ctx.user.tenantId), eq(userLicenses.isActive, 1), sql`${userLicenses.userId} IS NOT NULL`));
 
     const licensedUserIds = new Set(usersWithLicenses.map((l: { userId: number | null }) => l.userId));
     return allUsers.filter((u: { id: number; role: string | null }) => !licensedUserIds.has(u.id) && u.role !== "admin");
@@ -573,6 +590,12 @@ export const subscriptionRouter = router({
     const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
     if (!subscription?.stripeCustomerId) throw new TRPCError({ code: "BAD_REQUEST", message: "No customer found" });
 
+    if (!stripe) {
+      throw new TRPCError({ 
+        code: "PRECONDITION_FAILED", 
+        message: "Stripe is not configured. Please contact support to enable subscription features." 
+      });
+    }
     const origin = ctx.req.headers.origin || "https://care-compliance.manus.space";
     const session = await stripe.billingPortal.sessions.create({ customer: subscription.stripeCustomerId, return_url: `${origin}/admin/subscription` });
     return { url: session.url };
@@ -586,6 +609,8 @@ export const subscriptionRouter = router({
     const [subscription] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
     if (!subscription?.stripeCustomerId) return [];
 
+    if (!stripe) return [];
+    
     try {
       const invoices = await stripe.invoices.list({
         customer: subscription.stripeCustomerId,
@@ -623,7 +648,7 @@ export const subscriptionRouter = router({
         .where(and(
           eq(userLicenses.tenantId, ctx.user.tenantId),
           eq(userLicenses.userId, input.userId),
-          eq(userLicenses.isActive, true)
+          eq(userLicenses.isActive, 1)
         ));
       if (existingLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "User already has a license assigned" });
 
@@ -632,13 +657,13 @@ export const subscriptionRouter = router({
         .where(and(
           eq(userLicenses.tenantId, ctx.user.tenantId),
           isNull(userLicenses.userId),
-          eq(userLicenses.isActive, true)
+          eq(userLicenses.isActive, 1)
         ));
       if (!availableLicense) throw new TRPCError({ code: "BAD_REQUEST", message: "No available licenses. Please purchase more licenses." });
 
       // Assign the license
       await db.update(userLicenses)
-        .set({ userId: input.userId, assignedAt: new Date(), assignedById: ctx.user.id })
+        .set({ userId: input.userId, assignedAt: new Date().toISOString(), assignedById: ctx.user.id })
         .where(eq(userLicenses.id, availableLicense.id));
 
       return { success: true, licenseId: availableLicense.id };
@@ -656,7 +681,7 @@ export const subscriptionRouter = router({
         .where(and(
           eq(userLicenses.tenantId, ctx.user.tenantId),
           eq(userLicenses.userId, input.userId),
-          eq(userLicenses.isActive, true)
+          eq(userLicenses.isActive, 1)
         ));
       if (!license) throw new TRPCError({ code: "BAD_REQUEST", message: "User does not have a license assigned" });
 

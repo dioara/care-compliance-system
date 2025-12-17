@@ -743,7 +743,7 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         await db.createSupportingDocument({
           ...input,
-          uploadedAt: new Date(),
+          uploadedAt: new Date().toISOString(),
         });
         return { success: true };
       }),
