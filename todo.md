@@ -2240,3 +2240,10 @@
 - [x] Fixed auditDate format in auto-schedule suggestions (3 occurrences)
 - [x] Calendar already has proper invalidation on success
 - [x] All audit date insertions now use toMySQLDate() helper
+
+## CRITICAL: Fix Audit Scheduling Removing Other Audits
+- [x] Debug why scheduling an audit removes other audits from calendar
+- [x] Root cause: Calendar query filtered by date range, refetch replaced all audits with only current month
+- [x] Solution: Remove date range filter from calendar query, fetch all audits for location
+- [x] Frontend already filters by date when displaying (auditsByDate)
+- [ ] Test scheduling audit and verify all audits remain visible
