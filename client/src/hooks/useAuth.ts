@@ -14,13 +14,19 @@ export function useAuth() {
   }, [user, isLoading, error]);
 
   const logout = async () => {
-    // Clear token from localStorage
-    localStorage.removeItem('auth_token');
-    console.log('[useAuth] Token removed from localStorage');
-    // Call backend logout
-    await logoutMutation.mutateAsync();
-    // Redirect to login
-    window.location.href = '/login';
+    try {
+      // Clear token from localStorage
+      localStorage.removeItem('auth_token');
+      console.log('[useAuth] Token removed from localStorage');
+      // Call backend logout
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error('[useAuth] Logout error:', error);
+      // Even if backend logout fails, still clear local state and redirect
+    } finally {
+      // Always redirect to login
+      window.location.href = '/login';
+    }
   };
 
   return {

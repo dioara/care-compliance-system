@@ -192,6 +192,12 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      <Route path="/conduct-audit/:id">
+        <DashboardLayout>
+          <ConductAudit />
+        </DashboardLayout>
+      </Route>
+      
       <Route path="/audits/:id/results">
         <DashboardLayout>
           <AuditResults />

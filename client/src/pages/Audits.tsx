@@ -47,9 +47,9 @@ export default function Audits() {
 
   const createAuditMutation = trpc.audits.createAuditInstance.useMutation({
     onSuccess: (data) => {
-      toast.success("Audit scheduled successfully");
+      toast.success("Audit started successfully");
       setIsScheduleDialogOpen(false);
-      setLocation(`/audits/${data.id}`);
+      setLocation(`/conduct-audit/${data.id}`);
     },
     onError: (error) => {
       toast.error(`Failed to schedule audit: ${error.message}`);
