@@ -79,7 +79,7 @@ export default function ActionLog() {
       issueDescription: newAction.issueDescription,
       ragStatus: newAction.ragStatus,
       responsiblePersonId: newAction.responsiblePersonId || user.id,
-      targetCompletionDate: newAction.targetCompletionDate ? new Date(newAction.targetCompletionDate) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      targetCompletionDate: newAction.targetCompletionDate ? new Date(newAction.targetCompletionDate).toISOString() : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       notes: newAction.notes,
     });
   };

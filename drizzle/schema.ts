@@ -773,3 +773,35 @@ export const users = mysqlTable("users", {
 (table) => [
 	index("users_email_unique").on(table.email),
 ]);
+
+// Type exports for use in application code
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type Tenant = typeof tenants.$inferSelect;
+export type InsertTenant = typeof tenants.$inferInsert;
+export type Location = typeof locations.$inferSelect;
+export type InsertLocation = typeof locations.$inferInsert;
+export type Role = typeof roles.$inferSelect;
+export type InsertRole = typeof roles.$inferInsert;
+export type UserRole = typeof userRoles.$inferSelect;
+export type InsertUserRole = typeof userRoles.$inferInsert;
+export type RoleLocationPermission = typeof roleLocationPermissions.$inferSelect;
+export type InsertRoleLocationPermission = typeof roleLocationPermissions.$inferInsert;
+export type ServiceUser = typeof serviceUsers.$inferSelect;
+export type InsertServiceUser = typeof serviceUsers.$inferInsert;
+export type StaffMember = typeof staffMembers.$inferSelect;
+export type InsertStaffMember = typeof staffMembers.$inferInsert;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+export type AiAudit = typeof aiAudits.$inferSelect;
+export type InsertAiAudit = typeof aiAudits.$inferInsert;
+export type AiAuditSchedule = typeof aiAuditSchedules.$inferSelect;
+export type InsertAiAuditSchedule = typeof aiAuditSchedules.$inferInsert;
+export type UserConsent = typeof userConsents.$inferSelect;
+export type InsertUserConsent = typeof userConsents.$inferInsert;
+export type DataExportRequest = typeof dataExportRequests.$inferSelect;
+export type InsertDataExportRequest = typeof dataExportRequests.$inferInsert;
+export type EmailRecipient = typeof emailRecipients.$inferSelect;
+export type InsertEmailRecipient = typeof emailRecipients.$inferInsert;
+export type EmailTemplate = typeof emailTemplates.$inferSelect;
+export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;

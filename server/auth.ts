@@ -310,128 +310,6 @@ export const authRouter = router({
       return { success: true, message: "Password has been reset successfully" };
     }),
 
-  // Setup 2FA - Generate secret and QR code
-  setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
-    if (!ctx.user?.id) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
-    }
-
-    const speakeasy = await import("speakeasy");
-    const QRCode = await import("qrcode");
-
-    // Generate a new secret
-    const secret = speakeasy.default.generateSecret({
-      name: `CareCompliance:${ctx.user.email}`,
-      length: 20,
-    });
-
-    // Generate QR code as data URL
-    const qrCodeUrl = await QRCode.default.toDataURL(secret.otpauth_url || "");
-
-    // Save the secret to the user's record (not verified yet)
-    await db.update2FASecret(ctx.user.id, secret.base32);
-
-    return {
-      secret: secret.base32,
-      qrCode: qrCodeUrl,
-    };
-  }),
-
-  // Verify 2FA code and enable
-  verify2FA: protectedProcedure
-    .input(
-      z.object({
-        code: z.string().length(6),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
-      }
-
-      const user = await db.getUserById(ctx.user.id);
-      if (!user || !user.twoFaSecret) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "2FA setup not initiated",
-        });
-      }
-
-      const speakeasy = await import("speakeasy");
-      const verified = speakeasy.default.totp.verify({
-        secret: user.twoFaSecret,
-        encoding: "base32",
-        token: input.code,
-        window: 1,
-      });
-
-      if (!verified) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: ERROR_MESSAGES.TWO_FA_INVALID_CODE,
-        });
-      }
-
-      // Enable 2FA
-      await db.enable2FA(ctx.user.id);
-
-      return { success: true, message: "Two-factor authentication enabled" };
-    }),
-
-  // Disable 2FA
-  disable2FA: protectedProcedure
-    .input(
-      z.object({
-        code: z.string().length(6),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
-      }
-
-      const user = await db.getUserById(ctx.user.id);
-      if (!user || !user.twoFaSecret) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: ERROR_MESSAGES.TWO_FA_NOT_ENABLED,
-        });
-      }
-
-      const speakeasy = await import("speakeasy");
-      const verified = speakeasy.default.totp.verify({
-        secret: user.twoFaSecret,
-        encoding: "base32",
-        token: input.code,
-        window: 1,
-      });
-
-      if (!verified) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: ERROR_MESSAGES.TWO_FA_INVALID_CODE,
-        });
-      }
-
-      // Disable 2FA
-      await db.disable2FA(ctx.user.id);
-
-      return { success: true, message: "Two-factor authentication disabled" };
-    }),
-
-  // Get 2FA status
-  get2FAStatus: protectedProcedure.query(async ({ ctx }) => {
-    if (!ctx.user?.id) {
-      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
-    }
-
-    const user = await db.getUserById(ctx.user.id);
-    return {
-      enabled: user?.twoFaEnabled || false,
-      verified: user?.twoFaVerified || false,
-    };
-  }),
-
   // Setup 2FA - Generate QR code
   setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
     if (!ctx.user?.id) {
@@ -452,8 +330,8 @@ export const authRouter = router({
     // Store secret (not yet verified)
     await db.updateUser(user.id, {
       twoFaSecret: secret,
-      twoFaEnabled: false, // Not enabled until verified
-      twoFaVerified: false,
+      twoFaEnabled: 0, // Not enabled until verified
+      twoFaVerified: 0,
     });
 
     return {
@@ -495,8 +373,8 @@ export const authRouter = router({
 
       // Enable 2FA
       await db.updateUser(user.id, {
-        twoFaEnabled: true,
-        twoFaVerified: true,
+        twoFaEnabled: 1,
+        twoFaVerified: 1,
       });
 
       // Store backup codes in a separate table (you'll need to create this)
@@ -543,8 +421,8 @@ export const authRouter = router({
 
       // Disable 2FA
       await db.updateUser(user.id, {
-        twoFaEnabled: false,
-        twoFaVerified: false,
+        twoFaEnabled: 0,
+        twoFaVerified: 0,
         twoFaSecret: null,
       });
 

@@ -39,6 +39,7 @@ import {
   emailTemplates,
   passwordResetTokens,
   userLicenses,
+  notifications,
   type InsertUser,
   type InsertPasswordResetToken,
   type InsertAiAudit,
@@ -94,9 +95,9 @@ export async function createUser(data: {
     name: data.name,
     tenantId: data.tenantId,
     role: data.role || "staff",
-    superAdmin: data.superAdmin || false,
-    twoFaEnabled: false,
-    twoFaVerified: false,
+    superAdmin: data.superAdmin ? 1 : 0,
+    twoFaEnabled: 0,
+    twoFaVerified: 0,
   });
 
   // Return result with insertId
@@ -128,7 +129,7 @@ export async function update2FASecret(userId: number, secret: string) {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
-    .set({ twoFaSecret: secret, twoFaVerified: false })
+    .set({ twoFaSecret: secret, twoFaVerified: 0 })
     .where(eq(users.id, userId));
 }
 
@@ -146,7 +147,7 @@ export async function disable2FA(userId: number) {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
-    .set({ twoFaEnabled: false, twoFaVerified: false, twoFaSecret: null })
+    .set({ twoFaEnabled: 0, twoFaVerified: 0, twoFaSecret: null })
     .where(eq(users.id, userId));
 }
 
@@ -182,7 +183,7 @@ export async function updateUserLastSignIn(userId: number) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
-  await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
+  await db.update(users).set({ lastSignedIn: new Date().toISOString() }).where(eq(users.id, userId));
 }
 
 export async function verifyPassword(password: string, hashedPassword: string) {
@@ -193,7 +194,7 @@ export async function verifyPassword(password: string, hashedPassword: string) {
 // PASSWORD RESET
 // ============================================================================
 
-export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
+export async function createPasswordResetToken(userId: number, token: string, expiresAt: string) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
@@ -270,7 +271,7 @@ export async function upsertUser(data: {
     await db.update(users).set({
       name: data.name ?? existingUser.name,
       loginMethod: data.loginMethod ?? existingUser.loginMethod,
-      lastSignedIn: data.lastSignedIn ?? new Date(),
+      lastSignedIn: data.lastSignedIn ?? new Date().toISOString(),
     }).where(eq(users.openId, data.openId));
     return existingUser;
   } else {
@@ -281,7 +282,7 @@ export async function upsertUser(data: {
       email: email,
       name: data.name,
       loginMethod: data.loginMethod,
-      lastSignedIn: data.lastSignedIn ?? new Date(),
+      lastSignedIn: data.lastSignedIn ?? new Date().toISOString(),
     });
     return await getUserByOpenId(data.openId);
   }
@@ -725,7 +726,7 @@ export async function createStaffInvitation(data: {
   name?: string | null;
   token: string;
   roleIds?: string | null;
-  expiresAt: Date;
+  expiresAt: string;
   createdBy?: number | null;
 }) {
   const db = await getDb();
@@ -1166,7 +1167,7 @@ export async function createAuditInstance(data: {
   locationId: number;
   auditTypeId: number;
   auditTemplateId: number;
-  auditDate: Date;
+  auditDate: string;
   auditorId: number;
   auditorName?: string;
   auditorRole?: string;
@@ -1261,7 +1262,7 @@ export async function getAuditInstancesByLocation(locationId: number, limit = 50
 export async function updateAuditInstanceStatus(
   id: number,
   status: 'in_progress' | 'completed' | 'reviewed' | 'archived',
-  completedAt?: Date,
+  completedAt?: string,
   overallScore?: number,
   summary?: string,
   recommendations?: string
@@ -1286,10 +1287,10 @@ export async function saveAuditResponse(data: {
   response: string;
   responseValue?: string;
   observations?: string;
-  isCompliant?: boolean;
+  isCompliant?: number;
   actionRequired?: string;
   responsiblePersonId?: number;
-  targetDate?: Date;
+  targetDate?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
@@ -1337,7 +1338,7 @@ export async function createActionPlanFromIncident(data: {
   issueDescription: string;
   responsiblePersonId?: number;
   responsiblePersonName?: string;
-  targetCompletionDate: Date;
+  targetCompletionDate: string;
   ragStatus?: 'red' | 'amber' | 'green';
 }) {
   const db = await getDb();
@@ -1370,7 +1371,7 @@ export async function createAuditActionPlan(data: {
   ragStatus?: 'red' | 'amber' | 'green';
   responsiblePersonId: number;
   responsiblePersonName?: string;
-  targetCompletionDate: Date;
+  targetCompletionDate: string;
   actionTaken?: string;
   notes?: string;
 }) {
@@ -1436,7 +1437,7 @@ export async function getAllActionPlans(tenantId: number) {
 export async function updateAuditActionPlanStatus(
   id: number,
   status: 'not_started' | 'in_progress' | 'partially_completed' | 'completed',
-  actualCompletionDate?: Date,
+  actualCompletionDate?: string,
   actionTaken?: string
 ) {
   const db = await getDb();
@@ -1487,7 +1488,7 @@ export async function createIncident(data: {
   tenantId: number;
   locationId: number;
   incidentNumber: string;
-  incidentDate: Date;
+  incidentDate: string;
   incidentTime?: string;
   incidentType: string;
   severity?: string;
@@ -1824,7 +1825,7 @@ export async function getNonComplianceAreas(tenantId: number, limit = 10) {
     }
     
     questionStats[key].totalCount++;
-    if (response.isCompliant === false) {
+    if (response.isCompliant === 0) {
       questionStats[key].nonCompliantCount++;
     }
   }
@@ -1922,13 +1923,13 @@ export async function createAuditSchedule(data: {
   auditTypeId: number;
   locationId: number;
   frequency: string;
-  nextAuditDue: Date;
+  nextAuditDue: string;
   reminderDays: number;
-  isActive: boolean;
+  isActive: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
-  const result = await db.insert(auditSchedules).values(data);
+  const [result] = await db.insert(auditSchedules).values(data);
   return { id: Number(result.insertId), ...data };
 }
 
@@ -1936,9 +1937,9 @@ export async function updateAuditSchedule(
   scheduleId: number,
   data: {
     frequency?: string;
-    nextAuditDue?: Date;
+    nextAuditDue?: string;
     reminderDays?: number;
-    isActive?: boolean;
+    isActive?: number;
   }
 ) {
   const db = await getDb();
@@ -2186,7 +2187,7 @@ export async function withdrawUserConsent(userId: number, consentType: string) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(userConsents)
-    .set({ consentGiven: false, withdrawnAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
+    .set({ consentGiven: 0, withdrawnAt: new Date().toISOString(), updatedAt: new Date().toISOString() })
     .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
 }
 
@@ -2269,6 +2270,9 @@ export async function updateUser(userId: number, data: Partial<{
   email: string;
   password: string;
   superAdmin: boolean;
+  twoFaSecret: string;
+  twoFaEnabled: number;
+  twoFaVerified: number;
 }>) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
@@ -2850,8 +2854,8 @@ export async function markNotificationAsRead(notificationId: number, userId: num
   await db
     .update(notifications)
     .set({
-      isRead: true,
-      readAt: new Date(),
+      isRead: 1,
+      readAt: new Date().toISOString(),
     })
     .where(
       and(
@@ -2870,8 +2874,8 @@ export async function markAllNotificationsAsRead(userId: number) {
   await db
     .update(notifications)
     .set({
-      isRead: true,
-      readAt: new Date(),
+      isRead: 1,
+      readAt: new Date().toISOString(),
     })
     .where(
       and(

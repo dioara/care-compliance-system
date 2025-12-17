@@ -134,7 +134,7 @@ async function startServer() {
         email: invitation.email,
         name,
         password,
-        superAdmin: false,
+        superAdmin: 0,
       });
 
       const userId = (result as any).insertId;
