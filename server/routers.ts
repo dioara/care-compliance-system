@@ -1653,7 +1653,7 @@ export const appRouter = router({
         // Upload to S3
         console.log('[PDF Export] PDF generated, uploading to S3...');
         const { storagePut } = await import('./storage');
-        const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+        const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(input.startDate), 'yyyy-MM-dd')}-to-${format(new Date(input.endDate), 'yyyy-MM-dd')}-${Date.now()}.pdf`;
         const { url } = await storagePut(
           `reports/calendars/${filename}`,
           pdfBuffer,

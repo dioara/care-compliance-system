@@ -1944,3 +1944,20 @@
 - [x] Update PDF title to show selected date range (dynamic title based on range)
 - [ ] Test calendar PDF with different date ranges (needs user testing)
 - [x] Ensure custom range picker works correctly (date inputs for custom range)
+
+## BUG: Calendar PDF Not Using Selected Date Range
+- [x] Calendar PDF always shows December 2025 regardless of selected range
+- [x] Debug what dates are being sent to backend (dates were correct, title was hardcoded)
+- [x] Fix date range calculation in confirmPrintCalendar function (working correctly)
+- [x] Fix PDF title to show actual date range instead of "Full Year 2025"
+- [x] Fix PDF caching issue - filename now includes date range and timestamp to prevent S3 cache
+- [ ] Test with quarter, week, month, year, and custom ranges (needs user testing)
+
+## Calendar PDF Improvements
+- [x] Fix PDF generation timestamp to show UK time instead of UTC (using date-fns-tz)
+- [x] Fix "Invalid time value" error when changing custom date range (added date validation)
+- [x] Add Last Quarter and Next Quarter options
+- [x] Add Last Month and Next Month options  
+- [x] Add Last Week and Next Week options
+- [x] Add Last Year and Next Year options
+- [ ] Test all new date range options (needs user testing)

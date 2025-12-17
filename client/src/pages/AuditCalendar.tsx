@@ -29,9 +29,9 @@ export default function AuditCalendar() {
     (localStorage.getItem('calendarView') as 'month' | 'week' | 'day') || 'month'
   );
   const [showPrintDialog, setShowPrintDialog] = useState(false);
-  const [printRange, setPrintRange] = useState<'week' | 'month' | 'quarter' | 'year' | 'custom'>('year');
-  const [customStartDate, setCustomStartDate] = useState<Date>(new Date());
-  const [customEndDate, setCustomEndDate] = useState<Date>(new Date());
+  const [printRange, setPrintRange] = useState<'last_week' | 'week' | 'next_week' | 'last_month' | 'month' | 'next_month' | 'last_quarter' | 'quarter' | 'next_quarter' | 'last_year' | 'year' | 'next_year' | 'custom'>('year');
+  const [customStartDate, setCustomStartDate] = useState<Date>(startOfMonth(new Date()));
+  const [customEndDate, setCustomEndDate] = useState<Date>(endOfMonth(new Date()));
 
   // Save view preference to localStorage
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -131,11 +131,18 @@ export default function AuditCalendar() {
   const exportPdf = trpc.audits.exportCalendarPdf.useMutation();
 
   const handlePrintCalendar = async () => {
+    // Reset to default state when opening dialog
+    setPrintRange('year');
+    setCustomStartDate(startOfMonth(new Date()));
+    setCustomEndDate(endOfMonth(new Date()));
     setShowPrintDialog(true);
+    console.log('[Calendar PDF] Dialog opened, reset to year range');
   };
 
   const confirmPrintCalendar = async () => {
     if (!activeLocationId) return;
+
+    console.log('[Calendar PDF] Print range selected:', printRange);
 
     try {
       let startDate: Date;
@@ -144,13 +151,46 @@ export default function AuditCalendar() {
       // Calculate date range based on selection
       const today = new Date();
       switch (printRange) {
+        // Week ranges
+        case 'last_week':
+          const lastWeekStart = new Date(today);
+          lastWeekStart.setDate(today.getDate() - 7);
+          startDate = startOfWeek(lastWeekStart);
+          endDate = endOfWeek(lastWeekStart);
+          break;
         case 'week':
           startDate = startOfWeek(today);
           endDate = endOfWeek(today);
           break;
+        case 'next_week':
+          const nextWeekStart = new Date(today);
+          nextWeekStart.setDate(today.getDate() + 7);
+          startDate = startOfWeek(nextWeekStart);
+          endDate = endOfWeek(nextWeekStart);
+          break;
+        // Month ranges
+        case 'last_month':
+          const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+          startDate = startOfMonth(lastMonth);
+          endDate = endOfMonth(lastMonth);
+          break;
         case 'month':
           startDate = startOfMonth(today);
           endDate = endOfMonth(today);
+          break;
+        case 'next_month':
+          const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+          startDate = startOfMonth(nextMonth);
+          endDate = endOfMonth(nextMonth);
+          break;
+        // Quarter ranges
+        case 'last_quarter':
+          const lastQuarterMonth = today.getMonth() - 3;
+          const lastQuarterStartMonth = Math.floor(lastQuarterMonth / 3) * 3;
+          const lastQuarterYear = lastQuarterMonth < 0 ? today.getFullYear() - 1 : today.getFullYear();
+          const adjustedLastQuarterMonth = lastQuarterMonth < 0 ? lastQuarterStartMonth + 12 : lastQuarterStartMonth;
+          startDate = new Date(lastQuarterYear, adjustedLastQuarterMonth, 1);
+          endDate = endOfMonth(new Date(lastQuarterYear, adjustedLastQuarterMonth + 2, 1));
           break;
         case 'quarter':
           const currentMonth = today.getMonth();
@@ -158,10 +198,28 @@ export default function AuditCalendar() {
           startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
           endDate = endOfMonth(new Date(today.getFullYear(), quarterStartMonth + 2, 1));
           break;
+        case 'next_quarter':
+          const nextQuarterMonth = today.getMonth() + 3;
+          const nextQuarterStartMonth = Math.floor(nextQuarterMonth / 3) * 3;
+          const nextQuarterYear = nextQuarterMonth > 11 ? today.getFullYear() + 1 : today.getFullYear();
+          const adjustedNextQuarterMonth = nextQuarterMonth > 11 ? nextQuarterStartMonth - 12 : nextQuarterStartMonth;
+          startDate = new Date(nextQuarterYear, adjustedNextQuarterMonth, 1);
+          endDate = endOfMonth(new Date(nextQuarterYear, adjustedNextQuarterMonth + 2, 1));
+          break;
+        // Year ranges
+        case 'last_year':
+          startDate = new Date(today.getFullYear() - 1, 0, 1);
+          endDate = new Date(today.getFullYear() - 1, 11, 31);
+          break;
         case 'year':
           startDate = new Date(today.getFullYear(), 0, 1);
           endDate = new Date(today.getFullYear(), 11, 31);
           break;
+        case 'next_year':
+          startDate = new Date(today.getFullYear() + 1, 0, 1);
+          endDate = new Date(today.getFullYear() + 1, 11, 31);
+          break;
+        // Custom range
         case 'custom':
           startDate = customStartDate;
           endDate = customEndDate;
@@ -749,15 +807,26 @@ export default function AuditCalendar() {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Date Range</label>
-              <Select value={printRange} onValueChange={(v: any) => setPrintRange(v)}>
+              <Select value={printRange} onValueChange={(v: any) => {
+                console.log('[Calendar PDF] Range changed to:', v);
+                setPrintRange(v);
+              }}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="last_week">Last Week</SelectItem>
                   <SelectItem value="week">This Week</SelectItem>
+                  <SelectItem value="next_week">Next Week</SelectItem>
+                  <SelectItem value="last_month">Last Month</SelectItem>
                   <SelectItem value="month">This Month</SelectItem>
+                  <SelectItem value="next_month">Next Month</SelectItem>
+                  <SelectItem value="last_quarter">Last Quarter</SelectItem>
                   <SelectItem value="quarter">This Quarter</SelectItem>
+                  <SelectItem value="next_quarter">Next Quarter</SelectItem>
+                  <SelectItem value="last_year">Last Year</SelectItem>
                   <SelectItem value="year">This Year</SelectItem>
+                  <SelectItem value="next_year">Next Year</SelectItem>
                   <SelectItem value="custom">Custom Range</SelectItem>
                 </SelectContent>
               </Select>
@@ -769,8 +838,13 @@ export default function AuditCalendar() {
                   <label className="text-sm font-medium mb-2 block">Start Date</label>
                   <input
                     type="date"
-                    value={format(customStartDate, 'yyyy-MM-dd')}
-                    onChange={(e) => setCustomStartDate(new Date(e.target.value))}
+                    value={customStartDate ? format(customStartDate, 'yyyy-MM-dd') : ''}
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      if (!isNaN(date.getTime())) {
+                        setCustomStartDate(date);
+                      }
+                    }}
                     className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>
@@ -778,8 +852,13 @@ export default function AuditCalendar() {
                   <label className="text-sm font-medium mb-2 block">End Date</label>
                   <input
                     type="date"
-                    value={format(customEndDate, 'yyyy-MM-dd')}
-                    onChange={(e) => setCustomEndDate(new Date(e.target.value))}
+                    value={customEndDate ? format(customEndDate, 'yyyy-MM-dd') : ''}
+                    onChange={(e) => {
+                      const date = new Date(e.target.value);
+                      if (!isNaN(date.getTime())) {
+                        setCustomEndDate(date);
+                      }
+                    }}
                     className="w-full px-3 py-2 border rounded-md"
                   />
                 </div>

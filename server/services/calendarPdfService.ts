@@ -1,5 +1,6 @@
 import PDFDocument from 'pdfkit';
 import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 interface AuditForPdf {
   id: number;
@@ -40,8 +41,8 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
     doc.fontSize(14).font('Helvetica').text(locationName, { align: 'center', width: doc.page.width - 80 });
     doc.moveDown(0.3);
     
-    // Date range
-    const dateRangeText = `Full Year ${format(startDate, 'yyyy')} Calendar`;
+    // Date range - show actual range
+    const dateRangeText = `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`;
     doc.fontSize(12).text(dateRangeText, { align: 'center', width: doc.page.width - 80 });
     doc.moveDown(1);
 
@@ -125,7 +126,7 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
       doc.fontSize(8)
         .fillColor('#9ca3af')
         .text(
-          `Generated on ${format(new Date(), 'MMM d, yyyy HH:mm')}`,
+          `Generated on ${formatInTimeZone(new Date(), 'Europe/London', 'MMM d, yyyy HH:mm')} GMT`,
           40,
           footerY,
           { align: 'center', width: doc.page.width - 80 }
