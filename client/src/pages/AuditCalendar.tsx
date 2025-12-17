@@ -96,6 +96,22 @@ export default function AuditCalendar() {
   // Create empty cells for days before the month starts (month view only)
   const emptyDays = calendarView === 'month' ? Array(firstDayOfWeek).fill(null) : [];
 
+  // Helper function to generate audit title with person name
+  const getAuditTitle = (audit: any) => {
+    let title = audit.auditName || audit.auditTypeName || 'Audit';
+    
+    // Add staff member name if present
+    if (audit.staffMemberName) {
+      title += ` - ${audit.staffMemberName}`;
+    }
+    // Add service user name if present
+    else if (audit.serviceUserName) {
+      title += ` - ${audit.serviceUserName}`;
+    }
+    
+    return title;
+  };
+
   // Group audits by date
   const auditsByDate = (audits || []).reduce((acc, audit) => {
     const dateKey = format(new Date(audit.scheduledDate), 'yyyy-MM-dd');
@@ -572,7 +588,7 @@ export default function AuditCalendar() {
                         className="text-xs p-1 rounded bg-primary/10 border border-primary/20 cursor-pointer hover:bg-primary/20 transition-colors"
                         onClick={() => setSelectedDate(date)}
                       >
-                        <div className="font-medium truncate">{audit.auditName}</div>
+                        <div className="font-medium truncate">{getAuditTitle(audit)}</div>
                         <Badge variant={getStatusBadgeVariant(audit.status)} className="text-[10px] h-4 mt-0.5">
                           {audit.status}
                         </Badge>
@@ -605,7 +621,7 @@ export default function AuditCalendar() {
               {getAuditsForDate(selectedDate).map((audit) => (
                 <div key={audit.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex-1">
-                    <div className="font-semibold">{audit.auditName}</div>
+                    <div className="font-semibold">{getAuditTitle(audit)}</div>
                     <div className="text-sm text-muted-foreground">
                       Auditor: {audit.auditorName || 'Not assigned'}
                     </div>
@@ -747,7 +763,7 @@ export default function AuditCalendar() {
                     {getAuditsForDate(selectedDate).map((audit) => (
                       <div key={audit.id} className="p-3 border rounded-lg flex items-center justify-between">
                         <div>
-                          <p className="font-medium">{audit.auditName}</p>
+                          <p className="font-medium">{getAuditTitle(audit)}</p>
                           <p className="text-sm text-muted-foreground">
                             Status: <span className="capitalize">{audit.status}</span>
                           </p>

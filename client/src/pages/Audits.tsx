@@ -17,6 +17,22 @@ import { toast } from "sonner";
 export default function Audits() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+
+  // Helper function to generate audit title with person name
+  const getAuditTitle = (audit: any) => {
+    let title = audit.auditTypeName || audit.auditName || 'Audit';
+    
+    // Add staff member name if present
+    if (audit.staffMemberName) {
+      title += ` - ${audit.staffMemberName}`;
+    }
+    // Add service user name if present
+    else if (audit.serviceUserName) {
+      title += ` - ${audit.serviceUserName}`;
+    }
+    
+    return title;
+  };
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedServiceType, setSelectedServiceType] = useState<string>("all");
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
@@ -460,7 +476,7 @@ export default function Audits() {
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="font-semibold text-lg">{audit.auditTypeName}</h3>
+                          <h3 className="font-semibold text-lg">{getAuditTitle(audit)}</h3>
                           {getStatusBadge(audit.status)}
                         </div>
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">

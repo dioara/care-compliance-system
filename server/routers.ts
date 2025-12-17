@@ -1572,6 +1572,7 @@ export const appRouter = router({
         scheduledDate: z.string(),
         auditorId: z.number().optional(),
         serviceUserId: z.number().optional(),
+        staffMemberId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         // Get audit template for this type
@@ -1594,6 +1595,7 @@ export const appRouter = router({
           auditorName: ctx.user.name || undefined,
           auditorRole: ctx.user.role || undefined,
           serviceUserId: input.serviceUserId,
+          staffMemberId: input.staffMemberId,
           status: 'in_progress',
         });
 

@@ -1249,10 +1249,16 @@ export async function getAllAuditInstances(tenantId: number) {
       overallScore: auditInstances.overallScore,
       auditorName: auditInstances.auditorName,
       recommendedFrequency: auditTypes.recommendedFrequency,
+      staffMemberId: auditInstances.staffMemberId,
+      staffMemberName: staffMembers.name,
+      serviceUserId: auditInstances.serviceUserId,
+      serviceUserName: serviceUsers.name,
     })
     .from(auditInstances)
     .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
     .leftJoin(locations, eq(auditInstances.locationId, locations.id))
+    .leftJoin(staffMembers, eq(auditInstances.staffMemberId, staffMembers.id))
+    .leftJoin(serviceUsers, eq(auditInstances.serviceUserId, serviceUsers.id))
     .where(eq(auditInstances.tenantId, tenantId))
     .orderBy(desc(auditInstances.auditDate));
 }
@@ -1271,9 +1277,15 @@ export async function getAuditInstancesByLocation(locationId: number, limit = 50
       status: auditInstances.status,
       overallScore: auditInstances.overallScore,
       auditorName: auditInstances.auditorName,
+      staffMemberId: auditInstances.staffMemberId,
+      staffMemberName: staffMembers.name,
+      serviceUserId: auditInstances.serviceUserId,
+      serviceUserName: serviceUsers.name,
     })
     .from(auditInstances)
     .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
+    .leftJoin(staffMembers, eq(auditInstances.staffMemberId, staffMembers.id))
+    .leftJoin(serviceUsers, eq(auditInstances.serviceUserId, serviceUsers.id))
     .where(eq(auditInstances.locationId, locationId))
     .orderBy(desc(auditInstances.auditDate))
     .limit(limit);

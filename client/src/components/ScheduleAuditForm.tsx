@@ -19,6 +19,8 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
   );
   const [auditorId, setAuditorId] = useState<string>('');
   const [serviceUserId, setServiceUserId] = useState<string>('');
+  const [staffMemberId, setStaffMemberId] = useState<string>('');
+  const [validationError, setValidationError] = useState<string>('');
 
   // Update date when prefilledDate changes
   useEffect(() => {
@@ -29,6 +31,9 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
 
   // Fetch audit types
   const { data: auditTypes } = trpc.audits.listTypes.useQuery();
+
+  // Get selected audit type details
+  const selectedAuditType = auditTypes?.find(t => t.id.toString() === auditTypeId);
 
   // Fetch staff members (auditors)
   const { data: staff } = trpc.staff.list.useQuery({ locationId });
@@ -51,8 +56,21 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationError('');
 
     if (!auditTypeId || !scheduledDate) {
+      return;
+    }
+
+    // Validate staff member is selected for staff-specific audits
+    if (selectedAuditType?.targetType === 'staff' && (!staffMemberId || staffMemberId === 'none')) {
+      setValidationError('This audit requires a staff member to be selected');
+      return;
+    }
+
+    // Validate service user is selected for service-user-specific audits
+    if (selectedAuditType?.targetType === 'serviceUser' && (!serviceUserId || serviceUserId === 'none')) {
+      setValidationError('This audit requires a service user to be selected');
       return;
     }
 
@@ -62,6 +80,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
       scheduledDate: new Date(scheduledDate).toISOString(),
       auditorId: auditorId && auditorId !== 'none' ? parseInt(auditorId) : undefined,
       serviceUserId: serviceUserId && serviceUserId !== 'none' ? parseInt(serviceUserId) : undefined,
+      staffMemberId: staffMemberId && staffMemberId !== 'none' ? parseInt(staffMemberId) : undefined,
     });
   };
 
@@ -120,25 +139,56 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
         </Select>
       </div>
 
-      {/* Service User */}
-      <div>
-        <label className="text-sm font-medium mb-2 block">
-          Service User (Optional)
-        </label>
-        <Select value={serviceUserId} onValueChange={setServiceUserId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select service user" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">None</SelectItem>
-            {(serviceUsers || []).map((user) => (
-              <SelectItem key={user.id} value={user.id.toString()}>
-                {user.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Staff Member (for staff-specific audits) */}
+      {selectedAuditType?.targetType === 'staff' && (
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Staff Member <span className="text-destructive">*</span>
+          </label>
+          <Select value={staffMemberId} onValueChange={setStaffMemberId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select staff member" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {(staff || []).map((member) => (
+                <SelectItem key={member.id} value={member.id.toString()}>
+                  {member.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Service User (for service-user-specific audits) */}
+      {selectedAuditType?.targetType === 'serviceUser' && (
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Service User <span className="text-destructive">*</span>
+          </label>
+          <Select value={serviceUserId} onValueChange={setServiceUserId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select service user" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">None</SelectItem>
+              {(serviceUsers || []).map((user) => (
+                <SelectItem key={user.id} value={user.id.toString()}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {/* Validation Error */}
+      {validationError && (
+        <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">
+          {validationError}
+        </div>
+      )}
 
       {/* Form Actions */}
       <div className="flex justify-end gap-2 pt-4">

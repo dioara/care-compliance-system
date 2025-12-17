@@ -1,0 +1,130 @@
+{
+  "query": "SELECT id, tenantId, locationId, auditTypeId, auditDate, status, auditorId, serviceUserId, staffMemberId, createdAt \nFROM auditInstances \nORDER BY createdAt DESC \nLIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, tenantId, locationId, auditTypeId, auditDate, status, auditorId, serviceUserId, staffMemberId, createdAt \nFROM auditInstances \nORDER BY createdAt DESC \nLIMIT 10",
+  "rows": [
+    {
+      "id": "450001",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "30004",
+      "auditDate": "2025-12-25",
+      "status": "in_progress",
+      "auditorId": "1",
+      "serviceUserId": "1",
+      "staffMemberId": "NULL",
+      "createdAt": "2025-12-17 01:42:35"
+    },
+    {
+      "id": "420001",
+      "tenantId": "240002",
+      "locationId": "240001",
+      "auditTypeId": "30041",
+      "auditDate": "2025-12-17",
+      "status": "in_progress",
+      "auditorId": "300001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "NULL",
+      "createdAt": "2025-12-16 23:28:27"
+    },
+    {
+      "id": "420002",
+      "tenantId": "240002",
+      "locationId": "240001",
+      "auditTypeId": "30041",
+      "auditDate": "2025-12-17",
+      "status": "completed",
+      "auditorId": "300001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "NULL",
+      "createdAt": "2025-12-16 23:28:27"
+    },
+    {
+      "id": "391307",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "30010",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "NULL",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391305",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "4",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "6",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391308",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "30007",
+      "auditDate": "2026-12-01",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "NULL",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391303",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "4",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "4",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391304",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "4",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "5",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391306",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "4",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "7",
+      "createdAt": "2025-12-16 22:03:42"
+    },
+    {
+      "id": "391301",
+      "tenantId": "30002",
+      "locationId": "30001",
+      "auditTypeId": "4",
+      "auditDate": "2026-11-30",
+      "status": "in_progress",
+      "auditorId": "30001",
+      "serviceUserId": "NULL",
+      "staffMemberId": "2",
+      "createdAt": "2025-12-16 22:03:42"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttenantId\tlocationId\tauditTypeId\tauditDate\tstatus\tauditorId\tserviceUserId\tstaffMemberId\tcreatedAt\n450001\t30002\t30001\t30004\t2025-12-25\tin_progress\t1\t1\tNULL\t2025-12-17 01:42:35\n420001\t240002\t240001\t30041\t2025-12-17\tin_progress\t300001\tNULL\tNULL\t2025-12-16 23:28:27\n420002\t240002\t240001\t30041\t2025-12-17\tcompleted\t300001\tNULL\tNULL\t2025-12-16 23:28:27\n391307\t30002\t30001\t30010\t2026-11-30\tin_progress\t30001\tNULL\tNULL\t2025-12-16 22:03:42\n391305\t30002\t30001\t4\t2026-11-30\tin_progress\t30001\tNULL\t6\t2025-12-16 22:03:42\n391308\t30002\t30001\t30007\t2026-12-01\tin_progress\t30001\tNULL\tNULL\t2025-12-16 22:03:42\n391303\t30002\t30001\t4\t2026-11-30\tin_progress\t30001\tNULL\t4\t2025-12-16 22:03:42\n391304\t30002\t30001\t4\t2026-11-30\tin_progress\t30001\tNULL\t5\t2025-12-16 22:03:42\n391306\t30002\t30001\t4\t2026-11-30\tin_progress\t30001\tNULL\t7\t2025-12-16 22:03:42\n391301\t30002\t30001\t4\t2026-11-30\tin_progress\t30001\tNULL\t2\t2025-12-16 22:03:42\n",
+  "stderr": "",
+  "execution_time_ms": 3259
+}

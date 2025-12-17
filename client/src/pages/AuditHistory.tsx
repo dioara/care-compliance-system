@@ -16,6 +16,22 @@ import { useLocation } from "wouter";
 export default function AuditHistory() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+
+  // Helper function to generate audit title with person name
+  const getAuditTitle = (audit: any) => {
+    let title = audit.auditName || audit.auditTypeName || 'Audit';
+    
+    // Add staff member name if present
+    if (audit.staffMemberName) {
+      title += ` - ${audit.staffMemberName}`;
+    }
+    // Add service user name if present
+    else if (audit.serviceUserName) {
+      title += ` - ${audit.serviceUserName}`;
+    }
+    
+    return title;
+  };
   
   // Filter states
   const [search, setSearch] = useState("");
@@ -306,7 +322,7 @@ export default function AuditHistory() {
                 <TableBody>
                   {audits.map((audit) => (
                     <TableRow key={audit.id}>
-                      <TableCell className="font-medium">{audit.auditName}</TableCell>
+                      <TableCell className="font-medium">{getAuditTitle(audit)}</TableCell>
                       <TableCell>{audit.locationName}</TableCell>
                       <TableCell>
                         {audit.scheduledDate ? format(new Date(audit.scheduledDate), "PPP") : "N/A"}

@@ -2247,3 +2247,14 @@
 - [x] Solution: Remove date range filter from calendar query, fetch all audits for location
 - [x] Frontend already filters by date when displaying (auditsByDate)
 - [ ] Test scheduling audit and verify all audits remain visible
+
+## Enhance Audit Scheduling with Person Assignment
+- [x] Add targetType validation to schedule audit form
+- [x] Make staff/service user selection required based on audit targetType
+- [x] Show validation error if required person is not selected
+- [x] Update audit title display to include person name (e.g., "Staff Supervision - John Smith")
+- [x] Apply person name display to all audit views (calendar, audit history, audit list)
+- [x] Add staffMemberId to scheduleAudit mutation schema
+- [x] Add staff/service user name joins to getAllAuditInstances query
+- [x] Add staff/service user name joins to getAuditInstancesByLocation query
+- [ ] Test scheduling staff-specific and service-user-specific audits
