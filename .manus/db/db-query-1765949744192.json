@@ -1,0 +1,13 @@
+{
+  "query": "SELECT COUNT(*) as templateCount FROM auditTemplates;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT COUNT(*) as templateCount FROM auditTemplates;",
+  "rows": [
+    {
+      "templateCount": "71"
+    }
+  ],
+  "messages": [],
+  "stdout": "templateCount\n71\n",
+  "stderr": "",
+  "execution_time_ms": 60
+}
