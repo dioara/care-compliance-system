@@ -72,13 +72,17 @@ Click the "Sign in" button to launch the authentication flow. CCMS uses secure O
 
 Upon successful authentication, you'll be redirected to the CCMS dashboard. The dashboard provides an overview of:
 
-**Compliance Status**: Current compliance score and recent audit results across your organization.
+### Compliance Status
+Current compliance score and recent audit results across your organization.
 
-**Pending Tasks**: Outstanding action plans, scheduled audits, and items requiring attention.
+### Pending Tasks
+Outstanding action plans, scheduled audits, and items requiring attention.
 
-**Recent Activity**: Latest audits, incidents, and system updates.
+### Recent Activity
+Latest audits, incidents, and system updates.
 
-**Quick Actions**: Shortcuts to common tasks like starting an audit or reporting an incident.
+### Quick Actions
+Shortcuts to common tasks like starting an audit or reporting an incident.
 
 ## Navigation
 

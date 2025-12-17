@@ -217,7 +217,7 @@ export default function HelpArticle() {
                 prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-5 prose-h3:leading-snug
                 prose-h4:text-xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:leading-snug
                 prose-p:text-gray-700 prose-p:leading-[1.9] prose-p:mb-7 prose-p:text-[18px]
-                prose-strong:text-gray-900 prose-strong:font-bold prose-strong:block prose-strong:mt-6 prose-strong:mb-2
+                prose-strong:text-gray-900 prose-strong:font-bold
                 prose-ul:my-8 prose-ul:space-y-4 prose-ul:pl-6
                 prose-ol:my-8 prose-ol:space-y-4 prose-ol:pl-6
                 prose-li:text-gray-700 prose-li:text-[18px] prose-li:leading-[1.9] prose-li:pl-2
