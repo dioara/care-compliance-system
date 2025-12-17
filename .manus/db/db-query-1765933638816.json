@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `errorReports` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `errorLogId` int,\n  `tenantId` int,\n  `userId` int NOT NULL,\n  `userName` varchar(255),\n  `userEmail` varchar(255),\n  `userDescription` text NOT NULL,\n  `userAction` text,\n  `errorMessage` text,\n  `url` text,\n  `browserInfo` text,\n  `screenshot` text,\n  `status` enum('new','investigating','resolved','wont_fix') NOT NULL DEFAULT 'new',\n  `adminNotes` text,\n  `resolvedAt` timestamp,\n  `resolvedBy` int,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `errorReports_id` PRIMARY KEY(`id`)\n)",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute CREATE TABLE `errorReports` (\n  `id` int AUTO_INCREMENT NOT NULL,\n  `errorLogId` int,\n  `tenantId` int,\n  `userId` int NOT NULL,\n  `userName` varchar(255),\n  `userEmail` varchar(255),\n  `userDescription` text NOT NULL,\n  `userAction` text,\n  `errorMessage` text,\n  `url` text,\n  `browserInfo` text,\n  `screenshot` text,\n  `status` enum('new','investigating','resolved','wont_fix') NOT NULL DEFAULT 'new',\n  `adminNotes` text,\n  `resolvedAt` timestamp,\n  `resolvedBy` int,\n  `createdAt` timestamp NOT NULL DEFAULT (now()),\n  CONSTRAINT `errorReports_id` PRIMARY KEY(`id`)\n)",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 323
+}

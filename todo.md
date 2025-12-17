@@ -1916,3 +1916,31 @@
 - [x] Created error pattern matching system for automatic error message sanitization
 - [x] Added security headers to tRPC responses (X-Content-Type-Options, X-Frame-Options)
 - [ ] Test error scenarios to verify user-friendly messages (needs manual testing)
+
+## Feature: Error Monitoring Dashboard
+- [ ] Create errorLogs database table (id, timestamp, userId, errorType, errorMessage, stackTrace, url, userAgent)
+- [ ] Create database functions for error logging (createErrorLog, getErrorLogs, getErrorStats)
+- [ ] Create tRPC endpoints for error logging and retrieval (admin-only)
+- [ ] Build Error Monitoring Dashboard page (admin-only)
+- [ ] Show error frequency chart (last 7 days)
+- [ ] Show recent errors table with filters (error type, user, date range)
+- [ ] Show affected users list
+- [ ] Add navigation link to Error Monitoring in admin menu
+
+## Feature: User Error Feedback System
+- [ ] Create errorReports database table (id, errorLogId, userId, userDescription, userAction, timestamp)
+- [ ] Create database functions for error reports (createErrorReport, getErrorReports)
+- [ ] Create tRPC endpoints for error report submission
+- [ ] Add "Report Problem" button to ErrorBoundary component
+- [ ] Create error report dialog with description and context fields
+- [ ] Integrate error reporting with error monitoring dashboard
+- [ ] Send email notification to admin when user reports error
+
+## Feature: Calendar Print Range Selector
+- [x] Add date range selector UI to Audit Calendar page (dialog with range options)
+- [x] Create range options (This Week, This Month, This Quarter, This Year, Custom Range)
+- [x] Update calendar PDF mutation to accept startDate and endDate parameters (already supported)
+- [x] Update calendar PDF service to use provided date range (already implemented)
+- [x] Update PDF title to show selected date range (dynamic title based on range)
+- [ ] Test calendar PDF with different date ranges (needs user testing)
+- [x] Ensure custom range picker works correctly (date inputs for custom range)

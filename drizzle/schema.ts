@@ -993,3 +993,53 @@ export const auditCalendarEvents = mysqlTable("audit_calendar_events", {
 
 export type InsertAuditCalendarEvent = typeof auditCalendarEvents.$inferInsert;
 export type SelectAuditCalendarEvent = typeof auditCalendarEvents.$inferSelect;
+
+/**
+ * Error logs table for tracking application errors
+ */
+export const errorLogs = mysqlTable("errorLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  tenantId: int("tenantId"),
+  userId: int("userId"),
+  errorType: varchar("errorType", { length: 100 }).notNull(), // e.g., "TRPCError", "TypeError", "NetworkError"
+  errorCode: varchar("errorCode", { length: 50 }), // e.g., "UNAUTHORIZED", "NOT_FOUND"
+  errorMessage: text("errorMessage").notNull(),
+  stackTrace: text("stackTrace"),
+  url: text("url"), // Page URL where error occurred
+  userAgent: text("userAgent"),
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  severity: mysqlEnum("severity", ["low", "medium", "high", "critical"]).default("medium").notNull(),
+  resolved: boolean("resolved").default(false).notNull(),
+  resolvedAt: timestamp("resolvedAt"),
+  resolvedBy: int("resolvedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InsertErrorLog = typeof errorLogs.$inferInsert;
+export type SelectErrorLog = typeof errorLogs.$inferSelect;
+
+/**
+ * Error reports table for user-submitted error feedback
+ */
+export const errorReports = mysqlTable("errorReports", {
+  id: int("id").autoincrement().primaryKey(),
+  errorLogId: int("errorLogId"), // Optional link to errorLogs
+  tenantId: int("tenantId"),
+  userId: int("userId").notNull(),
+  userName: varchar("userName", { length: 255 }),
+  userEmail: varchar("userEmail", { length: 255 }),
+  userDescription: text("userDescription").notNull(), // What the user was trying to do
+  userAction: text("userAction"), // What action triggered the error
+  errorMessage: text("errorMessage"), // Error message shown to user
+  url: text("url"), // Page URL where error occurred
+  browserInfo: text("browserInfo"), // Browser and OS info
+  screenshot: text("screenshot"), // Optional screenshot URL
+  status: mysqlEnum("status", ["new", "investigating", "resolved", "wont_fix"]).default("new").notNull(),
+  adminNotes: text("adminNotes"),
+  resolvedAt: timestamp("resolvedAt"),
+  resolvedBy: int("resolvedBy"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type InsertErrorReport = typeof errorReports.$inferInsert;
+export type SelectErrorReport = typeof errorReports.$inferSelect;

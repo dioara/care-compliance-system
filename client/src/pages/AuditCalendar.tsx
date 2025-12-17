@@ -28,6 +28,10 @@ export default function AuditCalendar() {
   const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day'>(
     (localStorage.getItem('calendarView') as 'month' | 'week' | 'day') || 'month'
   );
+  const [showPrintDialog, setShowPrintDialog] = useState(false);
+  const [printRange, setPrintRange] = useState<'week' | 'month' | 'quarter' | 'year' | 'custom'>('year');
+  const [customStartDate, setCustomStartDate] = useState<Date>(new Date());
+  const [customEndDate, setCustomEndDate] = useState<Date>(new Date());
 
   // Save view preference to localStorage
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -127,26 +131,60 @@ export default function AuditCalendar() {
   const exportPdf = trpc.audits.exportCalendarPdf.useMutation();
 
   const handlePrintCalendar = async () => {
+    setShowPrintDialog(true);
+  };
+
+  const confirmPrintCalendar = async () => {
     if (!activeLocationId) return;
 
     try {
-      // Export full year instead of just current view
-      const currentYear = new Date().getFullYear();
-      const yearStart = new Date(currentYear, 0, 1); // January 1st
-      const yearEnd = new Date(currentYear, 11, 31); // December 31st
+      let startDate: Date;
+      let endDate: Date;
+
+      // Calculate date range based on selection
+      const today = new Date();
+      switch (printRange) {
+        case 'week':
+          startDate = startOfWeek(today);
+          endDate = endOfWeek(today);
+          break;
+        case 'month':
+          startDate = startOfMonth(today);
+          endDate = endOfMonth(today);
+          break;
+        case 'quarter':
+          const currentMonth = today.getMonth();
+          const quarterStartMonth = Math.floor(currentMonth / 3) * 3;
+          startDate = new Date(today.getFullYear(), quarterStartMonth, 1);
+          endDate = endOfMonth(new Date(today.getFullYear(), quarterStartMonth + 2, 1));
+          break;
+        case 'year':
+          startDate = new Date(today.getFullYear(), 0, 1);
+          endDate = new Date(today.getFullYear(), 11, 31);
+          break;
+        case 'custom':
+          startDate = customStartDate;
+          endDate = customEndDate;
+          break;
+        default:
+          startDate = new Date(today.getFullYear(), 0, 1);
+          endDate = new Date(today.getFullYear(), 11, 31);
+      }
       
-      console.log('[Calendar PDF] Exporting full year:', {
-        yearStart: format(yearStart, 'yyyy-MM-dd'),
-        yearEnd: format(yearEnd, 'yyyy-MM-dd'),
-        currentYear
+      console.log('[Calendar PDF] Exporting date range:', {
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        endDate: format(endDate, 'yyyy-MM-dd'),
+        range: printRange
       });
       
       const result = await exportPdf.mutateAsync({
         locationId: activeLocationId,
-        startDate: format(yearStart, 'yyyy-MM-dd'),
-        endDate: format(yearEnd, 'yyyy-MM-dd'),
-        viewType: 'month', // Always use month view for full year export
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        endDate: format(endDate, 'yyyy-MM-dd'),
+        viewType: 'month',
       });
+
+      setShowPrintDialog(false);
 
       // Open PDF in new tab
       window.open(result.url, '_blank');
@@ -695,6 +733,73 @@ export default function AuditCalendar() {
             }}
             onCancel={() => setShowScheduleDialog(false)}
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Print Calendar Dialog */}
+      <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Print Calendar</DialogTitle>
+            <DialogDescription>
+              Select the date range for your calendar PDF export
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Date Range</label>
+              <Select value={printRange} onValueChange={(v: any) => setPrintRange(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="week">This Week</SelectItem>
+                  <SelectItem value="month">This Month</SelectItem>
+                  <SelectItem value="quarter">This Quarter</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                  <SelectItem value="custom">Custom Range</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {printRange === 'custom' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Start Date</label>
+                  <input
+                    type="date"
+                    value={format(customStartDate, 'yyyy-MM-dd')}
+                    onChange={(e) => setCustomStartDate(new Date(e.target.value))}
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">End Date</label>
+                  <input
+                    type="date"
+                    value={format(customEndDate, 'yyyy-MM-dd')}
+                    onChange={(e) => setCustomEndDate(new Date(e.target.value))}
+                    className="w-full px-3 py-2 border rounded-md"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPrintDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmPrintCalendar}
+              disabled={exportPdf.isPending}
+            >
+              {exportPdf.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              <Printer className="h-4 w-4 mr-2" />
+              Generate PDF
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

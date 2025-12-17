@@ -8,6 +8,7 @@ import * as db from "./db";
 import { storagePut } from "./storage";
 import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
 import { subscriptionRouter } from "./subscription";
+import { errorMonitoringRouter } from "./errorMonitoringRouter";
 import { auditInstances, auditTrail, auditTypes, staffMembers, serviceUsers } from "../drizzle/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { format } from "date-fns";
@@ -28,6 +29,7 @@ export const appRouter = router({
   auth: authRouter,
   roles: rolesRouter,
   subscription: subscriptionRouter,
+  errorMonitoring: errorMonitoringRouter,
 
   // Dashboard statistics
   dashboard: router({

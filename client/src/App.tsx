@@ -45,6 +45,7 @@ import ActionLog from "./pages/ActionLog";
 import EmailSettings from "./pages/EmailSettings";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
+import ErrorMonitoring from "./pages/ErrorMonitoring";
 
 function Router() {
   return (
@@ -94,6 +95,12 @@ function Router() {
       <Route path="/admin/subscription">
         <DashboardLayout>
           <SubscriptionManagement />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/admin/error-monitoring">
+        <DashboardLayout>
+          <ErrorMonitoring />
         </DashboardLayout>
       </Route>
       
