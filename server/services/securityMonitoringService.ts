@@ -101,7 +101,7 @@ export function resetFailedLoginAttempts(email: string, ipAddress?: string): voi
 function cleanupFailedAttempts(): void {
   const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
   
-  for (const [key, value] of failedLoginAttempts.entries()) {
+  for (const [key, value] of Array.from(failedLoginAttempts.entries())) {
     if (value.lastAttempt < oneHourAgo) {
       failedLoginAttempts.delete(key);
     }
@@ -179,10 +179,13 @@ async function sendSecurityAlert(event: SecurityEvent): Promise<void> {
     `;
     
     // Send email to all super admins
+    const textBody = `Security Alert: ${event.eventType}\n\nSeverity: ${event.severity}\nEmail: ${event.email || 'Unknown'}\nIP Address: ${event.ipAddress || 'Unknown'}\nDetails: ${event.details || 'No additional details'}`;
+    
     for (const admin of superAdmins) {
       await sendEmail({
         to: admin.email,
         subject,
+        text: textBody,
         html: body,
       });
     }
@@ -220,7 +223,7 @@ export function getSecurityMetrics(): {
   const suspiciousIPs = new Set<string>();
   let totalAttempts = 0;
   
-  for (const [key, value] of failedLoginAttempts.entries()) {
+  for (const [key, value] of Array.from(failedLoginAttempts.entries())) {
     totalAttempts += value.count;
     if (value.count >= 5) {
       const ip = key.split(":")[1];

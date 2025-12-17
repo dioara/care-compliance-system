@@ -129,12 +129,15 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const quantity = subscription.items.data[0]?.quantity || 0;
   const status = mapStripeStatus(subscription.status);
 
+  // Type assertion: Stripe API has these properties but TypeScript definitions may be incomplete
+  const sub = subscription as any;
+  
   await db.update(tenantSubscriptions).set({
     stripeSubscriptionId: subscription.id,
     status,
     licensesCount: quantity,
-    currentPeriodStart: new Date(subscription.current_period_start * 1000).toISOString(),
-    currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+    currentPeriodStart: new Date(sub.current_period_start * 1000).toISOString(),
+    currentPeriodEnd: new Date(sub.current_period_end * 1000).toISOString(),
     cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
     canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
   }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
@@ -157,8 +160,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handlePaymentFailed(invoice: Stripe.Invoice) {
-  if (!invoice.subscription || !stripe) return;
-  const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+  // Type assertion: Stripe API has subscription property but TypeScript definitions may be incomplete
+  const inv = invoice as any;
+  if (!inv.subscription || !stripe) return;
+  const subscription = await stripe.subscriptions.retrieve(inv.subscription as string);
   const db = await requireDb();
   const [tenantSub] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.stripeCustomerId, subscription.customer as string));
   if (!tenantSub) return;

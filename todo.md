@@ -2111,3 +2111,5 @@
 - [x] Improve help article text styling and readability
 - [x] Fix incidents.generateSinglePDF 500 error
 - [x] Fix notifications.list and notifications.getUnreadCount 500 errors
+- [x] Fix Stripe webhook current_period_start and current_period_end type errors
+- [x] Fix Stripe invoice.subscription type errors

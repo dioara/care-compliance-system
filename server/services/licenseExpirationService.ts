@@ -192,9 +192,12 @@ async function sendLicenseExpirationEmail(
   `;
 
   try {
+    const textBody = `Dear ${name},\n\n${urgencyText}\n\nOrganisation: ${companyName}\nActive Licenses: ${licensesCount}\nExpiration Date: ${formattedDate}\nDays Remaining: ${daysRemaining}\n\n${actionText}\n\nPlease visit https://care-compliance.manus.space/admin/subscription to renew your subscription.`;
+    
     await sendEmail({
       to: email,
       subject,
+      text: textBody,
       html,
     });
     return true;
