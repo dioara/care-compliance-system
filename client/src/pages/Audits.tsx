@@ -125,14 +125,14 @@ export default function Audits() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 md:space-y-6 lg:space-y-8">
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
             <ClipboardList className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Audit Management</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Audit Management</h1>
             <p className="text-muted-foreground mt-1">
               Manage and conduct compliance audits across your care home
             </p>

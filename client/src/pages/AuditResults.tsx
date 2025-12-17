@@ -222,7 +222,7 @@ export default function AuditResults() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{auditInstance.auditTypeName}</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">{auditInstance.auditTypeName}</h1>
             <p className="text-muted-foreground mt-1">
               {auditInstance.locationName} • {format(new Date(auditInstance.auditDate), "PPP")}
             </p>
@@ -248,7 +248,7 @@ export default function AuditResults() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Completion Rate</CardDescription>
-            <CardTitle className="text-3xl">{completionRate}%</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{completionRate}%</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
@@ -259,7 +259,7 @@ export default function AuditResults() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Overall Score</CardDescription>
-            <CardTitle className="text-3xl">{auditInstance.overallScore || 0}%</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{auditInstance.overallScore || 0}%</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">Audit performance</p>
@@ -268,7 +268,7 @@ export default function AuditResults() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Action Plans</CardDescription>
-            <CardTitle className="text-3xl">{actionPlans?.length || 0}</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{actionPlans?.length || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">Items to address</p>
@@ -277,7 +277,7 @@ export default function AuditResults() {
         <Card>
           <CardHeader className="pb-3">
             <CardDescription>Evidence Files</CardDescription>
-            <CardTitle className="text-3xl">{evidence?.length || 0}</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{evidence?.length || 0}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">Uploaded documents</p>
@@ -376,7 +376,7 @@ export default function AuditResults() {
                         <p className="font-medium text-lg">{plan.issueDescription}</p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                       <div>
                         <Label className="text-muted-foreground">Responsible Person</Label>
                         <p className="font-medium mt-1">{plan.responsiblePersonName || "Unassigned"}</p>

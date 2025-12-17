@@ -102,7 +102,7 @@ export default function ForgotPassword() {
               <circle cx="12" cy="16" r="1" fill="currentColor"/>
             </svg>
           </div>
-          <h1 className="text-4xl font-bold mb-3">Forgot your password?</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">Forgot your password?</h1>
           <p className="text-xl text-white/80 mb-8">No worries, we'll help you reset it</p>
           
           <div className="space-y-4">
@@ -129,7 +129,7 @@ export default function ForgotPassword() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-6 lg:p-8 bg-gray-50">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
@@ -143,7 +143,7 @@ export default function ForgotPassword() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Reset password</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Reset password</h2>
             <p className="text-gray-600 mt-2">Enter your email and we'll send you a reset link</p>
           </div>
 

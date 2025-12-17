@@ -324,7 +324,7 @@ export default function ConductAudit() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{auditInstance.auditTypeName}</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">{auditInstance.auditTypeName}</h1>
             <p className="text-muted-foreground mt-1">
               {auditInstance.locationName} • {format(new Date(auditInstance.auditDate), "PPP")}
             </p>
@@ -466,7 +466,7 @@ export default function ConductAudit() {
                                   rows={2}
                                 />
                               </div>
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                   <Label className="flex items-center gap-2">
                                     <User className="h-4 w-4" /> Assign To

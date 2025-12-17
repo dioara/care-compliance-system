@@ -20,7 +20,7 @@ export default function TermsOfService() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Terms of Service</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl lg:text-3xl">Terms of Service</CardTitle>
             <p className="text-muted-foreground">
               Last updated: December 2024
             </p>

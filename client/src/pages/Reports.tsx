@@ -17,7 +17,7 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Reports</h1>
         <p className="text-muted-foreground mt-2">
           Generate branded compliance reports for CQC, regulators, and internal use
         </p>

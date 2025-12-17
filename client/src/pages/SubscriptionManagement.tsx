@@ -307,7 +307,7 @@ export default function SubscriptionManagement() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="p-4 border rounded-lg">
                 <h3 className="font-semibold mb-2">License Pricing</h3>
-                <p className="text-3xl font-bold">£70<span className="text-sm font-normal text-muted-foreground">/license/month</span></p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold">£70<span className="text-sm font-normal text-muted-foreground">/license/month</span></p>
                 <ul className="mt-4 space-y-2 text-sm">
                   <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />1-5 licenses: Full price</li>
                   <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />6-10 licenses: 10% discount</li>

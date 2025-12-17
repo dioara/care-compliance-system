@@ -186,7 +186,7 @@ export default function Locations() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Locations</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Locations</h1>
           <p className="text-muted-foreground mt-2">
             Manage your care service locations. Each location has separate compliance tracking.
           </p>
@@ -294,7 +294,7 @@ export default function Locations() {
 
                 <div className="space-y-2">
                   <Label>Service Types</Label>
-                  <div className="grid grid-cols-2 gap-3 p-4 border rounded-md">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 border rounded-md">
                     {SERVICE_TYPES.map(serviceType => (
                       <div key={serviceType} className="flex items-center space-x-2">
                         <Checkbox
@@ -431,7 +431,7 @@ export default function Locations() {
 
               <div className="space-y-2">
                 <Label>Service Types</Label>
-                <div className="grid grid-cols-2 gap-3 p-4 border rounded-md">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4 border rounded-md">
                   {SERVICE_TYPES.map(serviceType => (
                     <div key={serviceType} className="flex items-center space-x-2">
                       <Checkbox
@@ -524,7 +524,7 @@ export default function Locations() {
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-3 pt-3 border-t">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t">
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <div>

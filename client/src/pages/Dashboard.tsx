@@ -97,7 +97,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-6 md:space-y-4 md:space-y-6 lg:space-y-8">
       {/* Compliance Alert Banner */}
       {alertStatus?.hasAlerts && !alertDismissed && (
         <Alert variant="destructive" className="relative border-red-200 bg-red-50 shadow-sm">
@@ -140,23 +140,26 @@ export default function Dashboard() {
       
       {/* Header Section */}
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-start gap-3 md:gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
             <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl shrink-0">
               <Activity className="h-5 w-5 md:h-6 md:w-6 text-primary" />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent truncate">
                 Welcome back, {user?.name?.split(' ')[0] || 'User'}
               </h1>
+              <p className="text-sm md:text-base text-muted-foreground mt-1 truncate">
+                {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <Select
               value={activeLocationId?.toString() || "all"}
               onValueChange={(value) => setActiveLocationId(value === "all" ? null : parseInt(value))}
             >
-              <SelectTrigger className="w-[220px]">
+              <SelectTrigger className="w-full sm:w-[200px] lg:w-[220px]">
                 <SelectValue placeholder="All Locations" />
               </SelectTrigger>
               <SelectContent>
@@ -169,11 +172,6 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
           </div>
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm md:text-base text-muted-foreground mt-1">
-            {profile?.name ? `Managing compliance for ${profile.name}` : 'Compliance Management Dashboard'}
-          </p>
         </div>
       </div>
 
@@ -190,7 +188,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="flex items-end gap-2">
-              <span className="text-5xl font-bold">{stats.overallCompliance}</span>
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-bold">{stats.overallCompliance}</span>
               <span className="text-2xl font-bold text-slate-400 mb-1">%</span>
             </div>
             <Progress 
@@ -234,7 +232,7 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold">{stats.upcomingAudits}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.upcomingAudits}</div>
             <p className="text-xs text-muted-foreground mt-2">
               Due in next 30 days
             </p>

@@ -278,17 +278,16 @@ function DashboardLayoutContent({
               </Tooltip>
               {!isCollapsed && (
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-sm shrink-0">
-                    <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
+                  <img 
+                    src="/logo.png" 
+                    alt="CCMS Logo" 
+                    className="h-8 w-8 shrink-0 object-contain"
+                  />
                   <div className="flex flex-col min-w-0">
-                    <span className="font-semibold tracking-tight truncate text-sm">
-                      Care Compliance
+                    <span className="font-bold tracking-tight truncate text-sm">
+                      CCMS
                     </span>
-                    <span className="text-[10px] text-muted-foreground -mt-0.5">Management System</span>
+                    <span className="text-[10px] text-muted-foreground -mt-0.5 truncate">Care Compliance</span>
                   </div>
                 </div>
               )}

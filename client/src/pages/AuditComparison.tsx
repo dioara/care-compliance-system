@@ -149,7 +149,7 @@ export default function AuditComparison() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Total Audits</CardDescription>
-                <CardTitle className="text-3xl">{stats.totalAudits}</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{stats.totalAudits}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -160,7 +160,7 @@ export default function AuditComparison() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Average Score</CardDescription>
-                <CardTitle className="text-3xl">{stats.avgScore}/10</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl lg:text-3xl">{stats.avgScore}/10</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
@@ -171,7 +171,7 @@ export default function AuditComparison() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Trend</CardDescription>
-                <CardTitle className="text-3xl flex items-center gap-2">
+                <CardTitle className="text-xl sm:text-2xl lg:text-3xl flex items-center gap-2">
                   {getTrendIcon(stats.trend)}
                   {getTrendLabel(stats.trend)}
                 </CardTitle>
@@ -185,7 +185,7 @@ export default function AuditComparison() {
             <Card>
               <CardHeader className="pb-2">
                 <CardDescription>Compliance Rate</CardDescription>
-                <CardTitle className="text-3xl">
+                <CardTitle className="text-xl sm:text-2xl lg:text-3xl">
                   {((filteredData.filter(a => a.score >= 7).length / filteredData.length) * 100).toFixed(0)}%
                 </CardTitle>
               </CardHeader>

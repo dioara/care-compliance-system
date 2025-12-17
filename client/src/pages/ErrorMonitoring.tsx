@@ -113,7 +113,7 @@ export default function ErrorMonitoring() {
     <div className="container py-8 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Error Monitoring</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Error Monitoring</h1>
         <p className="text-muted-foreground mt-2">
           Monitor application errors and user-reported issues
         </p>

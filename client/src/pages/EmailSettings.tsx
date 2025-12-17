@@ -252,7 +252,7 @@ export default function EmailSettings() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-3">
             <Mail className="h-8 w-8 text-primary" />
             Email Settings
           </h1>
@@ -574,7 +574,7 @@ export default function EmailSettings() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="templateType">Template Type *</Label>
                 <Select
@@ -614,7 +614,7 @@ export default function EmailSettings() {
                 placeholder="⚠️ Compliance Alert - {{companyName}}"
               />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="headerColor">Header Color</Label>
                 <div className="flex gap-2">

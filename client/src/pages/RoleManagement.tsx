@@ -177,7 +177,7 @@ export default function RoleManagement() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Role Management</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Role Management</h1>
             <p className="text-muted-foreground">
               Create and manage roles with location-based permissions
             </p>

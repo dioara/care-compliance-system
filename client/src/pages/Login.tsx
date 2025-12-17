@@ -64,14 +64,16 @@ export default function Login() {
         <div className="relative z-10 flex flex-col justify-center px-16 text-white">
           {/* Logo */}
           <div className="mb-8">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-              <svg className="w-9 h-9 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-6 shadow-xl p-3">
+              <img 
+                src="/logo.png" 
+                alt="CCMS Logo" 
+                className="w-full h-full object-contain filter brightness-0 invert"
+              />
             </div>
-            <h1 className="text-4xl font-bold mb-3">Care Compliance</h1>
-            <p className="text-xl text-white/80">Management System</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">CCMS</h1>
+            <p className="text-xl text-white/90">Care Compliance Management System</p>
+            <p className="text-sm text-white/70 mt-2">Professional compliance management for healthcare providers</p>
           </div>
 
           {/* Features */}
@@ -133,7 +135,7 @@ export default function Login() {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-6 lg:p-8 bg-gray-50">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
@@ -148,7 +150,7 @@ export default function Login() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Welcome back</h2>
             <p className="text-gray-600 mt-2">Sign in to access your compliance dashboard</p>
           </div>
 
@@ -258,7 +260,7 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* Google SSO */}
               <button
                 type="button"

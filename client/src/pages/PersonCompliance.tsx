@@ -268,7 +268,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
           Back
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{personName}</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">{personName}</h1>
           <p className="text-muted-foreground mt-2">
             {personType === "staff" ? "Staff" : "Service User"} Compliance Assessment - {allSections?.length || 0} Sections
           </p>

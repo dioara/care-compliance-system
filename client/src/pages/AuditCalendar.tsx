@@ -411,7 +411,7 @@ export default function AuditCalendar() {
     <div className="container py-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Audit Calendar</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Audit Calendar</h1>
           <p className="text-muted-foreground">
             {activeLocation ? `Schedule and track audits for ${activeLocation.locationName}` : 'Select a location to view audits'}
           </p>
@@ -833,7 +833,7 @@ export default function AuditCalendar() {
             </div>
             
             {printRange === 'custom' && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">Start Date</label>
                   <input

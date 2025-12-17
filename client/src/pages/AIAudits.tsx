@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { RichTextEditor } from "@/components/RichTextEditor";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -171,7 +172,7 @@ export default function AIAudits() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight flex items-center gap-2">
           <Brain className="h-8 w-8" />
           AI-Powered Audits
         </h1>
@@ -266,16 +267,15 @@ export default function AIAudits() {
                 {uploadMode === "text" ? (
                   <div className="space-y-2">
                     <Label htmlFor="carePlanText">Care Plan Content *</Label>
-                    <Textarea
-                      id="carePlanText"
-                      placeholder="Paste the care plan text here..."
-                      value={carePlanText}
-                      onChange={(e) => setCarePlanText(e.target.value)}
-                      rows={10}
-                      disabled={!apiKeyStatus?.hasApiKey || isProcessing}
+                    <RichTextEditor
+                      content={carePlanText}
+                      onChange={setCarePlanText}
+                      placeholder="Paste the care plan text here... Use the toolbar to format your content."
+                      minHeight="300px"
+                      className={!apiKeyStatus?.hasApiKey || isProcessing ? 'opacity-50 pointer-events-none' : ''}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {carePlanText.length} characters (minimum 100 required)
+                      {carePlanText.replace(/<[^>]*>/g, '').length} characters (minimum 100 required)
                     </p>
                   </div>
                 ) : (
@@ -430,16 +430,15 @@ export default function AIAudits() {
 
                 <div className="space-y-2">
                   <Label htmlFor="dailyNotesText">Daily Notes Content *</Label>
-                  <Textarea
-                    id="dailyNotesText"
-                    placeholder="Paste the daily notes text here..."
-                    value={dailyNotesText}
-                    onChange={(e) => setDailyNotesText(e.target.value)}
-                    rows={12}
-                    disabled={!apiKeyStatus?.hasApiKey || isProcessing}
+                  <RichTextEditor
+                    content={dailyNotesText}
+                    onChange={setDailyNotesText}
+                    placeholder="Paste the daily notes text here... Use the toolbar to format your content."
+                    minHeight="350px"
+                    className={!apiKeyStatus?.hasApiKey || isProcessing ? 'opacity-50 pointer-events-none' : ''}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {dailyNotesText.length} characters (minimum 100 required)
+                    {dailyNotesText.replace(/<[^>]*>/g, '').length} characters (minimum 100 required)
                   </p>
                 </div>
 

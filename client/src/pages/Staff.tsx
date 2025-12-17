@@ -270,7 +270,7 @@ export default function Staff() {
     <PageHeader 
       breadcrumb={<Breadcrumb items={[{ label: "Staff" }]} />}
     >
-      <div className="space-y-6 md:space-y-8">
+      <div className="space-y-6 md:space-y-4 md:space-y-6 lg:space-y-8">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3 md:gap-4">
@@ -278,7 +278,7 @@ export default function Staff() {
             <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Staff Members</h1>
+            <h1 className="text-2xl md:text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Staff Members</h1>
             <p className="text-sm md:text-base text-muted-foreground mt-1">
               Manage staff members for the selected location. Track employment details and DBS certificates.
             </p>

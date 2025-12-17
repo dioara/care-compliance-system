@@ -143,7 +143,7 @@ export default function ResetPassword() {
               <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h1 className="text-4xl font-bold mb-3">Create new password</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">Create new password</h1>
           <p className="text-xl text-white/80 mb-8">Choose a strong, unique password</p>
           
           <div className="space-y-4 text-white/80">
@@ -170,10 +170,10 @@ export default function ResetPassword() {
       </div>
 
       {/* Right Panel - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-6 lg:p-8 bg-gray-50">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Set new password</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Set new password</h2>
             <p className="text-gray-600 mt-2">Enter your new password below</p>
           </div>
 

@@ -127,7 +127,7 @@ export default function CompanyProfile() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Company Profile</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Company Profile</h1>
         <p className="text-muted-foreground mt-2">
           Manage your company information and branding. This information will appear on all generated reports.
         </p>
@@ -170,7 +170,7 @@ export default function CompanyProfile() {
                 </Button>
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 space-y-4">
+              <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 md:p-6 lg:p-8 space-y-4">
                 <Building2 className="h-12 w-12 text-muted-foreground" />
                 <Button
                   variant="outline"

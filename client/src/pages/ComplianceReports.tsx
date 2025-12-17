@@ -253,9 +253,9 @@ export default function ComplianceReports() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Compliance Reports</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Compliance Reports</h1>
         <p className="text-muted-foreground mt-1">
           Generate comprehensive compliance reports for CQC submissions
         </p>
@@ -265,7 +265,7 @@ export default function ComplianceReports() {
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold mb-4">Report Configuration</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="startDate">Start Date *</Label>
                 <Input

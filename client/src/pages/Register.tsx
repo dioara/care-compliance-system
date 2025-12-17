@@ -92,7 +92,7 @@ export default function Register() {
                 <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <h1 className="text-3xl font-bold mb-2">Start Your Journey</h1>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Start Your Journey</h1>
             <p className="text-lg text-white/80">Join hundreds of care providers</p>
           </div>
 

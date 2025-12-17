@@ -310,7 +310,7 @@ export default function Incidents() {
   });
 
   return (
-    <div className="space-y-6 md:space-y-8">
+    <div className="space-y-6 md:space-y-4 md:space-y-6 lg:space-y-8">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3 md:gap-4">
@@ -318,7 +318,7 @@ export default function Incidents() {
             <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            <h1 className="text-2xl md:text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
               Incident Reporting
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-1 max-w-2xl">
@@ -392,7 +392,7 @@ export default function Incidents() {
                   </div>
                 ))}
               </div>
-              <div className="flex justify-center gap-8 text-sm text-muted-foreground mb-6">
+              <div className="flex justify-center gap-4 md:gap-6 lg:gap-8 text-sm text-muted-foreground mb-6">
                 <span className={formStep === 1 ? 'text-primary font-medium' : ''}>Basic Info</span>
                 <span className={formStep === 2 ? 'text-primary font-medium' : ''}>Details</span>
                 <span className={formStep === 3 ? 'text-primary font-medium' : ''}>Injuries</span>
@@ -471,7 +471,7 @@ export default function Incidents() {
                     {/* Incident Type Selection */}
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">Incident Type *</Label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 md:grid-cols-3 gap-3">
                         {INCIDENT_TYPES.map((type) => (
                           <button
                             key={type.value}
@@ -494,7 +494,7 @@ export default function Incidents() {
                     {/* Severity Selection */}
                     <div className="space-y-3">
                       <Label className="text-sm font-medium">Severity Level *</Label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 md:grid-cols-4 gap-3">
                         {SEVERITY_LEVELS.map((level) => (
                           <button
                             key={level.value}
@@ -966,7 +966,7 @@ export default function Incidents() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-slate-900">{totalIncidents}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">{totalIncidents}</div>
             <p className="text-xs text-slate-500 mt-1">All time records</p>
           </CardContent>
         </Card>
@@ -979,7 +979,7 @@ export default function Incidents() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-900">{openIncidents}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-900">{openIncidents}</div>
             <p className="text-xs text-orange-600 mt-1">Requiring attention</p>
           </CardContent>
         </Card>
@@ -992,7 +992,7 @@ export default function Incidents() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-900">{criticalIncidents}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-red-900">{criticalIncidents}</div>
             <p className="text-xs text-red-600 mt-1">High priority</p>
           </CardContent>
         </Card>
@@ -1005,7 +1005,7 @@ export default function Incidents() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-900">{thisMonthIncidents}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900">{thisMonthIncidents}</div>
             <p className="text-xs text-blue-600 mt-1">Current month</p>
           </CardContent>
         </Card>
@@ -1018,7 +1018,7 @@ export default function Incidents() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-purple-900">{cqcNotified}</div>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900">{cqcNotified}</div>
             <p className="text-xs text-purple-600 mt-1">Regulatory reports</p>
           </CardContent>
         </Card>
@@ -1172,7 +1172,7 @@ export default function Incidents() {
                 <div className="lg:col-span-2 space-y-6">
                   {/* Incident Type */}
                   <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg">
-                    <div className="text-3xl">
+                    <div className="text-xl sm:text-2xl lg:text-3xl">
                       {INCIDENT_TYPES.find(t => t.value === selectedIncident.incidentType)?.icon || "📋"}
                     </div>
                     <div>

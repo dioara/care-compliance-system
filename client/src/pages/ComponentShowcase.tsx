@@ -230,7 +230,7 @@ export default function ComponentsShowcase() {
     <div className="min-h-screen bg-background text-foreground">
       <main className="container max-w-6xl mx-auto">
         <div className="space-y-2 justify-between flex">
-          <h2 className="text-3xl font-bold tracking-tight mb-6">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-6">
             Shadcn/ui Component Library
           </h2>
           <Button variant="outline" size="icon" onClick={toggleTheme}>
@@ -617,7 +617,7 @@ export default function ComponentsShowcase() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="month" className="text-sm font-medium">
                         Month
@@ -1196,7 +1196,7 @@ export default function ComponentsShowcase() {
                         <div className="p-1">
                           <Card>
                             <CardContent className="flex aspect-square items-center justify-center p-6">
-                              <span className="text-4xl font-semibold">
+                              <span className="text-2xl sm:text-3xl lg:text-4xl font-semibold">
                                 {index + 1}
                               </span>
                             </CardContent>

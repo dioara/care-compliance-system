@@ -173,7 +173,7 @@ export default function ComplianceSection() {
           Back
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{section.sectionName}</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">{section.sectionName}</h1>
           <p className="text-muted-foreground mt-2">
             Section {section.sectionNumber} - {section.sectionType === 'service_user' ? 'Service User' : 'Staff'} Compliance
           </p>
