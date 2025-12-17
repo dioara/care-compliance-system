@@ -1,15 +1,20 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Home, ChevronRight, HelpCircle, Clock, ThumbsUp, ThumbsDown, Share2, Bookmark } from "lucide-react";
+import { ArrowLeft, Home, ChevronRight, HelpCircle, Clock, ThumbsUp, ThumbsDown, Share2, Bookmark, BookmarkCheck } from "lucide-react";
 import { helpArticles, helpCategories } from "@/data/helpContent";
 import { useLocation, useRoute } from "wouter";
 import Markdown from "react-markdown";
+import { trpc } from "@/lib/trpc";
+import { toast } from "sonner";
+import { ContactSupportModal } from "@/components/ContactSupportModal";
 
 export default function HelpArticle() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/help/:id");
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   
   const article = useMemo(() => {
     if (!params?.id) return null;
@@ -28,6 +33,93 @@ export default function HelpArticle() {
       .filter((a) => a.category === article.category && a.id !== article.id)
       .slice(0, 3);
   }, [article]);
+
+  // Check if article is bookmarked
+  const { data: isBookmarked, refetch: refetchBookmark } = trpc.helpCenter.isBookmarked.useQuery(
+    { articleId: article?.id || "" },
+    { enabled: !!article?.id }
+  );
+
+  // Check if user already submitted feedback
+  const { data: userFeedback } = trpc.helpCenter.getUserFeedback.useQuery(
+    { articleId: article?.id || "" },
+    { enabled: !!article?.id }
+  );
+
+  // Bookmark mutations
+  const addBookmark = trpc.helpCenter.addBookmark.useMutation({
+    onSuccess: () => {
+      toast.success("Article bookmarked!", {
+        description: "You can find it in your bookmarks",
+      });
+      refetchBookmark();
+    },
+    onError: (error) => {
+      toast.error("Failed to bookmark article", {
+        description: error.message,
+      });
+    },
+  });
+
+  const removeBookmark = trpc.helpCenter.removeBookmark.useMutation({
+    onSuccess: () => {
+      toast.success("Bookmark removed");
+      refetchBookmark();
+    },
+    onError: (error) => {
+      toast.error("Failed to remove bookmark", {
+        description: error.message,
+      });
+    },
+  });
+
+  // Feedback mutation
+  const submitFeedback = trpc.helpCenter.submitFeedback.useMutation({
+    onSuccess: () => {
+      setFeedbackSubmitted(true);
+      toast.success("Thank you for your feedback!", {
+        description: "Your input helps us improve our documentation",
+      });
+    },
+    onError: (error) => {
+      toast.error("Failed to submit feedback", {
+        description: error.message,
+      });
+    },
+  });
+
+  // Handle share
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied to clipboard!", {
+        description: "You can now share this article",
+      });
+    } catch (error) {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  // Handle bookmark toggle
+  const handleBookmarkToggle = () => {
+    if (!article) return;
+    
+    if (isBookmarked) {
+      removeBookmark.mutate({ articleId: article.id });
+    } else {
+      addBookmark.mutate({ articleId: article.id });
+    }
+  };
+
+  // Handle feedback
+  const handleFeedback = (helpful: boolean) => {
+    if (!article) return;
+    submitFeedback.mutate({
+      articleId: article.id,
+      helpful,
+    });
+  };
 
   if (!article || !category) {
     return (
@@ -48,6 +140,8 @@ export default function HelpArticle() {
       </div>
     );
   }
+
+  const hasFeedback = !!userFeedback || feedbackSubmitted;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
@@ -154,16 +248,35 @@ export default function HelpArticle() {
                     <p className="text-gray-700 mb-6 text-base leading-relaxed">
                       Your feedback helps us improve our documentation and provide better support to all users.
                     </p>
-                    <div className="flex gap-3 flex-wrap">
-                      <Button variant="outline" className="gap-2 bg-white hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all">
-                        <ThumbsUp className="h-4 w-4" />
-                        Yes, this helped
-                      </Button>
-                      <Button variant="outline" className="gap-2 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all">
-                        <ThumbsDown className="h-4 w-4" />
-                        No, needs improvement
-                      </Button>
-                    </div>
+                    {hasFeedback ? (
+                      <div className="bg-white rounded-lg p-4 border border-green-200">
+                        <p className="text-green-700 font-semibold flex items-center gap-2">
+                          <ThumbsUp className="h-4 w-4" />
+                          Thank you for your feedback!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex gap-3 flex-wrap">
+                        <Button 
+                          variant="outline" 
+                          className="gap-2 bg-white hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all"
+                          onClick={() => handleFeedback(true)}
+                          disabled={submitFeedback.isPending}
+                        >
+                          <ThumbsUp className="h-4 w-4" />
+                          Yes, this helped
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="gap-2 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all"
+                          onClick={() => handleFeedback(false)}
+                          disabled={submitFeedback.isPending}
+                        >
+                          <ThumbsDown className="h-4 w-4" />
+                          No, needs improvement
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -210,13 +323,31 @@ export default function HelpArticle() {
               <Card className="bg-white shadow-lg border-0 p-6">
                 <h3 className="font-bold text-lg text-gray-900 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start gap-3 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start gap-3 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all"
+                    onClick={handleShare}
+                  >
                     <Share2 className="h-4 w-4" />
                     Share this article
                   </Button>
-                  <Button variant="outline" className="w-full justify-start gap-3 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all">
-                    <Bookmark className="h-4 w-4" />
-                    Bookmark for later
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start gap-3 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-300 transition-all"
+                    onClick={handleBookmarkToggle}
+                    disabled={addBookmark.isPending || removeBookmark.isPending}
+                  >
+                    {isBookmarked ? (
+                      <>
+                        <BookmarkCheck className="h-4 w-4 fill-current" />
+                        Bookmarked
+                      </>
+                    ) : (
+                      <>
+                        <Bookmark className="h-4 w-4" />
+                        Bookmark for later
+                      </>
+                    )}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -242,16 +373,10 @@ export default function HelpArticle() {
                     </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                  {category.description}
-                </p>
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={() => {
-                    setLocation("/help");
-                    // Note: Would need to pass category filter state
-                  }}
+                  onClick={() => setLocation("/help")}
                   className="w-full bg-white hover:bg-indigo-600 hover:text-white transition-all"
                 >
                   View all {category.name} articles
@@ -273,6 +398,7 @@ export default function HelpArticle() {
                     variant="outline" 
                     size="sm"
                     className="w-full border-2 border-white text-white hover:bg-white hover:text-indigo-600 transition-all font-semibold"
+                    onClick={() => setSupportModalOpen(true)}
                   >
                     Contact Support
                   </Button>
@@ -282,6 +408,11 @@ export default function HelpArticle() {
           </div>
         </div>
       </div>
+
+      <ContactSupportModal 
+        open={supportModalOpen} 
+        onOpenChange={setSupportModalOpen} 
+      />
     </div>
   );
 }

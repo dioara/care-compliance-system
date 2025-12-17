@@ -774,6 +774,43 @@ export const users = mysqlTable("users", {
 	index("users_email_unique").on(table.email),
 ]);
 
+export const supportTickets = mysqlTable("supportTickets", {
+	id: int().autoincrement().primaryKey().notNull(),
+	tenantId: varchar({ length: 255 }).notNull(),
+	userId: varchar({ length: 255 }).notNull(),
+	ticketNumber: varchar({ length: 50 }).notNull(),
+	name: varchar({ length: 255 }).notNull(),
+	email: varchar({ length: 255 }).notNull(),
+	subject: varchar({ length: 500 }).notNull(),
+	message: text().notNull(),
+	priority: mysqlEnum(['low','medium','high','urgent']).default('medium').notNull(),
+	status: mysqlEnum(['open','in_progress','waiting_response','resolved','closed']).default('open').notNull(),
+	category: varchar({ length: 100 }),
+	assignedTo: int(),
+	resolvedAt: timestamp({ mode: 'string' }),
+	resolvedBy: int(),
+	resolutionNotes: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
+export const articleFeedback = mysqlTable("articleFeedback", {
+	id: int().autoincrement().primaryKey().notNull(),
+	articleId: varchar({ length: 100 }).notNull(),
+	userId: varchar({ length: 255 }),
+	tenantId: varchar({ length: 255 }),
+	helpful: tinyint().notNull(),
+	feedbackText: text(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
+export const articleBookmarks = mysqlTable("articleBookmarks", {
+	id: int().autoincrement().primaryKey().notNull(),
+	articleId: varchar({ length: 100 }).notNull(),
+	userId: varchar({ length: 255 }).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+});
+
 // Type exports for use in application code
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -805,3 +842,9 @@ export type EmailRecipient = typeof emailRecipients.$inferSelect;
 export type InsertEmailRecipient = typeof emailRecipients.$inferInsert;
 export type EmailTemplate = typeof emailTemplates.$inferSelect;
 export type InsertEmailTemplate = typeof emailTemplates.$inferInsert;
+export type SupportTicket = typeof supportTickets.$inferSelect;
+export type InsertSupportTicket = typeof supportTickets.$inferInsert;
+export type ArticleFeedback = typeof articleFeedback.$inferSelect;
+export type InsertArticleFeedback = typeof articleFeedback.$inferInsert;
+export type ArticleBookmark = typeof articleBookmarks.$inferSelect;
+export type InsertArticleBookmark = typeof articleBookmarks.$inferInsert;

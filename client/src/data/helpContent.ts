@@ -1264,4 +1264,1465 @@ Your feedback helps improve CCMS. Share your experience through:
 - Annual user conference and feedback sessions
 `
   },
+
+  // ============================================
+  // ANALYTICS & REPORTING (New Articles)
+  // ============================================
+  {
+    id: "analytics-dashboard",
+    category: "reports",
+    title: "Using the Analytics Dashboard",
+    keywords: ["analytics", "dashboard", "metrics", "insights", "trends", "statistics"],
+    content: `
+# Using the Analytics Dashboard
+
+## Overview
+
+The Analytics Dashboard provides comprehensive insights into your organisation's compliance performance, incident trends, and operational metrics. Access it from the main menu to view real-time data visualisations and key performance indicators.
+
+## Dashboard Sections
+
+### Compliance Overview
+
+The compliance overview displays your organisation's overall compliance score calculated from recent audits. The score is presented as a percentage with colour-coded indicators:
+
+**Green (85-100%)**: Excellent compliance - maintain current standards
+
+**Amber (70-84%)**: Adequate compliance - some areas need attention
+
+**Red (Below 70%)**: Poor compliance - immediate action required
+
+The compliance trend chart shows how your score has changed over the past 12 months, helping you identify improvements or declining performance.
+
+### Incident Analytics
+
+View incident statistics including:
+
+**Total Incidents**: Count of all reported incidents in the selected period
+
+**Severity Breakdown**: Distribution of incidents by severity level (minor, moderate, serious, critical)
+
+**Category Analysis**: Incidents grouped by type (medication errors, falls, safeguarding, etc.)
+
+**Resolution Time**: Average time taken to investigate and resolve incidents
+
+**Trend Analysis**: Month-by-month comparison showing whether incidents are increasing or decreasing
+
+### Audit Performance
+
+Track your audit programme effectiveness:
+
+**Completion Rate**: Percentage of scheduled audits completed on time
+
+**Average Scores**: Mean audit scores across all audit types
+
+**Overdue Audits**: List of audits past their due date requiring immediate attention
+
+**Audit Frequency**: Visual representation of how often each audit type is conducted
+
+### Staff Compliance
+
+Monitor staff-related compliance metrics:
+
+**Training Completion**: Percentage of staff with up-to-date mandatory training
+
+**Supervision Status**: Staff members due for supervision or appraisal
+
+**DBS Renewals**: Upcoming DBS check expiry dates
+
+**Competency Assessments**: Staff requiring competency reassessment
+
+## Filtering Data
+
+Use the filter controls at the top of the dashboard to customise your view:
+
+**Date Range**: Select from preset ranges (last 7 days, 30 days, 90 days, 12 months) or choose custom dates
+
+**Location**: Filter by specific care home location if you manage multiple sites
+
+**Department**: View data for specific departments or teams
+
+**Audit Type**: Focus on particular audit categories
+
+## Exporting Analytics
+
+Export dashboard data for external analysis or board presentations:
+
+1. Click the "Export" button in the top-right corner
+2. Choose your preferred format (PDF, Excel, CSV)
+3. Select which sections to include in the export
+4. Click "Download" to save the file
+
+Exported reports include all visible charts, tables, and summary statistics based on your current filter settings.
+
+## Setting Up Alerts
+
+Configure automatic alerts to notify you when metrics fall below acceptable thresholds:
+
+1. Navigate to Analytics Settings
+2. Click "Configure Alerts"
+3. Set threshold values for key metrics (e.g., compliance score below 75%)
+4. Choose notification method (email, in-app notification, SMS)
+5. Specify recipients for each alert type
+
+Alerts help you respond quickly to emerging issues before they become serious problems.
+
+## Benchmarking
+
+Compare your performance against:
+
+**Historical Performance**: See how you're performing compared to previous periods
+
+**Internal Benchmarks**: Compare locations within your organisation
+
+**Industry Standards**: View anonymised sector averages (where available)
+
+**CQC Requirements**: Track performance against regulatory expectations
+
+## Scheduled Reports
+
+Set up automated report delivery:
+
+1. Go to Analytics Settings > Scheduled Reports
+2. Click "Create New Schedule"
+3. Choose report type and frequency (daily, weekly, monthly)
+4. Select recipients
+5. Customise report content and format
+6. Save the schedule
+
+Scheduled reports are automatically generated and emailed to specified recipients, ensuring stakeholders stay informed without manual effort.
+`
+  },
+
+  {
+    id: "notification-center",
+    category: "settings",
+    title: "Managing Notifications",
+    keywords: ["notifications", "alerts", "email", "preferences", "reminders"],
+    content: `
+# Managing Notifications
+
+## Notification Centre
+
+The Notification Centre keeps you informed about important events, overdue tasks, and system updates. Access it by clicking the bell icon in the top navigation bar.
+
+## Notification Types
+
+### Compliance Alerts
+
+Receive notifications when:
+
+- Compliance scores fall below acceptable thresholds
+- Audits are overdue or approaching due dates
+- Action plans are not completed by target dates
+- Critical non-compliance is identified during audits
+- Service user or staff compliance assessments are due
+
+### Incident Notifications
+
+Stay informed about:
+
+- New incidents reported in your locations
+- Incidents requiring your review or approval
+- Investigation deadlines approaching
+- Serious incidents requiring immediate attention
+- Incident resolution updates
+
+### System Notifications
+
+Receive updates about:
+
+- Scheduled system maintenance
+- New features and enhancements
+- Important system announcements
+- Security updates
+- Account-related changes
+
+### Task Reminders
+
+Get reminded about:
+
+- Upcoming audits you're assigned to conduct
+- Action plans you're responsible for completing
+- Staff supervision sessions you need to conduct
+- Training courses approaching expiry
+- Document reviews due
+
+## Notification Preferences
+
+Customise how you receive notifications:
+
+### Email Notifications
+
+1. Navigate to Settings > Notifications
+2. Toggle email notifications on/off for each category
+3. Choose notification frequency:
+   - **Immediate**: Receive emails as events occur
+   - **Daily Digest**: One email per day summarising all notifications
+   - **Weekly Summary**: Weekly roundup of key notifications
+4. Set quiet hours to avoid notifications during specific times
+5. Save your preferences
+
+### In-App Notifications
+
+Control which notifications appear in the Notification Centre:
+
+- Enable/disable notifications by category
+- Set priority levels (show only high-priority notifications)
+- Choose notification sound preferences
+- Configure notification badge behaviour
+
+### SMS Notifications (Optional)
+
+For critical alerts, enable SMS notifications:
+
+1. Add your mobile number in Settings > Profile
+2. Verify your number via SMS code
+3. Select which notification types should trigger SMS
+4. Note: SMS notifications are typically reserved for urgent matters
+
+## Managing Notifications
+
+### Marking as Read
+
+Click on any notification to mark it as read and view full details. Unread notifications are highlighted with a blue dot.
+
+### Bulk Actions
+
+Select multiple notifications to:
+
+- Mark all as read
+- Delete selected notifications
+- Archive old notifications
+
+### Filtering Notifications
+
+Use filters to view specific notification types:
+
+- All notifications
+- Unread only
+- By category (compliance, incidents, system, tasks)
+- By date range
+- By priority level
+
+## Notification History
+
+Access your complete notification history:
+
+1. Click "View All" in the Notification Centre
+2. Use search to find specific notifications
+3. Filter by date, type, or status
+4. Export notification history if needed for audit purposes
+
+## Team Notifications
+
+If you're a manager or administrator, configure team-wide notifications:
+
+1. Go to Settings > Team Notifications
+2. Set up notification rules for your team
+3. Assign notification recipients based on roles
+4. Configure escalation rules for unacknowledged critical notifications
+5. Set up notification groups for different departments or locations
+
+## Do Not Disturb Mode
+
+Temporarily pause non-critical notifications:
+
+1. Click your profile icon > Do Not Disturb
+2. Choose duration (1 hour, 4 hours, until tomorrow, custom)
+3. Select which notifications to allow during DND mode
+4. Critical safety alerts will still come through
+
+## Troubleshooting Notifications
+
+**Not receiving email notifications?**
+
+- Check your spam/junk folder
+- Verify your email address in Settings > Profile
+- Ensure email notifications are enabled in preferences
+- Check if your organisation's email server is blocking CCMS emails
+- Contact IT support to whitelist notifications@ccms.co.uk
+
+**Too many notifications?**
+
+- Switch to daily digest mode instead of immediate notifications
+- Disable notifications for less critical categories
+- Adjust alert thresholds to reduce false alarms
+- Use filters to focus on high-priority items only
+
+**Missing important notifications?**
+
+- Review your notification preferences to ensure critical categories are enabled
+- Check if Do Not Disturb mode is accidentally active
+- Verify your role has permission to receive specific notification types
+- Contact your administrator if notifications seem to be missing
+`
+  },
+
+  {
+    id: "advanced-search",
+    category: "getting-started",
+    title: "Using Advanced Search",
+    keywords: ["search", "find", "filter", "advanced search", "query"],
+    content: `
+# Using Advanced Search
+
+## Global Search
+
+The global search bar at the top of every page allows you to quickly find records across the entire system. Simply type your search term and press Enter.
+
+## Search Scope
+
+Global search looks across:
+
+- Service users (names, NHS numbers, room numbers)
+- Staff members (names, employee IDs, job titles)
+- Audits (audit types, auditor names, findings)
+- Incidents (descriptions, categories, involved parties)
+- Action plans (descriptions, responsible persons)
+- Documents (titles, content, tags)
+
+## Advanced Search Filters
+
+Click "Advanced Search" or use the filter icon to access detailed search options:
+
+### Date Filters
+
+- **Created Date**: Find records created within a specific date range
+- **Modified Date**: Find recently updated records
+- **Due Date**: Find items due within a certain timeframe
+- **Completed Date**: Find items completed in a specific period
+
+### Status Filters
+
+- **Active/Inactive**: Filter by record status
+- **Completion Status**: Show only complete, in-progress, or pending items
+- **Approval Status**: Find items awaiting approval or already approved
+
+### Category Filters
+
+- **Audit Type**: Filter by specific audit categories
+- **Incident Type**: Show only certain incident categories
+- **Location**: Filter by care home location
+- **Department**: Show records from specific departments
+
+### User Filters
+
+- **Created By**: Find items created by specific users
+- **Assigned To**: Show items assigned to particular staff members
+- **Reviewed By**: Find records reviewed by specific people
+
+## Search Operators
+
+Use special operators for more precise searches:
+
+**Exact Phrase**: Use quotation marks
+- Example: "medication error" finds only that exact phrase
+
+**Exclude Terms**: Use minus sign
+- Example: incident -minor excludes minor incidents
+
+**Multiple Terms**: Use OR
+- Example: falls OR trips finds either term
+
+**Required Terms**: Use AND
+- Example: audit AND completed finds audits that are completed
+
+**Wildcard**: Use asterisk
+- Example: med* finds medication, medicine, medical, etc.
+
+## Saving Searches
+
+Save frequently used searches for quick access:
+
+1. Perform your search with desired filters
+2. Click "Save Search" button
+3. Give your search a descriptive name
+4. Choose whether to make it a favourite (appears in quick access menu)
+5. Click "Save"
+
+Saved searches appear in your user menu for one-click access.
+
+## Search Results
+
+### Sorting Results
+
+Click column headers to sort results:
+
+- **Relevance**: Most relevant results first (default)
+- **Date**: Newest or oldest first
+- **Name**: Alphabetical order
+- **Status**: Group by status
+
+### Viewing Results
+
+Search results show:
+
+- Record type icon
+- Primary information (name, title, ID)
+- Key details (date, status, location)
+- Quick action buttons (view, edit, delete)
+
+### Exporting Results
+
+Export search results to:
+
+1. Click "Export Results" button
+2. Choose format (Excel, CSV, PDF)
+3. Select fields to include in export
+4. Click "Download"
+
+Exports include all records matching your search, not just those visible on the current page.
+
+## Search Tips
+
+**Be specific**: Use multiple search terms to narrow results
+
+**Use filters**: Combine text search with filters for best results
+
+**Check spelling**: Typos will prevent matches
+
+**Try variations**: Search for both "service user" and "resident"
+
+**Use wildcards**: When unsure of exact spelling or want to find variations
+
+**Save common searches**: Speeds up repetitive tasks
+
+**Review recent searches**: Access your search history from the search dropdown
+
+## Search Shortcuts
+
+Keyboard shortcuts for faster searching:
+
+- **Ctrl/Cmd + K**: Open global search from anywhere
+- **Ctrl/Cmd + F**: Search within current page
+- **Enter**: Execute search
+- **Esc**: Close search results
+- **Arrow keys**: Navigate search results
+- **Enter on result**: Open selected record
+
+## Troubleshooting Search
+
+**No results found?**
+
+- Check spelling and try alternative terms
+- Remove some filters to broaden search
+- Verify you have permission to view the records
+- Try searching in specific modules instead of global search
+
+**Too many results?**
+
+- Add more specific search terms
+- Apply additional filters
+- Use exact phrase search with quotation marks
+- Filter by date range to narrow results
+
+**Missing expected results?**
+
+- Check if records are archived or deleted
+- Verify your location/department filters aren't excluding results
+- Ensure you have appropriate permissions
+- Contact administrator if records should be visible but aren't
+`
+  },
+
+  {
+    id: "mobile-app",
+    category: "getting-started",
+    title: "Using CCMS on Mobile Devices",
+    keywords: ["mobile", "app", "tablet", "smartphone", "iOS", "Android"],
+    content: `
+# Using CCMS on Mobile Devices
+
+## Mobile Access
+
+CCMS is fully responsive and works seamlessly on smartphones and tablets. Access the system through your mobile browser or download the dedicated mobile app for enhanced functionality.
+
+## Mobile Browser Access
+
+To use CCMS in your mobile browser:
+
+1. Open your preferred browser (Safari, Chrome, Firefox)
+2. Navigate to your organisation's CCMS URL
+3. Sign in with your credentials
+4. The interface automatically adapts to your screen size
+
+### Add to Home Screen
+
+For quick access, add CCMS to your home screen:
+
+**iOS (iPhone/iPad)**:
+1. Open CCMS in Safari
+2. Tap the Share button
+3. Select "Add to Home Screen"
+4. Name the shortcut and tap "Add"
+
+**Android**:
+1. Open CCMS in Chrome
+2. Tap the menu (three dots)
+3. Select "Add to Home screen"
+4. Confirm the shortcut name and tap "Add"
+
+## Mobile App Features
+
+The CCMS mobile app provides:
+
+**Offline Access**: View previously loaded data without internet connection
+
+**Push Notifications**: Receive instant alerts for critical events
+
+**Camera Integration**: Take photos directly for evidence or incident reporting
+
+**Biometric Login**: Use fingerprint or face recognition for quick, secure access
+
+**Voice Input**: Dictate notes and observations instead of typing
+
+**Barcode Scanning**: Scan medication barcodes or resident wristbands
+
+## Mobile-Optimised Features
+
+### Quick Actions
+
+The mobile interface provides streamlined access to common tasks:
+
+- Report an incident
+- Start an audit
+- Record observations
+- View notifications
+- Check schedules
+- Access emergency contacts
+
+### Touch-Friendly Interface
+
+Mobile design includes:
+
+- Large, easy-to-tap buttons
+- Swipe gestures for navigation
+- Simplified forms with mobile-friendly inputs
+- Collapsible sections to reduce scrolling
+- Bottom navigation bar for thumb-friendly access
+
+### Camera Features
+
+Use your device camera for:
+
+**Evidence Photos**: Capture images during audits
+
+**Incident Documentation**: Photograph incident scenes (following privacy guidelines)
+
+**Document Scanning**: Scan paper documents to upload
+
+**Signature Capture**: Collect electronic signatures
+
+## Conducting Audits on Mobile
+
+Mobile devices are ideal for conducting audits:
+
+1. Navigate to Audits > My Audits
+2. Select the audit to conduct
+3. Tap "Start Audit"
+4. Answer questions by tapping responses
+5. Add photos using the camera button
+6. Record voice notes for detailed observations
+7. Save progress at any time
+8. Complete and submit when finished
+
+Audits automatically sync when you regain internet connection.
+
+## Reporting Incidents on Mobile
+
+Quickly report incidents from anywhere:
+
+1. Tap the "Quick Actions" button
+2. Select "Report Incident"
+3. Choose incident type and severity
+4. Fill in required details
+5. Add photos if relevant
+6. Submit immediately or save as draft
+
+Critical incidents trigger immediate notifications to appropriate staff.
+
+## Offline Mode
+
+When internet connection is unavailable:
+
+**What Works Offline**:
+- View previously loaded data
+- Start and complete audits
+- Create incident reports
+- Record observations
+- Take photos and notes
+
+**What Requires Connection**:
+- Loading new data
+- Submitting completed forms
+- Accessing reports
+- Real-time notifications
+- User management
+
+**Syncing Data**:
+When connection is restored, the app automatically syncs all offline changes. You'll see a sync indicator showing upload progress.
+
+## Mobile Security
+
+### Device Security
+
+- Enable device passcode/biometric lock
+- Keep your operating system updated
+- Only download the official CCMS app from App Store or Google Play
+- Don't jailbreak or root your device
+- Report lost or stolen devices immediately
+
+### App Security
+
+- Enable biometric login in app settings
+- Set auto-lock timeout (app locks after period of inactivity)
+- Don't share your device with others when logged in
+- Always log out on shared devices
+- Clear app cache if selling or disposing of device
+
+## Mobile Tips
+
+**Battery Management**:
+- Close the app when not in use
+- Reduce screen brightness
+- Disable background app refresh if not needed
+- Carry a portable charger for long shifts
+
+**Data Usage**:
+- Connect to Wi-Fi when available
+- Download large reports on Wi-Fi only
+- Compress photos before uploading
+- Monitor your mobile data usage
+
+**Performance**:
+- Keep the app updated
+- Clear cache periodically (Settings > Clear Cache)
+- Restart the app if it becomes slow
+- Ensure adequate free storage space
+
+## Troubleshooting Mobile Issues
+
+**App won't load?**
+- Check internet connection
+- Force close and restart the app
+- Clear app cache
+- Update to latest version
+- Reinstall the app if problems persist
+
+**Can't log in?**
+- Verify username and password
+- Check if Caps Lock is on
+- Try logging in via browser
+- Reset password if needed
+- Contact IT support
+
+**Photos won't upload?**
+- Check camera permissions in device settings
+- Ensure adequate storage space
+- Try reducing photo size
+- Check internet connection
+- Upload via Wi-Fi for large files
+
+**Sync issues?**
+- Verify internet connection
+- Check if app is up to date
+- Force sync from settings
+- Log out and log back in
+- Contact support if sync repeatedly fails
+`
+  },
+
+  {
+    id: "data-privacy",
+    category: "settings",
+    title: "Data Privacy and GDPR Compliance",
+    keywords: ["privacy", "GDPR", "data protection", "personal data", "consent"],
+    content: `
+# Data Privacy and GDPR Compliance
+
+## Overview
+
+CCMS is designed to help care organisations comply with GDPR (General Data Protection Regulation) and UK data protection laws. Understanding how personal data is handled is essential for all users.
+
+## Types of Data Stored
+
+### Service User Data
+
+- Personal details (name, date of birth, NHS number)
+- Contact information
+- Medical and care information
+- Assessment records
+- Care plans and notes
+- Incident reports
+- Photographs (with consent)
+
+### Staff Data
+
+- Employment details
+- Contact information
+- Training records
+- DBS check information
+- Performance reviews
+- Supervision notes
+
+### System Data
+
+- User login information
+- Audit trails
+- System usage logs
+- IP addresses
+- Session data
+
+## Legal Basis for Processing
+
+CCMS processes personal data under several legal bases:
+
+**Contractual Necessity**: To provide care services
+
+**Legal Obligation**: To comply with CQC regulations and safeguarding requirements
+
+**Vital Interests**: To protect the health and safety of service users
+
+**Legitimate Interests**: To manage staff and maintain operational records
+
+**Consent**: Where explicitly obtained for specific purposes
+
+## Data Subject Rights
+
+Individuals have rights regarding their personal data:
+
+### Right to Access
+
+Service users and staff can request copies of their personal data. To process a Subject Access Request (SAR):
+
+1. Submit request in writing to your Data Protection Officer
+2. Verify identity
+3. Receive response within 30 days
+4. Data provided in accessible format
+
+### Right to Rectification
+
+Individuals can request correction of inaccurate data:
+
+1. Identify the incorrect information
+2. Provide correct information
+3. Updates made within 30 days
+4. Notification sent when complete
+
+### Right to Erasure ("Right to be Forgotten")
+
+In certain circumstances, individuals can request deletion of their data. However, care records must be retained for legal and regulatory requirements (typically 20 years for service users, 6 years for staff).
+
+### Right to Restrict Processing
+
+Individuals can request temporary restriction of data processing while disputes are resolved.
+
+### Right to Data Portability
+
+Service users can request their data in a machine-readable format to transfer to another provider.
+
+### Right to Object
+
+Individuals can object to processing based on legitimate interests, though this may not apply to care-essential data.
+
+## Consent Management
+
+CCMS includes consent tracking features:
+
+### Recording Consent
+
+1. Navigate to service user profile
+2. Go to Consent tab
+3. Record consent for specific purposes:
+   - Photographs
+   - Sharing information with family
+   - Participation in activities
+   - Use of data for quality improvement
+4. Document who gave consent and when
+5. Attach signed consent forms
+
+### Withdrawing Consent
+
+Service users can withdraw consent at any time:
+
+1. Record withdrawal date in system
+2. Stop processing for that purpose immediately
+3. Update care plans accordingly
+4. Inform relevant staff of the change
+
+## Data Security Measures
+
+CCMS employs multiple security layers:
+
+**Encryption**: All data encrypted in transit and at rest
+
+**Access Controls**: Role-based permissions limit data access
+
+**Authentication**: Strong password requirements and optional two-factor authentication
+
+**Audit Trails**: All data access and changes are logged
+
+**Regular Backups**: Data backed up daily with secure storage
+
+**Penetration Testing**: Regular security assessments
+
+**Staff Training**: Mandatory data protection training for all users
+
+## Data Retention
+
+CCMS follows legal retention requirements:
+
+**Service User Records**: 20 years from last contact or 8 years after death
+
+**Staff Records**: 6 years after employment ends
+
+**Incident Reports**: 20 years
+
+**Audit Records**: 6 years
+
+**Financial Records**: 6 years
+
+**System Logs**: 12 months
+
+After retention periods expire, data is securely deleted.
+
+## Data Breaches
+
+If you suspect a data breach:
+
+1. **Immediately report** to your Data Protection Officer
+2. **Document** what data may be affected
+3. **Don't attempt** to cover up or fix it yourself
+4. **Preserve evidence** (screenshots, logs)
+5. **Follow** your organisation's breach response procedure
+
+Examples of data breaches:
+
+- Sending email to wrong recipient
+- Leaving printed records in public area
+- Losing a device containing personal data
+- Unauthorised access to system
+- Ransomware or hacking incident
+
+Breaches must be reported to the ICO within 72 hours if they pose a risk to individuals' rights and freedoms.
+
+## Best Practices for Users
+
+### Accessing Data
+
+- Only access data you need for your role
+- Don't browse records out of curiosity
+- Log out when finished
+- Don't share your login credentials
+- Use secure connections (avoid public Wi-Fi)
+
+### Sharing Data
+
+- Verify recipient before sharing
+- Use secure methods (encrypted email, secure file transfer)
+- Don't discuss service users in public areas
+- Anonymise data when possible
+- Follow need-to-know principle
+
+### Storing Data
+
+- Don't download data to personal devices
+- Don't print unless necessary
+- Securely destroy printed records
+- Don't take photos of screens containing personal data
+- Use CCMS rather than personal notes
+
+### Disposing of Data
+
+- Shred paper documents
+- Securely wipe devices before disposal
+- Use "delete" function in CCMS (creates audit trail)
+- Don't use regular bins for confidential waste
+- Follow your organisation's disposal procedures
+
+## Privacy by Design
+
+CCMS incorporates privacy principles:
+
+**Data Minimisation**: Only collect necessary data
+
+**Purpose Limitation**: Use data only for stated purposes
+
+**Storage Limitation**: Delete data when no longer needed
+
+**Accuracy**: Keep data up to date
+
+**Integrity and Confidentiality**: Protect data from unauthorised access
+
+**Accountability**: Maintain records of processing activities
+
+## Training and Awareness
+
+All CCMS users must:
+
+- Complete data protection training annually
+- Acknowledge data protection policies
+- Understand their responsibilities
+- Report concerns promptly
+- Stay updated on policy changes
+
+## Contact Information
+
+For data protection queries:
+
+**Data Protection Officer**: dpo@ccms.co.uk
+
+**Privacy Questions**: privacy@ccms.co.uk
+
+**Report a Breach**: breach@ccms.co.uk (monitored 24/7)
+
+**ICO (Information Commissioner's Office)**: ico.org.uk
+`
+  },
+
+  {
+    id: "keyboard-shortcuts",
+    category: "getting-started",
+    title: "Keyboard Shortcuts",
+    keywords: ["shortcuts", "keyboard", "hotkeys", "quick keys", "productivity"],
+    content: `
+# Keyboard Shortcuts
+
+## Overview
+
+Keyboard shortcuts help you navigate CCMS more efficiently. This guide covers all available shortcuts organised by function.
+
+## Global Shortcuts
+
+These shortcuts work from anywhere in the system:
+
+**Ctrl/Cmd + K**: Open global search
+
+**Ctrl/Cmd + /**: Show keyboard shortcuts help
+
+**Ctrl/Cmd + ,**: Open settings
+
+**Ctrl/Cmd + H**: Go to home/dashboard
+
+**Ctrl/Cmd + N**: Create new record (context-dependent)
+
+**Ctrl/Cmd + S**: Save current form
+
+**Esc**: Close modal or cancel current action
+
+**Alt + N**: Open notifications
+
+**Alt + M**: Open main menu
+
+**Alt + U**: Open user menu
+
+## Navigation Shortcuts
+
+**Alt + 1**: Go to Dashboard
+
+**Alt + 2**: Go to Audits
+
+**Alt + 3**: Go to Incidents
+
+**Alt + 4**: Go to Service Users
+
+**Alt + 5**: Go to Staff
+
+**Alt + 6**: Go to Reports
+
+**Alt + 7**: Go to Settings
+
+**Alt + 8**: Go to Help Center
+
+**Alt + Left Arrow**: Go back
+
+**Alt + Right Arrow**: Go forward
+
+## Form Shortcuts
+
+**Tab**: Move to next field
+
+**Shift + Tab**: Move to previous field
+
+**Enter**: Submit form (when focused on submit button)
+
+**Ctrl/Cmd + Enter**: Quick submit from any field
+
+**Ctrl/Cmd + Z**: Undo last change
+
+**Ctrl/Cmd + Shift + Z**: Redo
+
+**Ctrl/Cmd + A**: Select all text in field
+
+**Ctrl/Cmd + C**: Copy selected text
+
+**Ctrl/Cmd + V**: Paste
+
+**Ctrl/Cmd + X**: Cut
+
+## Table/List Shortcuts
+
+**Arrow Keys**: Navigate between rows
+
+**Enter**: Open selected item
+
+**Space**: Select/deselect item
+
+**Ctrl/Cmd + A**: Select all items
+
+**Ctrl/Cmd + Click**: Select multiple items
+
+**Shift + Click**: Select range of items
+
+**Delete**: Delete selected item(s) (with confirmation)
+
+**Ctrl/Cmd + F**: Search within table
+
+**Ctrl/Cmd + E**: Export table data
+
+## Audit Shortcuts
+
+**Ctrl/Cmd + Right Arrow**: Next question
+
+**Ctrl/Cmd + Left Arrow**: Previous question
+
+**Ctrl/Cmd + S**: Save progress
+
+**Ctrl/Cmd + Shift + S**: Save and exit
+
+**Ctrl/Cmd + Shift + C**: Complete audit
+
+**Alt + P**: Add photo evidence
+
+**Alt + A**: Create action plan
+
+**Alt + C**: Add comment
+
+## Text Editor Shortcuts
+
+**Ctrl/Cmd + B**: Bold
+
+**Ctrl/Cmd + I**: Italic
+
+**Ctrl/Cmd + U**: Underline
+
+**Ctrl/Cmd + K**: Insert link
+
+**Ctrl/Cmd + Shift + 7**: Numbered list
+
+**Ctrl/Cmd + Shift + 8**: Bullet list
+
+**Ctrl/Cmd + [**: Decrease indent
+
+**Ctrl/Cmd + ]**: Increase indent
+
+**Ctrl/Cmd + Shift + X**: Strikethrough
+
+## Search Shortcuts
+
+**Ctrl/Cmd + F**: Search current page
+
+**Ctrl/Cmd + G**: Find next
+
+**Ctrl/Cmd + Shift + G**: Find previous
+
+**Enter**: Search
+
+**Esc**: Close search
+
+**Arrow Keys**: Navigate search results
+
+**Enter on result**: Open selected result
+
+## Calendar Shortcuts
+
+**T**: Go to today
+
+**N**: Next period (day/week/month)
+
+**P**: Previous period
+
+**D**: Day view
+
+**W**: Week view
+
+**M**: Month view
+
+**Enter**: Create event on selected date
+
+**Arrow Keys**: Navigate dates
+
+## Accessibility Shortcuts
+
+**Alt + Plus**: Increase text size
+
+**Alt + Minus**: Decrease text size
+
+**Alt + 0**: Reset text size
+
+**Alt + C**: Toggle high contrast mode
+
+**Alt + R**: Toggle screen reader optimisations
+
+**Tab**: Navigate focusable elements
+
+**Shift + Tab**: Navigate backwards
+
+**Enter/Space**: Activate focused element
+
+## Customising Shortcuts
+
+You can customise keyboard shortcuts:
+
+1. Go to Settings > Keyboard Shortcuts
+2. Click on the shortcut you want to change
+3. Press your desired key combination
+4. Click "Save" to confirm
+5. Reset to defaults anytime
+
+**Note**: Some shortcuts cannot be changed as they're standard browser functions.
+
+## Platform Differences
+
+**Windows/Linux**: Use Ctrl key
+
+**Mac**: Use Cmd (⌘) key
+
+**Alt key**: Option (⌥) on Mac
+
+Most shortcuts work identically across platforms with these key substitutions.
+
+## Tips for Learning Shortcuts
+
+**Start with frequently used actions**: Focus on shortcuts for tasks you perform daily
+
+**Use the cheat sheet**: Press Ctrl/Cmd + / to see available shortcuts
+
+**Practice regularly**: Muscle memory develops with repetition
+
+**Hover for hints**: Many buttons show their shortcut in the tooltip
+
+**Customise for your workflow**: Adjust shortcuts to match your preferences
+
+**Don't memorise everything**: Learn shortcuts as you need them
+
+## Troubleshooting Shortcuts
+
+**Shortcut not working?**
+
+- Check if another application is using the same shortcut
+- Verify you're using the correct modifier key (Ctrl vs Cmd)
+- Ensure the feature is available in your current context
+- Try refreshing the page
+- Check if shortcuts are disabled in settings
+
+**Conflicting shortcuts?**
+
+- Browser shortcuts take precedence over app shortcuts
+- Disable browser extensions that might interfere
+- Customise CCMS shortcuts to avoid conflicts
+- Some shortcuts only work in specific contexts
+
+**Accessibility concerns?**
+
+- All functions are available via mouse/touch
+- Screen readers announce available shortcuts
+- Keyboard navigation follows logical tab order
+- Contact support for accessibility assistance
+`
+  },
+
+  {
+    id: "system-requirements",
+    category: "troubleshooting",
+    title: "System Requirements and Browser Compatibility",
+    keywords: ["requirements", "browser", "compatibility", "technical", "specs"],
+    content: `
+# System Requirements and Browser Compatibility
+
+## Supported Browsers
+
+CCMS works best on modern, up-to-date browsers:
+
+### Recommended Browsers
+
+**Google Chrome**: Version 90 or later (recommended)
+
+**Microsoft Edge**: Version 90 or later (Chromium-based)
+
+**Mozilla Firefox**: Version 88 or later
+
+**Apple Safari**: Version 14 or later (macOS and iOS)
+
+### Browser Features Required
+
+- JavaScript enabled
+- Cookies enabled
+- Local storage enabled
+- Pop-ups allowed for CCMS domain
+- TLS 1.2 or higher support
+
+### Unsupported Browsers
+
+**Internet Explorer**: No longer supported (use Edge instead)
+
+**Older browser versions**: May have limited functionality or security issues
+
+## Operating Systems
+
+### Desktop/Laptop
+
+**Windows**: Windows 10 or later
+
+**macOS**: macOS 10.14 (Mojave) or later
+
+**Linux**: Modern distributions with up-to-date browsers
+
+**Chrome OS**: Current version
+
+### Mobile Devices
+
+**iOS**: iOS 13 or later (iPhone, iPad)
+
+**Android**: Android 8.0 (Oreo) or later
+
+**Tablets**: Same requirements as mobile phones
+
+## Hardware Requirements
+
+### Minimum Specifications
+
+**Processor**: Dual-core 1.6 GHz or equivalent
+
+**RAM**: 4 GB
+
+**Storage**: 500 MB free space (for cached data)
+
+**Display**: 1280x720 resolution
+
+**Internet**: 2 Mbps download, 1 Mbps upload
+
+### Recommended Specifications
+
+**Processor**: Quad-core 2.0 GHz or better
+
+**RAM**: 8 GB or more
+
+**Storage**: 1 GB free space
+
+**Display**: 1920x1080 resolution or higher
+
+**Internet**: 10 Mbps download, 5 Mbps upload
+
+## Internet Connection
+
+### Connection Types
+
+**Broadband**: Recommended for office use
+
+**4G/5G Mobile**: Suitable for mobile access
+
+**3G**: Minimum for basic functionality
+
+**Wi-Fi**: Ensure strong signal strength
+
+### Bandwidth Usage
+
+**Typical Usage**: 50-100 MB per hour
+
+**With Photos**: 200-500 MB per hour
+
+**Video Content**: 1-2 GB per hour
+
+**Background Sync**: 10-50 MB per day
+
+## Browser Configuration
+
+### Enabling JavaScript
+
+**Chrome/Edge**:
+1. Settings > Privacy and security > Site settings
+2. JavaScript > Allowed
+
+**Firefox**:
+1. Type about:config in address bar
+2. Search for javascript.enabled
+3. Ensure it's set to true
+
+**Safari**:
+1. Preferences > Security
+2. Enable JavaScript checkbox
+
+### Enabling Cookies
+
+**Chrome/Edge**:
+1. Settings > Privacy and security > Cookies
+2. Allow all cookies or add CCMS as exception
+
+**Firefox**:
+1. Settings > Privacy & Security
+2. Standard or Custom with cookies allowed
+
+**Safari**:
+1. Preferences > Privacy
+2. Uncheck "Block all cookies"
+
+### Allowing Pop-ups
+
+**Chrome/Edge**:
+1. Settings > Privacy and security > Site settings
+2. Pop-ups and redirects
+3. Add CCMS URL to allowed list
+
+**Firefox**:
+1. Settings > Privacy & Security
+2. Permissions > Block pop-up windows
+3. Add CCMS as exception
+
+**Safari**:
+1. Preferences > Websites > Pop-up Windows
+2. Set CCMS to "Allow"
+
+## Network Requirements
+
+### Firewall Configuration
+
+Ensure these domains are whitelisted:
+
+- *.ccms.co.uk
+- *.manusvm.computer (if applicable)
+- api.ccms.co.uk
+- cdn.ccms.co.uk
+
+### Required Ports
+
+**HTTPS**: Port 443 (outbound)
+
+**WebSocket**: Port 443 (for real-time features)
+
+### Proxy Servers
+
+If using a proxy:
+
+- Configure proxy to allow CCMS domains
+- Ensure WebSocket connections are supported
+- SSL inspection may cause issues (add exception)
+
+## Security Software
+
+### Antivirus Configuration
+
+Add CCMS to trusted sites in:
+
+- Antivirus software
+- Anti-malware tools
+- Web filtering software
+
+### VPN Compatibility
+
+CCMS works with most VPNs, but:
+
+- Ensure VPN doesn't block required ports
+- Some VPNs may slow performance
+- Split tunneling can improve speed
+
+## Performance Optimisation
+
+### Browser Optimisation
+
+**Clear cache regularly**: Settings > Privacy > Clear browsing data
+
+**Disable unnecessary extensions**: May interfere with CCMS
+
+**Keep browser updated**: Latest version has best performance
+
+**Close unused tabs**: Frees up memory
+
+**Restart browser periodically**: Clears memory leaks
+
+### System Optimisation
+
+**Close unnecessary applications**: Frees up RAM
+
+**Keep OS updated**: Security and performance improvements
+
+**Run disk cleanup**: Removes temporary files
+
+**Check for malware**: Can slow system performance
+
+**Upgrade hardware if needed**: Especially RAM and SSD
+
+## Testing Your System
+
+CCMS includes a system check tool:
+
+1. Visit your CCMS login page
+2. Click "System Check" link
+3. Run the automated test
+4. Review results and recommendations
+5. Address any issues identified
+
+The test checks:
+
+- Browser compatibility
+- JavaScript and cookies
+- Internet speed
+- Screen resolution
+- Required features
+
+## Troubleshooting Common Issues
+
+**Slow performance?**
+
+- Check internet speed
+- Clear browser cache
+- Disable browser extensions
+- Close other applications
+- Try a different browser
+
+**Features not working?**
+
+- Enable JavaScript
+- Allow cookies
+- Disable ad blockers for CCMS
+- Check browser console for errors
+- Update browser to latest version
+
+**Can't log in?**
+
+- Clear cookies and cache
+- Try incognito/private mode
+- Check if cookies are enabled
+- Verify correct URL
+- Try different browser
+
+**Mobile issues?**
+
+- Update mobile OS
+- Update browser app
+- Clear app cache
+- Check mobile data/Wi-Fi
+- Try mobile browser vs app
+
+## Getting Help
+
+If you continue experiencing issues:
+
+1. Document the problem (screenshots, error messages)
+2. Note your browser and OS versions
+3. Try the system check tool
+4. Contact IT support with details
+5. Email technical-support@ccms.co.uk
+
+Include in your support request:
+
+- Browser name and version
+- Operating system
+- Internet connection type
+- Exact error messages
+- Steps to reproduce the issue
+- Screenshots if possible
+`
+  },
 ];

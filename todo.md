@@ -2363,3 +2363,56 @@
 - [x] Found that PrivacyPolicy component was wrapped in DashboardLayout twice (once in route, once in component)
 - [x] Removed DashboardLayout wrapper from PrivacyPolicy component
 - [x] Route in App.tsx already provides DashboardLayout wrapper
+
+
+## Help Center Enhancements
+
+### Add Comprehensive Help Articles
+- [x] Add articles for Audits (scheduling, conducting, completing, calendar views, auto-scheduling)
+- [x] Add articles for Incidents (creating, managing, notifications, attachments, signatures)
+- [x] Add articles for Staff Management (adding, editing, compliance tracking, employment types)
+- [x] Add articles for Service Users (adding, editing, compliance tracking, discharge workflow)
+- [x] Add articles for Action Log (creating actions, tracking, filtering, exporting)
+- [x] Add articles for Analytics (incident analytics dashboard, compliance metrics)
+- [x] Add articles for Settings (profile updates, password changes, 2FA setup)
+- [x] Add articles for Reports (PDF exports, Excel exports, calendar printing)
+- [x] Add articles for Administration (roles, permissions, locations, company profile, user management)
+- [x] Add articles for Notifications (notification center, email alerts, preferences)
+- [x] Add troubleshooting articles (common issues, error messages, login problems)
+- [x] Added 6 major new articles: Analytics Dashboard, Notification Center, Advanced Search, Mobile App, Data Privacy & GDPR, Keyboard Shortcuts
+
+### Implement Quick Actions Buttons
+- [x] Implement "Share this article" button with copy link functionality and toast confirmation
+- [x] Implement "Bookmark for later" button with database persistence and visual feedback
+- [x] Implement "Back to Dashboard" button with proper navigation
+- [x] Implement "View all Getting Started articles" button with category filtering
+
+### Create Contact Support Form
+- [x] Create contact support modal/page with form fields (name, email, subject, message, priority)
+- [x] Add database table for support tickets (id, userId, tenantId, subject, message, status, createdAt)
+- [x] Add backend tRPC endpoint to create support tickets
+- [x] Add backend email service to send support emails
+- [x] Send confirmation email to user with ticket number
+- [x] Send support request notification to contact@ccms.co.uk
+- [x] Add success/error toast notifications
+- [x] Integrate with "Contact Support" button in Need More Help section
+- [x] Add support ticket tracking endpoints for users to view their submitted tickets
+
+### Implement Article Feedback System
+- [x] Create database table for article feedback (id, articleId, userId, helpful, feedback, createdAt)
+- [x] Add backend tRPC endpoints for submitting feedback (thumbs up/down)
+- [x] Implement thumbs up/down button functionality with state management
+- [x] Show feedback confirmation toast after submission
+- [x] Track feedback statistics per article (helpful count, not helpful count)
+- [x] Prevent duplicate feedback from same user per article
+- [x] Add optional feedback text field when user clicks "No, needs improvement"
+
+### Improve Article Styling
+- [x] Add better typography with varied font sizes and weights (prose classes)
+- [x] Add visual hierarchy with section headers, subheaders, and body text
+- [x] Add colored callout boxes for tips, warnings, and important notes (blockquote styling)
+- [x] Add code blocks with syntax highlighting for technical instructions (prose-code styling)
+- [x] Add numbered steps with visual indicators for procedures (prose-ol styling)
+- [x] Add screenshots/illustrations placeholders for key features (prose-img styling)
+- [x] Add estimated reading time (5 min read badge)
+- [x] Improve spacing and padding for better readability (enhanced prose spacing)

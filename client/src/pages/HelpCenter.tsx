@@ -158,6 +158,17 @@ export default function HelpCenter() {
                 );
               })}
             </div>
+            
+            <div className="text-center mt-8">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setSelectedCategory("getting-started")}
+                className="hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              >
+                View all Getting Started articles
+              </Button>
+            </div>
           </div>
         )}
 
