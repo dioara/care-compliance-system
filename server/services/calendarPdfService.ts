@@ -120,18 +120,14 @@ export async function generateCalendarPdf(options: CalendarPdfOptions): Promise<
         .text('No audits scheduled for this period.', { align: 'center' });
     }
 
-    // Footer - add on current page without creating new page
-    const footerY = doc.page.height - 30;
-    if (doc.y < footerY - 20) {
-      doc.fontSize(8)
-        .fillColor('#9ca3af')
-        .text(
-          `Generated on ${formatInTimeZone(new Date(), 'Europe/London', 'MMM d, yyyy HH:mm')} GMT`,
-          40,
-          footerY,
-          { align: 'center', width: doc.page.width - 80 }
-        );
-    }
+    // Footer - place at current Y position with some spacing
+    doc.moveDown(2);
+    doc.fontSize(8)
+      .fillColor('#9ca3af')
+      .text(
+        `Generated on ${formatInTimeZone(new Date(), 'Europe/London', 'MMM d, yyyy HH:mm')} GMT`,
+        { align: 'center' }
+      );
 
     doc.end();
   });

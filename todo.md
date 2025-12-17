@@ -2258,3 +2258,14 @@
 - [x] Add staff/service user name joins to getAllAuditInstances query
 - [x] Add staff/service user name joins to getAuditInstancesByLocation query
 - [ ] Test scheduling staff-specific and service-user-specific audits
+
+## Fix PDF Footer Placement Across All Reports
+- [x] Identify all PDF generation services (calendar, incidents, audits, action log)
+- [x] Fix footer placement in calendarGridPdfService (used by calendar export)
+- [x] Fix footer placement in calendarPdfService (legacy calendar export)
+- [x] Verified audit report and action log PDFs use proper multi-page footer management
+- [x] Verified incident PDF doesn't have footer placement issues
+- [ ] Test calendar PDF export
+- [ ] Test incident PDF export
+- [ ] Test audit report PDF export
+- [ ] Test action log PDF export

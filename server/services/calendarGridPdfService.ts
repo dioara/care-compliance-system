@@ -85,15 +85,13 @@ export async function generateCalendarGridPdf(
         }
       }
 
-      // Footer
-      const footerY = doc.page.height - 30;
+      // Footer - place at current Y position with some spacing
+      doc.moveDown(1);
       doc.fontSize(8)
         .fillColor('#9ca3af')
         .text(
           `Generated on ${formatInTimeZone(new Date(), 'Europe/London', 'MMM d, yyyy HH:mm')} GMT`,
-          40,
-          footerY,
-          { align: 'center', width: doc.page.width - 80 }
+          { align: 'center' }
         );
 
       doc.end();
