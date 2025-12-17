@@ -244,8 +244,20 @@ export default function AuditCalendar() {
 
       setShowPrintDialog(false);
 
-      // Open PDF in new tab
-      window.open(result.url, '_blank');
+      // Download PDF from base64 data
+      const blob = new Blob(
+        [Uint8Array.from(atob(result.data), c => c.charCodeAt(0))],
+        { type: result.mimeType }
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
       toast.success('Calendar PDF generated successfully!');
     } catch (error) {
       console.error('Failed to generate PDF:', error);

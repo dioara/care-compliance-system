@@ -92,7 +92,15 @@ export default function Incidents() {
 
   const generatePDFMutation = trpc.incidents.generatePDF.useMutation({
     onSuccess: (data) => {
-      window.open(data.url, "_blank");
+      const blob = new Blob([Uint8Array.from(atob(data.data), c => c.charCodeAt(0))], { type: data.mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success("PDF report generated successfully");
     },
     onError: (error) => {
@@ -102,7 +110,15 @@ export default function Incidents() {
 
   const generateSinglePDFMutation = trpc.incidents.generateSinglePDF.useMutation({
     onSuccess: (data) => {
-      window.open(data.url, "_blank");
+      const blob = new Blob([Uint8Array.from(atob(data.data), c => c.charCodeAt(0))], { type: data.mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success("Incident PDF generated successfully");
     },
     onError: (error) => {
@@ -112,7 +128,15 @@ export default function Incidents() {
 
   const generateExcelMutation = trpc.incidents.generateExcel.useMutation({
     onSuccess: (data) => {
-      window.open(data.url, "_blank");
+      const blob = new Blob([Uint8Array.from(atob(data.data), c => c.charCodeAt(0))], { type: data.mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success("Excel report generated successfully");
     },
     onError: (error) => {

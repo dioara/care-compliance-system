@@ -1187,11 +1187,10 @@ export const appRouter = router({
           generatedBy: ctx.user.name || ctx.user.email,
         });
         
-        // Upload to S3
         const filename = `action-log-${Date.now()}.pdf`;
-        const { url } = await storagePut(`reports/action-logs/${filename}`, pdfBuffer, "application/pdf");
+        const base64Pdf = pdfBuffer.toString('base64');
         
-        return { url, filename };
+        return { data: base64Pdf, filename, mimeType: 'application/pdf' };
       }),
 
     // Generate PDF report for completed audit
@@ -1271,11 +1270,10 @@ export const appRouter = router({
           generatedBy: ctx.user.name || ctx.user.email,
         });
         
-        // Upload to S3
         const filename = `audit-report-${auditInstance.id}-${Date.now()}.pdf`;
-        const { url } = await storagePut(`reports/audits/${filename}`, pdfBuffer, "application/pdf");
+        const base64Pdf = pdfBuffer.toString('base64');
         
-        return { url, filename };
+        return { data: base64Pdf, filename, mimeType: 'application/pdf' };
       }),
 
     // Get audit schedules
@@ -1690,18 +1688,13 @@ export const appRouter = router({
           }))
         );
 
-        // Upload to S3
-        console.log('[PDF Export] PDF generated, uploading to S3...');
-        const { storagePut } = await import('./storage');
-        const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(input.startDate), 'yyyy-MM-dd')}-to-${format(new Date(input.endDate), 'yyyy-MM-dd')}-${Date.now()}.pdf`;
-        const { url } = await storagePut(
-          `reports/calendars/${filename}`,
-          pdfBuffer,
-          'application/pdf'
-        );
+        // Return PDF as base64 for direct download
+        console.log('[PDF Export] PDF generated successfully');
+        const filename = `calendar-${location.name.replace(/\s+/g, '-')}-${format(new Date(input.startDate), 'yyyy-MM-dd')}-to-${format(new Date(input.endDate), 'yyyy-MM-dd')}.pdf`;
+        const base64Pdf = pdfBuffer.toString('base64');
 
-        console.log('[PDF Export] Success! URL:', url);
-        return { url, filename };
+        console.log('[PDF Export] Success! Returning base64 PDF');
+        return { data: base64Pdf, filename, mimeType: 'application/pdf' };
         } catch (error) {
           console.error('[PDF Export Error]', error);
           console.error('[PDF Export Error] Stack:', error instanceof Error ? error.stack : 'No stack trace');
@@ -1930,12 +1923,12 @@ export const appRouter = router({
             generatedBy: ctx.user.name || ctx.user.email,
           });
           
-          console.log('[PDF Generation] Uploading to storage...');
+          console.log('[PDF Generation] Converting to base64...');
           const filename = `incident-report-${Date.now()}.pdf`;
-          const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
+          const base64Pdf = pdfBuffer.toString('base64');
           
-          console.log('[PDF Generation] Success! URL:', url);
-          return { url, filename };
+          console.log('[PDF Generation] Success! Returning base64 PDF');
+          return { data: base64Pdf, filename, mimeType: 'application/pdf' };
         } catch (error) {
           console.error('[PDF Generation] Error:', error);
           console.error('[PDF Generation] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
@@ -1982,9 +1975,9 @@ export const appRouter = router({
         });
         
         const filename = `incident-${incident.incidentNumber}-${Date.now()}.pdf`;
-        const { url } = await storagePut(`reports/incidents/${filename}`, pdfBuffer, "application/pdf");
+        const base64Pdf = pdfBuffer.toString('base64');
         
-        return { url, filename };
+        return { data: base64Pdf, filename, mimeType: 'application/pdf' };
       }),
 
     // Generate Excel export for incidents
@@ -2035,9 +2028,10 @@ export const appRouter = router({
         });
         
         const filename = `incident-report-${Date.now()}.xlsx`;
-        const { url } = await storagePut(`reports/incidents/${filename}`, excelBuffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        const base64Excel = excelBuffer.toString('base64');
         
-        return { url, filename };
+        console.log('[Excel] Success! Returning base64 Excel');
+        return { data: base64Excel, filename, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' };
       }),
 
     // ============ Attachments ============
@@ -2576,11 +2570,10 @@ export const appRouter = router({
           companyName: tenant?.name || undefined,
         });
         
-        // Upload PDF to S3
         const filename = `audit-report-${audit.id}-${Date.now()}.pdf`;
-        const { url } = await storagePut(`ai-audits/reports/${filename}`, pdfBuffer, "application/pdf");
+        const base64Pdf = pdfBuffer.toString('base64');
         
-        return { url, filename };
+        return { data: base64Pdf, filename, mimeType: 'application/pdf' };
       }),
 
     // Submit audit from file upload

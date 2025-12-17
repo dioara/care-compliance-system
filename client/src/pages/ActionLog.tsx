@@ -86,8 +86,19 @@ export default function ActionLog() {
 
   const generatePdfMutation = trpc.audits.generateActionLogPDF.useMutation({
     onSuccess: (data) => {
-      // Open PDF in new tab
-      window.open(data.url, "_blank");
+      // Download PDF from base64 data
+      const blob = new Blob(
+        [Uint8Array.from(atob(data.data), c => c.charCodeAt(0))],
+        { type: data.mimeType }
+      );
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
       toast.success("PDF report generated successfully");
     },
     onError: (error) => {
