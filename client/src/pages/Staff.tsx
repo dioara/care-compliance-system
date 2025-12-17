@@ -126,7 +126,7 @@ export default function Staff() {
       employmentDate: staffMember.employmentDate ? new Date(staffMember.employmentDate).toISOString().split('T')[0] : "",
       dbsCertificateNumber: staffMember.dbsCertificateNumber || "",
       dbsDate: staffMember.dbsDate ? new Date(staffMember.dbsDate).toISOString().split('T')[0] : "",
-      isActive: staffMember.isActive ?? true,
+      isActive: Boolean(staffMember.isActive ?? 1),
     });
     setIsEditOpen(true);
   };

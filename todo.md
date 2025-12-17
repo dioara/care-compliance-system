@@ -2218,3 +2218,7 @@
 - [x] Create MySQL datetime helper functions (toMySQLDatetime, toMySQLDate)
 - [ ] Test audit creation in production
 - [ ] Test staff record creation in production
+
+## Fix Staff Update isActive Validation Error
+- [ ] Fix isActive field type mismatch in staff.update mutation (expects boolean, receives number)
+- [ ] Test staff update in production

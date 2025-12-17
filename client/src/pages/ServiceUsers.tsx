@@ -127,7 +127,7 @@ export default function ServiceUsers() {
       dischargeDate: serviceUser.dischargeDate ? new Date(serviceUser.dischargeDate).toISOString().split('T')[0] : "",
       supportNeeds: serviceUser.supportNeeds || "",
       locationId: serviceUser.locationId || activeLocationId || 0,
-      isActive: serviceUser.isActive !== false,
+      isActive: Boolean(serviceUser.isActive ?? 1),
     });
     setIsEditOpen(true);
   };
