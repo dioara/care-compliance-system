@@ -1,123 +1,44 @@
 import { useState } from "react";
-import { Bell, AlertTriangle, ClipboardCheck, Clock, CheckCircle2, X } from "lucide-react";
+import { useLocation } from "wouter";
+import { Bell, Check, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { trpc } from "@/lib/trpc";
 import { formatDistanceToNow } from "date-fns";
 
-interface Notification {
-  id: string;
-  type: "alert" | "audit" | "action" | "reminder";
-  title: string;
-  message: string;
-  timestamp: Date;
-  read: boolean;
-  severity?: "low" | "medium" | "high" | "critical";
-  link?: string;
-}
-
 export function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
+  const [, setLocation] = useLocation();
   
-  // Fetch dashboard stats for notifications
-  const { data: dashboardStats } = trpc.dashboard.getStats.useQuery();
-  const { data: alertStatus } = trpc.notifications.getAlertStatus.useQuery({ threshold: 80 });
-  // Build notifications from real data
-  const notifications: Notification[] = [];
+  // Fetch real notifications from database
+  const { data: notifications, refetch } = trpc.notifications.list.useQuery({
+    limit: 10,
+    offset: 0,
+  });
   
-  // Add compliance alerts
-  if (alertStatus?.hasAlerts && alertStatus.alerts) {
-    alertStatus.alerts.forEach((alert, index) => {
-      notifications.push({
-        id: `alert-${index}`,
-        type: "alert",
-        title: "Compliance Alert",
-        message: alert.message,
-        timestamp: new Date(),
-        read: false,
-        severity: alert.severity === "critical" ? "critical" : "high",
-      });
-    });
-  }
+  const { data: unreadCount } = trpc.notifications.getUnreadCount.useQuery();
   
-  // Add overdue actions
-  if (dashboardStats?.overdueActions && dashboardStats.overdueActions > 0) {
-    notifications.push({
-      id: "overdue-actions",
-      type: "action",
-      title: "Overdue Actions",
-      message: `You have ${dashboardStats.overdueActions} overdue action${dashboardStats.overdueActions > 1 ? "s" : ""} that need attention`,
-      timestamp: new Date(),
-      read: false,
-      severity: "high",
-      link: "/action-log",
-    });
-  }
+  const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
+    onSuccess: () => {
+      refetch();
+    },
+  });
   
-  // Add upcoming audits
-  if (dashboardStats?.upcomingAudits && dashboardStats.upcomingAudits > 0) {
-    notifications.push({
-      id: "upcoming-audits",
-      type: "audit",
-      title: "Upcoming Audits",
-      message: `${dashboardStats.upcomingAudits} audit${dashboardStats.upcomingAudits > 1 ? "s" : ""} scheduled in the next 7 days`,
-      timestamp: new Date(),
-      read: false,
-      severity: "medium",
-      link: "/audits",
-    });
-  }
-  
-  // Add recent incidents
-  if (dashboardStats?.recentIncidents && dashboardStats.recentIncidents > 0) {
-    notifications.push({
-      id: "recent-incidents",
-      type: "alert",
-      title: "Recent Incidents",
-      message: `${dashboardStats.recentIncidents} incident${dashboardStats.recentIncidents > 1 ? "s" : ""} reported this month`,
-      timestamp: new Date(),
-      read: false,
-      severity: "medium",
-      link: "/incidents",
-    });
-  }
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const getIcon = (type: string, severity?: string) => {
-    switch (type) {
-      case "alert":
-        return <AlertTriangle className={`h-4 w-4 ${severity === "critical" ? "text-red-500" : "text-orange-500"}`} />;
-      case "audit":
-        return <ClipboardCheck className="h-4 w-4 text-blue-500" />;
-      case "action":
-        return <Clock className="h-4 w-4 text-amber-500" />;
-      case "reminder":
-        return <Bell className="h-4 w-4 text-primary" />;
-      default:
-        return <Bell className="h-4 w-4 text-muted-foreground" />;
-    }
+  const handleMarkAsRead = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    markAsReadMutation.mutate({ id });
   };
-
-  const getSeverityColor = (severity?: string) => {
-    switch (severity) {
-      case "critical":
-        return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
-      case "high":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400";
-      case "medium":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400";
-      case "low":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
-      default:
-        return "bg-muted text-muted-foreground";
-    }
+  
+  const handleViewAll = () => {
+    setIsOpen(false);
+    setLocation("/notifications");
   };
 
   return (
@@ -125,7 +46,7 @@ export function NotificationCenter() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-lg hover:bg-accent">
           <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
+          {unreadCount && unreadCount > 0 && (
             <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center animate-pulse">
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
@@ -137,7 +58,7 @@ export function NotificationCenter() {
           <div className="flex items-center gap-2">
             <Bell className="h-4 w-4 text-primary" />
             <h3 className="font-semibold text-sm">Notifications</h3>
-            {unreadCount > 0 && (
+            {unreadCount && unreadCount > 0 && (
               <Badge variant="secondary" className="text-xs">
                 {unreadCount} new
               </Badge>
@@ -146,14 +67,14 @@ export function NotificationCenter() {
         </div>
         
         <ScrollArea className="max-h-[400px]">
-          {notifications.length === 0 ? (
+          {!notifications || notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
               <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
-                <CheckCircle2 className="h-6 w-6 text-green-500" />
+                <Bell className="h-6 w-6 text-muted-foreground" />
               </div>
-              <p className="text-sm font-medium">All caught up!</p>
+              <p className="text-sm font-medium">No notifications</p>
               <p className="text-xs text-muted-foreground mt-1">
-                No new notifications at this time
+                You're all caught up!
               </p>
             </div>
           ) : (
@@ -161,42 +82,42 @@ export function NotificationCenter() {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`px-4 py-3 hover:bg-accent/50 transition-colors cursor-pointer ${
-                    !notification.read ? "bg-primary/5" : ""
+                  className={`px-4 py-3 hover:bg-accent/50 transition-colors ${
+                    !notification.isRead ? "bg-primary/5 border-l-2 border-l-primary" : ""
                   }`}
-                  onClick={() => {
-                    if (notification.link) {
-                      window.location.href = notification.link;
-                    }
-                  }}
                 >
                   <div className="flex gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      {getIcon(notification.type, notification.severity)}
-                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-medium truncate">
-                          {notification.title}
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="text-sm font-medium">
+                          {notification.title || "Notification"}
                         </p>
-                        {notification.severity && (
-                          <Badge className={`text-[10px] px-1.5 py-0 ${getSeverityColor(notification.severity)}`}>
-                            {notification.severity}
-                          </Badge>
+                        {!notification.isRead && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs"
+                            onClick={(e) => handleMarkAsRead(e, notification.id)}
+                          >
+                            <Check className="h-3 w-3 mr-1" />
+                            Mark read
+                          </Button>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {notification.message}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-1.5">
-                        {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
-                      </p>
-                    </div>
-                    {!notification.read && (
-                      <div className="flex-shrink-0">
-                        <div className="h-2 w-2 rounded-full bg-primary" />
+                      {notification.message && (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                          {notification.message}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                          {notification.notificationType.replace(/_/g, " ")}
+                        </Badge>
+                        <p className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                        </p>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -204,12 +125,21 @@ export function NotificationCenter() {
           )}
         </ScrollArea>
         
-        {notifications.length > 0 && (
-          <div className="px-4 py-3 border-t bg-muted/30">
-            <Button variant="ghost" size="sm" className="w-full text-xs">
-              View all notifications
-            </Button>
-          </div>
+        {notifications && notifications.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="px-4 py-3 bg-muted/30">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full text-xs"
+                onClick={handleViewAll}
+              >
+                <Eye className="h-3 w-3 mr-2" />
+                View all notifications
+              </Button>
+            </div>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

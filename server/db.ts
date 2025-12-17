@@ -2798,3 +2798,87 @@ export async function getAllAuditInstancesForReminders(startDate: Date, endDate:
       )
     );
 }
+
+// ============================================
+// Notifications
+// ============================================
+
+export async function getUserNotifications(
+  userId: number,
+  limit: number = 20,
+  offset: number = 0,
+  unreadOnly: boolean = false
+) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const conditions = [eq(notifications.userId, userId)];
+  if (unreadOnly) {
+    conditions.push(eq(notifications.isRead, false));
+  }
+  
+  return db
+    .select()
+    .from(notifications)
+    .where(and(...conditions))
+    .orderBy(desc(notifications.createdAt))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getUnreadNotificationCount(userId: number) {
+  const db = await getDb();
+  if (!db) return 0;
+  
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(notifications)
+    .where(
+      and(
+        eq(notifications.userId, userId),
+        eq(notifications.isRead, false)
+      )
+    );
+  
+  return result[0]?.count || 0;
+}
+
+export async function markNotificationAsRead(notificationId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+  
+  await db
+    .update(notifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(
+      and(
+        eq(notifications.id, notificationId),
+        eq(notifications.userId, userId)
+      )
+    );
+  
+  return { success: true };
+}
+
+export async function markAllNotificationsAsRead(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+  
+  await db
+    .update(notifications)
+    .set({
+      isRead: true,
+      readAt: new Date(),
+    })
+    .where(
+      and(
+        eq(notifications.userId, userId),
+        eq(notifications.isRead, false)
+      )
+    );
+  
+  return { success: true };
+}

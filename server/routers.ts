@@ -204,6 +204,40 @@ export const appRouter = router({
           }
         };
       }),
+
+    // Get user notifications
+    list: protectedProcedure
+      .input(z.object({
+        limit: z.number().min(1).max(100).default(20),
+        offset: z.number().min(0).default(0),
+        unreadOnly: z.boolean().default(false),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const limit = input?.limit ?? 20;
+        const offset = input?.offset ?? 0;
+        const unreadOnly = input?.unreadOnly ?? false;
+        
+        return db.getUserNotifications(ctx.user.id, limit, offset, unreadOnly);
+      }),
+
+    // Get unread count
+    getUnreadCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getUnreadNotificationCount(ctx.user.id);
+      }),
+
+    // Mark notification as read
+    markAsRead: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return db.markNotificationAsRead(input.id, ctx.user.id);
+      }),
+
+    // Mark all notifications as read
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return db.markAllNotificationsAsRead(ctx.user.id);
+      }),
   }),
 
   // Admin dashboard (super admin only)

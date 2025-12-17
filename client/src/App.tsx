@@ -46,6 +46,7 @@ import EmailSettings from "./pages/EmailSettings";
 import AcceptInvitation from "./pages/AcceptInvitation";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ErrorMonitoring from "./pages/ErrorMonitoring";
+import Notifications from "./pages/Notifications";
 
 function Router() {
   return (
@@ -83,6 +84,12 @@ function Router() {
       <Route path="/settings">
         <DashboardLayout>
           <Settings />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/notifications">
+        <DashboardLayout>
+          <Notifications />
         </DashboardLayout>
       </Route>
       

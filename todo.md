@@ -2043,3 +2043,15 @@
 - [ ] Test authentication flow without Manus
 - [ ] Push changes to GitHub
 - [ ] Verify Railway deployment works without Manus variables
+
+
+## Notification System Improvements (Dec 2025)
+- [x] Add isRead field to notifications table schema
+- [x] Create markAsRead backend procedure
+- [x] Create markAllAsRead backend procedure
+- [x] Build dedicated notifications page (/notifications)
+- [x] Add mark as read button to notification dropdown items
+- [x] Add "View all notifications" link to dropdown
+- [x] Update notification count to show only unread
+- [ ] Test mark as read functionality
+- [ ] Create checkpoint
