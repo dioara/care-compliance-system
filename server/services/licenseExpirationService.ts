@@ -65,7 +65,7 @@ export async function checkExpiringSubscriptions() {
         .where(
           and(
             eq(users.tenantId, subscription.tenantId),
-            eq(users.superAdmin, true)
+            eq(users.superAdmin, 1)
           )
         );
 

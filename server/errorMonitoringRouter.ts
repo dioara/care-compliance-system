@@ -11,7 +11,7 @@ import * as errorService from "./services/errorLoggingService";
 
 // Super admin middleware
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  if (!ctx.user.superAdmin) {
+  if (ctx.user.superAdmin !== 1) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "Only super admins can access error monitoring",

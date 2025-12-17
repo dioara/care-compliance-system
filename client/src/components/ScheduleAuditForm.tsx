@@ -79,7 +79,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
           <SelectContent>
             {(auditTypes || []).map((type) => (
               <SelectItem key={type.id} value={type.id.toString()}>
-                {type.auditName || type.name}
+                {type.auditName || type.auditName}
               </SelectItem>
             ))}
           </SelectContent>

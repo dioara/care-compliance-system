@@ -168,7 +168,7 @@ export async function getUsersByTenant(tenantId: number) {
   // Add hasLicense field to each user
   return allUsers.map(user => ({
     ...user,
-    hasLicense: Boolean(user.superAdmin) || licensedUserIds.has(user.id)
+    hasLicense: Boolean(user.superAdmin === 1) || licensedUserIds.has(user.id)
   }));
 }
 
@@ -2347,7 +2347,7 @@ export async function getAdminDashboardStats(tenantId: number) {
   // Get super admin count
   const superAdminResult = await db.select({ count: sql<number>`COUNT(*)` })
     .from(users)
-    .where(and(eq(users.tenantId, tenantId), eq(users.superAdmin, true)));
+    .where(and(eq(users.tenantId, tenantId), eq(users.superAdmin, 1)));
   const superAdminCount = superAdminResult[0]?.count || 0;
   
   // Get recent signups (last 7 days)
@@ -2560,7 +2560,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
           </div>
         </div>
       `,
-      isDefault: true,
+      isDefault: 1,
       isActive: 1,
     },
     {
@@ -2586,7 +2586,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
           </div>
         </div>
       `,
-      isDefault: true,
+      isDefault: 1,
       isActive: 1,
     },
     {
@@ -2613,7 +2613,7 @@ export async function createDefaultEmailTemplates(tenantId: number) {
           </div>
         </div>
       `,
-      isDefault: true,
+      isDefault: 1,
       isActive: 1,
     },
   ];

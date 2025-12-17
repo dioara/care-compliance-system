@@ -491,7 +491,7 @@ export default function ActionLog() {
                   <SelectContent>
                     {staff.map((person) => (
                       <SelectItem key={person.id} value={person.id.toString()}>
-                        {person.firstName} {person.lastName}
+                        {person.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

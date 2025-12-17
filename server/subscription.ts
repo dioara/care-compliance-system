@@ -559,7 +559,7 @@ export const subscriptionRouter = router({
 
   checkUserLicense: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user?.tenantId) return { hasLicense: false, reason: "No company associated" };
-    if (ctx.user.role === "admin" || ctx.user.superAdmin) return { hasLicense: true, reason: "Admin access" };
+    if (ctx.user.role === "admin" || ctx.user.superAdmin === 1) return { hasLicense: true, reason: "Admin access" };
     
     const db = await requireDb();
     const [license] = await db.select().from(userLicenses)

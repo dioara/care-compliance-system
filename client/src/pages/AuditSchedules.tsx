@@ -45,7 +45,7 @@ export default function AuditSchedules() {
   );
 
   const { data: auditTypes } = trpc.audits.getAuditTypes.useQuery();
-  const { data: locations } = trpc.locations.getByTenant.useQuery(
+  const { data: locations } = trpc.locations.list.useQuery(
     { tenantId: user?.tenantId || 0 },
     { enabled: !!user?.tenantId }
   );
@@ -140,7 +140,7 @@ export default function AuditSchedules() {
       nextAuditDue: schedule.schedule.nextAuditDue
         ? new Date(schedule.schedule.nextAuditDue).toISOString().split("T")[0]
         : "",
-      reminderDays: schedule.schedule.reminderDays?.toString() || "7",
+      reminderDays: schedule.schedule.reminderDaysBefore?.toString() || "7",
       isActive: schedule.schedule.isActive,
     });
     setIsEditOpen(true);
@@ -244,7 +244,7 @@ export default function AuditSchedules() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
-                      <span>Reminder: {item.schedule.reminderDays || 7} days before</span>
+                      <span>Reminder: {item.schedule.reminderDaysBefore || 7} days before</span>
                     </div>
                   </div>
                 </div>

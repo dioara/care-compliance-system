@@ -310,6 +310,23 @@ export const authRouter = router({
       return { success: true, message: "Password has been reset successfully" };
     }),
 
+  // Get 2FA status
+  get2FAStatus: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user?.id) {
+      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
+    }
+
+    const user = await db.getUserById(ctx.user.id);
+    if (!user) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    }
+
+    return {
+      enabled: Boolean(user.twoFaEnabled),
+      verified: Boolean(user.twoFaVerified),
+    };
+  }),
+
   // Setup 2FA - Generate QR code
   setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
     if (!ctx.user?.id) {

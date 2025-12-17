@@ -15,7 +15,7 @@ import { format } from "date-fns";
 
 // Super admin middleware - only allows super admins to access
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  if (!ctx.user.superAdmin) {
+  if (ctx.user.superAdmin !== 1) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "Only super admins can perform this action",
@@ -445,10 +445,10 @@ export const appRouter = router({
         const serviceUser = await db.createServiceUser({
           ...input,
           tenantId: ctx.user.tenantId,
-          dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth) : null,
-          admissionDate: input.admissionDate ? new Date(input.admissionDate) : null,
-          dischargeDate: input.dischargeDate ? new Date(input.dischargeDate) : null,
-          isActive: input.isActive ?? true,
+          dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth).toISOString() : null,
+          admissionDate: input.admissionDate ? new Date(input.admissionDate).toISOString() : null,
+          dischargeDate: input.dischargeDate ? new Date(input.dischargeDate).toISOString() : null,
+          isActive: input.isActive ?? 1,
         });
 
         return serviceUser;
@@ -472,9 +472,9 @@ export const appRouter = router({
         const { id, ...data } = input;
         await db.updateServiceUser(id, {
           ...data,
-          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
-          admissionDate: data.admissionDate ? new Date(data.admissionDate) : undefined,
-          dischargeDate: data.dischargeDate ? new Date(data.dischargeDate) : undefined,
+          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : undefined,
+          admissionDate: data.admissionDate ? new Date(data.admissionDate).toISOString() : undefined,
+          dischargeDate: data.dischargeDate ? new Date(data.dischargeDate).toISOString() : undefined,
         });
         return { success: true };
       }),
@@ -573,9 +573,9 @@ export const appRouter = router({
           ...input,
           tenantId: ctx.user.tenantId,
           employmentType: input.employmentType || "permanent_not_sponsored",
-          employmentDate: input.employmentDate ? new Date(input.employmentDate) : null,
-          dbsDate: input.dbsDate ? new Date(input.dbsDate) : null,
-          isActive: input.isActive ?? true,
+          employmentDate: input.employmentDate ? new Date(input.employmentDate).toISOString() : null,
+          dbsDate: input.dbsDate ? new Date(input.dbsDate).toISOString() : null,
+          isActive: input.isActive ?? 1,
         });
 
         return staff;
@@ -599,8 +599,8 @@ export const appRouter = router({
         const { id, ...data } = input;
         await db.updateStaffMember(id, {
           ...data,
-          employmentDate: data.employmentDate ? new Date(data.employmentDate) : undefined,
-          dbsDate: data.dbsDate ? new Date(data.dbsDate) : undefined,
+          employmentDate: data.employmentDate ? new Date(data.employmentDate).toISOString() : undefined,
+          dbsDate: data.dbsDate ? new Date(data.dbsDate).toISOString() : undefined,
         });
         return { success: true };
       }),
@@ -1009,7 +1009,11 @@ export const appRouter = router({
       )
       .mutation(async ({ input }) => {
         console.log('[saveResponse] Received input:', JSON.stringify(input, null, 2));
-        const responseId = await db.saveAuditResponse(input);
+        const responseId = await db.saveAuditResponse({
+          ...input,
+          isCompliant: input.isCompliant !== undefined ? (input.isCompliant ? 1 : 0) : undefined,
+          targetDate: input.targetDate ? input.targetDate.toISOString() : undefined,
+        });
         console.log('[saveResponse] Saved with ID:', responseId);
         return { id: responseId };
       }),
@@ -1040,7 +1044,10 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
-        const actionPlanId = await db.createAuditActionPlan(input);
+        const actionPlanId = await db.createAuditActionPlan({
+          ...input,
+          targetCompletionDate: input.targetCompletionDate.toISOString(),
+        });
         return { id: actionPlanId };
       }),
 
@@ -2686,6 +2693,48 @@ export const appRouter = router({
             message: error instanceof Error ? error.message : "Failed to process document",
           });
         }
+      }),
+  }),
+
+  // AI Audit Schedules
+  aiAuditSchedules: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) return [];
+      return db.getAiAuditSchedulesByTenant(ctx.user.tenantId);
+    }),
+
+    create: protectedProcedure
+      .input(z.object({
+        locationId: z.number(),
+        serviceUserId: z.number().optional(),
+        auditType: z.enum(['care_plan', 'daily_notes']),
+        scheduleName: z.string(),
+        frequency: z.enum(['weekly', 'fortnightly', 'monthly', 'quarterly', 'annually']),
+        dayOfWeek: z.number().optional(),
+        dayOfMonth: z.number().optional(),
+        monthOfYear: z.number().optional(),
+        nextDueDate: z.string(),
+        notifyEmail: z.string().optional(),
+        reminderDaysBefore: z.number().default(3),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.createAiAuditSchedule({
+          ...input,
+          tenantId: ctx.user.tenantId,
+          createdById: ctx.user.id,
+        });
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.deleteAiAuditSchedule(input.id, ctx.user.tenantId);
       }),
   }),
 

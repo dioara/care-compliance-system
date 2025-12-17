@@ -177,7 +177,7 @@ export async function resolveError(errorId: number, resolvedBy: number) {
 
   await db.update(errorLogs)
     .set({
-      resolved: true,
+      resolved: 1,
       resolvedAt: new Date(),
       resolvedBy
     })

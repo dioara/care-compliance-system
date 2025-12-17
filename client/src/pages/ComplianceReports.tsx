@@ -24,12 +24,12 @@ export default function ComplianceReports() {
   const [selectedLocations, setSelectedLocations] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { data: locations } = trpc.locations.getByTenant.useQuery(
+  const { data: locations } = trpc.locations.list.useQuery(
     { tenantId: user?.tenantId || 0 },
     { enabled: !!user?.tenantId }
   );
 
-  const { data: companyProfile } = trpc.companyProfile.get.useQuery(
+  const { data: companyProfile } = trpc.company.get.useQuery(
     { tenantId: user?.tenantId || 0 },
     { enabled: !!user?.tenantId }
   );

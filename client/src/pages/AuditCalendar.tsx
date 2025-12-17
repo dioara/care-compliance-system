@@ -413,7 +413,7 @@ export default function AuditCalendar() {
         <div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Audit Calendar</h1>
           <p className="text-muted-foreground">
-            {activeLocation ? `Schedule and track audits for ${activeLocation.locationName}` : 'Select a location to view audits'}
+            {activeLocation ? `Schedule and track audits for ${activeLocation.name}` : 'Select a location to view audits'}
           </p>
         </div>
         <div className="flex gap-2">

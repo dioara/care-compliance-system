@@ -117,7 +117,7 @@ async function sendSecurityAlert(event: SecurityEvent): Promise<void> {
     
     // Get all super admin users
     const admins = await db.getUsersByTenant(1); // Adjust based on your tenant structure
-    const superAdmins = admins.filter((user) => user.superAdmin);
+    const superAdmins = admins.filter((user) => user.superAdmin === 1);
     
     if (superAdmins.length === 0) {
       console.warn("No super admins found to send security alert");

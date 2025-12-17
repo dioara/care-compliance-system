@@ -5,7 +5,7 @@ import * as db from "./db";
 
 // Middleware to check if user is super admin
 const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
-  if (!ctx.user.superAdmin) {
+  if (ctx.user.superAdmin !== 1) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "Only super admins can perform this action",
@@ -134,7 +134,7 @@ export const rolesRouter = router({
 
   getMyPermissions: protectedProcedure.query(async ({ ctx }) => {
     // Super admins have access to all locations
-    if (ctx.user.superAdmin) {
+    if (ctx.user.superAdmin === 1) {
       if (!ctx.user.tenantId) {
         return [];
       }

@@ -2114,3 +2114,15 @@
 - [x] Fix Stripe webhook current_period_start and current_period_end type errors
 - [x] Fix Stripe invoice.subscription type errors
 - [x] Fix all remaining TypeScript errors (reduced from 245 to 162) - superAdmin type mismatches, Drizzle ORM issues, and other type inconsistencies
+
+
+## URGENT: Fix Remaining 162 TypeScript Errors
+- [x] Fix all superAdmin field queries to use numeric comparison (0/1) instead of boolean in db.ts
+- [x] Fix all superAdmin field queries in routers.ts and auth.ts
+- [x] Fix client-side property mismatches (firstName/lastName, locationName, name vs auditName)
+- [x] Complete Date to string conversions in service users and staff (partial - 23 errors fixed)
+- [x] Add missing router procedures (get2FAStatus, aiAuditSchedules)
+- [x] Fix boolean to tinyint conversions (isActive, receiveAlerts, etc.)
+- [x] Fix router name corrections (companyProfile → company, locations.getByTenant → list)
+- [ ] Continue fixing remaining 139 TypeScript errors (complex type conversions, Drizzle ORM timestamp issues)
+- [ ] Test all functionality after fixes
