@@ -1584,25 +1584,18 @@ export const appRouter = router({
         }
         
         console.log('[PDF Export] Fetching audits for location:', input.locationId, 'from', input.startDate, 'to', input.endDate);
+        
         const audits = await database
           .select({
             id: auditInstances.id,
             auditName: auditTypes.auditName,
             scheduledDate: auditInstances.scheduledDate,
             status: auditInstances.status,
-            auditorName: sql<string | null>`auditor.name`,
-            serviceUserName: sql<string | null>`service_user.name`,
+            auditorId: auditInstances.assignedAuditorId,
+            serviceUserId: auditInstances.serviceUserId,
           })
           .from(auditInstances)
           .leftJoin(auditTypes, eq(auditInstances.auditTypeId, auditTypes.id))
-          .leftJoin(
-            staffMembers.as('auditor'),
-            eq(auditInstances.assignedAuditorId, staffMembers.id)
-          )
-          .leftJoin(
-            serviceUsers.as('service_user'),
-            eq(auditInstances.serviceUserId, serviceUsers.id)
-          )
           .where(
             and(
               eq(auditInstances.locationId, input.locationId),
@@ -1614,13 +1607,42 @@ export const appRouter = router({
 
         console.log('[PDF Export] Found', audits.length, 'audits');
         
+        // Fetch names separately for auditors and service users
+        const auditsWithNames = await Promise.all(
+          audits.map(async (audit) => {
+            let auditorName: string | null = null;
+            let serviceUserName: string | null = null;
+            
+            if (audit.auditorId) {
+              const auditor = await db.getStaffMemberById(audit.auditorId);
+              auditorName = auditor?.name || null;
+            }
+            
+            if (audit.serviceUserId) {
+              const serviceUser = await db.getServiceUserById(audit.serviceUserId);
+              serviceUserName = serviceUser?.name || null;
+            }
+            
+            return {
+              id: audit.id,
+              auditName: audit.auditName,
+              scheduledDate: audit.scheduledDate,
+              status: audit.status,
+              auditorName,
+              serviceUserName,
+            };
+          })
+        );
+        
+        console.log('[PDF Export] Enriched with names');
+        
         // Generate PDF
         console.log('[PDF Export] Generating PDF...');
         const pdfBuffer = await generateCalendarPdf({
           locationName: location.name,
           startDate: new Date(input.startDate),
           endDate: new Date(input.endDate),
-          audits: audits.map(a => ({
+          audits: auditsWithNames.map(a => ({
             ...a,
             scheduledDate: a.scheduledDate.toISOString(),
           })),
