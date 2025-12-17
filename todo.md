@@ -2281,3 +2281,17 @@
 - [ ] Test incident creation with various date/time combinations
 - [ ] Test audit scheduling with past dates (should show error)
 - [ ] Test conducting audit on past scheduled audits (should be read-only)
+
+## Incident Report Enhancements - Signatures and Attachments
+- [x] Review current incident database schema for signatures and attachments tables
+- [x] Signature capture component already exists (IncidentSignatures) with canvas drawing
+- [x] File upload component already exists (IncidentAttachments) with S3 integration
+- [x] Components integrated in incident detail view
+- [x] PDF export includes digital signatures with signature images
+- [x] PDF export includes attachment list with file names and descriptions
+- [x] Backend properly fetches attachments and signatures for single incident PDFs
+- [x] Support for manager, reviewer, and witness signature types
+- [x] File upload supports images, PDFs, Word documents (max 10MB)
+- [ ] Test signature capture on mobile and desktop
+- [ ] Test file upload with various formats
+- [ ] Verify signatures and attachments appear correctly in exported PDFs
