@@ -29,8 +29,8 @@ export default function ComplianceReports() {
     { enabled: !!user?.tenantId }
   );
 
-  const { data: companyProfile } = trpc.company.get.useQuery(
-    { tenantId: user?.tenantId || 0 },
+  const { data: companyProfile } = trpc.company.getProfile.useQuery(
+    undefined,
     { enabled: !!user?.tenantId }
   );
 

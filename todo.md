@@ -2206,3 +2206,7 @@
 - [x] Remove S3 storage dependency from export endpoints
 - [ ] Test PDF download in production
 - [ ] Test Excel download in production
+
+## Fix Audit Start Error
+- [ ] Fix missing company.get tRPC procedure error when starting audits
+- [ ] Test audit start functionality in production
