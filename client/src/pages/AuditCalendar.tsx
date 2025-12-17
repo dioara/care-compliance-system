@@ -743,7 +743,7 @@ export default function AuditCalendar() {
               {getAuditsForDate(selectedDate).length > 0 && (
                 <div>
                   <h3 className="font-semibold mb-2">Scheduled Audits</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
                     {getAuditsForDate(selectedDate).map((audit) => (
                       <div key={audit.id} className="p-3 border rounded-lg flex items-center justify-between">
                         <div>
@@ -753,7 +753,7 @@ export default function AuditCalendar() {
                           </p>
                         </div>
                         <Button size="sm" variant="outline" asChild>
-                          <a href={`/audits/${audit.id}`}>View</a>
+                          <a href={`/conduct-audit/${audit.id}`}>View</a>
                         </Button>
                       </div>
                     ))}

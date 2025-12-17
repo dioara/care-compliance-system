@@ -1459,7 +1459,7 @@ export const appRouter = router({
                   locationId: input.locationId,
                   auditTypeId: suggestion.auditTypeId,
                   auditTemplateId: template.id,
-                  auditDate: new Date(suggestion.suggestedDate),
+                  auditDate: toMySQLDate(suggestion.suggestedDate),
                   auditorId: ctx.user.id,
                   auditorName: ctx.user.name || undefined,
                   auditorRole: ctx.user.role || undefined,
@@ -1477,13 +1477,12 @@ export const appRouter = router({
                   locationId: input.locationId,
                   auditTypeId: suggestion.auditTypeId,
                   auditTemplateId: template.id,
-                  auditDate: new Date(suggestion.suggestedDate),
+                  auditDate: toMySQLDate(suggestion.suggestedDate),
                   auditorId: ctx.user.id,
                   auditorName: ctx.user.name || undefined,
                   auditorRole: ctx.user.role || undefined,
-                  status: 'in_progress',
-                  serviceUserId: user.id,
-                });
+                  serviceUserId: suggestion.serviceUserId,
+                  status: 'in_progress',});
                 createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId, serviceUserId: user.id });
               }
             }
@@ -1494,7 +1493,7 @@ export const appRouter = router({
                 locationId: input.locationId,
                 auditTypeId: suggestion.auditTypeId,
                 auditTemplateId: template.id,
-                auditDate: new Date(suggestion.suggestedDate),
+                auditDate: toMySQLDate(suggestion.suggestedDate),
                 auditorId: ctx.user.id,
                 auditorName: ctx.user.name || undefined,
                 auditorRole: ctx.user.role || undefined,
@@ -1590,7 +1589,7 @@ export const appRouter = router({
           locationId: input.locationId,
           auditTypeId: input.auditTypeId,
           auditTemplateId: template.id,
-          auditDate: new Date(input.scheduledDate),
+          auditDate: toMySQLDate(input.scheduledDate),
           auditorId: input.auditorId || ctx.user.id,
           auditorName: ctx.user.name || undefined,
           auditorRole: ctx.user.role || undefined,

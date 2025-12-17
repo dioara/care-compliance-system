@@ -2220,5 +2220,23 @@
 - [ ] Test staff record creation in production
 
 ## Fix Staff Update isActive Validation Error
-- [ ] Fix isActive field type mismatch in staff.update mutation (expects boolean, receives number)
+- [x] Fix isActive field type mismatch in staff.update mutation (expects boolean, receives number)
+- [x] Applied fix to ServiceUsers as well for consistency
 - [ ] Test staff update in production
+- [ ] Test service user update in production
+
+## Fix Calendar UI/UX Issues
+- [x] Add scrollable container for scheduled audits list (currently goes out of frame)
+- [x] Set max-height of 400px with overflow-y-auto for scrolling
+- [x] Improve modal height/overflow handling
+
+## Fix Audit View Navigation
+- [x] Fix 404 error when clicking "View" on in-progress audits
+- [x] Changed route from /audits/:id to /conduct-audit/:id
+- [x] Now correctly navigates to continue audit page
+
+## Fix Schedule Audit Not Appearing on Calendar
+- [x] Fixed auditDate format in scheduleAudit mutation (was Date object, now MySQL date string)
+- [x] Fixed auditDate format in auto-schedule suggestions (3 occurrences)
+- [x] Calendar already has proper invalidation on success
+- [x] All audit date insertions now use toMySQLDate() helper
