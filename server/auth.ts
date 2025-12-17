@@ -4,6 +4,7 @@ import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import jwt from "jsonwebtoken";
 import { startFreeTrial } from "./subscription";
+import { ERROR_MESSAGES, sanitizeError } from "./_core/errorMessages";
 import { trackFailedLogin, resetFailedLoginAttempts, logSecurityEvent } from "./services/securityMonitoringService";
 import { 
   generateTwoFactorSecret, 
@@ -34,7 +35,7 @@ export const authRouter = router({
       if (existingUser) {
         throw new TRPCError({
           code: "CONFLICT",
-          message: "User with this email already exists",
+          message: ERROR_MESSAGES.USER_EMAIL_EXISTS,
         });
       }
 
@@ -94,7 +95,7 @@ export const authRouter = router({
         trackFailedLogin(input.email, ipAddress);
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Invalid email or password",
+          message: ERROR_MESSAGES.AUTH_INVALID,
         });
       }
 
@@ -105,7 +106,7 @@ export const authRouter = router({
         trackFailedLogin(input.email, ipAddress);
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Invalid email or password",
+          message: ERROR_MESSAGES.AUTH_INVALID,
         });
       }
       
@@ -179,7 +180,7 @@ export const authRouter = router({
       if (!ctx.user?.id) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Not authenticated",
+          message: ERROR_MESSAGES.AUTH_REQUIRED,
         });
       }
       await db.updateUserProfile(ctx.user.id, { name: input.name });
@@ -211,7 +212,7 @@ export const authRouter = router({
       } catch (error: any) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: error.message || "Failed to update password",
+          message: ERROR_MESSAGES.USER_PASSWORD_INCORRECT,
         });
       }
     }),
@@ -264,7 +265,7 @@ export const authRouter = router({
       if (!tokenRecord) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Invalid or expired reset token",
+          message: ERROR_MESSAGES.AUTH_SESSION_EXPIRED,
         });
       }
 
@@ -285,7 +286,7 @@ export const authRouter = router({
       if (!tokenRecord) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Invalid or expired reset token",
+          message: ERROR_MESSAGES.AUTH_SESSION_EXPIRED,
         });
       }
 
@@ -301,7 +302,7 @@ export const authRouter = router({
   // Setup 2FA - Generate secret and QR code
   setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
     if (!ctx.user?.id) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
     }
 
     const speakeasy = await import("speakeasy");
@@ -334,7 +335,7 @@ export const authRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
       }
 
       const user = await db.getUserById(ctx.user.id);
@@ -356,7 +357,7 @@ export const authRouter = router({
       if (!verified) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invalid verification code",
+          message: ERROR_MESSAGES.TWO_FA_INVALID_CODE,
         });
       }
 
@@ -375,14 +376,14 @@ export const authRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
       }
 
       const user = await db.getUserById(ctx.user.id);
       if (!user || !user.twoFaSecret) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "2FA is not enabled",
+          message: ERROR_MESSAGES.TWO_FA_NOT_ENABLED,
         });
       }
 
@@ -397,7 +398,7 @@ export const authRouter = router({
       if (!verified) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Invalid verification code",
+          message: ERROR_MESSAGES.TWO_FA_INVALID_CODE,
         });
       }
 
@@ -410,7 +411,7 @@ export const authRouter = router({
   // Get 2FA status
   get2FAStatus: protectedProcedure.query(async ({ ctx }) => {
     if (!ctx.user?.id) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
     }
 
     const user = await db.getUserById(ctx.user.id);
@@ -423,12 +424,12 @@ export const authRouter = router({
   // Setup 2FA - Generate QR code
   setup2FA: protectedProcedure.mutation(async ({ ctx }) => {
     if (!ctx.user?.id) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+      throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
     }
 
     const user = await db.getUserById(ctx.user.id);
     if (!user) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      throw new TRPCError({ code: "NOT_FOUND", message: ERROR_MESSAGES.USER_NOT_FOUND });
     }
 
     // Generate new secret
@@ -457,7 +458,7 @@ export const authRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
       }
 
       const user = await db.getUserById(ctx.user.id);
@@ -512,12 +513,12 @@ export const authRouter = router({
     }))
     .mutation(async ({ ctx, input }) => {
       if (!ctx.user?.id) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+        throw new TRPCError({ code: "UNAUTHORIZED", message: ERROR_MESSAGES.AUTH_REQUIRED });
       }
 
       const user = await db.getUserById(ctx.user.id);
       if (!user) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        throw new TRPCError({ code: "NOT_FOUND", message: ERROR_MESSAGES.USER_NOT_FOUND });
       }
 
       // Verify password
@@ -525,7 +526,7 @@ export const authRouter = router({
       if (!isValidPassword) {
         throw new TRPCError({ 
           code: "UNAUTHORIZED", 
-          message: "Invalid password" 
+          message: ERROR_MESSAGES.USER_PASSWORD_INCORRECT 
         });
       }
 
@@ -559,7 +560,7 @@ export const authRouter = router({
       if (!user || !user.twoFaSecret) {
         throw new TRPCError({ 
           code: "UNAUTHORIZED", 
-          message: "Invalid credentials" 
+          message: ERROR_MESSAGES.AUTH_INVALID 
         });
       }
 

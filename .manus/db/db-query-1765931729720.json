@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, email, name, role, createdAt FROM users LIMIT 10",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT id, email, name, role, createdAt FROM users LIMIT 10",
+  "rows": [
+    {
+      "id": "1",
+      "email": "olufohunsi@gmail.com",
+      "name": "Tolulope Olufohunsi",
+      "role": "admin",
+      "createdAt": "2025-12-14 08:07:47"
+    },
+    {
+      "id": "30001",
+      "email": "admin@testcarehome.com",
+      "name": "Admin User",
+      "role": "admin",
+      "createdAt": "2025-12-14 08:19:04"
+    },
+    {
+      "id": "30002",
+      "email": "test-1765700456388@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "createdAt": "2025-12-14 08:20:56"
+    },
+    {
+      "id": "30003",
+      "email": "duplicate-1765700456638@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "createdAt": "2025-12-14 08:20:56"
+    },
+    {
+      "id": "30004",
+      "email": "verify-1765700456767@example.com",
+      "name": "Test User",
+      "role": "staff",
+      "createdAt": "2025-12-14 08:20:56"
+    },
+    {
+      "id": "60001",
+      "email": "verify-1765799746876@example.com",
+      "name": "Test User",
+      "role": "staff",
+      "createdAt": "2025-12-15 11:55:47"
+    },
+    {
+      "id": "150001",
+      "email": "tolufans@gmail.com",
+      "name": "Tanimola",
+      "role": "admin",
+      "createdAt": "2025-12-15 19:42:11"
+    },
+    {
+      "id": "180001",
+      "email": "lola@gmail.com",
+      "name": "John smi",
+      "role": "staff",
+      "createdAt": "2025-12-16 00:07:46"
+    },
+    {
+      "id": "210001",
+      "email": "test-1765882291027@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "createdAt": "2025-12-16 10:51:31"
+    },
+    {
+      "id": "210002",
+      "email": "duplicate-1765882291369@example.com",
+      "name": "Test User",
+      "role": "admin",
+      "createdAt": "2025-12-16 10:51:31"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\trole\tcreatedAt\n1\tolufohunsi@gmail.com\tTolulope Olufohunsi\tadmin\t2025-12-14 08:07:47\n30001\tadmin@testcarehome.com\tAdmin User\tadmin\t2025-12-14 08:19:04\n30002\ttest-1765700456388@example.com\tTest User\tadmin\t2025-12-14 08:20:56\n30003\tduplicate-1765700456638@example.com\tTest User\tadmin\t2025-12-14 08:20:56\n30004\tverify-1765700456767@example.com\tTest User\tstaff\t2025-12-14 08:20:56\n60001\tverify-1765799746876@example.com\tTest User\tstaff\t2025-12-15 11:55:47\n150001\ttolufans@gmail.com\tTanimola\tadmin\t2025-12-15 19:42:11\n180001\tlola@gmail.com\tJohn smi\tstaff\t2025-12-16 00:07:46\n210001\ttest-1765882291027@example.com\tTest User\tadmin\t2025-12-16 10:51:31\n210002\tduplicate-1765882291369@example.com\tTest User\tadmin\t2025-12-16 10:51:31\n",
+  "stderr": "",
+  "execution_time_ms": 96
+}

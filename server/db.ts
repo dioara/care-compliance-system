@@ -55,6 +55,7 @@ import {
   type InsertEmailRecipient,
   type InsertEmailTemplate,
 } from "../drizzle/schema";
+import { ERROR_MESSAGES } from "./_core/errorMessages";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -83,7 +84,7 @@ export async function createUser(data: {
   superAdmin?: boolean;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -124,7 +125,7 @@ export async function getUserById(id: number) {
 
 export async function update2FASecret(userId: number, secret: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
     .set({ twoFaSecret: secret, twoFaVerified: false })
@@ -133,7 +134,7 @@ export async function update2FASecret(userId: number, secret: string) {
 
 export async function enable2FA(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
     .set({ twoFaEnabled: true, twoFaVerified: true })
@@ -142,7 +143,7 @@ export async function enable2FA(userId: number) {
 
 export async function disable2FA(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
     .set({ twoFaEnabled: false, twoFaVerified: false, twoFaSecret: null })
@@ -172,14 +173,14 @@ export async function getUsersByTenant(tenantId: number) {
 
 export async function updateUserRole(userId: number, role: "admin" | "quality_officer" | "manager" | "staff") {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users).set({ role }).where(eq(users.id, userId));
 }
 
 export async function updateUserLastSignIn(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users).set({ lastSignedIn: new Date() }).where(eq(users.id, userId));
 }
@@ -194,7 +195,7 @@ export async function verifyPassword(password: string, hashedPassword: string) {
 
 export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Invalidate any existing tokens for this user
   await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, userId));
@@ -226,7 +227,7 @@ export async function getPasswordResetToken(token: string) {
 
 export async function markPasswordResetTokenUsed(token: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(passwordResetTokens)
     .set({ usedAt: new Date() })
@@ -235,7 +236,7 @@ export async function markPasswordResetTokenUsed(token: string) {
 
 export async function resetUserPassword(userId: number, newPassword: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await db.update(users)
@@ -259,7 +260,7 @@ export async function upsertUser(data: {
   lastSignedIn?: Date;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Check if user exists
   const existingUser = await getUserByOpenId(data.openId);
@@ -292,7 +293,7 @@ export async function upsertUser(data: {
 
 export async function createTenant(data: InsertTenant) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(tenants).values(data);
   // Return with id for MySQL
@@ -314,7 +315,7 @@ export async function getCompanyByTenantId(tenantId: number) {
 
 export async function updateTenant(id: number, data: Partial<InsertTenant>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(tenants).set(data).where(eq(tenants.id, id));
 }
@@ -325,7 +326,7 @@ export async function updateTenant(id: number, data: Partial<InsertTenant>) {
 
 export async function createLocation(data: InsertLocation) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(locations).values(data);
   return result;
@@ -371,14 +372,14 @@ export async function getLocationById(id: number) {
 
 export async function updateLocation(id: number, data: Partial<InsertLocation>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(locations).set(data).where(eq(locations.id, id));
 }
 
 export async function deleteLocation(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.delete(locations).where(eq(locations.id, id));
 }
@@ -389,7 +390,7 @@ export async function deleteLocation(id: number) {
 
 export async function createRole(data: InsertRole) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(roles).values(data);
   return result;
@@ -412,14 +413,14 @@ export async function getRoleById(id: number) {
 
 export async function updateRole(id: number, data: Partial<InsertRole>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(roles).set(data).where(eq(roles.id, id));
 }
 
 export async function deleteRole(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Delete role-location permissions
   await db.delete(roleLocationPermissions).where(eq(roleLocationPermissions.roleId, id));
@@ -437,7 +438,7 @@ export async function deleteRole(id: number) {
 
 export async function setRoleLocationPermissions(roleId: number, permissions: InsertRoleLocationPermission[]) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Delete existing permissions
   await db.delete(roleLocationPermissions).where(eq(roleLocationPermissions.roleId, roleId));
@@ -461,14 +462,14 @@ export async function getRoleLocationPermissions(roleId: number) {
 
 export async function assignUserToRole(userId: number, roleId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.insert(userRoles).values({ userId, roleId });
 }
 
 export async function removeUserFromRole(userId: number, roleId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.delete(userRoles).where(and(eq(userRoles.userId, userId), eq(userRoles.roleId, roleId)));
 }
@@ -482,7 +483,7 @@ export async function getUserRoles(userId: number) {
 
 export async function setUserRoles(userId: number, roleIds: number[]) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Delete existing role assignments
   await db.delete(userRoles).where(eq(userRoles.userId, userId));
@@ -565,7 +566,7 @@ export async function canUserWriteToLocation(userId: number, locationId: number)
 
 export async function createServiceUser(data: InsertServiceUser) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(serviceUsers).values(data);
   return result;
@@ -595,14 +596,14 @@ export async function getServiceUserById(id: number) {
 
 export async function updateServiceUser(id: number, data: Partial<InsertServiceUser>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(serviceUsers).set(data).where(eq(serviceUsers.id, id));
 }
 
 export async function deleteServiceUser(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.delete(serviceUsers).where(eq(serviceUsers.id, id));
 }
@@ -613,7 +614,7 @@ export async function deleteServiceUser(id: number) {
 
 export async function createStaffMember(data: InsertStaffMember) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(staffMembers).values(data);
   return result;
@@ -643,14 +644,14 @@ export async function getStaffMemberById(id: number) {
 
 export async function updateStaffMember(id: number, data: Partial<InsertStaffMember>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(staffMembers).set(data).where(eq(staffMembers.id, id));
 }
 
 export async function deleteStaffMember(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.delete(staffMembers).where(eq(staffMembers.id, id));
 }
@@ -670,7 +671,7 @@ export async function addStaffHistory(data: {
   notes?: string | null;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.insert(staffHistory).values(data);
 }
@@ -699,7 +700,7 @@ export async function addServiceUserHistory(data: {
   notes?: string | null;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.insert(serviceUserHistory).values(data);
 }
@@ -728,7 +729,7 @@ export async function createStaffInvitation(data: {
   createdBy?: number | null;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.insert(staffInvitationTokens).values(data);
 }
@@ -744,7 +745,7 @@ export async function getStaffInvitationByToken(token: string) {
 
 export async function markInvitationUsed(token: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(staffInvitationTokens)
     .set({ usedAt: new Date() })
@@ -816,7 +817,7 @@ export async function getComplianceAssessmentByQuestion(locationId: number, ques
 
 export async function createOrUpdateComplianceAssessment(data: any) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   // Check if assessment exists
   const existing = await getComplianceAssessmentByQuestion(data.locationId, data.questionId);
@@ -843,7 +844,7 @@ export async function getSupportingDocuments(assessmentId: number) {
 
 export async function createSupportingDocument(data: any) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(supportingDocuments).values(data);
   return result;
@@ -851,7 +852,7 @@ export async function createSupportingDocument(data: any) {
 
 export async function deleteSupportingDocument(id: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.delete(supportingDocuments).where(eq(supportingDocuments.id, id));
 }
@@ -1174,7 +1175,7 @@ export async function createAuditInstance(data: {
   status?: 'in_progress' | 'completed' | 'reviewed' | 'archived';
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const [result] = await db.insert(auditInstances).values({
     ...data,
     status: data.status || 'in_progress',
@@ -1266,7 +1267,7 @@ export async function updateAuditInstanceStatus(
   recommendations?: string
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db
     .update(auditInstances)
     .set({
@@ -1291,7 +1292,7 @@ export async function saveAuditResponse(data: {
   targetDate?: Date;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // Check if response already exists
   const [existing] = await db
@@ -1340,7 +1341,7 @@ export async function createActionPlanFromIncident(data: {
   ragStatus?: 'red' | 'amber' | 'green';
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // Use auditInstanceId = 0 to indicate this is from an incident, not an audit
   const [result] = await db.insert(auditActionPlans).values({
@@ -1374,7 +1375,7 @@ export async function createAuditActionPlan(data: {
   notes?: string;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const [result] = await db.insert(auditActionPlans).values({
     ...data,
     status: 'not_started',
@@ -1439,7 +1440,7 @@ export async function updateAuditActionPlanStatus(
   actionTaken?: string
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db
     .update(auditActionPlans)
     .set({ status, actualCompletionDate, actionTaken })
@@ -1460,7 +1461,7 @@ export async function uploadAuditEvidence(data: {
   uploadedById: number;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const [result] = await db.insert(auditEvidence).values({
     ...data,
     uploadedAt: new Date(),
@@ -1503,7 +1504,7 @@ export async function createIncident(data: {
   reportedByName?: string;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const [result] = await db.insert(incidents).values({
     ...data,
@@ -1588,7 +1589,7 @@ export async function getIncidentById(id: number) {
 
 export async function updateIncident(id: number, tenantId: number, data: Partial<typeof incidents.$inferInsert>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   await db
     .update(incidents)
@@ -1605,7 +1606,7 @@ export async function updateIncidentNotification(
   details: string
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const now = new Date();
   const updates: any = { updatedAt: now };
@@ -1652,7 +1653,7 @@ export async function updateIncidentNotificationStatus(
   details?: string
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const now = new Date();
   const updates: any = { updatedAt: now };
@@ -1693,7 +1694,7 @@ export async function updateIncidentNotificationStatus(
 
 export async function closeIncident(id: number, closedById: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   await db
     .update(incidents)
@@ -1902,7 +1903,7 @@ export async function getAuditsByType(tenantId: number) {
 
 export async function getAuditSchedulesByTenant(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db
     .select({
       schedule: auditSchedules,
@@ -1926,7 +1927,7 @@ export async function createAuditSchedule(data: {
   isActive: boolean;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(auditSchedules).values(data);
   return { id: Number(result.insertId), ...data };
 }
@@ -1941,7 +1942,7 @@ export async function updateAuditSchedule(
   }
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db
     .update(auditSchedules)
     .set({ ...data, updatedAt: new Date() })
@@ -1951,7 +1952,7 @@ export async function updateAuditSchedule(
 
 export async function deleteAuditSchedule(scheduleId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.delete(auditSchedules).where(eq(auditSchedules.id, scheduleId));
 }
 
@@ -1967,7 +1968,7 @@ export async function getComplianceReportData(
   locationIds?: number[]
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const conditions = [
     eq(auditInstances.tenantId, tenantId),
@@ -1998,7 +1999,7 @@ export async function getActionPlansForReport(
   locationIds?: number[]
 ) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const conditions = [
     eq(auditActionPlans.tenantId, tenantId),
@@ -2026,7 +2027,7 @@ export async function getActionPlansForReport(
 
 export async function createAiAudit(data: Omit<InsertAiAudit, "id" | "createdAt" | "updatedAt">) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   const result = await db.insert(aiAudits).values(data);
   return Number(result[0].insertId);
@@ -2034,7 +2035,7 @@ export async function createAiAudit(data: Omit<InsertAiAudit, "id" | "createdAt"
 
 export async function updateAiAudit(id: number, data: Partial<InsertAiAudit>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not initialized");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(aiAudits).set(data).where(eq(aiAudits.id, id));
 }
@@ -2071,20 +2072,20 @@ export async function getAiAuditsByTenant(tenantId: number, limit = 50) {
 
 export async function createAiAuditSchedule(data: InsertAiAuditSchedule) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(aiAuditSchedules).values(data);
   return { id: Number((result as any)[0].insertId), ...data };
 }
 
 export async function getAiAuditSchedulesByTenant(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(aiAuditSchedules).where(eq(aiAuditSchedules.tenantId, tenantId)).orderBy(aiAuditSchedules.nextDueDate);
 }
 
 export async function getAiAuditSchedulesByLocation(tenantId: number, locationId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(aiAuditSchedules)
     .where(and(eq(aiAuditSchedules.tenantId, tenantId), eq(aiAuditSchedules.locationId, locationId)))
     .orderBy(aiAuditSchedules.nextDueDate);
@@ -2092,7 +2093,7 @@ export async function getAiAuditSchedulesByLocation(tenantId: number, locationId
 
 export async function getAiAuditScheduleById(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const results = await db.select().from(aiAuditSchedules)
     .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
   return results[0] || null;
@@ -2100,7 +2101,7 @@ export async function getAiAuditScheduleById(id: number, tenantId: number) {
 
 export async function updateAiAuditSchedule(id: number, tenantId: number, data: Partial<InsertAiAuditSchedule>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(aiAuditSchedules)
     .set({ ...data, updatedAt: new Date() })
     .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
@@ -2109,14 +2110,14 @@ export async function updateAiAuditSchedule(id: number, tenantId: number, data: 
 
 export async function deleteAiAuditSchedule(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.delete(aiAuditSchedules)
     .where(and(eq(aiAuditSchedules.id, id), eq(aiAuditSchedules.tenantId, tenantId)));
 }
 
 export async function getOverdueAiAuditSchedules(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const today = new Date().toISOString().split('T')[0];
   return db.select().from(aiAuditSchedules)
     .where(and(
@@ -2129,7 +2130,7 @@ export async function getOverdueAiAuditSchedules(tenantId: number) {
 
 export async function getUpcomingAiAuditSchedules(tenantId: number, daysAhead: number = 7) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const today = new Date();
   const futureDate = new Date(today);
   futureDate.setDate(futureDate.getDate() + daysAhead);
@@ -2152,14 +2153,14 @@ export async function getUpcomingAiAuditSchedules(tenantId: number, daysAhead: n
 
 export async function createUserConsent(data: InsertUserConsent) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(userConsents).values(data);
   return { id: Number((result as any)[0].insertId), ...data };
 }
 
 export async function getUserConsents(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(userConsents)
     .where(eq(userConsents.userId, userId))
     .orderBy(userConsents.consentType);
@@ -2167,7 +2168,7 @@ export async function getUserConsents(userId: number) {
 
 export async function getUserConsentByType(userId: number, consentType: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const results = await db.select().from(userConsents)
     .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
   return results[0] || null;
@@ -2175,7 +2176,7 @@ export async function getUserConsentByType(userId: number, consentType: string) 
 
 export async function updateUserConsent(id: number, userId: number, data: Partial<InsertUserConsent>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(userConsents)
     .set({ ...data, updatedAt: new Date() })
     .where(and(eq(userConsents.id, id), eq(userConsents.userId, userId)));
@@ -2183,7 +2184,7 @@ export async function updateUserConsent(id: number, userId: number, data: Partia
 
 export async function withdrawUserConsent(userId: number, consentType: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(userConsents)
     .set({ consentGiven: false, withdrawnAt: new Date(), updatedAt: new Date() })
     .where(and(eq(userConsents.userId, userId), eq(userConsents.consentType, consentType as any)));
@@ -2195,14 +2196,14 @@ export async function withdrawUserConsent(userId: number, consentType: string) {
 
 export async function createDataExportRequest(data: InsertDataExportRequest) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(dataExportRequests).values(data);
   return { id: Number((result as any)[0].insertId), ...data };
 }
 
 export async function getDataExportRequestsByUser(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(dataExportRequests)
     .where(eq(dataExportRequests.userId, userId))
     .orderBy(desc(dataExportRequests.createdAt));
@@ -2210,7 +2211,7 @@ export async function getDataExportRequestsByUser(userId: number) {
 
 export async function getDataExportRequestById(id: number, userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const results = await db.select().from(dataExportRequests)
     .where(and(eq(dataExportRequests.id, id), eq(dataExportRequests.userId, userId)));
   return results[0] || null;
@@ -2218,7 +2219,7 @@ export async function getDataExportRequestById(id: number, userId: number) {
 
 export async function updateDataExportRequest(id: number, data: Partial<InsertDataExportRequest>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(dataExportRequests)
     .set({ ...data, updatedAt: new Date() })
     .where(eq(dataExportRequests.id, id));
@@ -2230,7 +2231,7 @@ export async function updateDataExportRequest(id: number, data: Partial<InsertDa
 
 export async function getAiAuditHistoryForServiceUser(tenantId: number, serviceUserId: number, auditType?: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(aiAudits)
     .where(and(
       eq(aiAudits.tenantId, tenantId),
@@ -2241,7 +2242,7 @@ export async function getAiAuditHistoryForServiceUser(tenantId: number, serviceU
 
 export async function getAiAuditScoreTrends(tenantId: number, startDate: Date, endDate: Date) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const startStr = startDate.toISOString().split('T')[0];
   const endStr = endDate.toISOString().split('T')[0];
   
@@ -2270,7 +2271,7 @@ export async function updateUser(userId: number, data: Partial<{
   superAdmin: boolean;
 }>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   return await db.update(users).set(data).where(eq(users.id, userId));
 }
@@ -2278,7 +2279,7 @@ export async function updateUser(userId: number, data: Partial<{
 // Update user profile (name only)
 export async function updateUserProfile(userId: number, data: { name: string }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   await db.update(users).set({ name: data.name }).where(eq(users.id, userId));
   return { success: true };
@@ -2287,15 +2288,15 @@ export async function updateUserProfile(userId: number, data: { name: string }) 
 // Update user password
 export async function updateUserPassword(userId: number, currentPassword: string, newPassword: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // Get user to verify current password
   const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  if (!user.length) throw new Error("User not found");
+  if (!user.length) throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
   
   // Verify current password
   const isValid = await bcrypt.compare(currentPassword, user[0].password);
-  if (!isValid) throw new Error("Current password is incorrect");
+  if (!isValid) throw new Error(ERROR_MESSAGES.USER_PASSWORD_INCORRECT);
   
   // Hash new password and update
   const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -2307,7 +2308,7 @@ export async function updateUserPassword(userId: number, currentPassword: string
 // Delete user
 export async function deleteUser(userId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // Delete user roles first
   await db.delete(userRoles).where(eq(userRoles.userId, userId));
@@ -2322,7 +2323,7 @@ export async function deleteUser(userId: number) {
 
 export async function getAdminDashboardStats(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // Get total users count
   const usersResult = await db.select({ count: sql<number>`COUNT(*)` })
@@ -2424,7 +2425,7 @@ export async function getAdminDashboardStats(tenantId: number) {
 
 export async function getEmailRecipients(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(emailRecipients)
     .where(eq(emailRecipients.tenantId, tenantId))
     .orderBy(emailRecipients.name);
@@ -2432,7 +2433,7 @@ export async function getEmailRecipients(tenantId: number) {
 
 export async function getActiveEmailRecipients(tenantId: number, alertType?: 'compliance' | 'audit' | 'incident') {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const recipients = await db.select().from(emailRecipients)
     .where(and(
@@ -2454,14 +2455,14 @@ export async function getActiveEmailRecipients(tenantId: number, alertType?: 'co
 
 export async function createEmailRecipient(data: InsertEmailRecipient) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(emailRecipients).values(data);
   return { id: Number((result as any)[0].insertId), ...data };
 }
 
 export async function updateEmailRecipient(id: number, tenantId: number, data: Partial<InsertEmailRecipient>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(emailRecipients)
     .set({ ...data, updatedAt: new Date() })
     .where(and(eq(emailRecipients.id, id), eq(emailRecipients.tenantId, tenantId)));
@@ -2469,7 +2470,7 @@ export async function updateEmailRecipient(id: number, tenantId: number, data: P
 
 export async function deleteEmailRecipient(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.delete(emailRecipients)
     .where(and(eq(emailRecipients.id, id), eq(emailRecipients.tenantId, tenantId)));
 }
@@ -2480,7 +2481,7 @@ export async function deleteEmailRecipient(id: number, tenantId: number) {
 
 export async function getEmailTemplates(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   return db.select().from(emailTemplates)
     .where(eq(emailTemplates.tenantId, tenantId))
     .orderBy(emailTemplates.templateType);
@@ -2488,7 +2489,7 @@ export async function getEmailTemplates(tenantId: number) {
 
 export async function getEmailTemplateByType(tenantId: number, templateType: string) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const results = await db.select().from(emailTemplates)
     .where(and(
@@ -2504,14 +2505,14 @@ export async function getEmailTemplateByType(tenantId: number, templateType: str
 
 export async function createEmailTemplate(data: InsertEmailTemplate) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   const result = await db.insert(emailTemplates).values(data);
   return { id: Number((result as any)[0].insertId), ...data };
 }
 
 export async function updateEmailTemplate(id: number, tenantId: number, data: Partial<InsertEmailTemplate>) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.update(emailTemplates)
     .set({ ...data, updatedAt: new Date() })
     .where(and(eq(emailTemplates.id, id), eq(emailTemplates.tenantId, tenantId)));
@@ -2519,7 +2520,7 @@ export async function updateEmailTemplate(id: number, tenantId: number, data: Pa
 
 export async function deleteEmailTemplate(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   await db.delete(emailTemplates)
     .where(and(eq(emailTemplates.id, id), eq(emailTemplates.tenantId, tenantId)));
 }
@@ -2527,7 +2528,7 @@ export async function deleteEmailTemplate(id: number, tenantId: number) {
 // Create default templates for a tenant
 export async function createDefaultEmailTemplates(tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const defaultTemplates = [
     {
@@ -2634,7 +2635,7 @@ export async function createIncidentAttachment(data: {
   uploadedByName?: string;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const [result] = await db.insert(incidentAttachments).values(data);
   return result.insertId;
@@ -2658,7 +2659,7 @@ export async function getIncidentAttachments(incidentId: number, tenantId: numbe
 
 export async function deleteIncidentAttachment(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   // First get the attachment to return the fileKey for S3 deletion
   const [attachment] = await db
@@ -2702,7 +2703,7 @@ export async function createIncidentSignature(data: {
   notes?: string;
 }) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   const [result] = await db.insert(incidentSignatures).values(data);
   return result.insertId;
@@ -2748,7 +2749,7 @@ export async function getIncidentSignatureByType(
 
 export async function deleteIncidentSignature(id: number, tenantId: number) {
   const db = await getDb();
-  if (!db) throw new Error("Database not available");
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
   
   await db
     .delete(incidentSignatures)

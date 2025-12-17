@@ -1905,3 +1905,14 @@
 - [x] Fix calendar PDF showing only one month instead of full year (now exports full current year)
 - [x] Fix header/footer creating separate pages in calendar PDF
 - [ ] Fix header/footer creating separate pages in action log PDF (action log uses different approach, needs separate fix if issue persists)
+
+## Security: Error Message Sanitization
+- [x] Audit all backend error messages for technical details exposure (293 instances found across 21 files)
+- [x] Audit all frontend error messages for technical details exposure (55 toast.error instances found)
+- [x] Replace technical error messages with user-friendly text (created centralized ERROR_MESSAGES)
+- [x] Add global error handler to catch and sanitize unexpected errors (tRPC errorFormatter + errorHandler.ts)
+- [x] Ensure no stack traces or internal paths are shown to users (ErrorBoundary hides stack in production)
+- [x] Created safe toast wrapper (safeToast.ts) to automatically sanitize all error toasts
+- [x] Created error pattern matching system for automatic error message sanitization
+- [x] Added security headers to tRPC responses (X-Content-Type-Options, X-Frame-Options)
+- [ ] Test error scenarios to verify user-friendly messages (needs manual testing)

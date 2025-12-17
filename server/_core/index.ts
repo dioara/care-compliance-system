@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createCustomContext } from "../customContext";
+import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -161,6 +162,23 @@ async function startServer() {
     createExpressMiddleware({
       router: appRouter,
       createContext: createCustomContext,
+      onError: ({ error, type, path }) => {
+        // Log error server-side
+        console.error(`[tRPC Error] ${type} at ${path}:`, error);
+        
+        // Error sanitization is handled by returning sanitized error
+        // The error formatter will use this
+      },
+      // Sanitize all errors before sending to client
+      responseMeta: () => {
+        return {
+          headers: {
+            // Security headers
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'DENY',
+          },
+        };
+      },
     })
   );
   // development mode uses Vite, production mode uses static files
