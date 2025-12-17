@@ -10,6 +10,7 @@ import { appRouter } from "../routers";
 import { createCustomContext } from "../customContext";
 import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
+import { stripeWebhookRouter } from "../stripe/webhook";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -42,6 +43,9 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // Cookie parser for auth tokens
   app.use(cookieParser());
+  
+  // Stripe webhook endpoint (must be before body parser middleware)
+  app.use("/api/webhooks/stripe", stripeWebhookRouter);
   
   // Rate limiting middleware - 100 requests per 15 minutes per IP
   const limiter = rateLimit({
