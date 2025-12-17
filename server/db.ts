@@ -1,5 +1,22 @@
 import { eq, and, inArray, sql, desc, gte, lte, ne } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+
+/**
+ * Convert JavaScript Date to MySQL datetime format: 'YYYY-MM-DD HH:MM:SS'
+ * MySQL doesn't accept ISO 8601 format with 'T' and 'Z'
+ */
+export function toMySQLDatetime(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+
+/**
+ * Convert JavaScript Date to MySQL date format: 'YYYY-MM-DD'
+ */
+export function toMySQLDate(date: Date | string): string {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return d.toISOString().split('T')[0];
+}
 import bcrypt from "bcryptjs";
 import {
   users,

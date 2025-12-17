@@ -5,6 +5,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { authRouter } from "./auth";
 import { rolesRouter } from "./roles";
 import * as db from "./db";
+import { toMySQLDatetime, toMySQLDate } from "./db";
 import { storagePut } from "./storage";
 import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_core/email";
 import { subscriptionRouter } from "./subscription";
@@ -445,9 +446,9 @@ export const appRouter = router({
         const serviceUser = await db.createServiceUser({
           ...input,
           tenantId: ctx.user.tenantId,
-          dateOfBirth: input.dateOfBirth ? new Date(input.dateOfBirth).toISOString() : null,
-          admissionDate: input.admissionDate ? new Date(input.admissionDate).toISOString() : null,
-          dischargeDate: input.dischargeDate ? new Date(input.dischargeDate).toISOString() : null,
+          dateOfBirth: input.dateOfBirth ? toMySQLDate(input.dateOfBirth) : null,
+          admissionDate: input.admissionDate ? toMySQLDate(input.admissionDate) : null,
+          dischargeDate: input.dischargeDate ? toMySQLDate(input.dischargeDate) : null,
           isActive: input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
         });
 
@@ -472,9 +473,9 @@ export const appRouter = router({
         const { id, ...data } = input;
         await db.updateServiceUser(id, {
           ...data,
-          dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : undefined,
-          admissionDate: data.admissionDate ? new Date(data.admissionDate).toISOString() : undefined,
-          dischargeDate: data.dischargeDate ? new Date(data.dischargeDate).toISOString() : undefined,
+          dateOfBirth: data.dateOfBirth ? toMySQLDate(data.dateOfBirth) : undefined,
+          admissionDate: data.admissionDate ? toMySQLDate(data.admissionDate) : undefined,
+          dischargeDate: data.dischargeDate ? toMySQLDate(data.dischargeDate) : undefined,
         });
         return { success: true };
       }),
@@ -573,8 +574,8 @@ export const appRouter = router({
           ...input,
           tenantId: ctx.user.tenantId,
           employmentType: input.employmentType || "permanent_not_sponsored",
-          employmentDate: input.employmentDate ? new Date(input.employmentDate).toISOString() : null,
-          dbsDate: input.dbsDate ? new Date(input.dbsDate).toISOString() : null,
+          employmentDate: input.employmentDate ? toMySQLDate(input.employmentDate) : null,
+          dbsDate: input.dbsDate ? toMySQLDate(input.dbsDate) : null,
           isActive: input.isActive !== undefined ? (input.isActive ? 1 : 0) : 1,
         });
 
@@ -599,8 +600,8 @@ export const appRouter = router({
         const { id, ...data } = input;
         await db.updateStaffMember(id, {
           ...data,
-          employmentDate: data.employmentDate ? new Date(data.employmentDate).toISOString() : undefined,
-          dbsDate: data.dbsDate ? new Date(data.dbsDate).toISOString() : undefined,
+          employmentDate: data.employmentDate ? toMySQLDate(data.employmentDate) : undefined,
+          dbsDate: data.dbsDate ? toMySQLDate(data.dbsDate) : undefined,
         });
         return { success: true };
       }),
@@ -936,7 +937,7 @@ export const appRouter = router({
           locationId: input.locationId,
           auditTypeId: input.auditTypeId,
           auditTemplateId: template.id,
-          auditDate: input.auditDate.toISOString(),
+          auditDate: toMySQLDate(input.auditDate),
           auditorId: ctx.user.id,
           auditorName: ctx.user.name || undefined,
           auditorRole: ctx.user.role || undefined,
@@ -1046,7 +1047,7 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         const actionPlanId = await db.createAuditActionPlan({
           ...input,
-          targetCompletionDate: input.targetCompletionDate.toISOString(),
+          targetCompletionDate: toMySQLDate(input.targetCompletionDate),
         });
         return { id: actionPlanId };
       }),

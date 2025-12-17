@@ -2208,5 +2208,13 @@
 - [ ] Test Excel download in production
 
 ## Fix Audit Start Error
-- [ ] Fix missing company.get tRPC procedure error when starting audits
+- [x] Fix missing company.get tRPC procedure error when starting audits
 - [ ] Test audit start functionality in production
+
+## Fix MySQL Datetime Format Errors
+- [x] Fix lastSignedIn datetime format in login
+- [x] Fix auditDate datetime format in audit creation
+- [x] Find and fix all other datetime format errors (staff records, service users, action plans)
+- [x] Create MySQL datetime helper functions (toMySQLDatetime, toMySQLDate)
+- [ ] Test audit creation in production
+- [ ] Test staff record creation in production
