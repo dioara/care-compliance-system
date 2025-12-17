@@ -32,9 +32,17 @@ export function useAuth() {
       localStorage.removeItem('trpc-cache');
       sessionStorage.clear();
       
+      // Clear all cookies by setting them to expire
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+          .replace(/^ +/, "")
+          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      console.log('[useAuth] All cookies cleared');
+      
       // Force a hard reload to clear all state and redirect to login
       console.log('[useAuth] Redirecting to login...');
-      window.location.replace('/login');
+      window.location.href = '/login';
     }
   };
 
