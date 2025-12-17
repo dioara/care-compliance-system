@@ -114,6 +114,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
           type="date"
           value={scheduledDate}
           onChange={(e) => setScheduledDate(e.target.value)}
+          min={new Date().toISOString().split('T')[0]}
           className="w-full px-3 py-2 border rounded-md"
           required
         />

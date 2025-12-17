@@ -1575,6 +1575,18 @@ export const appRouter = router({
         staffMemberId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Validate that scheduled date is not in the past
+        const scheduledDate = new Date(input.scheduledDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (scheduledDate < today) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Cannot schedule audits in the past. Please select today or a future date.',
+          });
+        }
+
         // Get audit template for this type
         const template = await db.getAuditTemplateByAuditTypeId(input.auditTypeId);
         if (!template) {
@@ -1752,7 +1764,7 @@ export const appRouter = router({
           tenantId: ctx.user.tenantId,
           locationId: input.locationId,
           incidentNumber: input.incidentNumber,
-          incidentDate: new Date(input.incidentDate),
+          incidentDate: toMySQLDate(input.incidentDate),
           incidentTime: input.incidentTime,
           incidentType: input.incidentType,
           severity: input.severity,

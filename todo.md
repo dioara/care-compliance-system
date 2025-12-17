@@ -2269,3 +2269,15 @@
 - [ ] Test incident PDF export
 - [ ] Test audit report PDF export
 - [ ] Test action log PDF export
+
+## Audit Date Restrictions and Incident Fixes
+- [x] Fix incident creation datetime format error (incidentDate receiving Date object instead of MySQL date string)
+- [x] Add validation to prevent scheduling audits in the past (backend validation)
+- [x] Make past audits read-only (cannot be edited, only viewed)
+- [x] Add date validation to schedule audit form (min date = today)
+- [x] Disable all input fields (RadioGroup, Textarea, Input) for past audits
+- [x] Hide Complete Audit button for past audits
+- [x] Show read-only warning banner for past audits
+- [ ] Test incident creation with various date/time combinations
+- [ ] Test audit scheduling with past dates (should show error)
+- [ ] Test conducting audit on past scheduled audits (should be read-only)

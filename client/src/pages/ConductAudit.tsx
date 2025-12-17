@@ -28,6 +28,9 @@ export default function ConductAudit() {
   const [expandedActions, setExpandedActions] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
+  // Check if audit is in the past (read-only)
+  const isAuditInPast = auditInstance ? new Date(auditInstance.auditDate) < new Date(new Date().setHours(0, 0, 0, 0)) : false;
+
   // Fetch audit instance
   const { data: auditInstance, isLoading: loadingInstance } = trpc.audits.getAuditInstance.useQuery(
     { id: auditId },
@@ -188,6 +191,7 @@ export default function ConductAudit() {
           <div className="space-y-3">
             <RadioGroup
               value={currentResponse.response || undefined}
+              disabled={isAuditInPast}
               onValueChange={(value) => {
                 // Update both response and isCompliant at once
                 const currentResponseData = responses[questionId] || {};
@@ -242,6 +246,7 @@ export default function ConductAudit() {
             value={currentResponse.response || ""}
             onChange={(e) => handleResponseChange(questionId, "response", e.target.value)}
             rows={question.questionType === "long_text" ? 6 : 3}
+            disabled={isAuditInPast}
           />
         );
 
@@ -252,6 +257,7 @@ export default function ConductAudit() {
             placeholder="Enter number..."
             value={currentResponse.response || ""}
             onChange={(e) => handleResponseChange(questionId, "response", e.target.value)}
+            disabled={isAuditInPast}
           />
         );
 
@@ -262,6 +268,7 @@ export default function ConductAudit() {
             value={currentResponse.response || ""}
             onChange={(e) => handleResponseChange(questionId, "response", e.target.value)}
             rows={4}
+            disabled={isAuditInPast}
           />
         );
 
@@ -272,6 +279,7 @@ export default function ConductAudit() {
             placeholder="Enter response..."
             value={currentResponse.response || ""}
             onChange={(e) => handleResponseChange(questionId, "response", e.target.value)}
+            disabled={isAuditInPast}
           />
         );
     }
@@ -317,6 +325,23 @@ export default function ConductAudit() {
 
   return (
     <div className="space-y-6">
+      {/* Read-only warning for past audits */}
+      {isAuditInPast && (
+        <Card className="border-amber-200 bg-amber-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600" />
+              <div>
+                <p className="font-medium text-amber-900">This audit is read-only</p>
+                <p className="text-sm text-amber-700 mt-1">
+                  Audits scheduled in the past cannot be edited. You can view the responses but cannot make changes.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -337,10 +362,12 @@ export default function ConductAudit() {
               Saving...
             </Badge>
           )}
-          <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
-            <CheckCircle2 className="h-5 w-5 mr-2" />
-            {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
-          </Button>
+          {!isAuditInPast && (
+            <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -551,10 +578,12 @@ export default function ConductAudit() {
               {progress}% of questions answered • You can add action plans and evidence after completion
             </p>
           </div>
-          <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
-            <CheckCircle2 className="h-5 w-5 mr-2" />
-            {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
-          </Button>
+          {!isAuditInPast && (
+            <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
+              <CheckCircle2 className="h-5 w-5 mr-2" />
+              {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>
