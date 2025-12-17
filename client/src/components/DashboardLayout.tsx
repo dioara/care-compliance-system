@@ -76,6 +76,7 @@ const menuItems = [
   { icon: FileText, label: "Audit History", path: "/audit-history", description: "View all audits" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
   { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
+  { icon: BarChart3, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends" },
   { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },
   { icon: ClipboardCheck, label: "Action Log", path: "/action-log", description: "Track actions" },
 ];

@@ -2295,3 +2295,22 @@
 - [ ] Test signature capture on mobile and desktop
 - [ ] Test file upload with various formats
 - [ ] Verify signatures and attachments appear correctly in exported PDFs
+
+## Incident Analytics Dashboard
+- [x] Create backend endpoint for incident analytics data aggregation
+- [x] Aggregate incidents by type (fall, medication error, safeguarding, etc.)
+- [x] Aggregate incidents by severity (low, medium, high, critical)
+- [x] Aggregate incidents by location
+- [x] Aggregate incidents by time period (daily, weekly, monthly trends)
+- [x] Create IncidentAnalytics page component
+- [x] Add pie chart for incidents by type
+- [x] Add bar chart for incidents by severity
+- [x] Add line chart for incident trends over time
+- [x] Add location comparison chart
+- [x] Add date range filter (last 7 days, 30 days, 90 days, 365 days)
+- [x] Add location filter dropdown
+- [x] Add key metrics cards (total incidents, avg resolution time, open incidents, critical incidents)
+- [x] Add navigation link to dashboard in sidebar
+- [x] Install recharts library for charts
+- [x] Add route to App.tsx
+- [ ] Test dashboard with real incident data

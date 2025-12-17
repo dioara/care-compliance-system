@@ -2918,3 +2918,124 @@ export async function markAllNotificationsAsRead(userId: number) {
   
   return { success: true };
 }
+
+// ============ Incident Analytics ============
+
+export async function getIncidentAnalytics(params: {
+  tenantId: number;
+  locationId?: number;
+  startDate?: string;
+  endDate?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  const { tenantId, locationId, startDate, endDate } = params;
+
+  // Build where conditions
+  const conditions = [eq(incidents.tenantId, tenantId)];
+  if (locationId) {
+    conditions.push(eq(incidents.locationId, locationId));
+  }
+  if (startDate) {
+    conditions.push(gte(incidents.incidentDate, startDate));
+  }
+  if (endDate) {
+    conditions.push(lte(incidents.incidentDate, endDate));
+  }
+
+  // Fetch all incidents matching criteria
+  const allIncidents = await db
+    .select()
+    .from(incidents)
+    .where(and(...conditions))
+    .orderBy(desc(incidents.incidentDate));
+
+  // Aggregate by type
+  const byType: Record<string, number> = {};
+  allIncidents.forEach((inc) => {
+    const type = inc.incidentType || 'unknown';
+    byType[type] = (byType[type] || 0) + 1;
+  });
+
+  // Aggregate by severity
+  const bySeverity: Record<string, number> = {};
+  allIncidents.forEach((inc) => {
+    const severity = inc.severity || 'unknown';
+    bySeverity[severity] = (bySeverity[severity] || 0) + 1;
+  });
+
+  // Aggregate by location
+  const byLocation: Record<number, { count: number; locationName?: string }> = {};
+  allIncidents.forEach((inc) => {
+    if (inc.locationId) {
+      if (!byLocation[inc.locationId]) {
+        byLocation[inc.locationId] = { count: 0 };
+      }
+      byLocation[inc.locationId].count += 1;
+    }
+  });
+
+  // Fetch location names
+  const locationIds = Object.keys(byLocation).map(Number);
+  if (locationIds.length > 0) {
+    const locationData = await db
+      .select()
+      .from(locations)
+      .where(inArray(locations.id, locationIds));
+    
+    locationData.forEach((loc) => {
+      if (byLocation[loc.id]) {
+        byLocation[loc.id].locationName = loc.name;
+      }
+    });
+  }
+
+  // Aggregate by status
+  const byStatus: Record<string, number> = {};
+  allIncidents.forEach((inc) => {
+    const status = inc.status || 'unknown';
+    byStatus[status] = (byStatus[status] || 0) + 1;
+  });
+
+  // Time series data (group by date)
+  const timeSeriesMap: Record<string, number> = {};
+  allIncidents.forEach((inc) => {
+    const date = inc.incidentDate ? new Date(inc.incidentDate).toISOString().split('T')[0] : 'unknown';
+    timeSeriesMap[date] = (timeSeriesMap[date] || 0) + 1;
+  });
+
+  // Convert to array and sort by date
+  const timeSeries = Object.entries(timeSeriesMap)
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  // Calculate key metrics
+  const totalIncidents = allIncidents.length;
+  const openIncidents = allIncidents.filter(inc => inc.status !== 'closed').length;
+  const criticalIncidents = allIncidents.filter(inc => inc.severity === 'critical').length;
+  
+  // Calculate average resolution time (for closed incidents)
+  const closedIncidents = allIncidents.filter(inc => inc.status === 'closed' && inc.closedAt && inc.createdAt);
+  let avgResolutionDays = 0;
+  if (closedIncidents.length > 0) {
+    const totalDays = closedIncidents.reduce((sum, inc) => {
+      const created = new Date(inc.createdAt!).getTime();
+      const closed = new Date(inc.closedAt!).getTime();
+      return sum + (closed - created) / (1000 * 60 * 60 * 24);
+    }, 0);
+    avgResolutionDays = Math.round(totalDays / closedIncidents.length);
+  }
+
+  return {
+    totalIncidents,
+    openIncidents,
+    criticalIncidents,
+    avgResolutionDays,
+    byType,
+    bySeverity,
+    byLocation,
+    byStatus,
+    timeSeries,
+  };
+}

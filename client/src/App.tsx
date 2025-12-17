@@ -29,6 +29,7 @@ import AuditResults from "./pages/AuditResults";
 import AIAudits from "./pages/AIAudits";
 import AuditCalendar from "./pages/AuditCalendar";
 import Incidents from "./pages/Incidents";
+import IncidentAnalytics from "./pages/IncidentAnalytics";
 import Reports from "./pages/Reports";
 import ServiceUsers from "./pages/ServiceUsers";
 import Staff from "./pages/Staff";
@@ -174,6 +175,12 @@ function Router() {
       <Route path="/incidents">
         <DashboardLayout>
           <Incidents />
+        </DashboardLayout>
+      </Route>
+
+      <Route path="/incident-analytics">
+        <DashboardLayout>
+          <IncidentAnalytics />
         </DashboardLayout>
       </Route>
       <Route path="/email-settings">

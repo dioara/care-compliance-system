@@ -2245,6 +2245,35 @@ export const appRouter = router({
         if (!ctx.user?.tenantId) return [];
         return db.getAuditsByType(ctx.user.tenantId);
       }),
+
+    // Incident analytics
+    incidentAnalytics: protectedProcedure
+      .input(z.object({
+        locationId: z.number().optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          return {
+            totalIncidents: 0,
+            openIncidents: 0,
+            criticalIncidents: 0,
+            avgResolutionDays: 0,
+            byType: {},
+            bySeverity: {},
+            byLocation: {},
+            byStatus: {},
+            timeSeries: [],
+          };
+        }
+        return db.getIncidentAnalytics({
+          tenantId: ctx.user.tenantId,
+          locationId: input.locationId,
+          startDate: input.startDate,
+          endDate: input.endDate,
+        });
+      }),
   }),
 
   // User management
