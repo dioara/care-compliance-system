@@ -36,15 +36,25 @@ The Care Compliance Management System streamlines compliance management for care
 
 ## Key Features
 
-**Audit Management**: Create, schedule, and conduct comprehensive audits across all areas of care delivery. Track audit history, generate action plans, and monitor compliance scores over time.
+### Audit Management
 
-**Incident Reporting**: Record and manage incidents with detailed categorization, severity tracking, and investigation workflows. Ensure timely reporting and resolution of safety concerns.
+Create, schedule, and conduct comprehensive audits across all areas of care delivery. Track audit history, generate action plans, and monitor compliance scores over time.
 
-**Service User Management**: Maintain comprehensive records for residents including care plans, assessments, and historical data. Track service user journeys and ensure personalized care delivery.
+### Incident Reporting
 
-**Staff Management**: Manage staff records, track training and certifications, and maintain compliance with staffing requirements. Monitor staff performance and development.
+Record and manage incidents with detailed categorization, severity tracking, and investigation workflows. Ensure timely reporting and resolution of safety concerns.
 
-**Reporting & Analytics**: Generate detailed compliance reports, track trends, and identify areas for improvement. Export data for regulatory submissions and internal reviews.
+### Service User Management
+
+Maintain comprehensive records for residents including care plans, assessments, and historical data. Track service user journeys and ensure personalized care delivery.
+
+### Staff Management
+
+Manage staff records, track training and certifications, and maintain compliance with staffing requirements. Monitor staff performance and development.
+
+### Reporting & Analytics
+
+Generate detailed compliance reports, track trends, and identify areas for improvement. Export data for regulatory submissions and internal reviews.
 
 ## Getting Help
 
@@ -159,13 +169,21 @@ Navigate to the Audits page and click the "Quick Add" button or "Schedule Audit"
 
 Provide the following information when scheduling an audit:
 
-**Audit Type**: Select from the list of available audit types (e.g., Daily Notes Review, Cleanliness and Housekeeping).
+### Audit Type
 
-**Location**: Choose the care home location where the audit will be conducted.
+Select from the list of available audit types (e.g., Daily Notes Review, Cleanliness and Housekeeping).
 
-**Scheduled Date**: Set the date when the audit should be performed.
+### Location
 
-**Auditor**: Assign a staff member responsible for conducting the audit. You can assign yourself or another qualified team member.
+Choose the care home location where the audit will be conducted.
+
+### Scheduled Date
+
+Set the date when the audit should be performed.
+
+### Auditor
+
+Assign a staff member responsible for conducting the audit. You can assign yourself or another qualified team member.
 
 **Service User** (if applicable): For service user-specific audits like care plan reviews, select the relevant resident.
 
@@ -203,13 +221,21 @@ Audits are organized into sections, each containing related questions. For examp
 
 Each question requires a response. Common response types include:
 
-**Yes/No**: Simple compliance questions where you indicate whether the standard is met.
+### Yes/No
 
-**Multiple Choice**: Select from predefined options that best describe the current situation.
+Simple compliance questions where you indicate whether the standard is met.
 
-**Rating Scale**: Rate compliance on a scale (e.g., 1-5) based on observed conditions.
+### Multiple Choice
 
-**Text Response**: Provide detailed observations or explanations for complex questions.
+Select from predefined options that best describe the current situation.
+
+### Rating Scale
+
+Rate compliance on a scale (e.g., 1-5) based on observed conditions.
+
+### Text Response
+
+Provide detailed observations or explanations for complex questions.
 
 ## Adding Evidence
 
@@ -249,29 +275,49 @@ Navigate to "Audit History" from the main menu to view all completed and in-prog
 
 Use the filter options to narrow down the audit list:
 
-**Audit Type**: Show only specific types of audits (e.g., only Medication Management audits).
+### Audit Type
 
-**Location**: Filter by care home location if you manage multiple sites.
+Show only specific types of audits (e.g., only Medication Management audits).
 
-**Date Range**: View audits from a specific time period.
+### Location
 
-**Status**: Filter by audit status (completed, in-progress, scheduled).
+Filter by care home location if you manage multiple sites.
 
-**Auditor**: See audits conducted by specific staff members.
+### Date Range
+
+View audits from a specific time period.
+
+### Status
+
+Filter by audit status (completed, in-progress, scheduled).
+
+### Auditor
+
+See audits conducted by specific staff members.
 
 ## Audit Status Indicators
 
 Each audit displays a status badge:
 
-**Scheduled**: Audit is planned for a future date.
+### Scheduled
 
-**In Progress**: Audit has been started but not yet completed.
+Audit is planned for a future date.
 
-**Completed**: All questions answered and audit finalized.
+### In Progress
 
-**Reviewed**: Audit has been reviewed by management.
+Audit has been started but not yet completed.
 
-**Archived**: Older audits moved to archive for record-keeping.
+### Completed
+
+All questions answered and audit finalized.
+
+### Reviewed
+
+Audit has been reviewed by management.
+
+### Archived
+
+Older audits moved to archive for record-keeping.
 
 ## Viewing Audit Details
 
@@ -303,15 +349,25 @@ Action plans are corrective actions created when audits identify non-compliance 
 
 Action plans are typically created during audits when you answer a question indicating non-compliance. You can also create standalone action plans from the audit results page. Provide the following information:
 
-**Issue Description**: Clearly describe the problem or non-compliance identified.
+### Issue Description
 
-**Corrective Action**: Specify what needs to be done to address the issue.
+Clearly describe the problem or non-compliance identified.
 
-**Responsible Person**: Assign a staff member accountable for completing the action.
+### Corrective Action
 
-**Target Date**: Set a realistic deadline for completion.
+Specify what needs to be done to address the issue.
 
-**Priority**: Indicate urgency (High, Medium, Low) based on risk and regulatory requirements.
+### Responsible Person
+
+Assign a staff member accountable for completing the action.
+
+### Target Date
+
+Set a realistic deadline for completion.
+
+### Priority
+
+Indicate urgency (High, Medium, Low) based on risk and regulatory requirements.
 
 ## Tracking Action Plans
 
@@ -321,13 +377,21 @@ All action plans are tracked in a centralized view accessible from the Audits se
 
 The assigned person can update action plan status as work progresses. Status options include:
 
-**Open**: Action plan created but work not yet started.
+### Open
 
-**In Progress**: Work underway to address the issue.
+Action plan created but work not yet started.
 
-**Completed**: Corrective action finished and verified.
+### In Progress
 
-**Verified**: Management has confirmed the issue is resolved.
+Work underway to address the issue.
+
+### Completed
+
+Corrective action finished and verified.
+
+### Verified
+
+Management has confirmed the issue is resolved.
 
 ## Evidence of Completion
 
@@ -355,13 +419,21 @@ The Audit Calendar provides a visual representation of all scheduled audits acro
 
 Switch between different calendar views:
 
-**Month View**: See all audits scheduled for the entire month at a glance.
+### Month View
 
-**Week View**: Detailed view of audits for the current week.
+See all audits scheduled for the entire month at a glance.
 
-**Day View**: Hourly breakdown of audits scheduled for a specific day.
+### Week View
 
-**List View**: Chronological list of upcoming audits with full details.
+Detailed view of audits for the current week.
+
+### Day View
+
+Hourly breakdown of audits scheduled for a specific day.
+
+### List View
+
+Chronological list of upcoming audits with full details.
 
 ## Color Coding
 
@@ -408,29 +480,49 @@ Click "Incidents" in the main menu, then "Report New Incident" or use the Quick 
 
 Complete the following sections when reporting an incident:
 
-**Incident Type**: Select the category that best describes the incident (e.g., Fall, Medication Error, Safeguarding, Pressure Injury).
+### Incident Type
 
-**Severity**: Indicate the impact level (Minor, Moderate, Severe, Critical). Severity determines notification requirements and investigation depth.
+Select the category that best describes the incident (e.g., Fall, Medication Error, Safeguarding, Pressure Injury).
 
-**Date and Time**: Record exactly when the incident occurred. Accurate timing is crucial for investigation and pattern analysis.
+### Severity
 
-**Location**: Specify where the incident happened (e.g., Resident Room 12, Dining Area, Garden).
+Indicate the impact level (Minor, Moderate, Severe, Critical). Severity determines notification requirements and investigation depth.
 
-**People Involved**: Identify all individuals involved including service users, staff, and visitors.
+### Date and Time
+
+Record exactly when the incident occurred. Accurate timing is crucial for investigation and pattern analysis.
+
+### Location
+
+Specify where the incident happened (e.g., Resident Room 12, Dining Area, Garden).
+
+### People Involved
+
+Identify all individuals involved including service users, staff, and visitors.
 
 ## Incident Description
 
 Provide a detailed, factual account of what happened. Include:
 
-**What occurred**: Describe the sequence of events leading to and during the incident.
+### What occurred
 
-**Who was involved**: Names and roles of all people present.
+Describe the sequence of events leading to and during the incident.
 
-**Where it happened**: Specific location details.
+### Who was involved
 
-**When it occurred**: Exact date and time.
+Names and roles of all people present.
 
-**Immediate actions taken**: First aid provided, medical attention sought, area secured, etc.
+### Where it happened
+
+Specific location details.
+
+### When it occurred
+
+Exact date and time.
+
+### Immediate actions taken
+
+First aid provided, medical attention sought, area secured, etc.
 
 Avoid speculation or blame. Focus on observable facts that can be verified during investigation.
 
@@ -472,13 +564,21 @@ Incident investigations determine root causes, identify contributing factors, an
 
 Begin investigations promptly after incident reporting. Severity determines investigation depth and timeline:
 
-**Critical incidents**: Investigation starts immediately, completed within 24-48 hours.
+### Critical incidents
 
-**Severe incidents**: Investigation begins within 24 hours, completed within 5 working days.
+Investigation starts immediately, completed within 24-48 hours.
 
-**Moderate incidents**: Investigation starts within 48 hours, completed within 10 working days.
+### Severe incidents
 
-**Minor incidents**: Investigation completed within 15 working days.
+Investigation begins within 24 hours, completed within 5 working days.
+
+### Moderate incidents
+
+Investigation starts within 48 hours, completed within 10 working days.
+
+### Minor incidents
+
+Investigation completed within 15 working days.
 
 ## Investigation Process
 
@@ -488,15 +588,25 @@ Access the incident from the Incidents list and click "Investigate" to begin. Th
 
 Collect all relevant information including:
 
-**Incident report**: Review the original report and any updates.
+### Incident report
 
-**Witness interviews**: Speak with everyone present during the incident.
+Review the original report and any updates.
 
-**Documentation review**: Examine care plans, risk assessments, policies, and previous incident reports.
+### Witness interviews
 
-**Physical evidence**: Inspect equipment, environment, or any physical factors involved.
+Speak with everyone present during the incident.
 
-**Staff records**: Check training, competency, and previous performance of involved staff.
+### Documentation review
+
+Examine care plans, risk assessments, policies, and previous incident reports.
+
+### Physical evidence
+
+Inspect equipment, environment, or any physical factors involved.
+
+### Staff records
+
+Check training, competency, and previous performance of involved staff.
 
 ## Root Cause Analysis
 
@@ -539,15 +649,25 @@ Service user records contain comprehensive information about each resident inclu
 
 Navigate to "Service Users" and click "Add Service User". Complete the registration form with:
 
-**Personal Information**: Full name, date of birth, NHS number, and contact details.
+### Personal Information
 
-**Emergency Contacts**: Family members or representatives to contact in emergencies.
+Full name, date of birth, NHS number, and contact details.
 
-**Admission Details**: Date of admission, room assignment, and funding source.
+### Emergency Contacts
 
-**Medical Information**: Diagnoses, allergies, medications, and healthcare providers.
+Family members or representatives to contact in emergencies.
 
-**Care Needs**: Mobility level, dietary requirements, communication needs, and personal care preferences.
+### Admission Details
+
+Date of admission, room assignment, and funding source.
+
+### Medical Information
+
+Diagnoses, allergies, medications, and healthcare providers.
+
+### Care Needs
+
+Mobility level, dietary requirements, communication needs, and personal care preferences.
 
 ## Care Plans
 
@@ -587,15 +707,25 @@ Staff records contain employment information, qualifications, training history, 
 
 Administrators can add new staff from the Staff section. Provide:
 
-**Personal Details**: Full name, contact information, and emergency contacts.
+### Personal Details
 
-**Employment Information**: Job title, start date, employment type (full-time, part-time, agency).
+Full name, contact information, and emergency contacts.
 
-**Qualifications**: Relevant certifications, licenses, and professional registrations.
+### Employment Information
 
-**DBS Check**: Disclosure and Barring Service check details and renewal dates.
+Job title, start date, employment type (full-time, part-time, agency).
 
-**Training Records**: Mandatory training completion dates and upcoming renewals.
+### Qualifications
+
+Relevant certifications, licenses, and professional registrations.
+
+### DBS Check
+
+Disclosure and Barring Service check details and renewal dates.
+
+### Training Records
+
+Mandatory training completion dates and upcoming renewals.
 
 ## User Accounts
 
@@ -605,13 +735,21 @@ Each staff member can have a CCMS user account for accessing the system. When cr
 
 CCMS uses role-based access control to ensure staff only access information relevant to their duties:
 
-**Administrator**: Full system access including configuration, user management, and all data.
+### Administrator
 
-**Manager**: Access to all operational features, reporting, and staff management for assigned locations.
+Full system access including configuration, user management, and all data.
 
-**Auditor**: Conduct audits, create action plans, and view audit history.
+### Manager
 
-**Care Staff**: View service user information, report incidents, and complete assigned tasks.
+Access to all operational features, reporting, and staff management for assigned locations.
+
+### Auditor
+
+Conduct audits, create action plans, and view audit history.
+
+### Care Staff
+
+View service user information, report incidents, and complete assigned tasks.
 
 ## Training Tracking
 
@@ -642,15 +780,25 @@ If using the scheduling module, staff availability and shift patterns are manage
 
 CCMS offers various reports to support compliance monitoring, performance analysis, and regulatory submissions:
 
-**Compliance Reports**: Overall compliance scores, audit results by type, and trend analysis.
+### Compliance Reports
 
-**Incident Reports**: Incident statistics, severity breakdown, and investigation status.
+Overall compliance scores, audit results by type, and trend analysis.
 
-**Action Plan Reports**: Outstanding actions, completion rates, and overdue items.
+### Incident Reports
 
-**Service User Reports**: Demographics, care needs analysis, and risk assessment summaries.
+Incident statistics, severity breakdown, and investigation status.
 
-**Staff Reports**: Training compliance, audit performance, and incident involvement.
+### Action Plan Reports
+
+Outstanding actions, completion rates, and overdue items.
+
+### Service User Reports
+
+Demographics, care needs analysis, and risk assessment summaries.
+
+### Staff Reports
+
+Training compliance, audit performance, and incident involvement.
 
 ## Accessing Reports
 
@@ -660,13 +808,21 @@ Navigate to the Reports section from the main menu. Select the report type you n
 
 Customize reports using available parameters:
 
-**Date Range**: Specify the time period for the report (e.g., last month, last quarter, custom dates).
+### Date Range
 
-**Location**: Filter by specific care home locations if managing multiple sites.
+Specify the time period for the report (e.g., last month, last quarter, custom dates).
 
-**Audit Type**: For audit reports, select specific audit types or include all types.
+### Location
 
-**Status**: Filter by status (e.g., only completed audits, only open action plans).
+Filter by specific care home locations if managing multiple sites.
+
+### Audit Type
+
+For audit reports, select specific audit types or include all types.
+
+### Status
+
+Filter by status (e.g., only completed audits, only open action plans).
 
 ## Generating Reports
 
@@ -676,11 +832,17 @@ After selecting parameters, click "Generate Report" to create the report. Depend
 
 Export reports in multiple formats:
 
-**PDF**: Professional format suitable for printing and regulatory submissions.
+### PDF
 
-**Excel**: Spreadsheet format for further analysis and data manipulation.
+Professional format suitable for printing and regulatory submissions.
 
-**CSV**: Raw data export for integration with external systems.
+### Excel
+
+Spreadsheet format for further analysis and data manipulation.
+
+### CSV
+
+Raw data export for integration with external systems.
 
 ## Scheduled Reports
 
@@ -708,57 +870,93 @@ Reports can be shared with internal stakeholders or external parties like CQC in
 
 CCMS tracks several KPIs to measure compliance and care quality:
 
-**Overall Compliance Score**: Weighted average of all audit results. Target: 85% or higher.
+### Overall Compliance Score
 
-**Audit Completion Rate**: Percentage of scheduled audits completed on time. Target: 95% or higher.
+Weighted average of all audit results. Target: 85% or higher.
 
-**Incident Rate**: Number of incidents per 100 resident days. Lower is better; compare to industry benchmarks.
+### Audit Completion Rate
 
-**Action Plan Completion**: Percentage of action plans completed by target date. Target: 90% or higher.
+Percentage of scheduled audits completed on time. Target: 95% or higher.
 
-**Training Compliance**: Percentage of staff with current mandatory training. Target: 100%.
+### Incident Rate
+
+Number of incidents per 100 resident days. Lower is better; compare to industry benchmarks.
+
+### Action Plan Completion
+
+Percentage of action plans completed by target date. Target: 90% or higher.
+
+### Training Compliance
+
+Percentage of staff with current mandatory training. Target: 100%.
 
 ## Trend Analysis
 
 Track KPIs over time to identify trends. Improving trends indicate effective compliance management, while declining trends signal areas needing attention. Look for:
 
-**Seasonal patterns**: Some metrics may vary by season (e.g., infection rates in winter).
+### Seasonal patterns
 
-**Sudden changes**: Investigate any sharp increases or decreases in metrics.
+Some metrics may vary by season (e.g., infection rates in winter).
 
-**Correlation**: Identify relationships between metrics (e.g., training compliance and incident rates).
+### Sudden changes
+
+Investigate any sharp increases or decreases in metrics.
+
+### Correlation
+
+Identify relationships between metrics (e.g., training compliance and incident rates).
 
 ## Benchmarking
 
 Compare your performance to:
 
-**Historical performance**: Are you improving compared to last year?
+### Historical performance
 
-**Other locations**: If managing multiple sites, identify best performers and share their practices.
+Are you improving compared to last year?
 
-**Industry standards**: Compare to published benchmarks for care homes.
+### Other locations
+
+If managing multiple sites, identify best performers and share their practices.
+
+### Industry standards
+
+Compare to published benchmarks for care homes.
 
 ## Data Quality
 
 Analytics are only as good as the underlying data. Ensure:
 
-**Timely data entry**: Record audits and incidents promptly.
+### Timely data entry
 
-**Complete information**: Fill all required fields accurately.
+Record audits and incidents promptly.
 
-**Consistent practices**: Use standardized processes across all locations.
+### Complete information
+
+Fill all required fields accurately.
+
+### Consistent practices
+
+Use standardized processes across all locations.
 
 ## Using Analytics for Improvement
 
 Analytics should drive continuous improvement:
 
-**Identify gaps**: Use data to find areas needing attention.
+### Identify gaps
 
-**Set targets**: Establish realistic improvement goals based on current performance.
+Use data to find areas needing attention.
 
-**Monitor progress**: Track whether interventions are working.
+### Set targets
 
-**Celebrate success**: Recognize improvements and share successes with the team.
+Establish realistic improvement goals based on current performance.
+
+### Monitor progress
+
+Track whether interventions are working.
+
+### Celebrate success
+
+Recognize improvements and share successes with the team.
 `
   },
 
@@ -781,75 +979,121 @@ Administrators can access system settings from the user menu in the top right co
 
 Configure basic organization information:
 
-**Organization Name**: Your care home or organization name displayed throughout the system.
+### Organization Name
 
-**Locations**: Add and manage multiple care home locations if you operate more than one site.
+Your care home or organization name displayed throughout the system.
 
-**Contact Information**: Main contact details for your organization.
+### Locations
 
-**Logo**: Upload your organization logo to appear on reports and documents.
+Add and manage multiple care home locations if you operate more than one site.
+
+### Contact Information
+
+Main contact details for your organization.
+
+### Logo
+
+Upload your organization logo to appear on reports and documents.
 
 ## User Management
 
 Manage user accounts, roles, and permissions:
 
-**Add Users**: Create new user accounts for staff members.
+### Add Users
 
-**Assign Roles**: Set appropriate access levels based on job responsibilities.
+Create new user accounts for staff members.
 
-**Deactivate Users**: Disable accounts for staff who leave without deleting historical data.
+### Assign Roles
 
-**Password Policies**: Configure password requirements and expiration policies.
+Set appropriate access levels based on job responsibilities.
+
+### Deactivate Users
+
+Disable accounts for staff who leave without deleting historical data.
+
+### Password Policies
+
+Configure password requirements and expiration policies.
 
 ## Notification Settings
 
 Control how and when the system sends notifications:
 
-**Email Notifications**: Enable or disable email alerts for incidents, audits, and action plans.
+### Email Notifications
 
-**Notification Recipients**: Specify who receives notifications for different event types.
+Enable or disable email alerts for incidents, audits, and action plans.
 
-**Reminder Timing**: Set how far in advance to send audit reminders.
+### Notification Recipients
+
+Specify who receives notifications for different event types.
+
+### Reminder Timing
+
+Set how far in advance to send audit reminders.
 
 ## Audit Configuration
 
 Customize audit settings:
 
-**Audit Templates**: View and manage audit templates (contact support to modify templates).
+### Audit Templates
 
-**Scoring Rules**: Configure how compliance scores are calculated.
+View and manage audit templates (contact support to modify templates).
 
-**Evidence Requirements**: Set whether evidence is mandatory for certain question types.
+### Scoring Rules
+
+Configure how compliance scores are calculated.
+
+### Evidence Requirements
+
+Set whether evidence is mandatory for certain question types.
 
 ## Data Retention
 
 Configure how long data is retained:
 
-**Audit History**: How long to keep completed audits before archiving.
+### Audit History
 
-**Incident Records**: Retention period for incident reports (must comply with regulations).
+How long to keep completed audits before archiving.
 
-**User Data**: When to remove data for discharged service users or former staff.
+### Incident Records
+
+Retention period for incident reports (must comply with regulations).
+
+### User Data
+
+When to remove data for discharged service users or former staff.
 
 ## Integration Settings
 
 If using integrations with other systems:
 
-**API Access**: Manage API keys for external system connections.
+### API Access
 
-**Data Sync**: Configure automatic data synchronization schedules.
+Manage API keys for external system connections.
 
-**Export Formats**: Set default formats for data exports.
+### Data Sync
+
+Configure automatic data synchronization schedules.
+
+### Export Formats
+
+Set default formats for data exports.
 
 ## Backup and Security
 
 Review security settings and backup status:
 
-**Data Backups**: Verify automatic backups are running successfully.
+### Data Backups
 
-**Access Logs**: Review who has accessed the system and when.
+Verify automatic backups are running successfully.
 
-**Security Policies**: Configure session timeouts and login attempt limits.
+### Access Logs
+
+Review who has accessed the system and when.
+
+### Security Policies
+
+Configure session timeouts and login attempt limits.
 `
   },
 
@@ -869,13 +1113,21 @@ Click your name or avatar in the top right corner to access your user profile. H
 
 Update your contact details:
 
-**Name**: Your display name shown throughout the system.
+### Name
 
-**Email**: Email address for notifications and password resets.
+Your display name shown throughout the system.
 
-**Phone**: Contact number for urgent notifications.
+### Email
 
-**Profile Photo**: Upload a photo to personalize your account.
+Email address for notifications and password resets.
+
+### Phone
+
+Contact number for urgent notifications.
+
+### Profile Photo
+
+Upload a photo to personalize your account.
 
 ## Changing Your Password
 
@@ -893,41 +1145,65 @@ Passwords must meet security requirements (minimum length, complexity) configure
 
 Control which notifications you receive:
 
-**Email Notifications**: Choose which types of events trigger email alerts.
+### Email Notifications
 
-**In-App Notifications**: Configure desktop notifications for time-sensitive events.
+Choose which types of events trigger email alerts.
 
-**Digest Emails**: Opt for daily or weekly summary emails instead of individual notifications.
+### In-App Notifications
+
+Configure desktop notifications for time-sensitive events.
+
+### Digest Emails
+
+Opt for daily or weekly summary emails instead of individual notifications.
 
 ## Display Preferences
 
 Customize how CCMS appears:
 
-**Theme**: Choose between light and dark themes.
+### Theme
 
-**Language**: Select your preferred language (if multiple languages are configured).
+Choose between light and dark themes.
 
-**Date Format**: Set your preferred date display format.
+### Language
 
-**Timezone**: Ensure timestamps match your local timezone.
+Select your preferred language (if multiple languages are configured).
+
+### Date Format
+
+Set your preferred date display format.
+
+### Timezone
+
+Ensure timestamps match your local timezone.
 
 ## Default Settings
 
 Set defaults for common actions:
 
-**Default Location**: If you primarily work at one location, set it as default for faster data entry.
+### Default Location
 
-**Default Audit View**: Choose how you prefer to view audit lists (grid, list, calendar).
+If you primarily work at one location, set it as default for faster data entry.
+
+### Default Audit View
+
+Choose how you prefer to view audit lists (grid, list, calendar).
 
 ## Privacy Settings
 
 Control your data and privacy:
 
-**Activity Visibility**: Choose whether other users can see your recent activity.
+### Activity Visibility
 
-**Profile Visibility**: Control who can view your full profile information.
+Choose whether other users can see your recent activity.
 
-**Data Export**: Request a copy of your personal data stored in the system.
+### Profile Visibility
+
+Control who can view your full profile information.
+
+### Data Export
+
+Request a copy of your personal data stored in the system.
 
 ## Two-Factor Authentication
 
@@ -957,13 +1233,21 @@ With 2FA enabled, you'll need both your password and a code from your authentica
 
 If you're having trouble signing in:
 
-**Check your email address**: Ensure you're using the correct email associated with your account. Email addresses are case-insensitive but must be spelled correctly.
+### Check your email address
 
-**Verify password**: Passwords are case-sensitive. Check that Caps Lock is not enabled.
+Ensure you're using the correct email associated with your account. Email addresses are case-insensitive but must be spelled correctly.
 
-**Clear browser cache**: Old cached data can sometimes interfere with login. Clear your browser cache and cookies, then try again.
+### Verify password
 
-**Try a different browser**: If issues persist, test with a different web browser to rule out browser-specific problems.
+Passwords are case-sensitive. Check that Caps Lock is not enabled.
+
+### Clear browser cache
+
+Old cached data can sometimes interfere with login. Clear your browser cache and cookies, then try again.
+
+### Try a different browser
+
+If issues persist, test with a different web browser to rule out browser-specific problems.
 
 ## Forgot Password
 
@@ -983,39 +1267,61 @@ Accounts are temporarily locked after multiple failed login attempts (typically 
 
 If your account is locked:
 
-**Wait 30 minutes**: Locks automatically expire after the lockout period.
+### Wait 30 minutes
 
-**Contact your administrator**: They can manually unlock your account immediately.
+Locks automatically expire after the lockout period.
 
-**Reset your password**: This also unlocks your account.
+### Contact your administrator
+
+They can manually unlock your account immediately.
+
+### Reset your password
+
+This also unlocks your account.
 
 ## Access Denied Messages
 
 If you can sign in but see "Access Denied" when trying to access certain features:
 
-**Check your role**: You may not have permission for that feature. Contact your administrator to request appropriate access.
+### Check your role
 
-**Verify location access**: Some features are restricted by location. Ensure you're assigned to the relevant location.
+You may not have permission for that feature. Contact your administrator to request appropriate access.
 
-**Session timeout**: Your session may have expired. Sign out and sign back in.
+### Verify location access
+
+Some features are restricted by location. Ensure you're assigned to the relevant location.
+
+### Session timeout
+
+Your session may have expired. Sign out and sign back in.
 
 ## Two-Factor Authentication Issues
 
 If you're having trouble with 2FA:
 
-**Time sync**: Ensure your authenticator app's time is synchronized correctly.
+### Time sync
 
-**Backup codes**: Use a backup code if you've lost access to your authenticator app.
+Ensure your authenticator app's time is synchronized correctly.
 
-**Contact administrator**: They can temporarily disable 2FA so you can sign in and reconfigure it.
+### Backup codes
+
+Use a backup code if you've lost access to your authenticator app.
+
+### Contact administrator
+
+They can temporarily disable 2FA so you can sign in and reconfigure it.
 
 ## Browser Compatibility
 
 CCMS works best with modern browsers:
 
-**Recommended**: Chrome, Edge, Firefox, Safari (latest versions)
+### Recommended
 
-**Not supported**: Internet Explorer
+Chrome, Edge, Firefox, Safari (latest versions)
+
+### Not supported
+
+Internet Explorer
 
 Update your browser to the latest version for the best experience and security.
 `
@@ -1033,73 +1339,121 @@ Update your browser to the latest version for the best experience and security.
 
 If CCMS is loading slowly:
 
-**Check internet connection**: Slow or unstable internet affects system performance. Test your connection speed and stability.
+### Check internet connection
 
-**Clear browser cache**: Accumulated cache can slow down the application. Clear your browser cache and reload the page.
+Slow or unstable internet affects system performance. Test your connection speed and stability.
 
-**Close unnecessary tabs**: Too many open browser tabs consume memory and processing power.
+### Clear browser cache
 
-**Disable browser extensions**: Some extensions interfere with web applications. Try disabling extensions temporarily.
+Accumulated cache can slow down the application. Clear your browser cache and reload the page.
 
-**Check system resources**: Ensure your computer has sufficient available memory and isn't running too many programs.
+### Close unnecessary tabs
+
+Too many open browser tabs consume memory and processing power.
+
+### Disable browser extensions
+
+Some extensions interfere with web applications. Try disabling extensions temporarily.
+
+### Check system resources
+
+Ensure your computer has sufficient available memory and isn't running too many programs.
 
 ## Page Not Loading
 
 If a page fails to load completely:
 
-**Refresh the page**: Press F5 or click the refresh button to reload.
+### Refresh the page
 
-**Check browser console**: Press F12 to open developer tools and check for error messages.
+Press F5 or click the refresh button to reload.
 
-**Try incognito mode**: Open CCMS in a private/incognito window to rule out extension or cache issues.
+### Check browser console
 
-**Contact support**: If problems persist, report the issue with details about what you were doing when it occurred.
+Press F12 to open developer tools and check for error messages.
+
+### Try incognito mode
+
+Open CCMS in a private/incognito window to rule out extension or cache issues.
+
+### Contact support
+
+If problems persist, report the issue with details about what you were doing when it occurred.
 
 ## Timeout Errors
 
 If you see timeout errors:
 
-**Large data sets**: Generating reports with extensive data can take time. Be patient and avoid clicking multiple times.
+### Large data sets
 
-**Network issues**: Timeouts often indicate network problems. Check your internet connection.
+Generating reports with extensive data can take time. Be patient and avoid clicking multiple times.
 
-**Try again later**: Temporary server load can cause timeouts. Wait a few minutes and retry.
+### Network issues
+
+Timeouts often indicate network problems. Check your internet connection.
+
+### Try again later
+
+Temporary server load can cause timeouts. Wait a few minutes and retry.
 
 ## Data Not Saving
 
 If your changes aren't being saved:
 
-**Check for error messages**: Look for red error notifications explaining why the save failed.
+### Check for error messages
 
-**Required fields**: Ensure all required fields are completed before saving.
+Look for red error notifications explaining why the save failed.
 
-**Session timeout**: If you've been inactive for a long time, your session may have expired. Sign in again.
+### Required fields
 
-**Network interruption**: Brief network disconnections can prevent saves. Check your connection and try again.
+Ensure all required fields are completed before saving.
+
+### Session timeout
+
+If you've been inactive for a long time, your session may have expired. Sign in again.
+
+### Network interruption
+
+Brief network disconnections can prevent saves. Check your connection and try again.
 
 ## Upload Failures
 
 If file uploads are failing:
 
-**File size**: Check that files don't exceed the maximum size limit (typically 10MB per file).
+### File size
 
-**File type**: Ensure you're uploading supported file types (PDF, JPG, PNG, DOCX, etc.).
+Check that files don't exceed the maximum size limit (typically 10MB per file).
 
-**Network stability**: Large file uploads require stable internet. Avoid uploading on unreliable connections.
+### File type
 
-**Browser issues**: Try a different browser if uploads consistently fail.
+Ensure you're uploading supported file types (PDF, JPG, PNG, DOCX, etc.).
+
+### Network stability
+
+Large file uploads require stable internet. Avoid uploading on unreliable connections.
+
+### Browser issues
+
+Try a different browser if uploads consistently fail.
 
 ## Screen Display Issues
 
 If the interface looks incorrect:
 
-**Zoom level**: Reset browser zoom to 100% (Ctrl+0 or Cmd+0).
+### Zoom level
 
-**Screen resolution**: CCMS is optimized for resolutions 1280x720 and higher.
+Reset browser zoom to 100% (Ctrl+0 or Cmd+0).
 
-**Browser compatibility**: Update to the latest browser version.
+### Screen resolution
 
-**Responsive design**: On mobile devices, rotate to landscape for better viewing of complex pages.
+CCMS is optimized for resolutions 1280x720 and higher.
+
+### Browser compatibility
+
+Update to the latest browser version.
+
+### Responsive design
+
+On mobile devices, rotate to landscape for better viewing of complex pages.
 `
   },
 
@@ -1115,67 +1469,109 @@ If the interface looks incorrect:
 
 If you can't find expected data:
 
-**Check filters**: Ensure filters aren't hiding the data you're looking for. Reset filters to show all records.
+### Check filters
 
-**Verify permissions**: You may not have access to certain data based on your role or assigned locations.
+Ensure filters aren't hiding the data you're looking for. Reset filters to show all records.
 
-**Search function**: Use the search feature to find specific records by name, ID, or other identifiers.
+### Verify permissions
 
-**Date range**: Expand the date range if looking for historical data.
+You may not have access to certain data based on your role or assigned locations.
 
-**Contact administrator**: They can verify whether the data exists and check your access permissions.
+### Search function
+
+Use the search feature to find specific records by name, ID, or other identifiers.
+
+### Date range
+
+Expand the date range if looking for historical data.
+
+### Contact administrator
+
+They can verify whether the data exists and check your access permissions.
 
 ## Duplicate Records
 
 If you see duplicate records:
 
-**Check carefully**: Records may appear similar but have different IDs or details.
+### Check carefully
 
-**Report to administrator**: True duplicates should be reported so they can be merged or removed.
+Records may appear similar but have different IDs or details.
 
-**Avoid creating duplicates**: Always search for existing records before creating new ones.
+### Report to administrator
+
+True duplicates should be reported so they can be merged or removed.
+
+### Avoid creating duplicates
+
+Always search for existing records before creating new ones.
 
 ## Incorrect Data
 
 If data appears incorrect:
 
-**Verify source**: Check when and by whom the data was entered (visible in audit trails).
+### Verify source
 
-**Update if needed**: If you have permission, edit the record to correct the information.
+Check when and by whom the data was entered (visible in audit trails).
 
-**Report errors**: Notify your administrator of systematic data errors that may indicate a larger issue.
+### Update if needed
+
+If you have permission, edit the record to correct the information.
+
+### Report errors
+
+Notify your administrator of systematic data errors that may indicate a larger issue.
 
 ## Sync Delays
 
 If recent changes aren't appearing:
 
-**Refresh the page**: Press F5 to reload and fetch the latest data.
+### Refresh the page
 
-**Wait briefly**: Some changes take a few seconds to propagate through the system.
+Press F5 to reload and fetch the latest data.
 
-**Check notifications**: The system may be performing maintenance or updates.
+### Wait briefly
+
+Some changes take a few seconds to propagate through the system.
+
+### Check notifications
+
+The system may be performing maintenance or updates.
 
 ## Export Issues
 
 If data exports are failing or incomplete:
 
-**Reduce date range**: Very large exports can timeout. Try exporting smaller date ranges.
+### Reduce date range
 
-**Check format**: Ensure you're using a supported export format.
+Very large exports can timeout. Try exporting smaller date ranges.
 
-**File permissions**: Verify you have permission to save files to your chosen location.
+### Check format
 
-**Browser downloads**: Check your browser's download settings and folder.
+Ensure you're using a supported export format.
+
+### File permissions
+
+Verify you have permission to save files to your chosen location.
+
+### Browser downloads
+
+Check your browser's download settings and folder.
 
 ## Audit Trail
 
 To track data changes:
 
-**View history**: Most records have a history or audit trail showing all changes.
+### View history
 
-**Identify who changed what**: Audit trails show the user, date, and nature of each change.
+Most records have a history or audit trail showing all changes.
 
-**Restore if needed**: Contact your administrator if data needs to be restored to a previous state.
+### Identify who changed what
+
+Audit trails show the user, date, and nature of each change.
+
+### Restore if needed
+
+Contact your administrator if data needs to be restored to a previous state.
 `
   },
 
@@ -1209,11 +1605,17 @@ For account-related issues, permissions, or organization-specific questions, con
 
 For technical issues that your administrator cannot resolve:
 
-**Email Support**: support@ccms.co.uk
+### Email Support
 
-**Phone Support**: Available during business hours (9 AM - 5 PM GMT, Monday-Friday)
+support@ccms.co.uk
 
-**Emergency Support**: For critical system issues affecting care delivery, use the emergency support line available 24/7
+### Phone Support
+
+Available during business hours (9 AM - 5 PM GMT, Monday-Friday)
+
+### Emergency Support
+
+For critical system issues affecting care delivery, use the emergency support line available 24/7
 
 When contacting support, provide:
 
@@ -1232,13 +1634,21 @@ Have ideas for improving CCMS? Submit feature requests through the feedback form
 
 Need additional training on CCMS features?
 
-**Online Training**: Self-paced video tutorials available in the Training section
+### Online Training
 
-**Live Training**: Schedule group training sessions for your team
+Self-paced video tutorials available in the Training section
 
-**Documentation**: Download user guides and quick reference cards
+### Live Training
 
-**Onboarding**: New users receive an onboarding tour highlighting key features
+Schedule group training sessions for your team
+
+### Documentation
+
+Download user guides and quick reference cards
+
+### Onboarding
+
+New users receive an onboarding tour highlighting key features
 
 ## Community Forum
 
@@ -1290,11 +1700,17 @@ The Analytics Dashboard provides comprehensive insights into your organisation's
 
 The compliance overview displays your organisation's overall compliance score calculated from recent audits. The score is presented as a percentage with colour-coded indicators:
 
-**Green (85-100%)**: Excellent compliance - maintain current standards
+### Green (85-100%)
 
-**Amber (70-84%)**: Adequate compliance - some areas need attention
+Excellent compliance - maintain current standards
 
-**Red (Below 70%)**: Poor compliance - immediate action required
+### Amber (70-84%)
+
+Adequate compliance - some areas need attention
+
+### Red (Below 70%)
+
+Poor compliance - immediate action required
 
 The compliance trend chart shows how your score has changed over the past 12 months, helping you identify improvements or declining performance.
 
@@ -1302,51 +1718,85 @@ The compliance trend chart shows how your score has changed over the past 12 mon
 
 View incident statistics including:
 
-**Total Incidents**: Count of all reported incidents in the selected period
+### Total Incidents
 
-**Severity Breakdown**: Distribution of incidents by severity level (minor, moderate, serious, critical)
+Count of all reported incidents in the selected period
 
-**Category Analysis**: Incidents grouped by type (medication errors, falls, safeguarding, etc.)
+### Severity Breakdown
 
-**Resolution Time**: Average time taken to investigate and resolve incidents
+Distribution of incidents by severity level (minor, moderate, serious, critical)
 
-**Trend Analysis**: Month-by-month comparison showing whether incidents are increasing or decreasing
+### Category Analysis
+
+Incidents grouped by type (medication errors, falls, safeguarding, etc.)
+
+### Resolution Time
+
+Average time taken to investigate and resolve incidents
+
+### Trend Analysis
+
+Month-by-month comparison showing whether incidents are increasing or decreasing
 
 ### Audit Performance
 
 Track your audit programme effectiveness:
 
-**Completion Rate**: Percentage of scheduled audits completed on time
+### Completion Rate
 
-**Average Scores**: Mean audit scores across all audit types
+Percentage of scheduled audits completed on time
 
-**Overdue Audits**: List of audits past their due date requiring immediate attention
+### Average Scores
 
-**Audit Frequency**: Visual representation of how often each audit type is conducted
+Mean audit scores across all audit types
+
+### Overdue Audits
+
+List of audits past their due date requiring immediate attention
+
+### Audit Frequency
+
+Visual representation of how often each audit type is conducted
 
 ### Staff Compliance
 
 Monitor staff-related compliance metrics:
 
-**Training Completion**: Percentage of staff with up-to-date mandatory training
+### Training Completion
 
-**Supervision Status**: Staff members due for supervision or appraisal
+Percentage of staff with up-to-date mandatory training
 
-**DBS Renewals**: Upcoming DBS check expiry dates
+### Supervision Status
 
-**Competency Assessments**: Staff requiring competency reassessment
+Staff members due for supervision or appraisal
+
+### DBS Renewals
+
+Upcoming DBS check expiry dates
+
+### Competency Assessments
+
+Staff requiring competency reassessment
 
 ## Filtering Data
 
 Use the filter controls at the top of the dashboard to customise your view:
 
-**Date Range**: Select from preset ranges (last 7 days, 30 days, 90 days, 12 months) or choose custom dates
+### Date Range
 
-**Location**: Filter by specific care home location if you manage multiple sites
+Select from preset ranges (last 7 days, 30 days, 90 days, 12 months) or choose custom dates
 
-**Department**: View data for specific departments or teams
+### Location
 
-**Audit Type**: Focus on particular audit categories
+Filter by specific care home location if you manage multiple sites
+
+### Department
+
+View data for specific departments or teams
+
+### Audit Type
+
+Focus on particular audit categories
 
 ## Exporting Analytics
 
@@ -1375,13 +1825,21 @@ Alerts help you respond quickly to emerging issues before they become serious pr
 
 Compare your performance against:
 
-**Historical Performance**: See how you're performing compared to previous periods
+### Historical Performance
 
-**Internal Benchmarks**: Compare locations within your organisation
+See how you're performing compared to previous periods
 
-**Industry Standards**: View anonymised sector averages (where available)
+### Internal Benchmarks
 
-**CQC Requirements**: Track performance against regulatory expectations
+Compare locations within your organisation
+
+### Industry Standards
+
+View anonymised sector averages (where available)
+
+### CQC Requirements
+
+Track performance against regulatory expectations
 
 ## Scheduled Reports
 
@@ -1461,9 +1919,15 @@ Customise how you receive notifications:
 1. Navigate to Settings > Notifications
 2. Toggle email notifications on/off for each category
 3. Choose notification frequency:
-   - **Immediate**: Receive emails as events occur
-   - **Daily Digest**: One email per day summarising all notifications
-   - **Weekly Summary**: Weekly roundup of key notifications
+   - ### Immediate
+
+Receive emails as events occur
+   - ### Daily Digest
+
+One email per day summarising all notifications
+   - ### Weekly Summary
+
+Weekly roundup of key notifications
 4. Set quiet hours to avoid notifications during specific times
 5. Save your preferences
 
@@ -1592,47 +2056,85 @@ Click "Advanced Search" or use the filter icon to access detailed search options
 
 ### Date Filters
 
-- **Created Date**: Find records created within a specific date range
-- **Modified Date**: Find recently updated records
-- **Due Date**: Find items due within a certain timeframe
-- **Completed Date**: Find items completed in a specific period
+- ### Created Date
+
+Find records created within a specific date range
+- ### Modified Date
+
+Find recently updated records
+- ### Due Date
+
+Find items due within a certain timeframe
+- ### Completed Date
+
+Find items completed in a specific period
 
 ### Status Filters
 
-- **Active/Inactive**: Filter by record status
-- **Completion Status**: Show only complete, in-progress, or pending items
-- **Approval Status**: Find items awaiting approval or already approved
+- ### Active/Inactive
+
+Filter by record status
+- ### Completion Status
+
+Show only complete, in-progress, or pending items
+- ### Approval Status
+
+Find items awaiting approval or already approved
 
 ### Category Filters
 
-- **Audit Type**: Filter by specific audit categories
-- **Incident Type**: Show only certain incident categories
-- **Location**: Filter by care home location
-- **Department**: Show records from specific departments
+- ### Audit Type
+
+Filter by specific audit categories
+- ### Incident Type
+
+Show only certain incident categories
+- ### Location
+
+Filter by care home location
+- ### Department
+
+Show records from specific departments
 
 ### User Filters
 
-- **Created By**: Find items created by specific users
-- **Assigned To**: Show items assigned to particular staff members
-- **Reviewed By**: Find records reviewed by specific people
+- ### Created By
+
+Find items created by specific users
+- ### Assigned To
+
+Show items assigned to particular staff members
+- ### Reviewed By
+
+Find records reviewed by specific people
 
 ## Search Operators
 
 Use special operators for more precise searches:
 
-**Exact Phrase**: Use quotation marks
+### Exact Phrase
+
+Use quotation marks
 - Example: "medication error" finds only that exact phrase
 
-**Exclude Terms**: Use minus sign
+### Exclude Terms
+
+Use minus sign
 - Example: incident -minor excludes minor incidents
 
-**Multiple Terms**: Use OR
+### Multiple Terms
+
+Use OR
 - Example: falls OR trips finds either term
 
-**Required Terms**: Use AND
+### Required Terms
+
+Use AND
 - Example: audit AND completed finds audits that are completed
 
-**Wildcard**: Use asterisk
+### Wildcard
+
+Use asterisk
 - Example: med* finds medication, medicine, medical, etc.
 
 ## Saving Searches
@@ -1653,10 +2155,18 @@ Saved searches appear in your user menu for one-click access.
 
 Click column headers to sort results:
 
-- **Relevance**: Most relevant results first (default)
-- **Date**: Newest or oldest first
-- **Name**: Alphabetical order
-- **Status**: Group by status
+- ### Relevance
+
+Most relevant results first (default)
+- ### Date
+
+Newest or oldest first
+- ### Name
+
+Alphabetical order
+- ### Status
+
+Group by status
 
 ### Viewing Results
 
@@ -1680,30 +2190,56 @@ Exports include all records matching your search, not just those visible on the 
 
 ## Search Tips
 
-**Be specific**: Use multiple search terms to narrow results
+### Be specific
 
-**Use filters**: Combine text search with filters for best results
+Use multiple search terms to narrow results
 
-**Check spelling**: Typos will prevent matches
+### Use filters
 
-**Try variations**: Search for both "service user" and "resident"
+Combine text search with filters for best results
 
-**Use wildcards**: When unsure of exact spelling or want to find variations
+### Check spelling
 
-**Save common searches**: Speeds up repetitive tasks
+Typos will prevent matches
 
-**Review recent searches**: Access your search history from the search dropdown
+### Try variations
+
+Search for both "service user" and "resident"
+
+### Use wildcards
+
+When unsure of exact spelling or want to find variations
+
+### Save common searches
+
+Speeds up repetitive tasks
+
+### Review recent searches
+
+Access your search history from the search dropdown
 
 ## Search Shortcuts
 
 Keyboard shortcuts for faster searching:
 
-- **Ctrl/Cmd + K**: Open global search from anywhere
-- **Ctrl/Cmd + F**: Search within current page
-- **Enter**: Execute search
-- **Esc**: Close search results
-- **Arrow keys**: Navigate search results
-- **Enter on result**: Open selected record
+- ### Ctrl/Cmd + K
+
+Open global search from anywhere
+- ### Ctrl/Cmd + F
+
+Search within current page
+- ### Enter
+
+Execute search
+- ### Esc
+
+Close search results
+- ### Arrow keys
+
+Navigate search results
+- ### Enter on result
+
+Open selected record
 
 ## Troubleshooting Search
 
@@ -1761,7 +2297,8 @@ For quick access, add CCMS to your home screen:
 3. Select "Add to Home Screen"
 4. Name the shortcut and tap "Add"
 
-**Android**:
+### Android
+
 1. Open CCMS in Chrome
 2. Tap the menu (three dots)
 3. Select "Add to Home screen"
@@ -1771,17 +2308,29 @@ For quick access, add CCMS to your home screen:
 
 The CCMS mobile app provides:
 
-**Offline Access**: View previously loaded data without internet connection
+### Offline Access
 
-**Push Notifications**: Receive instant alerts for critical events
+View previously loaded data without internet connection
 
-**Camera Integration**: Take photos directly for evidence or incident reporting
+### Push Notifications
 
-**Biometric Login**: Use fingerprint or face recognition for quick, secure access
+Receive instant alerts for critical events
 
-**Voice Input**: Dictate notes and observations instead of typing
+### Camera Integration
 
-**Barcode Scanning**: Scan medication barcodes or resident wristbands
+Take photos directly for evidence or incident reporting
+
+### Biometric Login
+
+Use fingerprint or face recognition for quick, secure access
+
+### Voice Input
+
+Dictate notes and observations instead of typing
+
+### Barcode Scanning
+
+Scan medication barcodes or resident wristbands
 
 ## Mobile-Optimised Features
 
@@ -1810,13 +2359,21 @@ Mobile design includes:
 
 Use your device camera for:
 
-**Evidence Photos**: Capture images during audits
+### Evidence Photos
 
-**Incident Documentation**: Photograph incident scenes (following privacy guidelines)
+Capture images during audits
 
-**Document Scanning**: Scan paper documents to upload
+### Incident Documentation
 
-**Signature Capture**: Collect electronic signatures
+Photograph incident scenes (following privacy guidelines)
+
+### Document Scanning
+
+Scan paper documents to upload
+
+### Signature Capture
+
+Collect electronic signatures
 
 ## Conducting Audits on Mobile
 
@@ -1850,21 +2407,24 @@ Critical incidents trigger immediate notifications to appropriate staff.
 
 When internet connection is unavailable:
 
-**What Works Offline**:
+### What Works Offline
+
 - View previously loaded data
 - Start and complete audits
 - Create incident reports
 - Record observations
 - Take photos and notes
 
-**What Requires Connection**:
+### What Requires Connection
+
 - Loading new data
 - Submitting completed forms
 - Accessing reports
 - Real-time notifications
 - User management
 
-**Syncing Data**:
+### Syncing Data
+
 When connection is restored, the app automatically syncs all offline changes. You'll see a sync indicator showing upload progress.
 
 ## Mobile Security
@@ -1887,19 +2447,22 @@ When connection is restored, the app automatically syncs all offline changes. Yo
 
 ## Mobile Tips
 
-**Battery Management**:
+### Battery Management
+
 - Close the app when not in use
 - Reduce screen brightness
 - Disable background app refresh if not needed
 - Carry a portable charger for long shifts
 
-**Data Usage**:
+### Data Usage
+
 - Connect to Wi-Fi when available
 - Download large reports on Wi-Fi only
 - Compress photos before uploading
 - Monitor your mobile data usage
 
-**Performance**:
+### Performance
+
 - Keep the app updated
 - Clear cache periodically (Settings > Clear Cache)
 - Restart the app if it becomes slow
@@ -1982,15 +2545,25 @@ CCMS is designed to help care organisations comply with GDPR (General Data Prote
 
 CCMS processes personal data under several legal bases:
 
-**Contractual Necessity**: To provide care services
+### Contractual Necessity
 
-**Legal Obligation**: To comply with CQC regulations and safeguarding requirements
+To provide care services
 
-**Vital Interests**: To protect the health and safety of service users
+### Legal Obligation
 
-**Legitimate Interests**: To manage staff and maintain operational records
+To comply with CQC regulations and safeguarding requirements
 
-**Consent**: Where explicitly obtained for specific purposes
+### Vital Interests
+
+To protect the health and safety of service users
+
+### Legitimate Interests
+
+To manage staff and maintain operational records
+
+### Consent
+
+Where explicitly obtained for specific purposes
 
 ## Data Subject Rights
 
@@ -2059,35 +2632,61 @@ Service users can withdraw consent at any time:
 
 CCMS employs multiple security layers:
 
-**Encryption**: All data encrypted in transit and at rest
+### Encryption
 
-**Access Controls**: Role-based permissions limit data access
+All data encrypted in transit and at rest
 
-**Authentication**: Strong password requirements and optional two-factor authentication
+### Access Controls
 
-**Audit Trails**: All data access and changes are logged
+Role-based permissions limit data access
 
-**Regular Backups**: Data backed up daily with secure storage
+### Authentication
 
-**Penetration Testing**: Regular security assessments
+Strong password requirements and optional two-factor authentication
 
-**Staff Training**: Mandatory data protection training for all users
+### Audit Trails
+
+All data access and changes are logged
+
+### Regular Backups
+
+Data backed up daily with secure storage
+
+### Penetration Testing
+
+Regular security assessments
+
+### Staff Training
+
+Mandatory data protection training for all users
 
 ## Data Retention
 
 CCMS follows legal retention requirements:
 
-**Service User Records**: 20 years from last contact or 8 years after death
+### Service User Records
 
-**Staff Records**: 6 years after employment ends
+20 years from last contact or 8 years after death
 
-**Incident Reports**: 20 years
+### Staff Records
 
-**Audit Records**: 6 years
+6 years after employment ends
 
-**Financial Records**: 6 years
+### Incident Reports
 
-**System Logs**: 12 months
+20 years
+
+### Audit Records
+
+6 years
+
+### Financial Records
+
+6 years
+
+### System Logs
+
+12 months
 
 After retention periods expire, data is securely deleted.
 
@@ -2149,17 +2748,29 @@ Breaches must be reported to the ICO within 72 hours if they pose a risk to indi
 
 CCMS incorporates privacy principles:
 
-**Data Minimisation**: Only collect necessary data
+### Data Minimisation
 
-**Purpose Limitation**: Use data only for stated purposes
+Only collect necessary data
 
-**Storage Limitation**: Delete data when no longer needed
+### Purpose Limitation
 
-**Accuracy**: Keep data up to date
+Use data only for stated purposes
 
-**Integrity and Confidentiality**: Protect data from unauthorised access
+### Storage Limitation
 
-**Accountability**: Maintain records of processing activities
+Delete data when no longer needed
+
+### Accuracy
+
+Keep data up to date
+
+### Integrity and Confidentiality
+
+Protect data from unauthorised access
+
+### Accountability
+
+Maintain records of processing activities
 
 ## Training and Awareness
 
@@ -2175,13 +2786,21 @@ All CCMS users must:
 
 For data protection queries:
 
-**Data Protection Officer**: dpo@ccms.co.uk
+### Data Protection Officer
 
-**Privacy Questions**: privacy@ccms.co.uk
+dpo@ccms.co.uk
 
-**Report a Breach**: breach@ccms.co.uk (monitored 24/7)
+### Privacy Questions
 
-**ICO (Information Commissioner's Office)**: ico.org.uk
+privacy@ccms.co.uk
+
+### Report a Breach
+
+breach@ccms.co.uk (monitored 24/7)
+
+### ICO (Information Commissioner's Office)
+
+ico.org.uk
 `
   },
 
@@ -2201,143 +2820,269 @@ Keyboard shortcuts help you navigate CCMS more efficiently. This guide covers al
 
 These shortcuts work from anywhere in the system:
 
-**Ctrl/Cmd + K**: Open global search
+### Ctrl/Cmd + K
 
-**Ctrl/Cmd + /**: Show keyboard shortcuts help
+Open global search
 
-**Ctrl/Cmd + ,**: Open settings
+### Ctrl/Cmd + /
 
-**Ctrl/Cmd + H**: Go to home/dashboard
+Show keyboard shortcuts help
 
-**Ctrl/Cmd + N**: Create new record (context-dependent)
+### Ctrl/Cmd + ,
 
-**Ctrl/Cmd + S**: Save current form
+Open settings
 
-**Esc**: Close modal or cancel current action
+### Ctrl/Cmd + H
 
-**Alt + N**: Open notifications
+Go to home/dashboard
 
-**Alt + M**: Open main menu
+### Ctrl/Cmd + N
 
-**Alt + U**: Open user menu
+Create new record (context-dependent)
+
+### Ctrl/Cmd + S
+
+Save current form
+
+### Esc
+
+Close modal or cancel current action
+
+### Alt + N
+
+Open notifications
+
+### Alt + M
+
+Open main menu
+
+### Alt + U
+
+Open user menu
 
 ## Navigation Shortcuts
 
-**Alt + 1**: Go to Dashboard
+### Alt + 1
 
-**Alt + 2**: Go to Audits
+Go to Dashboard
 
-**Alt + 3**: Go to Incidents
+### Alt + 2
 
-**Alt + 4**: Go to Service Users
+Go to Audits
 
-**Alt + 5**: Go to Staff
+### Alt + 3
 
-**Alt + 6**: Go to Reports
+Go to Incidents
 
-**Alt + 7**: Go to Settings
+### Alt + 4
 
-**Alt + 8**: Go to Help Center
+Go to Service Users
 
-**Alt + Left Arrow**: Go back
+### Alt + 5
 
-**Alt + Right Arrow**: Go forward
+Go to Staff
+
+### Alt + 6
+
+Go to Reports
+
+### Alt + 7
+
+Go to Settings
+
+### Alt + 8
+
+Go to Help Center
+
+### Alt + Left Arrow
+
+Go back
+
+### Alt + Right Arrow
+
+Go forward
 
 ## Form Shortcuts
 
-**Tab**: Move to next field
+### Tab
 
-**Shift + Tab**: Move to previous field
+Move to next field
 
-**Enter**: Submit form (when focused on submit button)
+### Shift + Tab
 
-**Ctrl/Cmd + Enter**: Quick submit from any field
+Move to previous field
 
-**Ctrl/Cmd + Z**: Undo last change
+### Enter
 
-**Ctrl/Cmd + Shift + Z**: Redo
+Submit form (when focused on submit button)
 
-**Ctrl/Cmd + A**: Select all text in field
+### Ctrl/Cmd + Enter
 
-**Ctrl/Cmd + C**: Copy selected text
+Quick submit from any field
 
-**Ctrl/Cmd + V**: Paste
+### Ctrl/Cmd + Z
 
-**Ctrl/Cmd + X**: Cut
+Undo last change
+
+### Ctrl/Cmd + Shift + Z
+
+Redo
+
+### Ctrl/Cmd + A
+
+Select all text in field
+
+### Ctrl/Cmd + C
+
+Copy selected text
+
+### Ctrl/Cmd + V
+
+Paste
+
+### Ctrl/Cmd + X
+
+Cut
 
 ## Table/List Shortcuts
 
-**Arrow Keys**: Navigate between rows
+### Arrow Keys
 
-**Enter**: Open selected item
+Navigate between rows
 
-**Space**: Select/deselect item
+### Enter
 
-**Ctrl/Cmd + A**: Select all items
+Open selected item
 
-**Ctrl/Cmd + Click**: Select multiple items
+### Space
 
-**Shift + Click**: Select range of items
+Select/deselect item
 
-**Delete**: Delete selected item(s) (with confirmation)
+### Ctrl/Cmd + A
 
-**Ctrl/Cmd + F**: Search within table
+Select all items
 
-**Ctrl/Cmd + E**: Export table data
+### Ctrl/Cmd + Click
+
+Select multiple items
+
+### Shift + Click
+
+Select range of items
+
+### Delete
+
+Delete selected item(s) (with confirmation)
+
+### Ctrl/Cmd + F
+
+Search within table
+
+### Ctrl/Cmd + E
+
+Export table data
 
 ## Audit Shortcuts
 
-**Ctrl/Cmd + Right Arrow**: Next question
+### Ctrl/Cmd + Right Arrow
 
-**Ctrl/Cmd + Left Arrow**: Previous question
+Next question
 
-**Ctrl/Cmd + S**: Save progress
+### Ctrl/Cmd + Left Arrow
 
-**Ctrl/Cmd + Shift + S**: Save and exit
+Previous question
 
-**Ctrl/Cmd + Shift + C**: Complete audit
+### Ctrl/Cmd + S
 
-**Alt + P**: Add photo evidence
+Save progress
 
-**Alt + A**: Create action plan
+### Ctrl/Cmd + Shift + S
 
-**Alt + C**: Add comment
+Save and exit
+
+### Ctrl/Cmd + Shift + C
+
+Complete audit
+
+### Alt + P
+
+Add photo evidence
+
+### Alt + A
+
+Create action plan
+
+### Alt + C
+
+Add comment
 
 ## Text Editor Shortcuts
 
-**Ctrl/Cmd + B**: Bold
+### Ctrl/Cmd + B
 
-**Ctrl/Cmd + I**: Italic
+Bold
 
-**Ctrl/Cmd + U**: Underline
+### Ctrl/Cmd + I
 
-**Ctrl/Cmd + K**: Insert link
+Italic
 
-**Ctrl/Cmd + Shift + 7**: Numbered list
+### Ctrl/Cmd + U
 
-**Ctrl/Cmd + Shift + 8**: Bullet list
+Underline
 
-**Ctrl/Cmd + [**: Decrease indent
+### Ctrl/Cmd + K
 
-**Ctrl/Cmd + ]**: Increase indent
+Insert link
 
-**Ctrl/Cmd + Shift + X**: Strikethrough
+### Ctrl/Cmd + Shift + 7
+
+Numbered list
+
+### Ctrl/Cmd + Shift + 8
+
+Bullet list
+
+### Ctrl/Cmd + [
+
+Decrease indent
+
+### Ctrl/Cmd + ]
+
+Increase indent
+
+### Ctrl/Cmd + Shift + X
+
+Strikethrough
 
 ## Search Shortcuts
 
-**Ctrl/Cmd + F**: Search current page
+### Ctrl/Cmd + F
 
-**Ctrl/Cmd + G**: Find next
+Search current page
 
-**Ctrl/Cmd + Shift + G**: Find previous
+### Ctrl/Cmd + G
 
-**Enter**: Search
+Find next
 
-**Esc**: Close search
+### Ctrl/Cmd + Shift + G
 
-**Arrow Keys**: Navigate search results
+Find previous
 
-**Enter on result**: Open selected result
+### Enter
+
+Search
+
+### Esc
+
+Close search
+
+### Arrow Keys
+
+Navigate search results
+
+### Enter on result
+
+Open selected result
 
 ## Calendar Shortcuts
 
@@ -2353,27 +3098,47 @@ These shortcuts work from anywhere in the system:
 
 **M**: Month view
 
-**Enter**: Create event on selected date
+### Enter
 
-**Arrow Keys**: Navigate dates
+Create event on selected date
+
+### Arrow Keys
+
+Navigate dates
 
 ## Accessibility Shortcuts
 
-**Alt + Plus**: Increase text size
+### Alt + Plus
 
-**Alt + Minus**: Decrease text size
+Increase text size
 
-**Alt + 0**: Reset text size
+### Alt + Minus
 
-**Alt + C**: Toggle high contrast mode
+Decrease text size
 
-**Alt + R**: Toggle screen reader optimisations
+### Alt + 0
 
-**Tab**: Navigate focusable elements
+Reset text size
 
-**Shift + Tab**: Navigate backwards
+### Alt + C
 
-**Enter/Space**: Activate focused element
+Toggle high contrast mode
+
+### Alt + R
+
+Toggle screen reader optimisations
+
+### Tab
+
+Navigate focusable elements
+
+### Shift + Tab
+
+Navigate backwards
+
+### Enter/Space
+
+Activate focused element
 
 ## Customising Shortcuts
 
@@ -2385,31 +3150,51 @@ You can customise keyboard shortcuts:
 4. Click "Save" to confirm
 5. Reset to defaults anytime
 
-**Note**: Some shortcuts cannot be changed as they're standard browser functions.
+### Note
+
+Some shortcuts cannot be changed as they're standard browser functions.
 
 ## Platform Differences
 
-**Windows/Linux**: Use Ctrl key
+### Windows/Linux
 
-**Mac**: Use Cmd (⌘) key
+Use Ctrl key
 
-**Alt key**: Option (⌥) on Mac
+### Mac
+
+Use Cmd (⌘) key
+
+### Alt key
+
+Option (⌥) on Mac
 
 Most shortcuts work identically across platforms with these key substitutions.
 
 ## Tips for Learning Shortcuts
 
-**Start with frequently used actions**: Focus on shortcuts for tasks you perform daily
+### Start with frequently used actions
 
-**Use the cheat sheet**: Press Ctrl/Cmd + / to see available shortcuts
+Focus on shortcuts for tasks you perform daily
 
-**Practice regularly**: Muscle memory develops with repetition
+### Use the cheat sheet
 
-**Hover for hints**: Many buttons show their shortcut in the tooltip
+Press Ctrl/Cmd + / to see available shortcuts
 
-**Customise for your workflow**: Adjust shortcuts to match your preferences
+### Practice regularly
 
-**Don't memorise everything**: Learn shortcuts as you need them
+Muscle memory develops with repetition
+
+### Hover for hints
+
+Many buttons show their shortcut in the tooltip
+
+### Customise for your workflow
+
+Adjust shortcuts to match your preferences
+
+### Don't memorise everything
+
+Learn shortcuts as you need them
 
 ## Troubleshooting Shortcuts
 
@@ -2451,13 +3236,21 @@ CCMS works best on modern, up-to-date browsers:
 
 ### Recommended Browsers
 
-**Google Chrome**: Version 90 or later (recommended)
+### Google Chrome
 
-**Microsoft Edge**: Version 90 or later (Chromium-based)
+Version 90 or later (recommended)
 
-**Mozilla Firefox**: Version 88 or later
+### Microsoft Edge
 
-**Apple Safari**: Version 14 or later (macOS and iOS)
+Version 90 or later (Chromium-based)
+
+### Mozilla Firefox
+
+Version 88 or later
+
+### Apple Safari
+
+Version 14 or later (macOS and iOS)
 
 ### Browser Features Required
 
@@ -2469,122 +3262,177 @@ CCMS works best on modern, up-to-date browsers:
 
 ### Unsupported Browsers
 
-**Internet Explorer**: No longer supported (use Edge instead)
+### Internet Explorer
 
-**Older browser versions**: May have limited functionality or security issues
+No longer supported (use Edge instead)
+
+### Older browser versions
+
+May have limited functionality or security issues
 
 ## Operating Systems
 
 ### Desktop/Laptop
 
-**Windows**: Windows 10 or later
+### Windows
+
+Windows 10 or later
 
 **macOS**: macOS 10.14 (Mojave) or later
 
-**Linux**: Modern distributions with up-to-date browsers
+### Linux
 
-**Chrome OS**: Current version
+Modern distributions with up-to-date browsers
+
+### Chrome OS
+
+Current version
 
 ### Mobile Devices
 
 **iOS**: iOS 13 or later (iPhone, iPad)
 
-**Android**: Android 8.0 (Oreo) or later
+### Android
 
-**Tablets**: Same requirements as mobile phones
+Android 8.0 (Oreo) or later
+
+### Tablets
+
+Same requirements as mobile phones
 
 ## Hardware Requirements
 
 ### Minimum Specifications
 
-**Processor**: Dual-core 1.6 GHz or equivalent
+### Processor
 
-**RAM**: 4 GB
+Dual-core 1.6 GHz or equivalent
 
-**Storage**: 500 MB free space (for cached data)
+### RAM
 
-**Display**: 1280x720 resolution
+4 GB
 
-**Internet**: 2 Mbps download, 1 Mbps upload
+### Storage
+
+500 MB free space (for cached data)
+
+### Display
+
+1280x720 resolution
+
+### Internet
+
+2 Mbps download, 1 Mbps upload
 
 ### Recommended Specifications
 
-**Processor**: Quad-core 2.0 GHz or better
+### Processor
 
-**RAM**: 8 GB or more
+Quad-core 2.0 GHz or better
 
-**Storage**: 1 GB free space
+### RAM
 
-**Display**: 1920x1080 resolution or higher
+8 GB or more
 
-**Internet**: 10 Mbps download, 5 Mbps upload
+### Storage
+
+1 GB free space
+
+### Display
+
+1920x1080 resolution or higher
+
+### Internet
+
+10 Mbps download, 5 Mbps upload
 
 ## Internet Connection
 
 ### Connection Types
 
-**Broadband**: Recommended for office use
+### Broadband
+
+Recommended for office use
 
 **4G/5G Mobile**: Suitable for mobile access
 
 **3G**: Minimum for basic functionality
 
-**Wi-Fi**: Ensure strong signal strength
+### Wi-Fi
+
+Ensure strong signal strength
 
 ### Bandwidth Usage
 
-**Typical Usage**: 50-100 MB per hour
+### Typical Usage
 
-**With Photos**: 200-500 MB per hour
+50-100 MB per hour
 
-**Video Content**: 1-2 GB per hour
+### With Photos
 
-**Background Sync**: 10-50 MB per day
+200-500 MB per hour
+
+### Video Content
+
+1-2 GB per hour
+
+### Background Sync
+
+10-50 MB per day
 
 ## Browser Configuration
 
 ### Enabling JavaScript
 
-**Chrome/Edge**:
+### Chrome/Edge
+
 1. Settings > Privacy and security > Site settings
 2. JavaScript > Allowed
 
-**Firefox**:
+### Firefox
+
 1. Type about:config in address bar
 2. Search for javascript.enabled
 3. Ensure it's set to true
 
-**Safari**:
+### Safari
+
 1. Preferences > Security
 2. Enable JavaScript checkbox
 
 ### Enabling Cookies
 
-**Chrome/Edge**:
+### Chrome/Edge
+
 1. Settings > Privacy and security > Cookies
 2. Allow all cookies or add CCMS as exception
 
-**Firefox**:
+### Firefox
+
 1. Settings > Privacy & Security
 2. Standard or Custom with cookies allowed
 
-**Safari**:
+### Safari
+
 1. Preferences > Privacy
 2. Uncheck "Block all cookies"
 
 ### Allowing Pop-ups
 
-**Chrome/Edge**:
+### Chrome/Edge
+
 1. Settings > Privacy and security > Site settings
 2. Pop-ups and redirects
 3. Add CCMS URL to allowed list
 
-**Firefox**:
+### Firefox
+
 1. Settings > Privacy & Security
 2. Permissions > Block pop-up windows
 3. Add CCMS as exception
 
-**Safari**:
+### Safari
+
 1. Preferences > Websites > Pop-up Windows
 2. Set CCMS to "Allow"
 
@@ -2601,9 +3449,13 @@ Ensure these domains are whitelisted:
 
 ### Required Ports
 
-**HTTPS**: Port 443 (outbound)
+### HTTPS
 
-**WebSocket**: Port 443 (for real-time features)
+Port 443 (outbound)
+
+### WebSocket
+
+Port 443 (for real-time features)
 
 ### Proxy Servers
 
@@ -2635,27 +3487,47 @@ CCMS works with most VPNs, but:
 
 ### Browser Optimisation
 
-**Clear cache regularly**: Settings > Privacy > Clear browsing data
+### Clear cache regularly
 
-**Disable unnecessary extensions**: May interfere with CCMS
+Settings > Privacy > Clear browsing data
 
-**Keep browser updated**: Latest version has best performance
+### Disable unnecessary extensions
 
-**Close unused tabs**: Frees up memory
+May interfere with CCMS
 
-**Restart browser periodically**: Clears memory leaks
+### Keep browser updated
+
+Latest version has best performance
+
+### Close unused tabs
+
+Frees up memory
+
+### Restart browser periodically
+
+Clears memory leaks
 
 ### System Optimisation
 
-**Close unnecessary applications**: Frees up RAM
+### Close unnecessary applications
 
-**Keep OS updated**: Security and performance improvements
+Frees up RAM
 
-**Run disk cleanup**: Removes temporary files
+### Keep OS updated
 
-**Check for malware**: Can slow system performance
+Security and performance improvements
 
-**Upgrade hardware if needed**: Especially RAM and SSD
+### Run disk cleanup
+
+Removes temporary files
+
+### Check for malware
+
+Can slow system performance
+
+### Upgrade hardware if needed
+
+Especially RAM and SSD
 
 ## Testing Your System
 

@@ -2459,3 +2459,15 @@
 - [x] Update frontend to handle unauthenticated state gracefully (show login prompt when trying to bookmark/feedback)
 - [x] Test Help Center works for both authenticated and unauthenticated users
 - [x] Add cache-busting version comment to CSS to force browser reload
+
+
+## Help Article Content Structure Updates (COMPLETED)
+- [x] Review all help articles in helpContent.ts
+- [x] Converted 444 bold text labels to ### headings using Python script
+- [x] Added @tailwindcss/typography plugin to index.css
+- [x] Enhanced prose styling for better visual hierarchy:
+  - H1: Large title with bottom border
+  - H2: Indigo color with top border separator
+  - H3: Left indigo border accent for subsections
+  - Proper paragraph spacing and line height
+- [x] Ensure consistent heading hierarchy across all articles

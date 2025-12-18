@@ -1,6 +1,7 @@
 /* CCMS Help Center Styles - Version 2.0.1 - Updated 2025-12-18 */
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
