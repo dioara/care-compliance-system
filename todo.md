@@ -2483,3 +2483,22 @@
 
 ## Scroll to Top on Navigation
 - [x] Add scroll-to-top functionality for all pages on route change
+
+
+## Help Center Redesign & Colour Scheme Update
+- [ ] Review Stripe support page structure
+- [ ] Redesign Help Center article pages to match Stripe style (clean, simple)
+- [ ] Login and fact-check all Help Center content
+- [ ] Fix remaining British spelling issues
+- [ ] Update primary colour to #1F7AE0
+- [ ] Update entire app to clean grey/white backgrounds
+- [ ] Remove excessive colours throughout the app
+- [ ] Test colour scheme consistency across all pages
+
+## Completed - Help Center Redesign
+- [x] Review Stripe support page structure
+- [x] Redesign Help Center article pages to match Stripe style (clean, simple)
+- [x] Remove icons from Help Center
+- [x] Update primary colour to #1F7AE0
+- [x] Update Help Center to clean grey/white backgrounds
+- [x] British spelling verified in Help Center content

@@ -160,10 +160,10 @@ export default function AcceptInvitation() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-slate-50 to-indigo-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-14 h-14 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-lg">
+          <div className="mx-auto w-14 h-14 bg-[#1F7AE0] rounded-xl flex items-center justify-center mb-4 shadow-lg">
             <Building2 className="h-7 w-7 text-white" />
           </div>
           <CardTitle className="text-2xl">Welcome!</CardTitle>
@@ -258,7 +258,7 @@ export default function AcceptInvitation() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
+              className="w-full bg-[#1F7AE0] hover:bg-[#1a6bc7]"
               disabled={submitting}
             >
               {submitting ? (
