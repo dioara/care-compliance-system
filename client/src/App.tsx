@@ -51,6 +51,7 @@ import Notifications from "./pages/Notifications";
 import HelpCenter from "./pages/HelpCenter";
 import HelpArticle from "./pages/HelpArticle";
 import { useSessionKeepalive } from "./hooks/useSessionKeepalive";
+import ScrollToTop from "./components/ScrollToTop";
 
 function Router() {
   return (
@@ -307,6 +308,7 @@ function App() {
       <ThemeProvider defaultTheme="light" switchable={true}>
         <LocationProvider>
           <TooltipProvider>
+            <ScrollToTop />
             <Toaster />
             <Router />
           </TooltipProvider>

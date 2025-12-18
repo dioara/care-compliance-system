@@ -2479,3 +2479,7 @@
 - [x] Fix authentication description (email/password, not OAuth/Manus)
 - [x] Verify British spelling throughout (organisation, colour, centre, etc.)
 - [x] Review all articles for accuracy and context
+
+
+## Scroll to Top on Navigation
+- [x] Add scroll-to-top functionality for all pages on route change
