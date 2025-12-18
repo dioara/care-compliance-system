@@ -14,22 +14,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import DOMPurify from 'dompurify';
 import {
-  Mail,
+  Envelope,
   Plus,
-  Pencil,
-  Trash2,
+  PencilSimple,
+  Trash,
   Users,
   FileText,
-  Send,
+  PaperPlaneTilt,
   Eye,
-  CheckCircle2,
+  CheckCircle,
   XCircle,
-  AlertCircle,
-  Building,
+  WarningCircle,
+  Buildings,
   Shield,
   UserCircle,
-  ExternalLink,
-} from "lucide-react";
+  ArrowSquareOut,
+} from "@phosphor-icons/react";
 
 export default function EmailSettings() {
   const { user } = useAuth();
@@ -200,11 +200,11 @@ export default function EmailSettings() {
 
   const getRecipientTypeIcon = (type: string) => {
     switch (type) {
-      case "manager": return <UserCircle className="h-4 w-4" />;
-      case "cqc_contact": return <Shield className="h-4 w-4" />;
-      case "owner": return <Building className="h-4 w-4" />;
-      case "external": return <ExternalLink className="h-4 w-4" />;
-      default: return <Users className="h-4 w-4" />;
+      case "manager": return <UserCircle className="h-4 w-4" weight="bold" />;
+      case "cqc_contact": return <Shield className="h-4 w-4" weight="bold" />;
+      case "owner": return <Buildings className="h-4 w-4" weight="bold" />;
+      case "external": return <ArrowSquareOut className="h-4 w-4" weight="bold" />;
+      default: return <Users className="h-4 w-4" weight="bold" />;
     }
   };
 
@@ -236,7 +236,7 @@ export default function EmailSettings() {
       <div className="flex items-center justify-center h-96">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
-            <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+            <WarningCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" weight="bold" />
             <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
             <p className="text-muted-foreground">
               Only super administrators can access email settings.
@@ -253,7 +253,7 @@ export default function EmailSettings() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold flex items-center gap-3">
-            <Mail className="h-8 w-8 text-primary" />
+            <Envelope className="h-8 w-8 text-primary" weight="bold" />
             Email Settings
           </h1>
           <p className="text-muted-foreground mt-2">
@@ -265,11 +265,11 @@ export default function EmailSettings() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2 max-w-md">
           <TabsTrigger value="recipients" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
+            <Users className="h-4 w-4" weight="bold" />
             Recipients
           </TabsTrigger>
           <TabsTrigger value="templates" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4" weight="bold" />
             Templates
           </TabsTrigger>
         </TabsList>
@@ -285,14 +285,14 @@ export default function EmailSettings() {
                 </CardDescription>
               </div>
               <Button onClick={() => { resetRecipientForm(); setShowRecipientDialog(true); }}>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2" weight="bold" />
                 Add Recipient
               </Button>
             </CardHeader>
             <CardContent>
               {recipients.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <Envelope className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                   <p>No email recipients configured yet.</p>
                   <p className="text-sm">Add recipients to receive compliance notifications.</p>
                 </div>
@@ -333,7 +333,7 @@ export default function EmailSettings() {
                       </div>
                       <div className="flex gap-2">
                         <Button variant="ghost" size="icon" onClick={() => openEditRecipient(recipient)}>
-                          <Pencil className="h-4 w-4" />
+                          <PencilSimple className="h-4 w-4" weight="bold" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -345,7 +345,7 @@ export default function EmailSettings() {
                             }
                           }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash className="h-4 w-4" weight="bold" />
                         </Button>
                       </div>
                     </div>
@@ -369,12 +369,12 @@ export default function EmailSettings() {
               <div className="flex gap-2">
                 {templates.length === 0 && (
                   <Button variant="outline" onClick={() => initializeDefaults.mutate()}>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2" weight="bold" />
                     Create Default Templates
                   </Button>
                 )}
                 <Button onClick={() => { resetTemplateForm(); setShowTemplateDialog(true); }}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="h-4 w-4 mr-2" weight="bold" />
                   New Template
                 </Button>
               </div>
@@ -382,7 +382,7 @@ export default function EmailSettings() {
             <CardContent>
               {templates.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                   <p>No email templates configured yet.</p>
                   <p className="text-sm">Create default templates to get started.</p>
                 </div>
@@ -425,11 +425,11 @@ export default function EmailSettings() {
                               setShowPreview(true);
                             }}
                           >
-                            <Eye className="h-4 w-4 mr-1" />
+                            <Eye className="h-4 w-4 mr-1" weight="bold" />
                             Preview
                           </Button>
                           <Button variant="outline" size="sm" onClick={() => openEditTemplate(template)}>
-                            <Pencil className="h-4 w-4 mr-1" />
+                            <PencilSimple className="h-4 w-4 mr-1" weight="bold" />
                             Edit
                           </Button>
                           <Button
@@ -442,7 +442,7 @@ export default function EmailSettings() {
                               }
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash className="h-4 w-4" weight="bold" />
                           </Button>
                         </div>
                       </CardContent>

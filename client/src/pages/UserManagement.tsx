@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, Users, Loader2, Mail, User, Key, ShieldCheck, ShieldAlert, CheckCircle2, XCircle, Ticket, TicketX } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Plus, PencilSimple, Trash, Shield, Users, Envelope, User, Key, ShieldCheck, ShieldWarning, CheckCircle, XCircle, Ticket } from "@phosphor-icons/react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function UserManagement() {
@@ -42,7 +43,7 @@ export default function UserManagement() {
           <Card className="max-w-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
-                <Shield className="h-5 w-5" />
+                <Shield className="h-5 w-5" weight="bold" />
                 Access Denied
               </CardTitle>
               <CardDescription>
@@ -194,7 +195,7 @@ export default function UserManagement() {
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
                 Add User
               </Button>
             </DialogTrigger>
@@ -297,7 +298,7 @@ export default function UserManagement() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+              <Users className="h-5 w-5" weight="bold" />
               Users
             </CardTitle>
             <CardDescription>
@@ -316,7 +317,7 @@ export default function UserManagement() {
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                 <p>No users found</p>
               </div>
             ) : (
@@ -337,7 +338,7 @@ export default function UserManagement() {
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="h-4 w-4 text-primary" />
+                            <User className="h-4 w-4 text-primary" weight="bold" />
                           </div>
                           <div>
                             <p>{user.name || "Unnamed User"}</p>
@@ -349,19 +350,19 @@ export default function UserManagement() {
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <Mail className="h-3 w-3" />
+                          <Envelope className="h-3 w-3" weight="bold" />
                           {user.email}
                         </div>
                       </TableCell>
                       <TableCell>
                         {user.superAdmin ? (
                           <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">
-                            <ShieldCheck className="h-3 w-3 mr-1" />
+                            <ShieldCheck className="h-3 w-3 mr-1" weight="bold" />
                             Super Admin
                           </Badge>
                         ) : (
                           <Badge variant="secondary">
-                            <Shield className="h-3 w-3 mr-1" />
+                            <Shield className="h-3 w-3 mr-1" weight="bold" />
                             Standard User
                           </Badge>
                         )}
@@ -369,17 +370,17 @@ export default function UserManagement() {
                       <TableCell>
                         {user.superAdmin ? (
                           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            <CheckCircle className="h-3 w-3 mr-1" weight="bold" />
                             Admin Access
                           </Badge>
                         ) : user.hasLicense ? (
                           <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            <CheckCircle className="h-3 w-3 mr-1" weight="bold" />
                             Licensed
                           </Badge>
                         ) : (
                           <Badge variant="outline" className="text-orange-600 border-orange-300">
-                            <XCircle className="h-3 w-3 mr-1" />
+                            <XCircle className="h-3 w-3 mr-1" weight="bold" />
                             No License
                           </Badge>
                         )}
@@ -410,7 +411,7 @@ export default function UserManagement() {
                               }}
                               disabled={assignLicense.isPending}
                             >
-                              <Ticket className="mr-1 h-3 w-3" />
+                              <Ticket className="mr-1 h-3 w-3" weight="bold" />
                               Assign License
                             </Button>
                           )}
@@ -431,7 +432,7 @@ export default function UserManagement() {
                               }}
                               disabled={unassignLicense.isPending}
                             >
-                              <TicketX className="mr-1 h-3 w-3" />
+                              <Ticket className="mr-1 h-3 w-3" weight="bold" />
                               Unassign
                             </Button>
                           )}
@@ -441,7 +442,7 @@ export default function UserManagement() {
                               size="sm"
                               onClick={() => openRolesDialog(user)}
                             >
-                              <Key className="mr-1 h-3 w-3" />
+                              <Key className="mr-1 h-3 w-3" weight="bold" />
                               Roles
                             </Button>
                           )}
@@ -450,7 +451,7 @@ export default function UserManagement() {
                             size="icon"
                             onClick={() => handleEdit(user)}
                           >
-                            <Pencil className="h-4 w-4" />
+                            <PencilSimple className="h-4 w-4" weight="bold" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -458,7 +459,7 @@ export default function UserManagement() {
                             onClick={() => handleDelete(user.id)}
                             disabled={user.id === currentUser?.id}
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <Trash className="h-4 w-4 text-destructive" weight="bold" />
                           </Button>
                         </div>
                       </TableCell>
@@ -558,7 +559,7 @@ export default function UserManagement() {
                 </div>
               ) : roles.length === 0 ? (
                 <div className="text-center py-4 text-muted-foreground">
-                  <ShieldAlert className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <ShieldWarning className="h-8 w-8 mx-auto mb-2 opacity-50" weight="bold" />
                   <p>No roles created yet</p>
                   <p className="text-sm">Create roles in Role Management first</p>
                 </div>

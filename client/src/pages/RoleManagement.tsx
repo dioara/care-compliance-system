@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Shield, MapPin, Loader2, Users } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Plus, PencilSimple, Trash, Shield, MapPin, Users } from "@phosphor-icons/react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface LocationPermission {
@@ -43,7 +44,7 @@ export default function RoleManagement() {
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
-              <Shield className="h-5 w-5" />
+              <Shield className="h-5 w-5" weight="bold" />
               Access Denied
             </CardTitle>
             <CardDescription>
@@ -185,7 +186,7 @@ export default function RoleManagement() {
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
                 Create Role
               </Button>
             </DialogTrigger>
@@ -237,7 +238,7 @@ export default function RoleManagement() {
         <Card className="bg-blue-50 border-blue-200">
           <CardContent className="pt-6">
             <div className="flex gap-4">
-              <Shield className="h-8 w-8 text-blue-600 flex-shrink-0" />
+              <Shield className="h-8 w-8 text-blue-600 flex-shrink-0" weight="bold" />
               <div>
                 <h3 className="font-semibold text-blue-900">How Role-Based Access Control Works</h3>
                 <p className="text-sm text-blue-700 mt-1">
@@ -255,7 +256,7 @@ export default function RoleManagement() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+              <Users className="h-5 w-5" weight="bold" />
               Roles
             </CardTitle>
             <CardDescription>
@@ -269,7 +270,7 @@ export default function RoleManagement() {
               </div>
             ) : roles.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                 <p>No roles created yet</p>
                 <p className="text-sm">Create a role to start assigning location permissions</p>
               </div>
@@ -288,7 +289,7 @@ export default function RoleManagement() {
                     <TableRow key={role.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">
-                          <Shield className="h-4 w-4 text-muted-foreground" />
+                          <Shield className="h-4 w-4 text-muted-foreground" weight="bold" />
                           {role.name}
                         </div>
                       </TableCell>
@@ -305,7 +306,7 @@ export default function RoleManagement() {
                             size="sm"
                             onClick={() => openPermissions(role)}
                           >
-                            <MapPin className="mr-1 h-3 w-3" />
+                            <MapPin className="mr-1 h-3 w-3" weight="bold" />
                             Permissions
                           </Button>
                           <Button
@@ -313,14 +314,14 @@ export default function RoleManagement() {
                             size="icon"
                             onClick={() => handleEdit(role)}
                           >
-                            <Pencil className="h-4 w-4" />
+                            <PencilSimple className="h-4 w-4" weight="bold" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => handleDelete(role.id)}
                           >
-                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <Trash className="h-4 w-4 text-destructive" weight="bold" />
                           </Button>
                         </div>
                       </TableCell>
@@ -403,7 +404,7 @@ export default function RoleManagement() {
                       <TableRow key={perm.locationId}>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            <MapPin className="h-4 w-4 text-muted-foreground" weight="bold" />
                             {perm.locationName}
                           </div>
                         </TableCell>

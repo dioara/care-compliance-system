@@ -9,8 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
-import { FileText } from "@phosphor-icons/react";
+import { CalendarBlank, MagnifyingGlass, Funnel, CaretLeft, CaretRight, FileText } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 
@@ -110,7 +109,7 @@ export default function AuditHistory() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+            <Funnel className="h-5 w-5" weight="bold" />
             Filters
           </CardTitle>
         </CardHeader>
@@ -120,7 +119,7 @@ export default function AuditHistory() {
             <div>
               <label className="text-sm font-medium mb-2 block">Search</label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="bold" />
                 <Input
                   placeholder="Search by audit name, location, or auditor..."
                   value={search}
@@ -209,7 +208,7 @@ export default function AuditHistory() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarBlank className="mr-2 h-4 w-4" weight="bold" />
                     {startDate ? format(startDate, "PPP") : "Select start date"}
                   </Button>
                 </PopoverTrigger>
@@ -232,7 +231,7 @@ export default function AuditHistory() {
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    <CalendarBlank className="mr-2 h-4 w-4" weight="bold" />
                     {endDate ? format(endDate, "PPP") : "Select end date"}
                   </Button>
                 </PopoverTrigger>
@@ -343,7 +342,7 @@ export default function AuditHistory() {
                             }
                           }}
                         >
-                          <FileText className="h-4 w-4 mr-2" />
+                          <FileText className="h-4 w-4 mr-2" weight="bold" />
                           {audit.status === 'in_progress' || audit.status === 'scheduled' ? 'Continue' : 'View'}
                         </Button>
                       </TableCell>
@@ -365,7 +364,7 @@ export default function AuditHistory() {
                       onClick={() => setPage(page - 1)}
                       disabled={page === 1}
                     >
-                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      <CaretLeft className="h-4 w-4 mr-1" weight="bold" />
                       Previous
                     </Button>
                     <Button
@@ -375,7 +374,7 @@ export default function AuditHistory() {
                       disabled={page === pagination.totalPages}
                     >
                       Next
-                      <ChevronRight className="h-4 w-4 ml-1" />
+                      <CaretRight className="h-4 w-4 ml-1" weight="bold" />
                     </Button>
                   </div>
                 </div>

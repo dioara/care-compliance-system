@@ -10,9 +10,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { 
-  CreditCard, Users, Plus, Minus, AlertTriangle, CheckCircle2, 
-  Clock, XCircle, ExternalLink, RefreshCw, UserPlus, UserMinus, Receipt, Download, FileText, ArrowUpDown, TrendingUp, TrendingDown
-} from "lucide-react";
+  CreditCard, Users, Plus, Minus, Warning, CheckCircle, 
+  Clock, XCircle, ArrowSquareOut, ArrowsClockwise, UserPlus, UserMinus, Receipt, DownloadSimple, FileText, ArrowsDownUp, TrendUp, TrendDown
+} from "@phosphor-icons/react";
 
 export default function SubscriptionManagement() {
   const { user } = useAuth();
@@ -147,15 +147,15 @@ export default function SubscriptionManagement() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Active</Badge>;
+        return <Badge className="bg-green-500"><CheckCircle className="h-3 w-3 mr-1" weight="bold" />Active</Badge>;
       case "past_due":
-        return <Badge className="bg-orange-500"><AlertTriangle className="h-3 w-3 mr-1" />Past Due</Badge>;
+        return <Badge className="bg-orange-500"><Warning className="h-3 w-3 mr-1" weight="bold" />Past Due</Badge>;
       case "canceled":
-        return <Badge className="bg-red-500"><XCircle className="h-3 w-3 mr-1" />Canceled</Badge>;
+        return <Badge className="bg-red-500"><XCircle className="h-3 w-3 mr-1" weight="bold" />Canceled</Badge>;
       case "trialing":
-        return <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" />Trial</Badge>;
+        return <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" weight="bold" />Trial</Badge>;
       default:
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Incomplete</Badge>;
+        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" weight="bold" />Incomplete</Badge>;
     }
   };
 
@@ -170,7 +170,7 @@ export default function SubscriptionManagement() {
         </div>
         {subscription?.stripeCustomerId && (
           <Button variant="outline" onClick={() => getBillingPortal.mutate()}>
-            <ExternalLink className="h-4 w-4 mr-2" />
+            <ArrowSquareOut className="h-4 w-4 mr-2" weight="bold" />
             Billing Portal
           </Button>
         )}
@@ -183,7 +183,7 @@ export default function SubscriptionManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Clock className={`h-5 w-5 ${trialStatus.isExpired ? "text-red-600" : trialStatus.daysRemaining <= 7 ? "text-amber-600" : "text-violet-600"}`} />
+                  <Clock className={`h-5 w-5 ${trialStatus.isExpired ? "text-red-600" : trialStatus.daysRemaining <= 7 ? "text-amber-600" : "text-violet-600"}`} weight="bold" />
                   {trialStatus.isExpired ? "Trial Expired" : "Free Trial"}
                 </CardTitle>
                 <CardDescription>
@@ -230,7 +230,7 @@ export default function SubscriptionManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
+                  <CreditCard className="h-5 w-5" weight="bold" />
                   Current Subscription
                 </CardTitle>
                 <CardDescription>Your active subscription details</CardDescription>
@@ -272,16 +272,16 @@ export default function SubscriptionManagement() {
                 setNewLicenseCount(subscription.licensesCount || 1);
                 setShowModifyDialog(true);
               }}>
-                <ArrowUpDown className="h-4 w-4 mr-2" />
+                <ArrowsDownUp className="h-4 w-4 mr-2" weight="bold" />
                 Modify Licenses
               </Button>
               <Button variant="outline" onClick={() => setShowAddLicensesDialog(true)}>
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 mr-2" weight="bold" />
                 Add Licenses
               </Button>
               {subscription.cancelAtPeriodEnd ? (
                 <Button variant="outline" onClick={() => reactivateSubscription.mutate()}>
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <ArrowsClockwise className="h-4 w-4 mr-2" weight="bold" />
                   Reactivate
                 </Button>
               ) : (
@@ -297,7 +297,7 @@ export default function SubscriptionManagement() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5" />
+              <CreditCard className="h-5 w-5" weight="bold" />
               Start Your Subscription
             </CardTitle>
             <CardDescription>Choose your plan and number of licenses</CardDescription>
@@ -309,10 +309,10 @@ export default function SubscriptionManagement() {
                 <h3 className="font-semibold mb-2">License Pricing</h3>
                 <p className="text-xl sm:text-2xl lg:text-3xl font-bold">£70<span className="text-sm font-normal text-muted-foreground">/license/month</span></p>
                 <ul className="mt-4 space-y-2 text-sm">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />1-5 licenses: Full price</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />6-10 licenses: 10% discount</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />11-20 licenses: 15% discount</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-green-500" />21+ licenses: 20% discount</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" weight="bold" />1-5 licenses: Full price</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" weight="bold" />6-10 licenses: 10% discount</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" weight="bold" />11-20 licenses: 15% discount</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-green-500" weight="bold" />21+ licenses: 20% discount</li>
                 </ul>
               </div>
               <div className="p-4 border rounded-lg bg-primary/5">
@@ -328,11 +328,11 @@ export default function SubscriptionManagement() {
                 <label className="text-sm font-medium">Number of Licenses</label>
                 <div className="flex items-center gap-2 mt-2">
                   <Button variant="outline" size="icon" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
-                    <Minus className="h-4 w-4" />
+                    <Minus className="h-4 w-4" weight="bold" />
                   </Button>
                   <span className="w-12 text-center text-lg font-semibold">{quantity}</span>
                   <Button variant="outline" size="icon" onClick={() => setQuantity(quantity + 1)}>
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-4 w-4" weight="bold" />
                   </Button>
                 </div>
               </div>
@@ -381,14 +381,14 @@ export default function SubscriptionManagement() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+                  <Users className="h-5 w-5" weight="bold" />
                   License Assignments
                 </CardTitle>
                 <CardDescription>Manage which users have access to the system</CardDescription>
               </div>
               {unassignedLicenses.length > 0 && (
                 <Button onClick={() => setShowAssignDialog(true)}>
-                  <UserPlus className="h-4 w-4 mr-2" />
+                  <UserPlus className="h-4 w-4 mr-2" weight="bold" />
                   Assign License
                 </Button>
               )}
@@ -438,7 +438,7 @@ export default function SubscriptionManagement() {
                           size="sm"
                           onClick={() => unassignLicense.mutate({ licenseId: license.id })}
                         >
-                          <UserMinus className="h-4 w-4 mr-1" />
+                          <UserMinus className="h-4 w-4 mr-1" weight="bold" />
                           Unassign
                         </Button>
                       ) : (
@@ -450,7 +450,7 @@ export default function SubscriptionManagement() {
                             setShowAssignDialog(true);
                           }}
                         >
-                          <UserPlus className="h-4 w-4 mr-1" />
+                          <UserPlus className="h-4 w-4 mr-1" weight="bold" />
                           Assign
                         </Button>
                       )}
@@ -483,11 +483,11 @@ export default function SubscriptionManagement() {
             <label className="text-sm font-medium">Number of Additional Licenses</label>
             <div className="flex items-center gap-2 mt-2">
               <Button variant="outline" size="icon" onClick={() => setAdditionalLicenses(Math.max(1, additionalLicenses - 1))}>
-                <Minus className="h-4 w-4" />
+                <Minus className="h-4 w-4" weight="bold" />
               </Button>
               <span className="w-12 text-center text-lg font-semibold">{additionalLicenses}</span>
               <Button variant="outline" size="icon" onClick={() => setAdditionalLicenses(additionalLicenses + 1)}>
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4" weight="bold" />
               </Button>
             </div>
           </div>
@@ -508,7 +508,7 @@ export default function SubscriptionManagement() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Receipt className="h-5 w-5" />
+              <Receipt className="h-5 w-5" weight="bold" />
               Billing History
             </CardTitle>
             <CardDescription>View your past invoices and payment history</CardDescription>
@@ -529,7 +529,7 @@ export default function SubscriptionManagement() {
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
+                        <FileText className="h-4 w-4 text-muted-foreground" weight="bold" />
                         {invoice.number || invoice.id.slice(-8)}
                       </div>
                     </TableCell>
@@ -545,19 +545,19 @@ export default function SubscriptionManagement() {
                     </TableCell>
                     <TableCell>
                       {invoice.status === 'paid' && (
-                        <Badge className="bg-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Paid</Badge>
+                        <Badge className="bg-green-500"><CheckCircle className="h-3 w-3 mr-1" weight="bold" />Paid</Badge>
                       )}
                       {invoice.status === 'open' && (
-                        <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" />Open</Badge>
+                        <Badge className="bg-blue-500"><Clock className="h-3 w-3 mr-1" weight="bold" />Open</Badge>
                       )}
                       {invoice.status === 'draft' && (
-                        <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />Draft</Badge>
+                        <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" weight="bold" />Draft</Badge>
                       )}
                       {invoice.status === 'uncollectible' && (
-                        <Badge className="bg-red-500"><XCircle className="h-3 w-3 mr-1" />Uncollectible</Badge>
+                        <Badge className="bg-red-500"><XCircle className="h-3 w-3 mr-1" weight="bold" />Uncollectible</Badge>
                       )}
                       {invoice.status === 'void' && (
-                        <Badge variant="outline"><XCircle className="h-3 w-3 mr-1" />Void</Badge>
+                        <Badge variant="outline"><XCircle className="h-3 w-3 mr-1" weight="bold" />Void</Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
@@ -568,7 +568,7 @@ export default function SubscriptionManagement() {
                             size="sm"
                             onClick={() => window.open(invoice.pdfUrl, '_blank')}
                           >
-                            <Download className="h-4 w-4 mr-1" />
+                            <DownloadSimple className="h-4 w-4 mr-1" weight="bold" />
                             PDF
                           </Button>
                         )}
@@ -578,7 +578,7 @@ export default function SubscriptionManagement() {
                             size="sm"
                             onClick={() => window.open(invoice.hostedUrl, '_blank')}
                           >
-                            <ExternalLink className="h-4 w-4 mr-1" />
+                            <ArrowSquareOut className="h-4 w-4 mr-1" weight="bold" />
                             View
                           </Button>
                         )}
@@ -604,7 +604,7 @@ export default function SubscriptionManagement() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ArrowUpDown className="h-5 w-5" />
+              <ArrowsDownUp className="h-5 w-5" weight="bold" />
               Modify License Count
             </DialogTitle>
             <DialogDescription>
@@ -621,7 +621,7 @@ export default function SubscriptionManagement() {
                   onClick={() => setNewLicenseCount(Math.max(1, newLicenseCount - 1))}
                   disabled={newLicenseCount <= 1}
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-4 w-4" weight="bold" />
                 </Button>
                 <span className="w-16 text-center text-2xl font-bold">{newLicenseCount}</span>
                 <Button 
@@ -629,7 +629,7 @@ export default function SubscriptionManagement() {
                   size="icon" 
                   onClick={() => setNewLicenseCount(newLicenseCount + 1)}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4" weight="bold" />
                 </Button>
               </div>
             </div>
@@ -647,7 +647,7 @@ export default function SubscriptionManagement() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Change</span>
                   <span className={`font-medium flex items-center gap-1 ${pricePreview.isUpgrade ? 'text-green-600' : 'text-orange-600'}`}>
-                    {pricePreview.isUpgrade ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                    {pricePreview.isUpgrade ? <TrendUp className="h-3 w-3" weight="bold" /> : <TrendDown className="h-3 w-3" weight="bold" />}
                     {pricePreview.change > 0 ? '+' : ''}{pricePreview.change}
                   </span>
                 </div>
@@ -667,7 +667,7 @@ export default function SubscriptionManagement() {
             {pricePreview && !pricePreview.available && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-sm text-red-600 flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
+                  <Warning className="h-4 w-4" weight="bold" />
                   {pricePreview.message}
                 </p>
                 {pricePreview.assignedCount !== undefined && (

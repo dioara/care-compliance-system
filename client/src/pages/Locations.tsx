@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
-import { MapPin, Plus, Pencil, Trash2, Loader2, Users, Building, Award } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { MapPin, Plus, PencilSimple, Trash, Users, Buildings, Medal } from "@phosphor-icons/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -168,7 +169,7 @@ export default function Locations() {
 
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${colors[rating as keyof typeof colors] || colors["Not Yet Rated"]}`}>
-        <Award className="h-3 w-3" />
+        <Medal className="h-3 w-3" weight="bold" />
         {rating}
       </span>
     );
@@ -194,7 +195,7 @@ export default function Locations() {
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" weight="bold" />
               Add Location
             </Button>
           </DialogTrigger>
@@ -477,7 +478,7 @@ export default function Locations() {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1">
                     <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
+                      <MapPin className="h-5 w-5" weight="bold" />
                       {location.name}
                     </CardTitle>
                     {location.cqcRating && (
@@ -492,14 +493,14 @@ export default function Locations() {
                       size="icon"
                       onClick={() => handleEdit(location)}
                     >
-                      <Pencil className="h-4 w-4" />
+                      <PencilSimple className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDelete(location.id)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash className="h-4 w-4" weight="bold" />
                     </Button>
                   </div>
                 </div>
@@ -526,14 +527,14 @@ export default function Locations() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t">
                   <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <Users className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <div>
                       <p className="text-xs text-muted-foreground">Service Users</p>
                       <p className="text-sm font-medium">{location.numberOfServiceUsers || 0}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-muted-foreground" />
+                    <Buildings className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <div>
                       <p className="text-xs text-muted-foreground">Staff</p>
                       <p className="text-sm font-medium">{location.numberOfStaff || 0}</p>
@@ -569,13 +570,13 @@ export default function Locations() {
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
+            <MapPin className="h-12 w-12 text-muted-foreground mb-4" weight="bold" />
             <h3 className="text-lg font-semibold mb-2">No locations yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
               Get started by adding your first care service location.
             </p>
             <Button onClick={() => setIsCreateOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" weight="bold" />
               Add Location
             </Button>
           </CardContent>

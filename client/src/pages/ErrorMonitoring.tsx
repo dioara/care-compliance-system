@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertTriangle, CheckCircle, Clock, Users, TrendingUp, FileText } from "lucide-react";
+import { Warning, CheckCircle, Clock, Users, TrendUp, FileText } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 
@@ -140,7 +140,7 @@ export default function ErrorMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Errors</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <Warning className="h-4 w-4 text-muted-foreground" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalErrors || 0}</div>
@@ -153,7 +153,7 @@ export default function ErrorMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Critical Errors</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <Warning className="h-4 w-4 text-destructive" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">
@@ -168,7 +168,7 @@ export default function ErrorMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Affected Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-muted-foreground" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.affectedUsers || 0}</div>
@@ -181,7 +181,7 @@ export default function ErrorMonitoring() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">User Reports</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <FileText className="h-4 w-4 text-muted-foreground" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{errorReports?.length || 0}</div>
@@ -311,12 +311,12 @@ export default function ErrorMonitoring() {
                         <TableCell>
                           {log.resolved ? (
                             <Badge variant="secondary">
-                              <CheckCircle className="h-3 w-3 mr-1" />
+                              <CheckCircle className="h-3 w-3 mr-1" weight="bold" />
                               Resolved
                             </Badge>
                           ) : (
                             <Badge variant="destructive">
-                              <Clock className="h-3 w-3 mr-1" />
+                              <Clock className="h-3 w-3 mr-1" weight="bold" />
                               Open
                             </Badge>
                           )}

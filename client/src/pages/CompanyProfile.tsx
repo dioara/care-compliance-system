@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Building2, Upload, Loader2, Key, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Buildings, UploadSimple, Key, ArrowSquareOut, Eye, EyeSlash } from "@phosphor-icons/react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
@@ -163,7 +164,7 @@ export default function CompanyProfile() {
                     </>
                   ) : (
                     <>
-                      <Upload className="mr-2 h-4 w-4" />
+                      <UploadSimple className="mr-2 h-4 w-4" weight="bold" />
                       Change Logo
                     </>
                   )}
@@ -171,7 +172,7 @@ export default function CompanyProfile() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 md:p-6 lg:p-8 space-y-4">
-                <Building2 className="h-12 w-12 text-muted-foreground" />
+                <Buildings className="h-12 w-12 text-muted-foreground" weight="bold" />
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
@@ -184,7 +185,7 @@ export default function CompanyProfile() {
                     </>
                   ) : (
                     <>
-                      <Upload className="mr-2 h-4 w-4" />
+                      <UploadSimple className="mr-2 h-4 w-4" weight="bold" />
                       Upload Logo
                     </>
                   )}
@@ -355,7 +356,7 @@ export default function CompanyProfile() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
+            <Key className="h-5 w-5" weight="bold" />
             AI Features Configuration
           </CardTitle>
           <CardDescription>
@@ -395,7 +396,7 @@ export default function CompanyProfile() {
                   className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                   onClick={() => setShowApiKey(!showApiKey)}
                 >
-                  {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showApiKey ? <EyeSlash className="h-4 w-4" weight="bold" /> : <Eye className="h-4 w-4" weight="bold" />}
                 </Button>
               </div>
             </div>
@@ -407,7 +408,7 @@ export default function CompanyProfile() {
           <div className="rounded-lg border p-4 bg-muted/50 space-y-3">
             <h4 className="font-semibold text-sm">How to get an OpenAI API Key:</h4>
             <ol className="text-sm text-muted-foreground space-y-2 list-decimal list-inside">
-              <li>Go to <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">platform.openai.com <ExternalLink className="h-3 w-3" /></a> and create an account (or sign in)</li>
+              <li>Go to <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">platform.openai.com <ArrowSquareOut className="h-3 w-3" weight="bold" /></a> and create an account (or sign in)</li>
               <li>Navigate to <strong>API Keys</strong> in the left sidebar</li>
               <li>Click <strong>"Create new secret key"</strong> and give it a name (e.g., "Care Compliance")</li>
               <li>Copy the key (starts with <code className="bg-muted px-1 rounded">sk-</code>) and paste it above</li>

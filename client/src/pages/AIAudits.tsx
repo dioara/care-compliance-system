@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Upload, FileText, AlertCircle, CheckCircle, XCircle, Clock, Key, Loader2, Shield, Download, File } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Brain, UploadSimple, FileText, WarningCircle, CheckCircle, XCircle, Clock, Key, Shield, DownloadSimple, File } from "@phosphor-icons/react";
 import { trpc } from "@/lib/trpc";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
@@ -173,7 +174,7 @@ export default function AIAudits() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight flex items-center gap-2">
-          <Brain className="h-8 w-8" />
+          <Brain className="h-8 w-8" weight="bold" />
           AI-Powered Audits
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -184,7 +185,7 @@ export default function AIAudits() {
       {/* API Key Status */}
       {!apiKeyStatus?.hasApiKey && (
         <Alert variant="destructive">
-          <Key className="h-4 w-4" />
+          <Key className="h-4 w-4" weight="bold" />
           <AlertTitle>OpenAI API Key Required</AlertTitle>
           <AlertDescription className="space-y-2">
             <p>
@@ -193,7 +194,7 @@ export default function AIAudits() {
             </p>
             <Button asChild variant="outline" size="sm">
               <Link href="/company-profile">
-                <Key className="mr-2 h-4 w-4" />
+                <Key className="mr-2 h-4 w-4" weight="bold" />
                 Configure API Key
               </Link>
             </Button>
@@ -203,7 +204,7 @@ export default function AIAudits() {
 
       {apiKeyStatus?.hasApiKey && (
         <Alert>
-          <Shield className="h-4 w-4" />
+          <Shield className="h-4 w-4" weight="bold" />
           <AlertTitle>Privacy Protection Active</AlertTitle>
           <AlertDescription>
             Your documents are automatically anonymised before AI analysis. Names are converted to initials
@@ -240,7 +241,7 @@ export default function AIAudits() {
                     size="sm"
                     onClick={() => setUploadMode("text")}
                   >
-                    <FileText className="mr-2 h-4 w-4" />
+                    <FileText className="mr-2 h-4 w-4" weight="bold" />
                     Paste Text
                   </Button>
                   <Button
@@ -248,7 +249,7 @@ export default function AIAudits() {
                     size="sm"
                     onClick={() => setUploadMode("file")}
                   >
-                    <Upload className="mr-2 h-4 w-4" />
+                    <UploadSimple className="mr-2 h-4 w-4" weight="bold" />
                     Upload File
                   </Button>
                 </div>
@@ -297,7 +298,7 @@ export default function AIAudits() {
                       />
                       {selectedFile ? (
                         <div className="flex items-center justify-center gap-2">
-                          <File className="h-8 w-8 text-green-600" />
+                          <File className="h-8 w-8 text-green-600" weight="bold" />
                           <div className="text-left">
                             <p className="font-medium">{selectedFile.name}</p>
                             <p className="text-xs text-muted-foreground">
@@ -307,7 +308,7 @@ export default function AIAudits() {
                         </div>
                       ) : (
                         <>
-                          <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                          <UploadSimple className="h-8 w-8 mx-auto text-muted-foreground mb-2" weight="bold" />
                           <p className="text-sm text-muted-foreground">
                             Click to upload or drag and drop
                           </p>
@@ -366,7 +367,7 @@ export default function AIAudits() {
                     </>
                   ) : (
                     <>
-                      <Brain className="mr-2 h-4 w-4" />
+                      <Brain className="mr-2 h-4 w-4" weight="bold" />
                       Analyse Care Plan
                     </>
                   )}
@@ -393,7 +394,7 @@ export default function AIAudits() {
 
                 {!isProcessing && !auditResult && (
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                    <FileText className="h-12 w-12 mb-4" />
+                    <FileText className="h-12 w-12 mb-4" weight="bold" />
                     <p>Submit a care plan to see analysis results</p>
                   </div>
                 )}
@@ -454,7 +455,7 @@ export default function AIAudits() {
                     </>
                   ) : (
                     <>
-                      <Brain className="mr-2 h-4 w-4" />
+                      <Brain className="mr-2 h-4 w-4" weight="bold" />
                       Analyse Daily Notes
                     </>
                   )}
@@ -481,7 +482,7 @@ export default function AIAudits() {
 
                 {!isProcessing && !auditResult && (
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                    <FileText className="h-12 w-12 mb-4" />
+                    <FileText className="h-12 w-12 mb-4" weight="bold" />
                     <p>Submit daily notes to see analysis results</p>
                   </div>
                 )}
@@ -519,13 +520,13 @@ export default function AIAudits() {
                           )}
                           {audit.status === "processing" && (
                             <Badge variant="secondary">
-                              <Clock className="mr-1 h-3 w-3" />
+                              <Clock className="mr-1 h-3 w-3" weight="bold" />
                               Processing
                             </Badge>
                           )}
                           {audit.status === "failed" && (
                             <Badge variant="destructive">
-                              <XCircle className="mr-1 h-3 w-3" />
+                              <XCircle className="mr-1 h-3 w-3" weight="bold" />
                               Failed
                             </Badge>
                           )}
@@ -552,7 +553,7 @@ export default function AIAudits() {
                         {generatePDF.isPending ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
-                          <Download className="mr-2 h-4 w-4" />
+                          <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
                         )}
                         PDF
                       </Button>
@@ -561,7 +562,7 @@ export default function AIAudits() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                  <FileText className="h-12 w-12 mb-4" />
+                  <FileText className="h-12 w-12 mb-4" weight="bold" />
                   <p>No audits yet. Submit a care plan or daily notes to get started.</p>
                 </div>
               )}
@@ -597,7 +598,7 @@ function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownload
       {/* Anonymization Summary */}
       {anonymizationSummary && (
         <Alert>
-          <Shield className="h-4 w-4" />
+          <Shield className="h-4 w-4" weight="bold" />
           <AlertDescription className="text-xs">
             Privacy: {anonymizationSummary.namesRedacted} names converted to initials,{" "}
             {anonymizationSummary.piiRedacted} PII items redacted
@@ -609,7 +610,7 @@ function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownload
       {strengths && strengths.length > 0 && (
         <div>
           <h4 className="font-semibold text-green-700 flex items-center gap-2 mb-2">
-            <CheckCircle className="h-4 w-4" />
+            <CheckCircle className="h-4 w-4" weight="bold" />
             Strengths
           </h4>
           <ul className="space-y-1 text-sm">
@@ -627,7 +628,7 @@ function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownload
       {areasForImprovement && areasForImprovement.length > 0 && (
         <div>
           <h4 className="font-semibold text-orange-700 flex items-center gap-2 mb-2">
-            <AlertCircle className="h-4 w-4" />
+            <WarningCircle className="h-4 w-4" weight="bold" />
             Areas for Improvement
           </h4>
           <ul className="space-y-1 text-sm">
@@ -645,7 +646,7 @@ function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownload
       {recommendations && recommendations.length > 0 && (
         <div>
           <h4 className="font-semibold text-blue-700 flex items-center gap-2 mb-2">
-            <Brain className="h-4 w-4" />
+            <Brain className="h-4 w-4" weight="bold" />
             Recommendations
           </h4>
           <ul className="space-y-1 text-sm">
@@ -669,7 +670,7 @@ function AuditResultDisplay({ result, onDownloadPDF }: { result: any; onDownload
 
       {/* Download Button */}
       <Button onClick={onDownloadPDF} variant="outline" className="w-full">
-        <Download className="mr-2 h-4 w-4" />
+        <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
         Download PDF Report
       </Button>
     </div>
