@@ -1,0 +1,110 @@
+{
+  "query": "SELECT DISTINCT t.id as tenant_id, t.name as company_name, u.email\nFROM tenants t\nLEFT JOIN users u ON u.tenantId = t.id\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY t.id DESC\nLIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT DISTINCT t.id as tenant_id, t.name as company_name, u.email\nFROM tenants t\nLEFT JOIN users u ON u.tenantId = t.id\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY t.id DESC\nLIMIT 20;",
+  "rows": [
+    {
+      "tenant_id": "240003",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765927707617@example.com"
+    },
+    {
+      "tenant_id": "240002",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765927707487@example.com"
+    },
+    {
+      "tenant_id": "210004",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765920856687@example.com"
+    },
+    {
+      "tenant_id": "210001",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765920856561@example.com"
+    },
+    {
+      "tenant_id": "180022",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918845213@example.com"
+    },
+    {
+      "tenant_id": "180021",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918836224@example.com"
+    },
+    {
+      "tenant_id": "180020",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918688964@example.com"
+    },
+    {
+      "tenant_id": "180019",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918662971@example.com"
+    },
+    {
+      "tenant_id": "180018",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918656148@example.com"
+    },
+    {
+      "tenant_id": "180017",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918628548@example.com"
+    },
+    {
+      "tenant_id": "180016",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918621579@example.com"
+    },
+    {
+      "tenant_id": "180015",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918589571@example.com"
+    },
+    {
+      "tenant_id": "180014",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918565894@example.com"
+    },
+    {
+      "tenant_id": "180013",
+      "company_name": "Test Care Home for Reminders",
+      "email": "auditor-reminders-1765918482259@example.com"
+    },
+    {
+      "tenant_id": "180012",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918098399@example.com"
+    },
+    {
+      "tenant_id": "180011",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918075480@example.com"
+    },
+    {
+      "tenant_id": "180010",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918068317@example.com"
+    },
+    {
+      "tenant_id": "180009",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918061562@example.com"
+    },
+    {
+      "tenant_id": "180008",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918033796@example.com"
+    },
+    {
+      "tenant_id": "180007",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "email": "auditor-1765918025939@example.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "tenant_id\tcompany_name\temail\n240003\tTest Care Home for Audit Scheduling\tauditor-1765927707617@example.com\n240002\tTest Care Home for Reminders\tauditor-reminders-1765927707487@example.com\n210004\tTest Care Home for Audit Scheduling\tauditor-1765920856687@example.com\n210001\tTest Care Home for Reminders\tauditor-reminders-1765920856561@example.com\n180022\tTest Care Home for Audit Scheduling\tauditor-1765918845213@example.com\n180021\tTest Care Home for Audit Scheduling\tauditor-1765918836224@example.com\n180020\tTest Care Home for Reminders\tauditor-reminders-1765918688964@example.com\n180019\tTest Care Home for Reminders\tauditor-reminders-1765918662971@example.com\n180018\tTest Care Home for Reminders\tauditor-reminders-1765918656148@example.com\n180017\tTest Care Home for Reminders\tauditor-reminders-1765918628548@example.com\n180016\tTest Care Home for Reminders\tauditor-reminders-1765918621579@example.com\n180015\tTest Care Home for Reminders\tauditor-reminders-1765918589571@example.com\n180014\tTest Care Home for Reminders\tauditor-reminders-1765918565894@example.com\n180013\tTest Care Home for Reminders\tauditor-reminders-1765918482259@example.com\n180012\tTest Care Home for Audit Scheduling\tauditor-1765918098399@example.com\n180011\tTest Care Home for Audit Scheduling\tauditor-1765918075480@example.com\n180010\tTest Care Home for Audit Scheduling\tauditor-1765918068317@example.com\n180009\tTest Care Home for Audit Scheduling\tauditor-1765918061562@example.com\n180008\tTest Care Home for Audit Scheduling\tauditor-1765918033796@example.com\n180007\tTest Care Home for Audit Scheduling\tauditor-1765918025939@example.com\n",
+  "stderr": "",
+  "execution_time_ms": 58
+}

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { AlertCircle, Mail, RefreshCw } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -13,6 +14,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const utils = trpc.useUtils();
   
@@ -26,15 +29,38 @@ export default function Login() {
       setLocation("/");
     },
     onError: (error) => {
-      toast.error(error.message || "Login failed");
+      // Check if the error is about email verification
+      if (error.message?.toLowerCase().includes('verify your email') || 
+          error.message?.toLowerCase().includes('verification')) {
+        setShowVerificationMessage(true);
+        setUnverifiedEmail(email);
+      } else {
+        toast.error(error.message || "Login failed");
+      }
       setIsLoading(false);
+    },
+  });
+
+  const resendVerificationMutation = trpc.auth.resendVerification.useMutation({
+    onSuccess: () => {
+      toast.success("Verification email sent! Please check your inbox.");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to resend verification email");
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowVerificationMessage(false);
     setIsLoading(true);
     loginMutation.mutate({ email, password, rememberMe });
+  };
+
+  const handleResendVerification = () => {
+    if (unverifiedEmail) {
+      resendVerificationMutation.mutate({ email: unverifiedEmail });
+    }
   };
 
   return (
@@ -50,6 +76,35 @@ export default function Login() {
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center px-4 pb-16">
         <div className="w-full max-w-md">
+          {/* Email Verification Required Message */}
+          {showVerificationMessage && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Mail className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-amber-800">Email Verification Required</h3>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Please verify your email address before signing in. We sent a verification link to <strong>{unverifiedEmail}</strong>.
+                  </p>
+                  <p className="text-sm text-amber-700 mt-2">
+                    Check your inbox and spam folder for the verification email.
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResendVerification}
+                    disabled={resendVerificationMutation.isPending}
+                    className="mt-3 text-amber-700 border-amber-300 hover:bg-amber-100"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${resendVerificationMutation.isPending ? 'animate-spin' : ''}`} />
+                    {resendVerificationMutation.isPending ? "Sending..." : "Resend Verification Email"}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Card */}
           <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">

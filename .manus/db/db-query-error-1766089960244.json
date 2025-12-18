@@ -1,0 +1,8 @@
+{
+  "query": "SELECT t.id as tenant_id, t.name as company_name, u.email, u.name as user_name, ts.id as subscription_id\nFROM tenants t\nLEFT JOIN users u ON u.tenantId = t.id AND u.isSuperAdmin = 1\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY t.id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT t.id as tenant_id, t.name as company_name, u.email, u.name as user_name, ts.id as subscription_id\nFROM tenants t\nLEFT JOIN users u ON u.tenantId = t.id AND u.isSuperAdmin = 1\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY t.id DESC;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'u.issuperadmin' in 'on clause'"
+  ]
+}

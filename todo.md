@@ -2730,4 +2730,8 @@
 ## BUG: Registration Failing with 'Already Registered' Error
 - [x] Fix trialEndsAt datetime format - using ISO 8601 instead of MySQL format
 - [x] Convert trialEndsAt to MySQL datetime format in startFreeTrial function
-- [ ] Test registration flow end-to-end
+- [x] Test registration flow end-to-end
+
+## UX: Clearer Email Verification Message
+- [ ] Show clear message on login page when email verification is required
+- [ ] Add option to resend verification email from login error

@@ -1,0 +1,125 @@
+{
+  "query": "SELECT u.email, t.name as company_name, t.id as tenant_id\nFROM users u\nJOIN tenants t ON u.tenantId = t.id\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY u.id DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT u.email, t.name as company_name, t.id as tenant_id\nFROM users u\nJOIN tenants t ON u.tenantId = t.id\nLEFT JOIN tenantSubscriptions ts ON ts.tenantId = t.id\nWHERE ts.id IS NULL\nORDER BY u.id DESC;",
+  "rows": [
+    {
+      "email": "auditor-1765927707617@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "240003"
+    },
+    {
+      "email": "auditor-reminders-1765927707487@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "240002"
+    },
+    {
+      "email": "auditor-1765920856687@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "210004"
+    },
+    {
+      "email": "auditor-reminders-1765920856561@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "210001"
+    },
+    {
+      "email": "auditor-1765918845213@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180022"
+    },
+    {
+      "email": "auditor-1765918836224@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180021"
+    },
+    {
+      "email": "auditor-reminders-1765918688964@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180020"
+    },
+    {
+      "email": "auditor-reminders-1765918662971@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180019"
+    },
+    {
+      "email": "auditor-reminders-1765918656148@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180018"
+    },
+    {
+      "email": "auditor-reminders-1765918628548@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180017"
+    },
+    {
+      "email": "auditor-reminders-1765918621579@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180016"
+    },
+    {
+      "email": "auditor-reminders-1765918589571@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180015"
+    },
+    {
+      "email": "auditor-reminders-1765918565894@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180014"
+    },
+    {
+      "email": "auditor-reminders-1765918482259@example.com",
+      "company_name": "Test Care Home for Reminders",
+      "tenant_id": "180013"
+    },
+    {
+      "email": "auditor-1765918098399@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180012"
+    },
+    {
+      "email": "auditor-1765918075480@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180011"
+    },
+    {
+      "email": "auditor-1765918068317@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180010"
+    },
+    {
+      "email": "auditor-1765918061562@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180009"
+    },
+    {
+      "email": "auditor-1765918033796@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180008"
+    },
+    {
+      "email": "auditor-1765918025939@example.com",
+      "company_name": "Test Care Home for Audit Scheduling",
+      "tenant_id": "180007"
+    },
+    {
+      "email": "tolufans@gmail.com",
+      "company_name": "Sunny care",
+      "tenant_id": "120001"
+    },
+    {
+      "email": "duplicate-1765700456638@example.com",
+      "company_name": "Test Company",
+      "tenant_id": "30006"
+    },
+    {
+      "email": "test-1765700456388@example.com",
+      "company_name": "Test Company",
+      "tenant_id": "30005"
+    }
+  ],
+  "messages": [],
+  "stdout": "email\tcompany_name\ttenant_id\nauditor-1765927707617@example.com\tTest Care Home for Audit Scheduling\t240003\nauditor-reminders-1765927707487@example.com\tTest Care Home for Reminders\t240002\nauditor-1765920856687@example.com\tTest Care Home for Audit Scheduling\t210004\nauditor-reminders-1765920856561@example.com\tTest Care Home for Reminders\t210001\nauditor-1765918845213@example.com\tTest Care Home for Audit Scheduling\t180022\nauditor-1765918836224@example.com\tTest Care Home for Audit Scheduling\t180021\nauditor-reminders-1765918688964@example.com\tTest Care Home for Reminders\t180020\nauditor-reminders-1765918662971@example.com\tTest Care Home for Reminders\t180019\nauditor-reminders-1765918656148@example.com\tTest Care Home for Reminders\t180018\nauditor-reminders-1765918628548@example.com\tTest Care Home for Reminders\t180017\nauditor-reminders-1765918621579@example.com\tTest Care Home for Reminders\t180016\nauditor-reminders-1765918589571@example.com\tTest Care Home for Reminders\t180015\nauditor-reminders-1765918565894@example.com\tTest Care Home for Reminders\t180014\nauditor-reminders-1765918482259@example.com\tTest Care Home for Reminders\t180013\nauditor-1765918098399@example.com\tTest Care Home for Audit Scheduling\t180012\nauditor-1765918075480@example.com\tTest Care Home for Audit Scheduling\t180011\nauditor-1765918068317@example.com\tTest Care Home for Audit Scheduling\t180010\nauditor-1765918061562@example.com\tTest Care Home for Audit Scheduling\t180009\nauditor-1765918033796@example.com\tTest Care Home for Audit Scheduling\t180008\nauditor-1765918025939@example.com\tTest Care Home for Audit Scheduling\t180007\ntolufans@gmail.com\tSunny care\t120001\nduplicate-1765700456638@example.com\tTest Company\t30006\ntest-1765700456388@example.com\tTest Company\t30005\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
