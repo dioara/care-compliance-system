@@ -848,3 +848,7 @@ export type ArticleFeedback = typeof articleFeedback.$inferSelect;
 export type InsertArticleFeedback = typeof articleFeedback.$inferInsert;
 export type ArticleBookmark = typeof articleBookmarks.$inferSelect;
 export type InsertArticleBookmark = typeof articleBookmarks.$inferInsert;
+export type ErrorLog = typeof errorLogs.$inferSelect;
+export type InsertErrorLog = typeof errorLogs.$inferInsert;
+export type ErrorReport = typeof errorReports.$inferSelect;
+export type InsertErrorReport = typeof errorReports.$inferInsert;

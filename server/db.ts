@@ -155,7 +155,7 @@ export async function enable2FA(userId: number) {
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
   await db.update(users)
-    .set({ twoFaEnabled: true, twoFaVerified: true })
+    .set({ twoFaEnabled: 1, twoFaVerified: 1 })
     .where(eq(users.id, userId));
 }
 
@@ -278,7 +278,7 @@ export async function upsertUser(data: {
   name?: string | null;
   email?: string | null;
   loginMethod?: string | null;
-  lastSignedIn?: Date;
+  lastSignedIn?: Date | string;
 }) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
@@ -291,7 +291,7 @@ export async function upsertUser(data: {
     await db.update(users).set({
       name: data.name ?? existingUser.name,
       loginMethod: data.loginMethod ?? existingUser.loginMethod,
-      lastSignedIn: data.lastSignedIn ?? new Date().toISOString(),
+      lastSignedIn: data.lastSignedIn instanceof Date ? data.lastSignedIn.toISOString() : (data.lastSignedIn ?? new Date().toISOString()),
     }).where(eq(users.openId, data.openId));
     return existingUser;
   } else {
@@ -302,7 +302,7 @@ export async function upsertUser(data: {
       email: email,
       name: data.name,
       loginMethod: data.loginMethod,
-      lastSignedIn: data.lastSignedIn ?? new Date().toISOString(),
+      lastSignedIn: data.lastSignedIn instanceof Date ? data.lastSignedIn.toISOString() : (data.lastSignedIn ?? new Date().toISOString()),
     });
     return await getUserByOpenId(data.openId);
   }
@@ -549,15 +549,15 @@ export async function getUserLocationPermissions(userId: number) {
     if (!existing) {
       locationMap.set(perm.locationId, {
         locationId: perm.locationId,
-        canRead: perm.canRead,
-        canWrite: perm.canWrite,
+        canRead: Boolean(perm.canRead),
+        canWrite: Boolean(perm.canWrite),
       });
     } else {
       // Take most permissive permissions
       locationMap.set(perm.locationId, {
         locationId: perm.locationId,
-        canRead: existing.canRead || perm.canRead,
-        canWrite: existing.canWrite || perm.canWrite,
+        canRead: existing.canRead || Boolean(perm.canRead),
+        canWrite: existing.canWrite || Boolean(perm.canWrite),
       });
     }
   }
@@ -843,15 +843,29 @@ export async function createOrUpdateComplianceAssessment(data: any) {
   // Check if assessment exists
   const existing = await getComplianceAssessmentByQuestion(data.locationId, data.questionId);
   
+  // Convert Date objects to MySQL-compatible format strings
+  const formatForMySQL = (date: Date | string | undefined) => {
+    if (!date) return undefined;
+    const d = date instanceof Date ? date : new Date(date);
+    return d.toISOString().slice(0, 19).replace('T', ' ');
+  };
+  
+  const sanitizedData = {
+    ...data,
+    assessedAt: data.assessedAt ? formatForMySQL(data.assessedAt) : undefined,
+    targetCompletionDate: data.targetCompletionDate ? formatForMySQL(data.targetCompletionDate) : undefined,
+    actualCompletionDate: data.actualCompletionDate ? formatForMySQL(data.actualCompletionDate) : undefined,
+  };
+  
   if (existing) {
     // Update existing
     await db.update(complianceAssessments)
-      .set({ ...data, updatedAt: new Date().toISOString() })
+      .set({ ...sanitizedData, updatedAt: formatForMySQL(new Date()) })
       .where(eq(complianceAssessments.id, existing.id));
     return existing.id;
   } else {
     // Create new
-    const result = await db.insert(complianceAssessments).values(data);
+    const result = await db.insert(complianceAssessments).values(sanitizedData);
     return result[0]?.insertId;
   }
 }
@@ -2301,8 +2315,8 @@ export async function updateUser(userId: number, data: Partial<{
   name: string;
   email: string;
   password: string;
-  superAdmin: boolean;
-  twoFaSecret: string;
+  superAdmin: number;
+  twoFaSecret: string | null;
   twoFaEnabled: number;
   twoFaVerified: number;
 }>) {
@@ -2805,6 +2819,9 @@ export async function getAllAuditInstancesForReminders(startDate: Date, endDate:
   const db = await getDb();
   if (!db) return [];
   
+  const startStr = startDate.toISOString().split('T')[0];
+  const endStr = endDate.toISOString().split('T')[0];
+  
   return db
     .select({
       id: auditInstances.id,
@@ -2827,8 +2844,8 @@ export async function getAllAuditInstancesForReminders(startDate: Date, endDate:
     .leftJoin(tenants, eq(auditInstances.tenantId, tenants.id))
     .where(
       and(
-        gte(auditInstances.auditDate, startDate),
-        lte(auditInstances.auditDate, endDate),
+        gte(auditInstances.auditDate, startStr),
+        lte(auditInstances.auditDate, endStr),
         ne(auditInstances.status, 'completed'),
         ne(auditInstances.status, 'archived')
       )

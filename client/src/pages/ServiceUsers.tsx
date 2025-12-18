@@ -532,7 +532,7 @@ export default function ServiceUsers() {
                     className="w-full"
                     onClick={() => window.location.href = `/service-users/${serviceUser.id}/compliance`}
                   >
-                    <ClipboardCheck className="mr-2 h-4 w-4" />
+                    <ClipboardText weight="bold" className="mr-2 h-4 w-4" />
                     View Compliance ({serviceUser.complianceProgress?.completed || 0}/{serviceUser.complianceProgress?.total || 19} complete)
                   </Button>
                 </div>
