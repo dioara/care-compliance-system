@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Loader2 } from "lucide-react";
-import { UserCheck, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Shield, CheckCircle, XCircle, Funnel, Lock, ClockCounterClockwise, Envelope, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -15,6 +14,7 @@ import { useLocation as useRouter } from "wouter";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { PageHeader } from "@/components/PageHeader";
 
+import { Spinner, UserCheck, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Shield, CheckCircle, XCircle, Funnel, Lock, ClockCounterClockwise, Envelope, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
 export default function Staff() {
   const { activeLocationId, canWrite, permissions } = useLocation();
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
@@ -257,7 +257,7 @@ export default function Staff() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -446,7 +446,7 @@ export default function Staff() {
                 <Button type="submit" disabled={createStaff.isPending}>
                   {createStaff.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Adding...
                     </>
                   ) : (
@@ -726,7 +726,7 @@ export default function Staff() {
               <Button type="submit" disabled={updateStaff.isPending}>
                 {updateStaff.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Updating...
                   </>
                 ) : (
@@ -753,7 +753,7 @@ export default function Staff() {
           <div className="space-y-4 py-4">
             {historyLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin" />
+                <Spinner className="h-6 w-6 animate-spin" />
               </div>
             ) : staffHistory && staffHistory.length > 0 ? (
               <div className="space-y-3">
@@ -828,7 +828,7 @@ export default function Staff() {
               </Button>
               <Button type="submit" disabled={sendInvitation.isPending}>
                 {sendInvitation.isPending ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
+                  <><Spinner className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
                 ) : (
                   <><PaperPlaneTilt className="mr-2 h-4 w-4" weight="bold" /> Send Invitation</>
                 )}

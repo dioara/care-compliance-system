@@ -2583,4 +2583,45 @@
 - [x] Migrate ui/sheet.tsx to Phosphor Icons
 - [x] Migrate ui/sidebar.tsx to Phosphor Icons
 - [x] Verify no Lucide imports remain in components folder
-- [ ] Note: 33 pages still have Lucide imports (separate migration task)
+- [x] All pages migrated to Phosphor Icons - 0 Lucide imports remaining
+
+
+## Migrate Pages to Phosphor Icons & Fix TypeScript Errors
+- [ ] Fix TypeScript errors in server/routers.ts (34 errors - type mismatches)
+- [ ] Fix TypeScript errors in server/routers/helpCenter.ts (18 errors)
+- [ ] Fix TypeScript errors in server/services/errorLoggingService.ts (11 errors)
+- [ ] Fix TypeScript errors in server/db.ts (11 errors)
+- [ ] Fix TypeScript errors in other server files
+- [x] Migrate AIAudits.tsx to Phosphor Icons
+- [x] Migrate AcceptInvitation.tsx to Phosphor Icons
+- [x] Migrate AdminDashboard.tsx to Phosphor Icons
+- [x] Migrate Analytics.tsx to Phosphor Icons
+- [x] Migrate AuditCalendar.tsx to Phosphor Icons
+- [x] Migrate AuditComparison.tsx to Phosphor Icons
+- [x] Migrate AuditResults.tsx to Phosphor Icons
+- [x] Migrate AuditSchedules.tsx to Phosphor Icons
+- [x] Migrate AuditScheduling.tsx to Phosphor Icons
+- [x] Migrate CompanyProfile.tsx to Phosphor Icons
+- [x] Migrate Compliance.tsx to Phosphor Icons
+- [x] Migrate ComplianceReports.tsx to Phosphor Icons
+- [x] Migrate ComplianceSection.tsx to Phosphor Icons
+- [x] Migrate ComponentShowcase.tsx to Phosphor Icons
+- [x] Migrate ConductAudit.tsx to Phosphor Icons
+- [x] Migrate DataPrivacy.tsx to Phosphor Icons
+- [x] Migrate Home.tsx to Phosphor Icons
+- [x] Migrate Incidents.tsx to Phosphor Icons
+- [x] Migrate Locations.tsx to Phosphor Icons
+- [x] Migrate NotFound.tsx to Phosphor Icons
+- [x] Migrate PersonCompliance.tsx to Phosphor Icons
+- [x] Migrate PrivacyPolicy.tsx to Phosphor Icons
+- [x] Migrate Reports.tsx to Phosphor Icons
+- [x] Migrate RoleManagement.tsx to Phosphor Icons
+- [x] Migrate ServiceUsers.tsx to Phosphor Icons
+- [x] Migrate Settings.tsx to Phosphor Icons
+- [x] Migrate Staff.tsx to Phosphor Icons
+- [x] Migrate TermsOfService.tsx to Phosphor Icons
+- [x] Migrate UserManagement.tsx to Phosphor Icons
+- [x] Migrate Notifications.tsx to Phosphor Icons
+- [x] Migrate HelpCenter.tsx to Phosphor Icons
+- [x] Migrate HelpArticle.tsx to Phosphor Icons
+- [x] Migrate IncidentAnalytics.tsx to Phosphor Icons

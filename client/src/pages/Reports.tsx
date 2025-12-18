@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, AlertCircle } from "lucide-react";
 
+import { FileText, DownloadSimple, WarningCircle } from "@phosphor-icons/react";
 export default function Reports() {
   const reportTypes = [
     { name: "Compliance Summary Report", description: "Overall compliance status with RAG ratings" },
@@ -42,14 +42,14 @@ export default function Reports() {
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4" />
+                  <DownloadSimple className="h-4 w-4" />
                 </Button>
               </div>
             ))}
           </div>
           <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <AlertCircle className="inline h-4 w-4 mr-2" />
+              <WarningCircle className="inline h-4 w-4 mr-2" />
               Report generation with company branding coming soon. Supports PDF, Word, and Excel formats.
             </p>
           </div>

@@ -6,10 +6,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Settings as SettingsIcon, User, Lock, Loader2, CheckCircle, Shield, Smartphone, QrCode, Key, AlertTriangle } from "lucide-react";
+
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { Gear as SettingsIcon, User, Lock, Spinner, CheckCircle, Shield, DeviceMobile, QrCode, Key, Warning } from "@phosphor-icons/react";
 export default function Settings() {
   const { user, refresh } = useAuth();
   const trpcUtils = trpc.useUtils();
@@ -186,7 +187,7 @@ export default function Settings() {
               <Button type="submit" disabled={isProfileSaving}>
                 {isProfileSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Saving...
                   </>
                 ) : (
@@ -256,7 +257,7 @@ export default function Settings() {
               <Button type="submit" disabled={isPasswordSaving}>
                 {isPasswordSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Updating...
                   </>
                 ) : (
@@ -310,14 +311,14 @@ export default function Settings() {
                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
                 onClick={() => setShow2FADisable(true)}
               >
-                <AlertTriangle className="mr-2 h-4 w-4" />
+                <Warning className="mr-2 h-4 w-4" />
                 Disable Two-Factor Authentication
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               <div className="flex items-start gap-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <Warning className="h-5 w-5 text-amber-600 mt-0.5" />
                 <div>
                   <p className="font-medium text-amber-800">Two-factor authentication is not enabled</p>
                   <p className="text-sm text-amber-700 mt-1">
@@ -329,7 +330,7 @@ export default function Settings() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-start gap-3 p-3 border rounded-lg">
                   <div className="p-2 bg-violet-100 rounded-lg">
-                    <Smartphone className="h-5 w-5 text-violet-600" />
+                    <DeviceMobile className="h-5 w-5 text-violet-600" />
                   </div>
                   <div>
                     <p className="font-medium text-sm">Step 1</p>
@@ -359,7 +360,7 @@ export default function Settings() {
               <Button onClick={handleSetup2FA} disabled={setup2FA.isPending}>
                 {setup2FA.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Setting up...
                   </>
                 ) : (
@@ -476,7 +477,7 @@ export default function Settings() {
                 >
                   {verify2FA.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Verifying...
                     </>
                   ) : (
@@ -497,7 +498,7 @@ export default function Settings() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-red-600">
-              <AlertTriangle className="h-5 w-5" />
+              <Warning className="h-5 w-5" />
               Disable Two-Factor Authentication
             </DialogTitle>
             <DialogDescription>
@@ -544,12 +545,12 @@ export default function Settings() {
               >
                 {disable2FA.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Disabling...
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    <Warning className="mr-2 h-4 w-4" />
                     Disable 2FA
                   </>
                 )}

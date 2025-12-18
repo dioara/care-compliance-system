@@ -5,8 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Calendar, FileText, ArrowRight } from "lucide-react";
 
+import { TrendUp, TrendDown, Minus, ChartBar, Calendar, FileText, ArrowRight } from "@phosphor-icons/react";
 type AuditData = {
   id: number;
   auditType: "care_plan" | "daily_notes";
@@ -80,8 +80,8 @@ export default function AuditComparison() {
   }, [filteredData]);
 
   const getTrendIcon = (trend: number) => {
-    if (trend > 0.5) return <TrendingUp className="h-5 w-5 text-green-600" />;
-    if (trend < -0.5) return <TrendingDown className="h-5 w-5 text-red-600" />;
+    if (trend > 0.5) return <TrendUp className="h-5 w-5 text-green-600" />;
+    if (trend < -0.5) return <TrendDown className="h-5 w-5 text-red-600" />;
     return <Minus className="h-5 w-5 text-gray-500" />;
   };
 
@@ -202,7 +202,7 @@ export default function AuditComparison() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+              <ChartBar className="h-5 w-5" />
               Score Timeline
             </CardTitle>
             <CardDescription>
@@ -250,7 +250,7 @@ export default function AuditComparison() {
               </div>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <ChartBar className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>No audit data available for the selected time range</p>
               </div>
             )}
@@ -294,7 +294,7 @@ export default function AuditComparison() {
                           </span>
                           {scoreChange !== 0 && (
                             <span className={`flex items-center gap-1 ${scoreChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {scoreChange > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                              {scoreChange > 0 ? <TrendUp className="h-3 w-3" /> : <TrendDown className="h-3 w-3" />}
                               {scoreChange > 0 ? '+' : ''}{scoreChange} from previous
                             </span>
                           )}

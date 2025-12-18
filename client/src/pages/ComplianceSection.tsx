@@ -9,9 +9,10 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation as useRouter, useParams } from "wouter";
-import { ArrowLeft, CheckCircle2, XCircle, AlertTriangle, Upload, FileText, Trash2, Loader2, Save } from "lucide-react";
+
 import { useState } from "react";
 import { toast } from "sonner";
+import { ArrowLeft, CheckCircle, XCircle, Warning, UploadSimple, FileText, Trash, Spinner, FloppyDisk } from "@phosphor-icons/react";
 // File upload will be handled through tRPC endpoint
 
 export default function ComplianceSection() {
@@ -53,7 +54,7 @@ export default function ComplianceSection() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -85,14 +86,14 @@ export default function ComplianceSection() {
       case 'green':
         return (
           <Badge className="bg-green-500">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
+            <CheckCircle className="h-3 w-3 mr-1" />
             Compliant
           </Badge>
         );
       case 'amber':
         return (
           <Badge className="bg-amber-500">
-            <AlertTriangle className="h-3 w-3 mr-1" />
+            <Warning className="h-3 w-3 mr-1" />
             Partial
           </Badge>
         );
@@ -340,12 +341,12 @@ export default function ComplianceSection() {
                       >
                         {saveAssessment.isPending ? (
                           <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Spinner className="mr-2 h-4 w-4 animate-spin" />
                             Saving...
                           </>
                         ) : (
                           <>
-                            <Save className="mr-2 h-4 w-4" />
+                            <FloppyDisk className="mr-2 h-4 w-4" />
                             Save Assessment
                           </>
                         )}
@@ -372,12 +373,12 @@ export default function ComplianceSection() {
                           >
                             {uploadingFiles[question.id] ? (
                               <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                <Spinner className="mr-2 h-4 w-4 animate-spin" />
                                 Uploading...
                               </>
                             ) : (
                               <>
-                                <Upload className="mr-2 h-4 w-4" />
+                                <UploadSimple className="mr-2 h-4 w-4" />
                                 Upload Evidence
                               </>
                             )}

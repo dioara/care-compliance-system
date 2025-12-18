@@ -14,10 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, FileText, CheckCircle2, XCircle, AlertTriangle, Plus, CalendarIcon, Upload, Download } from "lucide-react";
+
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+import { ArrowLeft, FileText, CheckCircle, XCircle, Warning, Plus, Calendar as CalendarIcon, UploadSimple, DownloadSimple } from "@phosphor-icons/react";
 export default function AuditResults() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
@@ -136,7 +137,7 @@ export default function AuditResults() {
     if (response === "yes") {
       return (
         <Badge className="bg-green-100 text-green-800">
-          <CheckCircle2 className="h-3 w-3 mr-1" />
+          <CheckCircle className="h-3 w-3 mr-1" />
           Yes
         </Badge>
       );
@@ -249,7 +250,7 @@ export default function AuditResults() {
             onClick={handleExportPDF}
             disabled={exportPdfMutation.isPending}
           >
-            <Download className="h-4 w-4 mr-2" />
+            <DownloadSimple className="h-4 w-4 mr-2" />
             {exportPdfMutation.isPending ? "Generating..." : "Export Report"}
           </Button>
         </div>
@@ -413,7 +414,7 @@ export default function AuditResults() {
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <AlertTriangle className="h-12 w-12 text-muted-foreground mb-4" />
+                <Warning className="h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">No action plans created yet</p>
                 <Button className="mt-4" onClick={() => setIsActionPlanDialogOpen(true)}>
                   Create First Action Plan
@@ -428,7 +429,7 @@ export default function AuditResults() {
           <div className="flex justify-between items-center">
             <p className="text-sm text-muted-foreground">Supporting documents and evidence for this audit</p>
             <Button>
-              <Upload className="h-4 w-4 mr-2" />
+              <UploadSimple className="h-4 w-4 mr-2" />
               Upload Evidence
             </Button>
           </div>
@@ -459,7 +460,7 @@ export default function AuditResults() {
                     </div>
                     <Button variant="outline" size="sm" className="w-full mt-4" asChild>
                       <a href={file.fileUrl} target="_blank" rel="noopener noreferrer">
-                        <Download className="h-4 w-4 mr-2" />
+                        <DownloadSimple className="h-4 w-4 mr-2" />
                         View
                       </a>
                     </Button>
@@ -470,7 +471,7 @@ export default function AuditResults() {
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <Upload className="h-12 w-12 text-muted-foreground mb-4" />
+                <UploadSimple className="h-12 w-12 text-muted-foreground mb-4" />
                 <p className="text-muted-foreground">No evidence uploaded yet</p>
                 <Button className="mt-4">Upload First Evidence</Button>
               </CardContent>

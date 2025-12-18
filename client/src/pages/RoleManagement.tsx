@@ -9,10 +9,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import { Plus, PencilSimple, Trash, Shield, MapPin, Users } from "@phosphor-icons/react";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+import { Spinner, Plus, PencilSimple, Trash, Shield, MapPin, Users } from "@phosphor-icons/react";
 interface LocationPermission {
   locationId: number;
   locationName: string;
@@ -225,7 +225,7 @@ export default function RoleManagement() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createRole.isPending}>
-                    {createRole.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {createRole.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                     Create Role
                   </Button>
                 </DialogFooter>
@@ -266,7 +266,7 @@ export default function RoleManagement() {
           <CardContent>
             {rolesLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : roles.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -368,7 +368,7 @@ export default function RoleManagement() {
                   Cancel
                 </Button>
                 <Button type="submit" disabled={updateRole.isPending}>
-                  {updateRole.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {updateRole.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
                 </Button>
               </DialogFooter>
@@ -439,7 +439,7 @@ export default function RoleManagement() {
                 Cancel
               </Button>
               <Button onClick={savePermissions} disabled={setPermissionsMutation.isPending}>
-                {setPermissionsMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {setPermissionsMutation.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 Save Permissions
               </Button>
             </DialogFooter>

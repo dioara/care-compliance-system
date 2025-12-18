@@ -7,12 +7,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { trpc } from "@/lib/trpc";
-import { Loader2 } from "lucide-react";
-import { MapPin, Plus, PencilSimple, Trash, Users, Buildings, Medal } from "@phosphor-icons/react";
+
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
 
+import { Spinner, MapPin, Plus, PencilSimple, Trash, Users, Buildings, Medal } from "@phosphor-icons/react";
 const CQC_RATINGS = [
   "Outstanding",
   "Good",
@@ -178,7 +178,7 @@ export default function Locations() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -321,7 +321,7 @@ export default function Locations() {
                 <Button type="submit" disabled={createLocation.isPending}>
                   {createLocation.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Creating...
                     </>
                   ) : (
@@ -458,7 +458,7 @@ export default function Locations() {
               <Button type="submit" disabled={updateLocation.isPending}>
                 {updateLocation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Updating...
                   </>
                 ) : (

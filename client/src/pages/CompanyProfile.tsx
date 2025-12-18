@@ -7,13 +7,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { Loader2 } from "lucide-react";
-import { Buildings, UploadSimple, Key, ArrowSquareOut, Eye, EyeSlash } from "@phosphor-icons/react";
+
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
+import { Spinner, Buildings, UploadSimple, Key, ArrowSquareOut, Eye, EyeSlash } from "@phosphor-icons/react";
 export default function CompanyProfile() {
   const { user } = useAuth();
   const { data: profile, isLoading, refetch } = trpc.company.getProfile.useQuery();
@@ -120,7 +120,7 @@ export default function CompanyProfile() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -159,7 +159,7 @@ export default function CompanyProfile() {
                 >
                   {isUploading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Uploading...
                     </>
                   ) : (
@@ -180,7 +180,7 @@ export default function CompanyProfile() {
                 >
                   {isUploading ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Uploading...
                     </>
                   ) : (
@@ -339,7 +339,7 @@ export default function CompanyProfile() {
                 <Button type="submit" disabled={updateProfile.isPending}>
                   {updateProfile.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Saving...
                     </>
                   ) : (
@@ -435,7 +435,7 @@ export default function CompanyProfile() {
             >
               {updateProfile.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
@@ -475,7 +475,7 @@ function TemplatePreviewDialog({ careSettingType }: { careSettingType: string })
 
       {isLoading ? (
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <div className="space-y-6">

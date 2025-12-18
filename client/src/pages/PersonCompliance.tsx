@@ -10,10 +10,11 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation as useRouter, useParams } from "wouter";
-import { ArrowLeft, CheckCircle2, XCircle, AlertTriangle, Loader2, Save, ClipboardCheck, HelpCircle } from "lucide-react";
+
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { ArrowLeft, CheckCircle, XCircle, Warning, Spinner, FloppyDisk, ClipboardText, Question } from "@phosphor-icons/react";
 interface PersonComplianceProps {
   personType: "staff" | "service_user";
 }
@@ -99,7 +100,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
   if (personLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -163,14 +164,14 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
       case 'green':
         return (
           <Badge className="bg-green-500">
-            <CheckCircle2 className="h-3 w-3 mr-1" />
+            <CheckCircle className="h-3 w-3 mr-1" />
             Compliant
           </Badge>
         );
       case 'amber':
         return (
           <Badge className="bg-amber-500">
-            <AlertTriangle className="h-3 w-3 mr-1" />
+            <Warning className="h-3 w-3 mr-1" />
             Partial
           </Badge>
         );
@@ -287,7 +288,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg flex items-center gap-2">
-                        <ClipboardCheck className="h-5 w-5" />
+                        <ClipboardText className="h-5 w-5" />
                         Section {section.sectionNumber}: {section.sectionName}
                       </CardTitle>
                       {section.description && (
@@ -495,12 +496,12 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                                   >
                                     {saveAssessment.isPending ? (
                                       <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        <Spinner className="mr-2 h-4 w-4 animate-spin" />
                                         Saving...
                                       </>
                                     ) : (
                                       <>
-                                        <Save className="mr-2 h-4 w-4" />
+                                        <FloppyDisk className="mr-2 h-4 w-4" />
                                         Save Assessment
                                       </>
                                     )}

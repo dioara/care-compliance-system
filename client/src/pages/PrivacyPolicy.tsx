@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Shield, Lock, Eye, FileText, Users, Globe, Mail, Clock } from "lucide-react";
 
+import { Shield, Lock, Eye, FileText, Users, Globe, Envelope, Clock } from "@phosphor-icons/react";
 export default function PrivacyPolicy() {
   const lastUpdated = "15 December 2024";
   const companyName = "Care Compliance Management System";
@@ -400,7 +400,7 @@ export default function PrivacyPolicy() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
+              <Envelope className="h-5 w-5" />
               Contact Us
             </CardTitle>
           </CardHeader>

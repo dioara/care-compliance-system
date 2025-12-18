@@ -2,11 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardCheck, Users, Briefcase, AlertCircle, CheckCircle2, XCircle, AlertTriangle, Loader2, TrendingUp } from "lucide-react";
+
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
 import { useLocation as useRouter } from "wouter";
 
+import { ClipboardText, Users, Briefcase, WarningCircle, CheckCircle, XCircle, Warning, Spinner, TrendUp } from "@phosphor-icons/react";
 export default function Compliance() {
   const { activeLocationId } = useLocation();
   const [, setLocation] = useRouter();
@@ -36,7 +37,7 @@ export default function Compliance() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <ClipboardCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <ClipboardText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-muted-foreground">Please select a location to view compliance assessments</p>
         </div>
       </div>
@@ -46,7 +47,7 @@ export default function Compliance() {
   if (sectionsLoading || summaryLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -69,9 +70,9 @@ export default function Compliance() {
     
     switch (status) {
       case 'green':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'amber':
-        return <AlertTriangle className="h-5 w-5 text-amber-500" />;
+        return <Warning className="h-5 w-5 text-amber-500" />;
       case 'red':
         return <XCircle className="h-5 w-5 text-red-500" />;
       default:
@@ -97,7 +98,7 @@ export default function Compliance() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Overall Compliance</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary?.compliancePercentage || 0}%</div>
@@ -110,7 +111,7 @@ export default function Compliance() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Compliant</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">{summary?.compliant || 0}</div>
@@ -121,7 +122,7 @@ export default function Compliance() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Partial Compliance</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-amber-500" />
+            <Warning className="h-4 w-4 text-amber-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-600">{summary?.partial || 0}</div>
@@ -177,7 +178,7 @@ export default function Compliance() {
                         className="flex items-center justify-between p-4 rounded-lg border hover:bg-accent transition-colors text-left"
                       >
                         <div className="flex items-center gap-3 flex-1">
-                          <ClipboardCheck className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <ClipboardText className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <div className="min-w-0">
                             <p className="font-medium">{section.sectionName}</p>
                             <p className="text-xs text-muted-foreground">Section {section.sectionNumber}</p>
@@ -195,7 +196,7 @@ export default function Compliance() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <ClipboardCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <ClipboardText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">No service user compliance sections found</p>
                 </div>
               )}
@@ -256,7 +257,7 @@ export default function Compliance() {
         <Card className="border-red-200 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-900 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
+              <WarningCircle className="h-5 w-5" />
               Overdue Actions
             </CardTitle>
             <CardDescription className="text-red-700">

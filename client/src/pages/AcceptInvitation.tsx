@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, CheckCircle, XCircle, Building2, Mail, User, Lock, Eye, EyeOff } from "lucide-react";
 
+import { Spinner, CheckCircle, XCircle, Buildings, Envelope, User, Lock, Eye, EyeSlash } from "@phosphor-icons/react";
 export default function AcceptInvitation() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/accept-invitation");
@@ -106,7 +106,7 @@ export default function AcceptInvitation() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+          <Spinner className="h-8 w-8 animate-spin mx-auto text-primary" />
           <p className="mt-4 text-muted-foreground">Validating invitation...</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function AcceptInvitation() {
             <p className="text-sm text-muted-foreground mb-4">
               Redirecting you to the login page...
             </p>
-            <Loader2 className="h-5 w-5 animate-spin mx-auto text-primary" />
+            <Spinner className="h-5 w-5 animate-spin mx-auto text-primary" />
           </CardContent>
         </Card>
       </div>
@@ -164,7 +164,7 @@ export default function AcceptInvitation() {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center pb-2">
           <div className="mx-auto w-14 h-14 bg-[#1F7AE0] rounded-xl flex items-center justify-center mb-4 shadow-lg">
-            <Building2 className="h-7 w-7 text-white" />
+            <Buildings className="h-7 w-7 text-white" />
           </div>
           <CardTitle className="text-2xl">Welcome!</CardTitle>
           <CardDescription>
@@ -178,7 +178,7 @@ export default function AcceptInvitation() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Envelope className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
@@ -226,7 +226,7 @@ export default function AcceptInvitation() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function AcceptInvitation() {
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? <EyeSlash className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function AcceptInvitation() {
             >
               {submitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner className="mr-2 h-4 w-4 animate-spin" />
                   Creating Account...
                 </>
               ) : (

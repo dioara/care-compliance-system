@@ -1,8 +1,8 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
 
+import { ChartBar, TrendUp, Warning, CheckCircle } from "@phosphor-icons/react";
 export default function Analytics() {
   // Fetch analytics data
   const { data: completionStats } = trpc.analytics.auditCompletion.useQuery({ days: 90 });
@@ -25,7 +25,7 @@ export default function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <TrendUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{completionStats?.completionRate || 0}%</div>
@@ -38,7 +38,7 @@ export default function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-            <BarChart3 className="h-4 w-4 text-blue-500" />
+            <ChartBar className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{completionStats?.inProgress || 0}</div>
@@ -49,7 +49,7 @@ export default function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Action Plans</CardTitle>
-            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{actionPlanStats?.completed || 0}/{actionPlanStats?.total || 0}</div>
@@ -60,7 +60,7 @@ export default function Analytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Overdue Actions</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-500" />
+            <Warning className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{actionPlanStats?.overdue || 0}</div>

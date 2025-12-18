@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Bell, Plus, Trash2, Edit, AlertTriangle, CheckCircle } from "lucide-react";
+
 import { toast } from "sonner";
 
+import { Calendar, Clock, Bell, Plus, Trash, PencilSimple, Warning, CheckCircle } from "@phosphor-icons/react";
 type AuditSchedule = {
   id: number;
   scheduleName: string;
@@ -124,7 +125,7 @@ export default function AuditScheduling() {
     const daysUntilDue = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysUntilDue < 0) {
-      return <Badge variant="destructive" className="flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Overdue</Badge>;
+      return <Badge variant="destructive" className="flex items-center gap-1"><Warning className="h-3 w-3" /> Overdue</Badge>;
     } else if (daysUntilDue <= schedule.reminderDaysBefore) {
       return <Badge variant="warning" className="flex items-center gap-1 bg-amber-500"><Clock className="h-3 w-3" /> Due Soon</Badge>;
     } else {
@@ -377,7 +378,7 @@ export default function AuditScheduling() {
                       )}
                       <div className="flex gap-2 pt-2">
                         <Button variant="outline" size="sm" className="flex-1">
-                          <Edit className="h-3 w-3 mr-1" />
+                          <PencilSimple className="h-3 w-3 mr-1" />
                           Edit
                         </Button>
                         <Button 
@@ -386,7 +387,7 @@ export default function AuditScheduling() {
                           className="text-destructive hover:text-destructive"
                           onClick={() => deleteScheduleMutation?.mutate({ id: schedule.id })}
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash className="h-3 w-3" />
                         </Button>
                       </div>
                     </CardContent>

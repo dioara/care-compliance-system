@@ -3,9 +3,10 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Check, CheckCheck, Loader2 } from "lucide-react";
+
 import { formatDistanceToNow } from "date-fns";
 
+import { Bell, Check, Checks, Spinner } from "@phosphor-icons/react";
 export default function Notifications() {
   const [filter, setFilter] = useState<"all" | "unread">("all");
   
@@ -83,9 +84,9 @@ export default function Notifications() {
               disabled={markAllAsReadMutation.isPending}
             >
               {markAllAsReadMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Spinner className="h-4 w-4 mr-2 animate-spin" />
               ) : (
-                <CheckCheck className="h-4 w-4 mr-2" />
+                <Checks className="h-4 w-4 mr-2" />
               )}
               Mark all as read
             </Button>
@@ -95,7 +96,7 @@ export default function Notifications() {
       
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : !notifications || notifications.length === 0 ? (
         <Card className="p-12 text-center">

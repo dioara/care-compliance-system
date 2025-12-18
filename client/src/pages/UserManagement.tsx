@@ -8,10 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import { Plus, PencilSimple, Trash, Shield, Users, Envelope, User, Key, ShieldCheck, ShieldWarning, CheckCircle, XCircle, Ticket } from "@phosphor-icons/react";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+import { Spinner, Plus, PencilSimple, Trash, Shield, Users, Envelope, User, Key, ShieldCheck, ShieldWarning, CheckCircle, XCircle, Ticket } from "@phosphor-icons/react";
 export default function UserManagement() {
   const { data: currentUser } = trpc.auth.me.useQuery();
   const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = trpc.users.list.useQuery();
@@ -285,7 +285,7 @@ export default function UserManagement() {
                     Cancel
                   </Button>
                   <Button type="submit" disabled={createUser.isPending}>
-                    {createUser.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {createUser.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                     Create User
                   </Button>
                 </DialogFooter>
@@ -313,7 +313,7 @@ export default function UserManagement() {
           <CardContent>
             {usersLoading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
@@ -534,7 +534,7 @@ export default function UserManagement() {
                   Cancel
                 </Button>
                 <Button type="submit" disabled={updateUser.isPending}>
-                  {updateUser.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {updateUser.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
                 </Button>
               </DialogFooter>
@@ -554,7 +554,7 @@ export default function UserManagement() {
             <div className="py-4">
               {isLoadingRoles ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <Spinner className="h-6 w-6 animate-spin text-muted-foreground" />
                   <span className="ml-2 text-muted-foreground">Loading roles...</span>
                 </div>
               ) : roles.length === 0 ? (
@@ -591,7 +591,7 @@ export default function UserManagement() {
                 Cancel
               </Button>
               <Button onClick={saveRoles} disabled={assignRoles.isPending}>
-                {assignRoles.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {assignRoles.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
                 Save Roles
               </Button>
             </DialogFooter>

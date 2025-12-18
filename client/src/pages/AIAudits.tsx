@@ -8,8 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
-import { Loader2 } from "lucide-react";
-import { Brain, UploadSimple, FileText, WarningCircle, CheckCircle, XCircle, Clock, Key, Shield, DownloadSimple, File } from "@phosphor-icons/react";
+import { Brain, UploadSimple, FileText, WarningCircle, CheckCircle, XCircle, Clock, Key, Shield, DownloadSimple, File, Spinner } from "@phosphor-icons/react";
 import { trpc } from "@/lib/trpc";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
@@ -165,7 +164,7 @@ export default function AIAudits() {
   if (isLoadingApiKey) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner weight="bold" className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -362,7 +361,7 @@ export default function AIAudits() {
                 >
                   {isProcessing ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner weight="bold" className="mr-2 h-4 w-4 animate-spin" />
                       Analysing Care Plan...
                     </>
                   ) : (
@@ -386,7 +385,7 @@ export default function AIAudits() {
               <CardContent>
                 {isProcessing && (
                   <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                    <Spinner weight="bold" className="h-12 w-12 animate-spin text-primary" />
                     <p className="text-muted-foreground">Analysing document...</p>
                     <p className="text-xs text-muted-foreground">This may take 10-30 seconds</p>
                   </div>
@@ -450,7 +449,7 @@ export default function AIAudits() {
                 >
                   {isProcessing ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner weight="bold" className="mr-2 h-4 w-4 animate-spin" />
                       Analysing Daily Notes...
                     </>
                   ) : (
@@ -474,7 +473,7 @@ export default function AIAudits() {
               <CardContent>
                 {isProcessing && (
                   <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                    <Spinner weight="bold" className="h-12 w-12 animate-spin text-primary" />
                     <p className="text-muted-foreground">Analysing document...</p>
                     <p className="text-xs text-muted-foreground">This may take 10-30 seconds</p>
                   </div>
@@ -551,7 +550,7 @@ export default function AIAudits() {
                         disabled={audit.status !== "completed" || generatePDF.isPending}
                       >
                         {generatePDF.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Spinner weight="bold" className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                           <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
                         )}

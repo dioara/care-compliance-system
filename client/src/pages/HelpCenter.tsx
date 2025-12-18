@@ -2,10 +2,11 @@ import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ArrowLeft, ChevronRight } from "lucide-react";
+
 import { helpArticles, helpCategories, type HelpArticle } from "@/data/helpContent";
 import { useLocation } from "wouter";
 
+import { MagnifyingGlass, ArrowLeft, CaretRight } from "@phosphor-icons/react";
 export default function HelpCenter() {
   const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -81,7 +82,7 @@ export default function HelpCenter() {
             
             {/* Search bar */}
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <MagnifyingGlass className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <Input
                 type="text"
                 placeholder="Search help articles..."
@@ -194,7 +195,7 @@ export default function HelpCenter() {
                             {article.content.substring(0, 100).replace(/[#*]/g, "")}...
                           </p>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-[#1F7AE0] flex-shrink-0" />
+                        <CaretRight className="h-5 w-5 text-gray-400 group-hover:text-[#1F7AE0] flex-shrink-0" />
                       </button>
                     ))}
                   </div>

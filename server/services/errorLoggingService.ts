@@ -55,15 +55,15 @@ export async function getErrorLogs(filters: {
   }
   
   if (filters.resolved !== undefined) {
-    conditions.push(eq(errorLogs.resolved, filters.resolved));
+    conditions.push(eq(errorLogs.resolved, filters.resolved ? 1 : 0));
   }
   
   if (filters.startDate) {
-    conditions.push(gte(errorLogs.createdAt, filters.startDate));
+    conditions.push(gte(errorLogs.createdAt, filters.startDate.toISOString()));
   }
   
   if (filters.endDate) {
-    conditions.push(sql`${errorLogs.createdAt} <= ${filters.endDate}`);
+    conditions.push(sql`${errorLogs.createdAt} <= ${filters.endDate.toISOString()}`);
   }
 
   if (conditions.length > 0) {
@@ -89,6 +89,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
+  const startDateStr = startDate.toISOString();
 
   // Get total errors
   const totalErrors = await db
@@ -96,7 +97,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
     .from(errorLogs)
     .where(and(
       eq(errorLogs.tenantId, tenantId),
-      gte(errorLogs.createdAt, startDate)
+      gte(errorLogs.createdAt, startDateStr)
     ));
 
   // Get errors by severity
@@ -108,7 +109,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
     .from(errorLogs)
     .where(and(
       eq(errorLogs.tenantId, tenantId),
-      gte(errorLogs.createdAt, startDate)
+      gte(errorLogs.createdAt, startDateStr)
     ))
     .groupBy(errorLogs.severity);
 
@@ -121,7 +122,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
     .from(errorLogs)
     .where(and(
       eq(errorLogs.tenantId, tenantId),
-      gte(errorLogs.createdAt, startDate)
+      gte(errorLogs.createdAt, startDateStr)
     ))
     .groupBy(errorLogs.errorType)
     .orderBy(desc(sql`count(*)`))
@@ -136,7 +137,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
     .from(errorLogs)
     .where(and(
       eq(errorLogs.tenantId, tenantId),
-      gte(errorLogs.createdAt, startDate)
+      gte(errorLogs.createdAt, startDateStr)
     ))
     .groupBy(sql`DATE(${errorLogs.createdAt})`)
     .orderBy(sql`DATE(${errorLogs.createdAt})`);
@@ -149,7 +150,7 @@ export async function getErrorStats(tenantId: number, days: number = 7) {
     .from(errorLogs)
     .where(and(
       eq(errorLogs.tenantId, tenantId),
-      gte(errorLogs.createdAt, startDate),
+      gte(errorLogs.createdAt, startDateStr),
       sql`${errorLogs.userId} IS NOT NULL`
     ));
 
@@ -178,7 +179,7 @@ export async function resolveError(errorId: number, resolvedBy: number) {
   await db.update(errorLogs)
     .set({
       resolved: 1,
-      resolvedAt: new Date(),
+      resolvedAt: new Date().toISOString(),
       resolvedBy
     })
     .where(eq(errorLogs.id, errorId));
@@ -227,11 +228,11 @@ export async function getErrorReports(filters: {
   }
   
   if (filters.startDate) {
-    conditions.push(gte(errorReports.createdAt, filters.startDate));
+    conditions.push(gte(errorReports.createdAt, filters.startDate.toISOString()));
   }
   
   if (filters.endDate) {
-    conditions.push(sql`${errorReports.createdAt} <= ${filters.endDate}`);
+    conditions.push(sql`${errorReports.createdAt} <= ${filters.endDate.toISOString()}`);
   }
 
   if (conditions.length > 0) {
@@ -267,7 +268,7 @@ export async function updateErrorReportStatus(
   }
   
   if (status === 'resolved' || status === 'wont_fix') {
-    updateData.resolvedAt = new Date();
+    updateData.resolvedAt = new Date().toISOString();
     updateData.resolvedBy = resolvedBy;
   }
 

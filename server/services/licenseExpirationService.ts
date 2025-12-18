@@ -14,6 +14,9 @@ export async function checkExpiringSubscriptions() {
   const now = new Date();
   const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const oneDayFromNow = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
+  // Convert to ISO strings for comparison with timestamp columns (mode: 'string')
+  const nowStr = now.toISOString();
+  const sevenDaysFromNowStr = sevenDaysFromNow.toISOString();
 
   try {
     // Find subscriptions expiring in the next 7 days
@@ -28,8 +31,8 @@ export async function checkExpiringSubscriptions() {
         and(
           eq(tenantSubscriptions.status, "active"),
           isNotNull(tenantSubscriptions.currentPeriodEnd),
-          lte(tenantSubscriptions.currentPeriodEnd, sevenDaysFromNow),
-          gt(tenantSubscriptions.currentPeriodEnd, now)
+          lte(tenantSubscriptions.currentPeriodEnd, sevenDaysFromNowStr),
+          gt(tenantSubscriptions.currentPeriodEnd, nowStr)
         )
       );
 

@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+
 import { useLocation } from "wouter";
 
+import { ArrowLeft } from "@phosphor-icons/react";
 export default function TermsOfService() {
   const [, setLocation] = useLocation();
 

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ThumbsUp, ThumbsDown, ChevronRight } from "lucide-react";
+
 import { helpArticles, helpCategories } from "@/data/helpContent";
 import { useLocation, useRoute } from "wouter";
 import Markdown from "react-markdown";
@@ -11,6 +11,7 @@ import { ContactSupportModal } from "@/components/ContactSupportModal";
 import { useAuth } from "@/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 
+import { ArrowLeft, ThumbsUp, ThumbsDown, CaretRight } from "@phosphor-icons/react";
 export default function HelpArticle() {
   const [, setLocation] = useLocation();
   const [, params] = useRoute("/help/:id");
@@ -117,7 +118,7 @@ export default function HelpArticle() {
               >
                 Help Centre
               </button>
-              <ChevronRight className="h-4 w-4" />
+              <CaretRight className="h-4 w-4" />
               <span className="text-gray-900">{article.title}</span>
             </div>
           </div>

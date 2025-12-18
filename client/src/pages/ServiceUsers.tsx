@@ -6,14 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Loader2 } from "lucide-react";
-import { Users, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Heart, Funnel, Lock, ClockCounterClockwise } from "@phosphor-icons/react";
+
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useLocation as useRouter } from "wouter";
 
+import { Spinner, Users, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Heart, Funnel, Lock, ClockCounterClockwise } from "@phosphor-icons/react";
 export default function ServiceUsers() {
   const { activeLocationId, canWrite, permissions } = useLocation();
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
@@ -224,7 +224,7 @@ export default function ServiceUsers() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -418,7 +418,7 @@ export default function ServiceUsers() {
                 <Button type="submit" disabled={createServiceUser.isPending}>
                   {createServiceUser.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Spinner className="mr-2 h-4 w-4 animate-spin" />
                       Adding...
                     </>
                   ) : (
@@ -716,7 +716,7 @@ export default function ServiceUsers() {
               <Button type="submit" disabled={updateServiceUser.isPending}>
                 {updateServiceUser.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Spinner className="mr-2 h-4 w-4 animate-spin" />
                     Updating...
                   </>
                 ) : (

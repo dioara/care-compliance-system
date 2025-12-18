@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-import { ClipboardText, User, FileText, MagnifyingGlass, Funnel, DownloadSimple, CheckCircle, Clock, WarningCircle, CalendarBlank, Plus } from "@phosphor-icons/react";
+import { ClipboardText, User, FileText, MagnifyingGlass, Funnel, DownloadSimple, CheckCircle, Clock, WarningCircle, CalendarBlank, Plus, Clipboard } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -164,8 +164,8 @@ export default function ActionLog() {
     const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
       not_started: { label: "Not Started", color: "bg-gray-100 text-gray-800", icon: Clock },
       in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-800", icon: Clock },
-      partially_completed: { label: "Partial", color: "bg-amber-100 text-amber-800", icon: AlertCircle },
-      completed: { label: "Completed", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
+      partially_completed: { label: "Partial", color: "bg-amber-100 text-amber-800", icon: WarningCircle },
+      completed: { label: "Completed", color: "bg-green-100 text-green-800", icon: CheckCircle },
     };
     const config = statusConfig[status] || statusConfig.not_started;
     const Icon = config.icon;
@@ -424,7 +424,7 @@ export default function ActionLog() {
             </Table>
           ) : (
             <div className="text-center py-12">
-              <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <Clipboard weight="bold" className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No action items found</p>
             </div>
           )}

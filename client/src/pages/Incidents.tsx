@@ -11,18 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
-import { 
-  Warning, FileText, User, Shield, Phone, Buildings, 
-  Stethoscope, ClipboardText, Users, Eye, FileXls,
-  Plus, CheckCircle, Clock, XCircle, DownloadSimple,
-  MapPin, CalendarBlank, WarningCircle, Envelope,
-  CaretRight, Pulse
-} from "@phosphor-icons/react";
+
 import { toast } from "sonner";
 import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
 import { IncidentAttachments, IncidentSignatures } from "@/components/IncidentAttachmentsSignatures";
 
+import { Spinner, Warning, FileText, User, Shield, Phone, Buildings, Stethoscope, ClipboardText, Users, Eye, FileXls, Plus, CheckCircle, Clock, XCircle, DownloadSimple, MapPin, CalendarBlank, WarningCircle, Envelope, CaretRight, Pulse } from "@phosphor-icons/react";
 // Incident types with icons and descriptions
 const INCIDENT_TYPES = [
   { value: "fall", label: "Fall", description: "Slips, trips, and falls", icon: "🚶" },
@@ -415,7 +409,7 @@ export default function Incidents() {
             className="shadow-sm"
           >
             {generatePDFMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
             )}
@@ -428,7 +422,7 @@ export default function Incidents() {
             className="shadow-sm"
           >
             {generateExcelMutation.isPending ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Spinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <FileXls className="mr-2 h-4 w-4" />
             )}
@@ -1019,7 +1013,7 @@ export default function Incidents() {
                     <Button type="submit" disabled={createMutation.isPending} className="min-w-[150px]">
                       {createMutation.isPending ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Spinner className="mr-2 h-4 w-4 animate-spin" />
                           Submitting...
                         </>
                       ) : (
@@ -1577,7 +1571,7 @@ export default function Incidents() {
                             disabled={closeMutation.isPending}
                           >
                             {closeMutation.isPending ? (
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              <Spinner className="mr-2 h-4 w-4 animate-spin" />
                             ) : (
                               <XCircle className="mr-2 h-4 w-4" weight="bold" />
                             )}
@@ -1592,7 +1586,7 @@ export default function Incidents() {
                         disabled={generateSinglePDFMutation.isPending}
                       >
                         {generateSinglePDFMutation.isPending ? (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          <Spinner className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                           <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
                         )}
@@ -1677,7 +1671,7 @@ export default function Incidents() {
               disabled={addFollowUpMutation.isPending}
             >
               {addFollowUpMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Plus className="mr-2 h-4 w-4" weight="bold" />
               )}

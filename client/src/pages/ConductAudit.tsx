@@ -11,12 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ArrowLeft, Save, CheckCircle2, Upload, AlertCircle, Plus, X, User, Calendar } from "lucide-react";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
+import { ArrowLeft, FloppyDisk, CheckCircle, UploadSimple, WarningCircle, Plus, X, User, Calendar } from "@phosphor-icons/react";
 export default function ConductAudit() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
@@ -314,7 +315,7 @@ export default function ConductAudit() {
   if (!auditInstance || !auditTemplate) {
     return (
       <div className="flex flex-col items-center justify-center h-96 space-y-4">
-        <AlertCircle className="h-12 w-12 text-muted-foreground" />
+        <WarningCircle className="h-12 w-12 text-muted-foreground" />
         <p className="text-muted-foreground">Audit not found</p>
         <Button onClick={() => setLocation("/audits")}>Back to Audits</Button>
       </div>
@@ -330,7 +331,7 @@ export default function ConductAudit() {
         <Card className="border-amber-200 bg-amber-50">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <AlertCircle className="h-5 w-5 text-amber-600" />
+              <WarningCircle className="h-5 w-5 text-amber-600" />
               <div>
                 <p className="font-medium text-amber-900">This audit is read-only</p>
                 <p className="text-sm text-amber-700 mt-1">
@@ -358,13 +359,13 @@ export default function ConductAudit() {
         <div className="flex items-center gap-3">
           {isSaving && (
             <Badge variant="outline" className="bg-blue-50 text-blue-700">
-              <Save className="h-3 w-3 mr-1 animate-pulse" />
+              <FloppyDisk className="h-3 w-3 mr-1 animate-pulse" />
               Saving...
             </Badge>
           )}
           {!isAuditInPast && (
             <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
-              <CheckCircle2 className="h-5 w-5 mr-2" />
+              <CheckCircle className="h-5 w-5 mr-2" />
               {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
             </Button>
           )}
@@ -412,7 +413,7 @@ export default function ConductAudit() {
                       </CardTitle>
                       {question.evidenceRequired && (
                         <CardDescription className="flex items-center gap-2 mt-2">
-                          <Upload className="h-4 w-4" />
+                          <UploadSimple className="h-4 w-4" />
                           Evidence required: {question.evidenceRequired}
                         </CardDescription>
                       )}
@@ -439,7 +440,7 @@ export default function ConductAudit() {
                       {/* Response Status */}
                       {responses[question.id]?.response && (
                         <div className="flex items-center gap-2 text-sm">
-                          <CheckCircle2 className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-green-600" />
                           <span className="text-green-600 font-medium">Response saved</span>
                         </div>
                       )}
@@ -580,7 +581,7 @@ export default function ConductAudit() {
           </div>
           {!isAuditInPast && (
             <Button onClick={handleCompleteAudit} size="lg" disabled={completeAuditMutation.isPending}>
-              <CheckCircle2 className="h-5 w-5 mr-2" />
+              <CheckCircle className="h-5 w-5 mr-2" />
               {completeAuditMutation.isPending ? "Completing..." : "Complete Audit"}
             </Button>
           )}

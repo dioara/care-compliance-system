@@ -1,9 +1,10 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+
 import { getLoginUrl } from "@/const";
 import { Streamdown } from 'streamdown';
 
+import { Spinner } from "@phosphor-icons/react";
 /**
  * All content in this page are only for example, replace with your own feature implementation
  * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
@@ -19,8 +20,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
+        {/* Example: Phosphor Icons */}
+        <Spinner className="animate-spin" />
         Example Page
         {/* Example: Streamdown for markdown rendering */}
         <Streamdown>Any **markdown** content</Streamdown>

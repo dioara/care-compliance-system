@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { FileText, DownloadSimple } from "@phosphor-icons/react";
 import {
   Select,
   SelectContent,
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, Download } from "lucide-react";
+
 import { toast } from "sonner";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -350,7 +351,7 @@ export default function ComplianceReports() {
                 <>Generating...</>
               ) : (
                 <>
-                  <Download className="h-4 w-4 mr-2" />
+                  <DownloadSimple className="h-4 w-4 mr-2" />
                   Generate PDF Report
                 </>
               )}

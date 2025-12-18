@@ -8,12 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ChevronLeft, ChevronRight, Plus, Loader2 } from 'lucide-react';
-import { CalendarBlank, Sparkle, Printer } from '@phosphor-icons/react';
+
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay, startOfWeek, endOfWeek, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
 
+import { CaretLeft, CaretRight, Plus, Spinner, CalendarBlank, Sparkle, Printer } from "@phosphor-icons/react";
 export default function AuditCalendar() {
   const { activeLocationId, setActiveLocationId } = useLocation();
 
@@ -496,7 +496,7 @@ export default function AuditCalendar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" onClick={handlePrevious}>
-                <ChevronLeft className="h-4 w-4" />
+                <CaretLeft className="h-4 w-4" />
               </Button>
               <h2 className="text-2xl font-semibold min-w-[200px] text-center">
                 {calendarView === 'month' && format(currentMonth, 'MMMM yyyy')}
@@ -504,7 +504,7 @@ export default function AuditCalendar() {
                 {calendarView === 'day' && format(currentMonth, 'MMMM d, yyyy')}
               </h2>
               <Button variant="outline" size="icon" onClick={handleNext}>
-                <ChevronRight className="h-4 w-4" />
+                <CaretRight className="h-4 w-4" />
               </Button>
             </div>
             <div className="flex items-center gap-2">
@@ -679,7 +679,7 @@ export default function AuditCalendar() {
           
           {generateSuggestions.isPending && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <Spinner className="h-8 w-8 animate-spin text-primary" />
               <span className="ml-3 text-muted-foreground">Generating schedule suggestions...</span>
             </div>
           )}
@@ -735,7 +735,7 @@ export default function AuditCalendar() {
               onClick={handleAcceptSelected}
               disabled={selectedSuggestions.size === 0 || acceptSuggestions.isPending}
             >
-              {acceptSuggestions.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {acceptSuggestions.isPending && <Spinner className="h-4 w-4 mr-2 animate-spin" />}
               Accept Selected ({selectedSuggestions.size})
             </Button>
           </DialogFooter>
@@ -903,7 +903,7 @@ export default function AuditCalendar() {
               onClick={confirmPrintCalendar}
               disabled={exportPdf.isPending}
             >
-              {exportPdf.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {exportPdf.isPending && <Spinner className="h-4 w-4 mr-2 animate-spin" />}
               <Printer className="h-4 w-4 mr-2" weight="bold" />
               Generate PDF
             </Button>
@@ -951,7 +951,7 @@ export default function AuditCalendar() {
               onClick={handleDeleteAllConfirm}
               disabled={deleteConfirmation !== 'CONFIRM' || deleteAll.isPending}
             >
-              {deleteAll.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {deleteAll.isPending && <Spinner className="h-4 w-4 mr-2 animate-spin" />}
               Delete All Audits
             </Button>
           </DialogFooter>

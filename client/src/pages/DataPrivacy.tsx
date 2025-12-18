@@ -8,9 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Download, Trash2, Shield, FileText, Clock, CheckCircle, AlertTriangle, ExternalLink } from "lucide-react";
+
 import { toast } from "sonner";
 
+import { DownloadSimple, Trash, Shield, FileText, Clock, CheckCircle, Warning, ArrowSquareOut } from "@phosphor-icons/react";
 export default function DataPrivacy() {
   // Get user from trpc auth query
   const { data: user } = trpc.auth.me.useQuery();
@@ -163,7 +164,7 @@ export default function DataPrivacy() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Download className="h-5 w-5" />
+              <DownloadSimple className="h-5 w-5" />
               Export Your Data
             </CardTitle>
             <CardDescription>
@@ -206,7 +207,7 @@ export default function DataPrivacy() {
                     </div>
                     {request.status === "completed" && (
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-1" />
+                        <DownloadSimple className="h-4 w-4 mr-1" />
                         Download
                       </Button>
                     )}
@@ -221,7 +222,7 @@ export default function DataPrivacy() {
             <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
-                  <Download className="h-4 w-4 mr-2" />
+                  <DownloadSimple className="h-4 w-4 mr-2" />
                   Request Data Export
                 </Button>
               </DialogTrigger>
@@ -256,7 +257,7 @@ export default function DataPrivacy() {
         <Card className="border-destructive/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
-              <Trash2 className="h-5 w-5" />
+              <Trash className="h-5 w-5" />
               Delete Your Account
             </CardTitle>
             <CardDescription>
@@ -265,7 +266,7 @@ export default function DataPrivacy() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
+              <Warning className="h-4 w-4" />
               <AlertTitle>Warning: This action cannot be undone</AlertTitle>
               <AlertDescription>
                 Deleting your account will permanently remove all your personal data, 
@@ -278,7 +279,7 @@ export default function DataPrivacy() {
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive">
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash className="h-4 w-4 mr-2" />
                   Request Account Deletion
                 </Button>
               </DialogTrigger>
@@ -351,7 +352,7 @@ export default function DataPrivacy() {
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <span>Privacy Policy</span>
                 </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                <ArrowSquareOut className="h-4 w-4 text-muted-foreground" />
               </a>
               <a 
                 href="/terms-of-service" 
@@ -361,7 +362,7 @@ export default function DataPrivacy() {
                   <FileText className="h-5 w-5 text-muted-foreground" />
                   <span>Terms of Service</span>
                 </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                <ArrowSquareOut className="h-4 w-4 text-muted-foreground" />
               </a>
               <a 
                 href="https://ico.org.uk" 
@@ -373,7 +374,7 @@ export default function DataPrivacy() {
                   <Shield className="h-5 w-5 text-muted-foreground" />
                   <span>ICO Website</span>
                 </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                <ArrowSquareOut className="h-4 w-4 text-muted-foreground" />
               </a>
               <a 
                 href="mailto:privacy@carecompliancesystem.co.uk" 
@@ -383,7 +384,7 @@ export default function DataPrivacy() {
                   <Shield className="h-5 w-5 text-muted-foreground" />
                   <span>Contact Privacy Team</span>
                 </div>
-                <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                <ArrowSquareOut className="h-4 w-4 text-muted-foreground" />
               </a>
             </div>
           </CardContent>

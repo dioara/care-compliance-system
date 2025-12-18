@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Calendar, Clock, MapPin, Plus, Pencil, Trash, WarningCircle } from "@phosphor-icons/react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Calendar, Clock, MapPin, Plus, Pencil, Trash2, AlertCircle } from "lucide-react";
+
 import { toast } from "sonner";
 
 export default function AuditSchedules() {
@@ -262,7 +263,7 @@ export default function AuditSchedules() {
                     size="sm"
                     onClick={() => openDeleteDialog(item)}
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
@@ -491,7 +492,7 @@ export default function AuditSchedules() {
           </DialogHeader>
           <div className="py-4">
             <div className="flex items-start gap-3 p-4 bg-destructive/10 rounded-lg">
-              <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
+              <WarningCircle className="h-5 w-5 text-destructive mt-0.5" />
               <div>
                 <p className="font-medium text-destructive mb-1">
                   Are you sure you want to delete this schedule?

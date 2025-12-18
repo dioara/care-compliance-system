@@ -15,7 +15,7 @@ import {
   CheckCircle,
   WarningCircle,
   Clock,
-  TrendingUp,
+  TrendUp,
   Users,
   Bell,
   X,

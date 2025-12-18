@@ -1,21 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Loader2 } from "lucide-react";
-import { 
-  Users, 
-  Shield, 
-  MapPin, 
-  UserCheck, 
-  Clock, 
-  Pulse,
-  Crown,
-  UserGear
-} from "@phosphor-icons/react";
+
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { SecurityMetrics } from "@/components/SecurityMetrics";
 
+import { Spinner, Users, Shield, MapPin, UserCheck, Clock, Pulse, Crown, UserGear } from "@phosphor-icons/react";
 export default function AdminDashboard() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
@@ -37,7 +28,7 @@ export default function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Spinner className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
