@@ -2662,3 +2662,9 @@
 - [x] Remove Generate Report from Quick Actions
 - [x] Make Schedule Audit go directly to schedule audit flow
 - [x] Make Report Incident go directly to incident reporting flow
+
+
+## Bug Fixes (December 18, 2025)
+- [x] Fix Incidents page error when clicking to view an incident (Mail -> Envelope, PenTool -> PenNib)
+- [x] Fix Action Log PDF layout - fields extending past page (reduced column widths)
+- [x] Fix Action Log PDF - header/footer extending into another page (adjusted column widths to fit content area)

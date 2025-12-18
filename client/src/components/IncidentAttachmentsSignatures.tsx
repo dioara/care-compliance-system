@@ -487,7 +487,7 @@ export function IncidentSignatures({ incidentId, incidentStatus }: IncidentAttac
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <PenTool className="h-5 w-5" />
+              <PenNib className="h-5 w-5" weight="bold" />
               Add Digital Signature
             </DialogTitle>
             <DialogDescription>

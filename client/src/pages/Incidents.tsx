@@ -1412,7 +1412,7 @@ export default function Incidents() {
                         { key: 'reportedToCouncil', atKey: 'councilNotifiedAt', notifType: 'council' as const, label: 'Local Authority / Council', icon: Buildings, color: 'purple' },
                         { key: 'reportedToPolice', atKey: 'policeNotifiedAt', notifType: 'police' as const, label: 'Police', icon: Shield, color: 'slate' },
                         { key: 'reportedToFamily', atKey: 'familyNotifiedAt', notifType: 'family' as const, label: 'Family / Next of Kin', icon: Users, color: 'amber' },
-                        { key: 'reportedToIco', atKey: 'icoNotifiedAt', notifType: 'ico' as const, label: 'ICO (Data Breach)', icon: Mail, color: 'teal' },
+                        { key: 'reportedToIco', atKey: 'icoNotifiedAt', notifType: 'ico' as const, label: 'ICO (Data Breach)', icon: Envelope, color: 'teal' },
                       ].map(({ key, atKey, notifType, label, icon: Icon, color }) => {
                         const isNotified = selectedIncident[key];
                         const notifiedAt = selectedIncident[atKey];

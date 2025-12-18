@@ -220,18 +220,19 @@ function drawStatBox(doc: PDFKit.PDFDocument, x: number, y: number, width: numbe
 }
 
 function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], contentWidth: number, margin: number, pageHeight: number) {
-  // Column definitions
+  // Column definitions - adjusted to fit A4 landscape (contentWidth = 761.89)
+  // Total: 45 + 130 + 75 + 65 + 45 + 75 + 60 + 55 + 100 + 60 = 710
   const columns = [
-    { header: "Issue #", width: 50, key: "issueNumber" },
-    { header: "Description", width: 150, key: "issueDescription" },
-    { header: "Audit Origin", width: 85, key: "auditOrigin" },
-    { header: "Location", width: 70, key: "locationName" },
-    { header: "Priority", width: 50, key: "ragStatus" },
-    { header: "Assigned To", width: 80, key: "responsiblePersonName" },
-    { header: "Target Date", width: 65, key: "targetCompletionDate" },
-    { header: "Status", width: 65, key: "status" },
-    { header: "Action Taken", width: 110, key: "actionTaken" },
-    { header: "Completion", width: 65, key: "actualCompletionDate" },
+    { header: "Issue #", width: 45, key: "issueNumber" },
+    { header: "Description", width: 130, key: "issueDescription" },
+    { header: "Audit Origin", width: 75, key: "auditOrigin" },
+    { header: "Location", width: 65, key: "locationName" },
+    { header: "Priority", width: 45, key: "ragStatus" },
+    { header: "Assigned To", width: 75, key: "responsiblePersonName" },
+    { header: "Target", width: 60, key: "targetCompletionDate" },
+    { header: "Status", width: 55, key: "status" },
+    { header: "Action Taken", width: 100, key: "actionTaken" },
+    { header: "Completed", width: 60, key: "actualCompletionDate" },
   ];
 
   const tableTop = doc.y;
@@ -291,12 +292,12 @@ function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], content
           break;
         case "issueDescription":
           value = action.issueDescription || "";
-          if (value.length > 50) value = value.substring(0, 47) + "...";
+          if (value.length > 40) value = value.substring(0, 37) + "...";
           doc.font("Helvetica");
           break;
         case "auditOrigin":
           value = action.auditOrigin || "";
-          if (value.length > 25) value = value.substring(0, 22) + "...";
+          if (value.length > 20) value = value.substring(0, 17) + "...";
           doc.font("Helvetica");
           break;
         case "locationName":
@@ -331,7 +332,7 @@ function drawActionTable(doc: PDFKit.PDFDocument, actions: ActionItem[], content
           break;
         case "actionTaken":
           value = action.actionTaken || "-";
-          if (value.length > 30) value = value.substring(0, 27) + "...";
+          if (value.length > 25) value = value.substring(0, 22) + "...";
           doc.font("Helvetica");
           break;
         case "actualCompletionDate":

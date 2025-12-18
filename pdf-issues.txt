@@ -1,0 +1,16 @@
+Action Log PDF Issues Found:
+
+1. Page 1: Main content is fine but the table columns are cut off on the right side
+   - "Completed" column is partially visible
+   - Table is too wide for the page
+
+2. Pages 2-4: Almost entirely blank pages with only header/footer text
+   - Page 2: Only shows "UK Health Kits LTD - Action Log Report" at top
+   - Page 3: Only shows "Confidential - For Internal Use Only" in middle
+   - Page 4: Only shows "Page 1 of 1" at top right
+
+Issues to fix:
+- Table is too wide - need to reduce columns or use smaller font
+- Header/footer elements are creating extra blank pages
+- Need to use page-break-inside: avoid on content sections
+- Footer should only appear at bottom of actual content pages
