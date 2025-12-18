@@ -2518,3 +2518,16 @@
 
 ## Incidents Page Stat Cards
 - [x] Make stat cards uniform (Total Incidents, Open, Critical/High, This Month, CQC Notified)
+
+
+## Phosphor Icons Consistency Update
+- [x] Update Dashboard Quick Actions icons to Phosphor (Sparkle, ClipboardText, FileText, Warning)
+- [x] Update Dashboard Locations section icons to Phosphor (Buildings)
+- [x] Update Incidents page header icon to Phosphor (Warning)
+- [x] Update Audits page header icon to Phosphor (ClipboardText)
+- [x] Update Staff page header icon to Phosphor (UserCheck)
+- [x] Update Service Users page header icon to Phosphor (Users)
+- [x] Update Action Log page header icon to Phosphor (ClipboardText)
+- [x] Update Incident Analytics icons to Phosphor (Warning, ChartBar, ChartPie, ChartLine)
+- [x] Update Audit Calendar icons to Phosphor (Sparkle, Printer)
+- [x] Fix all remaining Lucide icon references causing errors

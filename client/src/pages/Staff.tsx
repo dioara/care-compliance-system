@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { UserCheck, Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, ClipboardCheck, Filter, Lock, History, Mail, Send } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, Filter, Lock, History, Mail, Send } from "lucide-react";
+import { UserCheck, ClipboardText } from "@phosphor-icons/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -275,7 +276,7 @@ export default function Staff() {
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3 md:gap-4">
           <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm shrink-0">
-            <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+            <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-primary" weight="bold" />
           </div>
           <div className="min-w-0">
             <h1 className="text-2xl md:text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Staff Members</h1>
@@ -467,7 +468,7 @@ export default function Staff() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <CardTitle className="flex items-center gap-2">
-                        <UserCheck className="h-5 w-5 text-blue-500" />
+                        <UserCheck className="h-5 w-5 text-blue-500" weight="bold" />
                         {staffMember.name}
                       </CardTitle>
                       {staffMember.isActive ? (

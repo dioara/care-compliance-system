@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, Filter, ChevronLeft, ChevronRight, FileText } from "lucide-react";
+import { CalendarIcon, Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { FileText } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 

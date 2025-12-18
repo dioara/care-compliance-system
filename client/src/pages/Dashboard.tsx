@@ -9,19 +9,23 @@ import {
   AlertCircle, 
   Clock, 
   TrendingUp,
-  FileText,
   Users,
-  ClipboardCheck,
   AlertTriangle,
   Bell,
   X,
-  Building2,
   Activity,
   ChevronRight,
   Shield,
-  BarChart3,
-  Sparkles
+  BarChart3
 } from "lucide-react";
+import { 
+  ClipboardText, 
+  FileText, 
+  Warning, 
+  Buildings, 
+  Sparkle,
+  CaretRight
+} from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -340,7 +344,7 @@ export default function Dashboard() {
         <Card className="shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkle className="h-5 w-5 text-primary" weight="fill" />
               Quick Actions
             </CardTitle>
             <CardDescription>
@@ -353,7 +357,7 @@ export default function Dashboard() {
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
-                <ClipboardCheck className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
+                <ClipboardText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" weight="bold" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Schedule Audit</p>
@@ -367,7 +371,7 @@ export default function Dashboard() {
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
-                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
+                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" weight="bold" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">AI Care Plan Audit</p>
@@ -381,7 +385,7 @@ export default function Dashboard() {
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
-                <AlertTriangle className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
+                <Warning className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" weight="bold" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Report Incident</p>
@@ -395,7 +399,7 @@ export default function Dashboard() {
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
-                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
+                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" weight="bold" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Generate Report</p>
@@ -414,7 +418,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-primary" />
+                  <Buildings className="h-5 w-5 text-primary" weight="bold" />
                   Your Locations
                 </CardTitle>
                 <CardDescription className="mt-1">
@@ -438,7 +442,7 @@ export default function Dashboard() {
                   }}
                 >
                   <div className="p-2 bg-primary/10 rounded-lg">
-                    <Building2 className="h-5 w-5 text-primary" />
+                    <Buildings className="h-5 w-5 text-primary" weight="bold" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate">{location.name}</p>
@@ -466,7 +470,7 @@ export default function Dashboard() {
         <Card className="border-2 border-dashed border-primary/30 bg-primary/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkle className="h-5 w-5 text-primary" weight="fill" />
               Getting Started
             </CardTitle>
             <CardDescription>

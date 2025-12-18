@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Calendar, ChevronLeft, ChevronRight, Plus, Sparkles, Loader2, Printer } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Loader2 } from 'lucide-react';
+import { CalendarBlank, Sparkle, Printer } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday, isBefore, startOfDay, startOfWeek, endOfWeek, addWeeks, subWeeks, addDays, subDays } from 'date-fns';
 import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
@@ -465,7 +466,7 @@ export default function AuditCalendar() {
           {activeLocation && (
             <>
               <Button variant="outline" size="sm" onClick={handleAutoSchedule}>
-                <Sparkles className="h-4 w-4 mr-2" />
+                <Sparkle className="h-4 w-4 mr-2" weight="bold" />
                 Auto-Schedule
               </Button>
               <Button size="sm" onClick={() => handleScheduleAuditClick()}>
@@ -538,7 +539,7 @@ export default function AuditCalendar() {
                 Today
               </Button>
               <Button variant="outline" onClick={handlePrintCalendar}>
-                <Printer className="h-4 w-4 mr-2" />
+                <Printer className="h-4 w-4 mr-2" weight="bold" />
                 Print Calendar
               </Button>
             </div>
@@ -903,7 +904,7 @@ export default function AuditCalendar() {
               disabled={exportPdf.isPending}
             >
               {exportPdf.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              <Printer className="h-4 w-4 mr-2" />
+              <Printer className="h-4 w-4 mr-2" weight="bold" />
               Generate PDF
             </Button>
           </DialogFooter>

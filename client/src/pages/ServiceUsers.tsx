@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Users, Plus, Pencil, Trash2, Loader2, Calendar, Heart, ClipboardCheck, Filter, Lock, History } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Calendar, Heart, Filter, Lock, History } from "lucide-react";
+import { Users, ClipboardText } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
@@ -238,7 +239,7 @@ export default function ServiceUsers() {
       <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
-            <Users className="h-6 w-6 text-primary" />
+            <Users className="h-6 w-6 text-primary" weight="bold" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Service Users</h1>

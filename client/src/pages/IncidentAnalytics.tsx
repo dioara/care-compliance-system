@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { 
-  AlertTriangle, TrendingUp, Clock, CheckCircle, BarChart3, 
-  PieChart, LineChart, MapPin, Calendar, Download 
+  TrendingUp, Clock, CheckCircle, 
+  MapPin, Calendar, Download 
 } from "lucide-react";
+import { Warning, ChartBar, ChartPie, ChartLine } from "@phosphor-icons/react";
 import {
   BarChart, Bar, PieChart as RechartsPie, Pie, Cell, LineChart as RechartsLine, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -188,7 +189,7 @@ export default function IncidentAnalytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Incidents</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            <Warning className="h-4 w-4 text-muted-foreground" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{analytics?.totalIncidents || 0}</div>
@@ -214,7 +215,7 @@ export default function IncidentAnalytics() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Critical Incidents</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
+            <Warning className="h-4 w-4 text-destructive" weight="bold" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">{analytics?.criticalIncidents || 0}</div>
@@ -244,7 +245,7 @@ export default function IncidentAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <PieChart className="h-5 w-5" />
+              <ChartPie className="h-5 w-5" weight="bold" />
               Incidents by Type
             </CardTitle>
             <CardDescription>Distribution of incident types</CardDescription>
@@ -281,7 +282,7 @@ export default function IncidentAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+              <ChartBar className="h-5 w-5" weight="bold" />
               Incidents by Severity
             </CardTitle>
             <CardDescription>Severity level distribution</CardDescription>
@@ -313,7 +314,7 @@ export default function IncidentAnalytics() {
         <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <LineChart className="h-5 w-5" />
+              <ChartLine className="h-5 w-5" weight="bold" />
               Incident Trend Over Time
             </CardTitle>
             <CardDescription>Daily incident count in selected period</CardDescription>

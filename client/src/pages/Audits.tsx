@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, ClipboardList, FileText, AlertCircle, CheckCircle2, Clock, Plus } from "lucide-react";
+import { CalendarIcon, AlertCircle, CheckCircle2, Clock, Plus } from "lucide-react";
+import { ClipboardText, FileText } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -145,7 +146,7 @@ export default function Audits() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
         <div className="flex items-start gap-4">
           <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shadow-sm">
-            <ClipboardList className="h-6 w-6 text-primary" />
+            <ClipboardText className="h-6 w-6 text-primary" weight="bold" />
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Audit Management</h1>
@@ -380,7 +381,7 @@ export default function Audits() {
                 <Card key={auditType.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <ClipboardList className="h-8 w-8 text-primary" />
+                      <ClipboardText className="h-8 w-8 text-primary" weight="bold" />
                       <div className="flex flex-col gap-1 items-end">
                         <Badge className={getCategoryBadgeColor(auditType.auditCategory)}>
                           {auditType.recommendedFrequency || auditType.auditCategory}
@@ -494,7 +495,7 @@ export default function Audits() {
           ) : (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <ClipboardList className="h-12 w-12 text-muted-foreground mb-4" />
+                <ClipboardText className="h-12 w-12 text-muted-foreground mb-4" weight="bold" />
                 <p className="text-muted-foreground">No audits found for this location</p>
                 <Button className="mt-4" onClick={() => setIsScheduleDialogOpen(true)}>
                   Schedule First Audit

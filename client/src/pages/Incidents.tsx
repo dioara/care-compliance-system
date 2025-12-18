@@ -12,10 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { 
-  AlertTriangle, Plus, CheckCircle, Clock, XCircle, FileText, Download, Loader2,
-  User, MapPin, Calendar, AlertCircle, Shield, Phone, Mail, Building, 
-  Stethoscope, ClipboardList, Users, Eye, ChevronRight, Activity, FileSpreadsheet
+  Plus, CheckCircle, Clock, XCircle, Download, Loader2,
+  MapPin, Calendar, AlertCircle, Mail, 
+  ChevronRight, Activity
 } from "lucide-react";
+import { 
+  Warning, FileText, User, Shield, Phone, Buildings, 
+  Stethoscope, ClipboardText, Users, Eye, FileXls
+} from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
 import { IncidentAttachments, IncidentSignatures } from "@/components/IncidentAttachmentsSignatures";
@@ -373,7 +377,7 @@ export default function Incidents() {
   const getStatusBadge = (status: string | null) => {
     switch (status) {
       case "open": return <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50"><Clock className="h-3 w-3 mr-1" />Open</Badge>;
-      case "under_investigation": return <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50"><AlertTriangle className="h-3 w-3 mr-1" />Investigating</Badge>;
+      case "under_investigation": return <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50"><Warning className="h-3 w-3 mr-1" weight="bold" />Investigating</Badge>;
       case "resolved": return <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
       case "closed": return <Badge variant="outline" className="border-gray-500 text-gray-600 bg-gray-50"><XCircle className="h-3 w-3 mr-1" />Closed</Badge>;
       default: return <Badge variant="outline"><FileText className="h-3 w-3 mr-1" />Unknown</Badge>;
@@ -393,7 +397,7 @@ export default function Incidents() {
       <div className="flex flex-col gap-4">
         <div className="flex items-start gap-3 md:gap-4">
           <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-500/5 flex items-center justify-center shadow-sm shrink-0">
-            <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />
+            <Warning className="h-5 w-5 md:h-6 md:w-6 text-orange-500" weight="bold" />
           </div>
           <div className="min-w-0">
             <h1 className="text-2xl md:text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
@@ -427,7 +431,7 @@ export default function Incidents() {
             {generateExcelMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
+              <FileXls className="mr-2 h-4 w-4" />
             )}
             Export Excel
           </Button>
@@ -441,7 +445,7 @@ export default function Incidents() {
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader className="pb-4 border-b">
                 <DialogTitle className="text-2xl font-semibold flex items-center gap-2">
-                  <AlertTriangle className="h-6 w-6 text-orange-500" />
+                  <Warning className="h-6 w-6 text-orange-500" weight="bold" />
                   Report New Incident
                 </DialogTitle>
                 <DialogDescription>
@@ -499,7 +503,7 @@ export default function Incidents() {
                       {/* Location */}
                       <div className="space-y-2">
                         <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
-                          <Building className="h-4 w-4" />
+                          <Buildings className="h-4 w-4" weight="bold" />
                           Location *
                         </Label>
                         <Select value={formData.locationId} onValueChange={(value) => setFormData({ ...formData, locationId: value })}>
@@ -616,7 +620,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <User className="h-5 w-5" />
+                          <User className="h-5 w-5" weight="bold" />
                           Affected Person
                         </CardTitle>
                       </CardHeader>
@@ -765,7 +769,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Stethoscope className="h-5 w-5" />
+                          <Stethoscope className="h-5 w-5" weight="bold" />
                           Injuries & Medical Treatment
                         </CardTitle>
                       </CardHeader>
@@ -845,7 +849,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Eye className="h-5 w-5" />
+                          <Eye className="h-5 w-5" weight="bold" />
                           Witnesses
                         </CardTitle>
                       </CardHeader>
@@ -884,7 +888,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Phone className="h-5 w-5" />
+                          <Phone className="h-5 w-5" weight="bold" />
                           Notifications Made
                         </CardTitle>
                       </CardHeader>
@@ -931,7 +935,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Shield className="h-5 w-5" />
+                          <Shield className="h-5 w-5" weight="bold" />
                           Risk Assessment
                         </CardTitle>
                       </CardHeader>
@@ -965,7 +969,7 @@ export default function Incidents() {
                     <Card className="border-2">
                       <CardHeader className="pb-4">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <ClipboardList className="h-5 w-5" />
+                          <ClipboardText className="h-5 w-5" weight="bold" />
                           Follow-up Actions
                         </CardTitle>
                       </CardHeader>
@@ -1066,7 +1070,7 @@ export default function Incidents() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Critical/High</CardTitle>
             <div className="p-2 bg-gray-100 rounded-lg">
-              <AlertTriangle className="h-4 w-4 text-gray-600" />
+              <Warning className="h-4 w-4 text-gray-600" weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -1348,7 +1352,7 @@ export default function Incidents() {
                           )}
                           {selectedIncident.hospitalAttendance && (
                             <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                              <Building className="h-3 w-3 mr-1" /> Hospital Attendance
+                              <Buildings className="h-3 w-3 mr-1" weight="bold" /> Hospital Attendance
                             </Badge>
                           )}
                         </div>
@@ -1378,7 +1382,7 @@ export default function Incidents() {
                   {selectedIncident.investigationNotes && (
                     <div>
                       <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <ClipboardList className="h-4 w-4" />
+                        <ClipboardText className="h-4 w-4" weight="bold" />
                         Investigation Notes
                       </h4>
                       <div className="p-4 bg-muted/30 rounded-lg">
@@ -1394,7 +1398,7 @@ export default function Incidents() {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
-                        <Phone className="h-4 w-4" />
+                        <Phone className="h-4 w-4" weight="bold" />
                         Notification Status
                       </CardTitle>
                       <CardDescription>Track who has been notified about this incident</CardDescription>
@@ -1402,7 +1406,7 @@ export default function Incidents() {
                     <CardContent className="space-y-3">
                       {[
                         { key: 'reportedToCqc', atKey: 'cqcNotifiedAt', notifType: 'cqc' as const, label: 'CQC', icon: Shield, color: 'blue' },
-                        { key: 'reportedToCouncil', atKey: 'councilNotifiedAt', notifType: 'council' as const, label: 'Local Authority / Council', icon: Building, color: 'purple' },
+                        { key: 'reportedToCouncil', atKey: 'councilNotifiedAt', notifType: 'council' as const, label: 'Local Authority / Council', icon: Buildings, color: 'purple' },
                         { key: 'reportedToPolice', atKey: 'policeNotifiedAt', notifType: 'police' as const, label: 'Police', icon: Shield, color: 'slate' },
                         { key: 'reportedToFamily', atKey: 'familyNotifiedAt', notifType: 'family' as const, label: 'Family / Next of Kin', icon: Users, color: 'amber' },
                         { key: 'reportedToIco', atKey: 'icoNotifiedAt', notifType: 'ico' as const, label: 'ICO (Data Breach)', icon: Mail, color: 'teal' },
@@ -1483,7 +1487,7 @@ export default function Incidents() {
                   <Card>
                     <CardHeader className="pb-3">
                       <CardTitle className="text-base flex items-center gap-2">
-                        <ClipboardList className="h-4 w-4" />
+                        <ClipboardText className="h-4 w-4" weight="bold" />
                         Follow-up Actions
                       </CardTitle>
                       <CardDescription className="text-xs">Add actions to the Master Action Log</CardDescription>
@@ -1609,7 +1613,7 @@ export default function Incidents() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <ClipboardList className="h-5 w-5" />
+              <ClipboardText className="h-5 w-5" weight="bold" />
               Add Follow-up Action
             </DialogTitle>
             <DialogDescription>
