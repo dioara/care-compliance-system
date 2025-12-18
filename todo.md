@@ -2515,3 +2515,6 @@
 
 ## Quick Action Buttons
 - [x] Make Quick Action buttons uniform (consistent icon colours)
+
+## Incidents Page Stat Cards
+- [x] Make stat cards uniform (Total Incidents, Open, Critical/High, This Month, CQC Notified)

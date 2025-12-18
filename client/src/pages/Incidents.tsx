@@ -1036,68 +1036,68 @@ export default function Incidents() {
 
       {/* Statistics Cards */}
       <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-        <Card className="bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-slate-600">Total Incidents</CardTitle>
-            <div className="p-2 bg-slate-200 rounded-lg">
-              <Activity className="h-4 w-4 text-slate-600" />
+            <CardTitle className="text-sm font-medium text-gray-600">Total Incidents</CardTitle>
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Activity className="h-4 w-4 text-gray-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">{totalIncidents}</div>
-            <p className="text-xs text-slate-500 mt-1">All time records</p>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{totalIncidents}</div>
+            <p className="text-xs text-gray-500 mt-1">All time records</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700">Open</CardTitle>
-            <div className="p-2 bg-orange-200 rounded-lg">
-              <Clock className="h-4 w-4 text-orange-600" />
+            <CardTitle className="text-sm font-medium text-gray-600">Open</CardTitle>
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Clock className="h-4 w-4 text-gray-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-900">{openIncidents}</div>
-            <p className="text-xs text-orange-600 mt-1">Requiring attention</p>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{openIncidents}</div>
+            <p className="text-xs text-gray-500 mt-1">Requiring attention</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-red-700">Critical/High</CardTitle>
-            <div className="p-2 bg-red-200 rounded-lg">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
+            <CardTitle className="text-sm font-medium text-gray-600">Critical/High</CardTitle>
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-gray-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-red-900">{criticalIncidents}</div>
-            <p className="text-xs text-red-600 mt-1">High priority</p>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{criticalIncidents}</div>
+            <p className="text-xs text-gray-500 mt-1">High priority</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700">This Month</CardTitle>
-            <div className="p-2 bg-blue-200 rounded-lg">
-              <Calendar className="h-4 w-4 text-blue-600" />
+            <CardTitle className="text-sm font-medium text-gray-600">This Month</CardTitle>
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Calendar className="h-4 w-4 text-gray-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900">{thisMonthIncidents}</div>
-            <p className="text-xs text-blue-600 mt-1">Current month</p>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{thisMonthIncidents}</div>
+            <p className="text-xs text-gray-500 mt-1">Current month</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700">CQC Notified</CardTitle>
-            <div className="p-2 bg-purple-200 rounded-lg">
-              <Shield className="h-4 w-4 text-purple-600" />
+            <CardTitle className="text-sm font-medium text-gray-600">CQC Notified</CardTitle>
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Shield className="h-4 w-4 text-gray-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-900">{cqcNotified}</div>
-            <p className="text-xs text-purple-600 mt-1">Regulatory reports</p>
+            <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{cqcNotified}</div>
+            <p className="text-xs text-gray-500 mt-1">Regulatory reports</p>
           </CardContent>
         </Card>
       </div>
