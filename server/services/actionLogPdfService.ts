@@ -111,11 +111,15 @@ export async function generateActionLogPDF(data: ActionLogReportData): Promise<B
       // Table
       drawActionTable(doc, data.actions, contentWidth, margin, pageHeight);
 
-      // Footer on each page
-      const pageCount = doc.bufferedPageRange().count;
+      // Footer on each page - draw footer before finalizing
+      const range = doc.bufferedPageRange();
+      const pageCount = range.count;
       for (let i = 0; i < pageCount; i++) {
         doc.switchToPage(i);
+        // Save current position
+        const savedY = doc.y;
         drawFooter(doc, data, pageWidth, pageHeight, margin, i + 1, pageCount);
+        // Restore position (though not needed since we're done)
       }
 
       console.log('[PDF Service] Finalizing document');
@@ -361,13 +365,13 @@ function drawFooter(doc: PDFKit.PDFDocument, data: ActionLogReportData, pageWidt
   // Footer line
   doc.moveTo(margin, footerY - 5).lineTo(pageWidth - margin, footerY - 5).stroke(COLORS.border);
 
-  // Left side - company info
+  // Left side - company info - use lineBreak: false to prevent page creation
   doc.fontSize(7).font("Helvetica").fillColor(COLORS.textLight);
-  doc.text(`${data.companyName} - Action Log Report`, margin, footerY, { width: 300 });
+  doc.text(`${data.companyName} - Action Log Report`, margin, footerY, { width: 300, lineBreak: false });
 
   // Center - confidentiality notice
-  doc.text("Confidential - For Internal Use Only", pageWidth / 2 - 75, footerY, { width: 150, align: "center" });
+  doc.text("Confidential - For Internal Use Only", pageWidth / 2 - 75, footerY, { width: 150, align: "center", lineBreak: false });
 
   // Right side - page number
-  doc.text(`Page ${pageNum} of ${totalPages}`, pageWidth - margin - 100, footerY, { width: 100, align: "right" });
+  doc.text(`Page ${pageNum} of ${totalPages}`, pageWidth - margin - 100, footerY, { width: 100, align: "right", lineBreak: false });
 }
