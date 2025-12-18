@@ -2290,6 +2290,16 @@ export const appRouter = router({
       return db.getUsersByTenant(ctx.user.tenantId);
     }),
 
+    // Check available licenses before creating user
+    checkLicenseAvailability: superAdminProcedure
+      .query(async ({ ctx }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "No tenant" });
+        }
+        const licenseInfo = await db.getLicenseAvailability(ctx.user.tenantId);
+        return licenseInfo;
+      }),
+
     create: superAdminProcedure
       .input(
         z.object({
@@ -2297,6 +2307,7 @@ export const appRouter = router({
           email: z.string().email(),
           password: z.string().min(6),
           superAdmin: z.boolean().optional(),
+          assignLicense: z.boolean().optional(), // Whether to auto-assign a license
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -2308,6 +2319,23 @@ export const appRouter = router({
         if (existing) {
           throw new TRPCError({ code: "CONFLICT", message: "Email already exists" });
         }
+        
+        // If not super admin, check license availability
+        if (!input.superAdmin && input.assignLicense !== false) {
+          const licenseInfo = await db.getLicenseAvailability(ctx.user.tenantId);
+          if (licenseInfo.availableLicenses <= 0) {
+            throw new TRPCError({ 
+              code: "PRECONDITION_FAILED", 
+              message: "NO_LICENSES_AVAILABLE",
+              cause: {
+                totalLicenses: licenseInfo.totalLicenses,
+                usedLicenses: licenseInfo.usedLicenses,
+                availableLicenses: licenseInfo.availableLicenses,
+              }
+            });
+          }
+        }
+        
         // createUser already hashes the password internally
         const result = await db.createUser({
           tenantId: ctx.user.tenantId,
@@ -2316,7 +2344,20 @@ export const appRouter = router({
           password: input.password,
           superAdmin: input.superAdmin || false,
         });
-        return { success: true, userId: (result as any).insertId };
+        
+        const userId = (result as any).insertId;
+        
+        // Auto-assign license if requested and not super admin
+        if (!input.superAdmin && input.assignLicense !== false) {
+          try {
+            await db.assignLicenseToUser(ctx.user.tenantId, userId, ctx.user.id);
+          } catch (error) {
+            // License assignment failed, but user was created
+            console.error("Failed to auto-assign license:", error);
+          }
+        }
+        
+        return { success: true, userId, id: userId };
       }),
 
     update: superAdminProcedure

@@ -1,4 +1,4 @@
-import { eq, and, inArray, sql, desc, gte, lte, ne } from "drizzle-orm";
+import { eq, and, inArray, sql, desc, gte, lte, ne, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 
 /**
@@ -56,6 +56,7 @@ import {
   emailTemplates,
   passwordResetTokens,
   userLicenses,
+  tenantSubscriptions,
   notifications,
   type InsertUser,
   type InsertPasswordResetToken,
@@ -247,6 +248,82 @@ export async function updateUserLastSignIn(userId: number) {
   const now = new Date();
   const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
   await db.update(users).set({ lastSignedIn: mysqlDatetime }).where(eq(users.id, userId));
+}
+
+// ============================================================================
+// LICENSE MANAGEMENT
+// ============================================================================
+
+export async function getLicenseAvailability(tenantId: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  // Get subscription info
+  const [subscription] = await db.select().from(tenantSubscriptions)
+    .where(eq(tenantSubscriptions.tenantId, tenantId));
+
+  // Get license counts
+  const [licenseStats] = await db.select({
+    total: sql<number>`COUNT(*)`,
+    assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
+    unassigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NULL THEN 1 ELSE 0 END)`,
+  }).from(userLicenses)
+    .where(and(eq(userLicenses.tenantId, tenantId), eq(userLicenses.isActive, 1)));
+
+  // Count super admins (they don't need licenses)
+  const [superAdminCount] = await db.select({
+    count: sql<number>`COUNT(*)`
+  }).from(users)
+    .where(and(eq(users.tenantId, tenantId), eq(users.superAdmin, 1)));
+
+  const totalLicenses = Number(licenseStats?.total || 0);
+  const usedLicenses = Number(licenseStats?.assigned || 0);
+  const availableLicenses = Number(licenseStats?.unassigned || 0);
+
+  return {
+    totalLicenses,
+    usedLicenses,
+    availableLicenses,
+    superAdminCount: Number(superAdminCount?.count || 0),
+    subscriptionStatus: subscription?.status || 'none',
+    isTrial: subscription?.isTrial === 1,
+    trialEndsAt: subscription?.trialEndsAt,
+  };
+}
+
+export async function assignLicenseToUser(tenantId: number, userId: number, assignedById: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  // Check if user already has a license
+  const [existingLicense] = await db.select().from(userLicenses)
+    .where(and(
+      eq(userLicenses.tenantId, tenantId),
+      eq(userLicenses.userId, userId),
+      eq(userLicenses.isActive, 1)
+    ));
+  if (existingLicense) {
+    throw new Error("User already has a license assigned");
+  }
+
+  // Find an available unassigned license
+  const [availableLicense] = await db.select().from(userLicenses)
+    .where(and(
+      eq(userLicenses.tenantId, tenantId),
+      isNull(userLicenses.userId),
+      eq(userLicenses.isActive, 1)
+    ));
+  if (!availableLicense) {
+    throw new Error("No available licenses");
+  }
+
+  // Assign the license
+  const now = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  await db.update(userLicenses)
+    .set({ userId, assignedAt: now, assignedById })
+    .where(eq(userLicenses.id, availableLicense.id));
+
+  return { success: true, licenseId: availableLicense.id };
 }
 
 export async function verifyPassword(password: string, hashedPassword: string) {

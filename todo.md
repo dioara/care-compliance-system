@@ -2707,3 +2707,10 @@
 - [x] Make Help Center publicly accessible (no login required)
 - [x] Update company name to Lampstand Consulting throughout the app
 
+
+## License Check on User Creation
+- [x] Check available licenses before creating new user
+- [x] Show license purchase prompt if not enough licenses
+- [x] Deduct license when user is successfully created
+- [x] Allow purchasing additional licenses during user creation flow
+
