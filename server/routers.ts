@@ -2320,8 +2320,8 @@ export const appRouter = router({
           throw new TRPCError({ code: "CONFLICT", message: "Email already exists" });
         }
         
-        // If not super admin, check license availability
-        if (!input.superAdmin && input.assignLicense !== false) {
+        // Check license availability for ALL users (super admins need licenses too)
+        if (input.assignLicense !== false) {
           const licenseInfo = await db.getLicenseAvailability(ctx.user.tenantId);
           if (licenseInfo.availableLicenses <= 0) {
             throw new TRPCError({ 
@@ -2347,8 +2347,8 @@ export const appRouter = router({
         
         const userId = (result as any).insertId;
         
-        // Auto-assign license if requested and not super admin
-        if (!input.superAdmin && input.assignLicense !== false) {
+        // Auto-assign license to ALL new users (super admins need licenses too)
+        if (input.assignLicense !== false) {
           try {
             await db.assignLicenseToUser(ctx.user.tenantId, userId, ctx.user.id);
           } catch (error) {

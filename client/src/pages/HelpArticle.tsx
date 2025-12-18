@@ -281,7 +281,7 @@ export default function HelpArticle() {
       
       {/* Footer */}
       <footer className="border-t border-gray-200 mt-8 py-6 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
+        <p>&copy; {new Date().getFullYear()} CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
         <div className="mt-2 space-x-4">
           <a href="/privacy" className="hover:text-gray-700">Privacy</a>
           <a href="/terms" className="hover:text-gray-700">Terms</a>

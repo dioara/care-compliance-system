@@ -2714,3 +2714,10 @@
 - [x] Deduct license when user is successfully created
 - [x] Allow purchasing additional licenses during user creation flow
 
+
+## Bug Fixes - Dec 18
+- [x] Fix user update error - superAdmin expects boolean but receives number
+- [x] Fix license count - super admins DO need licenses
+- [x] Update wording to remove no license required for super admins
+- [x] Add Lampstand Consulting link to https://lampstand.consulting
+

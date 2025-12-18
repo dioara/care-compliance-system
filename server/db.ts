@@ -262,7 +262,7 @@ export async function getLicenseAvailability(tenantId: number) {
   const [subscription] = await db.select().from(tenantSubscriptions)
     .where(eq(tenantSubscriptions.tenantId, tenantId));
 
-  // Get license counts
+  // Get license counts from userLicenses table
   const [licenseStats] = await db.select({
     total: sql<number>`COUNT(*)`,
     assigned: sql<number>`SUM(CASE WHEN ${userLicenses.userId} IS NOT NULL THEN 1 ELSE 0 END)`,
@@ -270,7 +270,13 @@ export async function getLicenseAvailability(tenantId: number) {
   }).from(userLicenses)
     .where(and(eq(userLicenses.tenantId, tenantId), eq(userLicenses.isActive, 1)));
 
-  // Count super admins (they don't need licenses)
+  // Count total users (all users need licenses, including super admins)
+  const [userCount] = await db.select({
+    count: sql<number>`COUNT(*)`
+  }).from(users)
+    .where(eq(users.tenantId, tenantId));
+
+  // Count super admins for reference
   const [superAdminCount] = await db.select({
     count: sql<number>`COUNT(*)`
   }).from(users)
@@ -279,11 +285,13 @@ export async function getLicenseAvailability(tenantId: number) {
   const totalLicenses = Number(licenseStats?.total || 0);
   const usedLicenses = Number(licenseStats?.assigned || 0);
   const availableLicenses = Number(licenseStats?.unassigned || 0);
+  const totalUsers = Number(userCount?.count || 0);
 
   return {
     totalLicenses,
     usedLicenses,
     availableLicenses,
+    totalUsers,
     superAdminCount: Number(superAdminCount?.count || 0),
     subscriptionStatus: subscription?.status || 'none',
     isTrial: subscription?.isTrial === 1,

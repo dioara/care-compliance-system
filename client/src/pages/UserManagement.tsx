@@ -192,7 +192,7 @@ export default function UserManagement() {
       name: user.name || "", 
       email: user.email, 
       password: "", 
-      superAdmin: user.superAdmin || false 
+      superAdmin: Boolean(user.superAdmin) // Convert number to boolean
     });
     setIsEditOpen(true);
   };
@@ -206,7 +206,7 @@ export default function UserManagement() {
         name: formData.name,
         email: formData.email,
         password: formData.password || undefined,
-        superAdmin: formData.superAdmin,
+        superAdmin: Boolean(formData.superAdmin),
       });
       toast.success("User updated successfully");
       setIsEditOpen(false);
@@ -328,20 +328,19 @@ export default function UserManagement() {
                   </DialogDescription>
                 </DialogHeader>
                 
-                {/* License availability warning */}
-                {!formData.superAdmin && licenseInfo && licenseInfo.availableLicenses <= 0 && (
+                {/* License availability warning - ALL users need licenses */}
+                {licenseInfo && licenseInfo.availableLicenses <= 0 && (
                   <Alert variant="destructive" className="mt-4">
                     <Warning className="h-4 w-4" />
                     <AlertTitle>No Licenses Available</AlertTitle>
                     <AlertDescription>
-                      You have used all {licenseInfo.totalLicenses} licenses. 
-                      Purchase additional licenses or create a Super Admin (no license required).
+                      You have used all {licenseInfo.totalLicenses} licenses. Purchase additional licenses to add more users.
                     </AlertDescription>
                   </Alert>
                 )}
                 
                 {/* License info banner */}
-                {licenseInfo && licenseInfo.availableLicenses > 0 && !formData.superAdmin && (
+                {licenseInfo && licenseInfo.availableLicenses > 0 && (
                   <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm">
                     <div className="flex items-center gap-2 text-blue-700">
                       <Ticket className="h-4 w-4" />
@@ -394,7 +393,7 @@ export default function UserManagement() {
                       }}
                     />
                     <Label htmlFor="superAdmin" className="text-sm font-normal">
-                      Make this user a Super Admin (full access, no license required)
+                      Make this user a Super Admin (full system access)
                     </Label>
                   </div>
                   {!formData.superAdmin && (
@@ -679,7 +678,7 @@ export default function UserManagement() {
                     onCheckedChange={(checked) => setFormData(prev => ({ ...prev, superAdmin: !!checked }))}
                   />
                   <Label htmlFor="edit-superAdmin" className="text-sm font-normal">
-                    Super Admin (full access, no license required)
+                    Super Admin (full system access)
                   </Label>
                 </div>
               </div>
