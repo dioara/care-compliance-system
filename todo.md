@@ -2747,3 +2747,7 @@
 - [x] Redirect expired trial users to subscription page (non-dismissible)
 - [x] Restore access after successful payment
 - [ ] Test complete subscription flow end-to-end
+
+## Bug Fixes
+- [x] Fix company profile image upload - improved error handling
+- [x] Review TypeScript errors in auditReminderService.ts - fixed Date type

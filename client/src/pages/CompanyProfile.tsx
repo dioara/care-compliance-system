@@ -93,12 +93,22 @@ export default function CompanyProfile() {
 
     setIsUploading(true);
 
-    try {
-      // Convert file to base64
-      const reader = new FileReader();
-      reader.onload = async () => {
+    // Convert file to base64
+    const reader = new FileReader();
+    reader.onerror = () => {
+      toast.error("Failed to read file");
+      setIsUploading(false);
+    };
+    reader.onload = async () => {
+      try {
         const base64 = reader.result as string;
         const fileData = base64.split(',')[1]; // Remove data:image/...;base64, prefix
+
+        if (!fileData) {
+          toast.error("Invalid file data");
+          setIsUploading(false);
+          return;
+        }
 
         await uploadLogo.mutateAsync({
           fileData,
@@ -108,13 +118,14 @@ export default function CompanyProfile() {
 
         toast.success("Logo uploaded successfully");
         refetch();
+      } catch (error: any) {
+        console.error("Logo upload error:", error);
+        toast.error(error?.message || "Failed to upload logo");
+      } finally {
         setIsUploading(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      toast.error("Failed to upload logo");
-      setIsUploading(false);
-    }
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (isLoading) {

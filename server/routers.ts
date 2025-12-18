@@ -297,7 +297,7 @@ export const appRouter = router({
     uploadLogo: protectedProcedure
       .input(
         z.object({
-          fileData: z.string(), // base64
+          fileData: z.string(), // base64 (without data:...;base64, prefix)
           fileName: z.string(),
           mimeType: z.string(),
         })
@@ -307,17 +307,32 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
         }
 
-        // Convert base64 to buffer
-        const buffer = Buffer.from(input.fileData.split(",")[1] || input.fileData, "base64");
+        try {
+          // Convert base64 to buffer - fileData should already have prefix removed by frontend
+          const buffer = Buffer.from(input.fileData, "base64");
+          
+          if (buffer.length === 0) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid file data" });
+          }
 
-        // Upload to S3
-        const fileKey = `logos/${ctx.user.tenantId}/${Date.now()}-${input.fileName}`;
-        const { url } = await storagePut(fileKey, buffer, input.mimeType);
+          // Upload to S3
+          const fileKey = `logos/${ctx.user.tenantId}/${Date.now()}-${input.fileName}`;
+          console.log(`[UPLOAD] Uploading logo for tenant ${ctx.user.tenantId}: ${fileKey}, size: ${buffer.length} bytes`);
+          
+          const { url } = await storagePut(fileKey, buffer, input.mimeType);
+          console.log(`[UPLOAD] Logo uploaded successfully: ${url}`);
 
-        // Update tenant with logo URL
-        await db.updateTenant(ctx.user.tenantId, { logoUrl: url });
+          // Update tenant with logo URL
+          await db.updateTenant(ctx.user.tenantId, { logoUrl: url });
 
-        return { success: true, url };
+          return { success: true, url };
+        } catch (error: any) {
+          console.error(`[UPLOAD] Logo upload failed:`, error);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: error.message || "Failed to upload logo" 
+          });
+        }
       }),
 
     // List all locations for the company (used by LocationSwitcher)

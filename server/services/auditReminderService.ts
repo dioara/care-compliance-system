@@ -13,7 +13,7 @@ if (SENDGRID_API_KEY) {
 interface AuditReminder {
   auditId: number;
   auditType: string;
-  auditDate: Date;
+  auditDate: string | Date; // Can be string from DB or Date object
   locationName: string;
   auditorEmail: string;
   auditorName: string;
