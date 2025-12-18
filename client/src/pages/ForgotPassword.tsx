@@ -81,7 +81,7 @@ export default function ForgotPassword() {
 
         {/* Footer */}
         <footer className="p-6 text-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} CCMS. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
         </footer>
       </div>
     );
@@ -155,7 +155,7 @@ export default function ForgotPassword() {
 
       {/* Footer */}
       <footer className="p-6 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} CCMS. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
       </footer>
     </div>
   );

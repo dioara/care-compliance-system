@@ -2702,3 +2702,8 @@
 - [x] Email verification flow for new users
 - [x] Remember me with extended session duration (30 days vs 7 days)
 - [x] Rate limiting on forgot password endpoint (3 requests per hour)
+
+## Public Help Center & Company Branding
+- [x] Make Help Center publicly accessible (no login required)
+- [x] Update company name to Lampstand Consulting throughout the app
+

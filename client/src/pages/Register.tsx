@@ -221,11 +221,11 @@ export default function Register() {
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>© {new Date().getFullYear()} CCMS. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
             <div className="mt-2 space-x-4">
               <a href="/privacy" className="hover:text-gray-700">Privacy</a>
               <a href="/terms" className="hover:text-gray-700">Terms</a>
-              <a href="/help-center" className="hover:text-gray-700">Help</a>
+              <a href="/help" className="hover:text-gray-700">Help</a>
             </div>
           </div>
         </div>

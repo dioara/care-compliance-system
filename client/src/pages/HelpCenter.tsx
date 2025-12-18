@@ -59,15 +59,25 @@ export default function HelpCenter() {
       <header className="border-b border-gray-200 bg-white">
         <div className="container max-w-6xl py-4">
           <div className="flex items-center justify-between">
-            <button 
-              onClick={() => setLocation("/")}
-              className="flex items-center gap-2 text-gray-600 hover:text-[#1F7AE0] transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="font-medium">Back to Dashboard</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
+              <span className="font-semibold text-gray-900">CCMS Help Centre</span>
+            </div>
             
-            <span className="text-sm text-gray-500">CCMS Help Centre</span>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setLocation("/login")}
+                className="text-sm text-[#1F7AE0] hover:text-[#1a6bc7] font-medium"
+              >
+                Sign in
+              </button>
+              <button 
+                onClick={() => setLocation("/register")}
+                className="text-sm bg-[#1F7AE0] hover:bg-[#1a6bc7] text-white px-4 py-2 rounded-lg font-medium"
+              >
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -205,6 +215,15 @@ export default function HelpCenter() {
           </div>
         )}
       </div>
+      
+      {/* Footer */}
+      <footer className="border-t border-gray-200 mt-8 py-6 text-center text-sm text-gray-500">
+        <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
+        <div className="mt-2 space-x-4">
+          <a href="/privacy" className="hover:text-gray-700">Privacy</a>
+          <a href="/terms" className="hover:text-gray-700">Terms</a>
+        </div>
+      </footer>
     </div>
   );
 }

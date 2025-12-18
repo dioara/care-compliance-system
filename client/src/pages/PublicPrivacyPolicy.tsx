@@ -319,15 +319,15 @@ export default function PublicPrivacyPolicy() {
           <button onClick={() => setLocation("/terms")} className="text-[#1F7AE0] hover:underline">
             Terms of Service
           </button>
-          <button onClick={() => setLocation("/help-center")} className="text-[#1F7AE0] hover:underline">
-            Help Center
+          <button onClick={() => setLocation("/help")} className="text-[#1F7AE0] hover:underline">
+            Help Centre
           </button>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-gray-200 mt-8 py-6 text-center text-sm text-gray-500">
-        <p>&copy; {new Date().getFullYear()} Care Compliance Management System. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
       </footer>
     </div>
   );

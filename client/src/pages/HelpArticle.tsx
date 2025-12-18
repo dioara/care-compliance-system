@@ -103,23 +103,41 @@ export default function HelpArticle() {
       <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="container max-w-6xl py-4">
           <div className="flex items-center justify-between">
-            <button 
-              onClick={() => setLocation("/help")}
-              className="flex items-center gap-2 text-gray-600 hover:text-[#1F7AE0] transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span className="font-medium">Back to Help Centre</span>
-            </button>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocation("/help")}>
+                <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
+                <span className="font-semibold text-gray-900">CCMS Help Centre</span>
+              </div>
+              <div className="hidden md:flex items-center gap-2 text-sm text-gray-500">
+                <CaretRight className="h-4 w-4" />
+                <span className="text-gray-700 truncate max-w-[200px]">{article.title}</span>
+              </div>
+            </div>
             
-            <div className="flex items-center gap-2 text-sm text-gray-500">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={() => setLocation("/help")}
-                className="hover:text-[#1F7AE0] transition-colors"
+                className="flex items-center gap-2 text-gray-600 hover:text-[#1F7AE0] transition-colors text-sm"
               >
-                Help Centre
+                <ArrowLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">All Articles</span>
               </button>
-              <CaretRight className="h-4 w-4" />
-              <span className="text-gray-900">{article.title}</span>
+              {!user && (
+                <>
+                  <button 
+                    onClick={() => setLocation("/login")}
+                    className="text-sm text-[#1F7AE0] hover:text-[#1a6bc7] font-medium"
+                  >
+                    Sign in
+                  </button>
+                  <button 
+                    onClick={() => setLocation("/register")}
+                    className="text-sm bg-[#1F7AE0] hover:bg-[#1a6bc7] text-white px-4 py-2 rounded-lg font-medium"
+                  >
+                    Get Started
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -260,6 +278,15 @@ export default function HelpArticle() {
         open={supportModalOpen} 
         onOpenChange={setSupportModalOpen} 
       />
+      
+      {/* Footer */}
+      <footer className="border-t border-gray-200 mt-8 py-6 text-center text-sm text-gray-500">
+        <p>&copy; {new Date().getFullYear()} CCMS. Built by Lampstand Consulting.</p>
+        <div className="mt-2 space-x-4">
+          <a href="/privacy" className="hover:text-gray-700">Privacy</a>
+          <a href="/terms" className="hover:text-gray-700">Terms</a>
+        </div>
+      </footer>
     </div>
   );
 }
