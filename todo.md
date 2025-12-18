@@ -2733,5 +2733,6 @@
 - [x] Test registration flow end-to-end
 
 ## UX: Clearer Email Verification Message
-- [ ] Show clear message on login page when email verification is required
-- [ ] Add option to resend verification email from login error
+- [x] Show clear message on login page when email verification is required
+- [x] Add option to resend verification email from login error
+- [x] Show success screen after registration with email verification instructions

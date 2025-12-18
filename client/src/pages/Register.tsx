@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
+import { CheckCircle2, Mail } from "lucide-react";
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -20,11 +21,13 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: () => {
-      toast.success("Registration successful! Please log in.");
-      setLocation("/login");
+      setRegistrationComplete(true);
+      setRegisteredEmail(formData.email);
     },
     onError: (error) => {
       toast.error(error.message || "Registration failed");
@@ -64,6 +67,78 @@ export default function Register() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  // Show success screen after registration
+  if (registrationComplete) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        {/* Header with logo */}
+        <header className="p-6">
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
+            <span className="font-semibold text-gray-900">CCMS</span>
+          </div>
+        </header>
+
+        {/* Main content */}
+        <main className="flex-1 flex items-center justify-center px-4 pb-16">
+          <div className="w-full max-w-md">
+            {/* Success Card */}
+            <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-8 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              </div>
+              
+              <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                Account Created Successfully!
+              </h1>
+              
+              <p className="text-gray-600 mb-6">
+                Welcome to CCMS. Your 30-day free trial has started.
+              </p>
+
+              {/* Email Verification Notice */}
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3 text-left">
+                  <Mail className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-medium text-amber-800">Verify Your Email</h3>
+                    <p className="text-sm text-amber-700 mt-1">
+                      We've sent a verification email to:
+                    </p>
+                    <p className="text-sm font-medium text-amber-800 mt-1">
+                      {registeredEmail}
+                    </p>
+                    <p className="text-sm text-amber-700 mt-2">
+                      Please click the link in the email to verify your account before signing in.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => setLocation("/login")}
+                  className="w-full h-11 bg-[#1F7AE0] hover:bg-[#1a6bc7] text-white font-medium"
+                >
+                  Go to Sign In
+                </Button>
+                
+                <p className="text-xs text-gray-500">
+                  Didn't receive the email? Check your spam folder or request a new verification link from the sign in page.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 text-center text-sm text-gray-500">
+              <p>© {new Date().getFullYear()} CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
