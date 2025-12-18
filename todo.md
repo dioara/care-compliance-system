@@ -2507,3 +2507,8 @@
 - [x] Update login page text from "Continue to launch the login flow" to clearer message
 - [x] Apply #1F7AE0 blue colour scheme to dashboard sidebar
 - [x] Apply clean colour scheme to dashboard pages
+
+## Login Page Factual Updates
+- [x] Remove organisation count (+500 organisations)
+- [x] Remove organisation logos/avatars
+- [x] Make text factual without exaggerated claims

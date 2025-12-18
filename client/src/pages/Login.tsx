@@ -87,7 +87,7 @@ export default function Login() {
               </div>
               <div>
                 <h3 className="font-semibold text-lg">CQC Compliance Tracking</h3>
-                <p className="text-white/70 text-sm">Monitor all 29 compliance sections with real-time RAG status</p>
+                <p className="text-white/70 text-sm">Track compliance across CQC key lines of enquiry with RAG status</p>
               </div>
             </div>
 
@@ -99,37 +99,27 @@ export default function Login() {
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Automated Audit Scheduling</h3>
-                <p className="text-white/70 text-sm">Never miss an audit with intelligent scheduling and reminders</p>
+                <h3 className="font-semibold text-lg">Audit Scheduling</h3>
+                <p className="text-white/70 text-sm">Schedule and manage audits with calendar view and reminders</p>
               </div>
             </div>
 
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9.663 17H14.336M12 3V4M18.364 5.636L17.657 6.343M21 12H20M4 12H3M6.343 6.343L5.636 5.636M12 20C8.13401 20 5 16.866 5 13C5 9.13401 8.13401 6 12 6C15.866 6 19 9.13401 19 13C19 16.866 15.866 20 12 20Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 9V13M12 17H12.01M5.07 19H18.93C20.14 19 20.93 17.69 20.33 16.64L13.4 4.18C12.8 3.13 11.2 3.13 10.6 4.18L3.67 16.64C3.07 17.69 3.86 19 5.07 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
               <div>
-                <h3 className="font-semibold text-lg">AI-Powered Insights</h3>
-                <p className="text-white/70 text-sm">Get intelligent recommendations for care plan improvements</p>
+                <h3 className="font-semibold text-lg">Incident Management</h3>
+                <p className="text-white/70 text-sm">Record, investigate and track incidents and action plans</p>
               </div>
             </div>
           </div>
 
-          {/* Trust Badge */}
+          {/* Footer note */}
           <div className="mt-12 pt-8 border-t border-white/20">
-            <p className="text-white/60 text-sm">Trusted by care providers across the UK</p>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-xs font-medium">
-                    {String.fromCharCode(64 + i)}
-                  </div>
-                ))}
-              </div>
-              <span className="text-white/80 text-sm ml-2">+500 organisations</span>
-            </div>
+            <p className="text-white/60 text-sm">Designed for care homes and healthcare providers in the UK</p>
           </div>
         </div>
       </div>
