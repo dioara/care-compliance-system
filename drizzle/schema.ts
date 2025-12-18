@@ -769,6 +769,9 @@ export const users = mysqlTable("users", {
 	superAdmin: tinyint().default(0).notNull(),
 	openId: varchar({ length: 255 }),
 	loginMethod: varchar({ length: 50 }),
+	emailVerified: tinyint().default(0).notNull(),
+	emailVerificationToken: varchar({ length: 255 }),
+	emailVerificationExpires: timestamp({ mode: 'string' }),
 },
 (table) => [
 	index("users_email_unique").on(table.email),

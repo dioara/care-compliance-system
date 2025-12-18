@@ -1,0 +1,9 @@
+{
+  "query": "ALTER TABLE users \nADD COLUMN emailVerified TINYINT NOT NULL DEFAULT 0,\nADD COLUMN emailVerificationToken VARCHAR(255),\nADD COLUMN emailVerificationExpires TIMESTAMP NULL;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute ALTER TABLE users \nADD COLUMN emailVerified TINYINT NOT NULL DEFAULT 0,\nADD COLUMN emailVerificationToken VARCHAR(255),\nADD COLUMN emailVerificationExpires TIMESTAMP NULL;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 992
+}

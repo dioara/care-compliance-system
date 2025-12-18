@@ -100,6 +100,9 @@ export async function createUser(data: {
   tenantId?: number;
   role?: "admin" | "quality_officer" | "manager" | "staff";
   superAdmin?: boolean;
+  emailVerified?: number;
+  emailVerificationToken?: string;
+  emailVerificationExpires?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
@@ -115,6 +118,9 @@ export async function createUser(data: {
     superAdmin: data.superAdmin ? 1 : 0,
     twoFaEnabled: 0,
     twoFaVerified: 0,
+    emailVerified: data.emailVerified ?? 1, // Default to verified for backward compatibility
+    emailVerificationToken: data.emailVerificationToken ?? null,
+    emailVerificationExpires: data.emailVerificationExpires ?? null,
   });
 
   // Return result with insertId
@@ -165,6 +171,43 @@ export async function disable2FA(userId: number) {
 
   await db.update(users)
     .set({ twoFaEnabled: 0, twoFaVerified: 0, twoFaSecret: null })
+    .where(eq(users.id, userId));
+}
+
+// ============================================================================
+// EMAIL VERIFICATION
+// ============================================================================
+
+export async function getUserByVerificationToken(token: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.emailVerificationToken, token)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function verifyUserEmail(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  await db.update(users)
+    .set({ 
+      emailVerified: 1, 
+      emailVerificationToken: null, 
+      emailVerificationExpires: null 
+    })
+    .where(eq(users.id, userId));
+}
+
+export async function updateUserVerificationToken(userId: number, token: string, expires: string) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  await db.update(users)
+    .set({ 
+      emailVerificationToken: token, 
+      emailVerificationExpires: expires 
+    })
     .where(eq(users.id, userId));
 }
 

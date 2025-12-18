@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
 import Dashboard from "./pages/Dashboard";
 import CompanyProfile from "./pages/CompanyProfile";
 import Locations from "./pages/Locations";
@@ -65,6 +66,7 @@ function Router() {
       <Route path="/accept-invitation" component={AcceptInvitation} />
       <Route path="/privacy" component={PublicPrivacyPolicy} />
       <Route path="/terms" component={PublicTermsOfService} />
+      <Route path="/verify-email" component={VerifyEmail} />
       
       <Route path="/">
         <DashboardLayout>

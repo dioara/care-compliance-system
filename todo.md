@@ -2690,3 +2690,15 @@
 - [x] Create public Terms of Service page (/terms)
 - [x] Add Help Center link to login/register pages
 - [x] Update footer links on login/register to point to correct pages
+
+
+## Security & Auth Enhancements (December 18, 2025)
+- [ ] Email verification flow - send verification email on signup, require verification before login
+- [ ] Remember me functionality - extend session duration when checkbox is checked
+- [ ] Rate limiting on forgot password endpoint - prevent abuse/brute force
+
+
+## Security & Auth Enhancements (December 18, 2025)
+- [x] Email verification flow for new users
+- [x] Remember me with extended session duration (30 days vs 7 days)
+- [x] Rate limiting on forgot password endpoint (3 requests per hour)

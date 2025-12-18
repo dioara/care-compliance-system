@@ -3,6 +3,7 @@ import { z } from "zod";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import * as db from "./db";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { startFreeTrial } from "./subscription";
 import { ERROR_MESSAGES, sanitizeError } from "./_core/errorMessages";
 import { trackFailedLogin, resetFailedLoginAttempts, logSecurityEvent } from "./services/securityMonitoringService";
@@ -15,6 +16,30 @@ import {
 } from "./services/twoFactorAuthService";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
+
+// Rate limiting for password reset - max 3 requests per email per hour
+const passwordResetAttempts = new Map<string, { count: number; firstAttempt: number }>();
+const PASSWORD_RESET_MAX_ATTEMPTS = 3;
+const PASSWORD_RESET_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+function checkPasswordResetRateLimit(email: string): boolean {
+  const now = Date.now();
+  const key = email.toLowerCase();
+  const record = passwordResetAttempts.get(key);
+  
+  if (!record || now - record.firstAttempt > PASSWORD_RESET_WINDOW_MS) {
+    // Reset or create new record
+    passwordResetAttempts.set(key, { count: 1, firstAttempt: now });
+    return true;
+  }
+  
+  if (record.count >= PASSWORD_RESET_MAX_ATTEMPTS) {
+    return false; // Rate limited
+  }
+  
+  record.count++;
+  return true;
+}
 
 export const authRouter = router({
   // Register new user and create company
@@ -57,7 +82,11 @@ export const authRouter = router({
         numberOfStaff: 0,
       });
 
-      // Create user as admin of the company
+      // Generate email verification token
+      const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+      const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      // Create user as admin of the company (unverified)
       const userResult = await db.createUser({
         email: input.email,
         password: input.password,
@@ -65,29 +94,40 @@ export const authRouter = router({
         tenantId: tenant.id,
         role: "admin",
         superAdmin: true, // First user is super admin
+        emailVerified: 0,
+        emailVerificationToken,
+        emailVerificationExpires: emailVerificationExpires.toISOString().slice(0, 19).replace('T', ' '),
       });
 
       // Start free trial for the new company
       await startFreeTrial(tenant.id);
 
-      // Send welcome email with trial info
+      // Send email verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
         ? "https://care-compliance-system-production.up.railway.app" 
         : "http://localhost:3000";
       
+      const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
+      
       await sendEmail({
         to: input.email,
-        subject: "Welcome to CCMS - Your 14-Day Free Trial Has Started!",
-        text: `Welcome to Care Compliance Management System, ${input.name}!\n\nYour 14-day free trial has started. You have full access to all features during your trial period.\n\nWhat's included in your trial:\n- Unlimited compliance audits\n- AI-powered care plan auditing\n- Incident reporting and tracking\n- Staff training management\n- CQC inspection preparation tools\n\nReady to continue after your trial?\n- Monthly: £49/month\n- Annual: £490/year (2 months free!)\n\nUpgrade anytime at: ${baseUrl}/subscription\n\nNeed help? Visit our Help Center: ${baseUrl}/help-center\n\nBest regards,\nThe CCMS Team`,
+        subject: "Verify Your Email - CCMS",
+        text: `Welcome to Care Compliance Management System, ${input.name}!\n\nPlease verify your email address to activate your account and start your 14-day free trial.\n\nClick here to verify: ${verificationUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can safely ignore this email.\n\nBest regards,\nThe CCMS Team`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: #1F7AE0; padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to CCMS!</h1>
+              <h1 style="color: white; margin: 0; font-size: 28px;">Verify Your Email</h1>
             </div>
             <div style="padding: 30px; background: #ffffff;">
               <h2 style="color: #1f2937; margin-top: 0;">Hi ${input.name},</h2>
-              <p style="color: #4b5563; font-size: 16px;">Your <strong>14-day free trial</strong> has started! You now have full access to all CCMS features.</p>
+              <p style="color: #4b5563; font-size: 16px;">Welcome to CCMS! Please verify your email address to activate your account and start your <strong>14-day free trial</strong>.</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verificationUrl}" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Verify Email Address</a>
+              </div>
+              
+              <p style="color: #6b7280; font-size: 14px;">This link expires in 24 hours.</p>
               
               <div style="background: #f0f9ff; border-left: 4px solid #1F7AE0; padding: 20px; margin: 25px 0;">
                 <h3 style="color: #1F7AE0; margin-top: 0;">What's included in your trial:</h3>
@@ -100,17 +140,7 @@ export const authRouter = router({
                 </ul>
               </div>
               
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${baseUrl}/dashboard" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Go to Dashboard</a>
-              </div>
-              
-              <div style="background: #fef3c7; border-radius: 8px; padding: 20px; margin: 25px 0;">
-                <h3 style="color: #92400e; margin-top: 0;">Ready to continue after your trial?</h3>
-                <p style="color: #92400e; margin-bottom: 10px;"><strong>Monthly:</strong> £49/month</p>
-                <p style="color: #92400e; margin-bottom: 0;"><strong>Annual:</strong> £490/year <span style="background: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">2 months FREE!</span></p>
-              </div>
-              
-              <p style="color: #6b7280; font-size: 14px;">Need help getting started? Visit our <a href="${baseUrl}/help-center" style="color: #1F7AE0;">Help Center</a>.</p>
+              <p style="color: #9ca3af; font-size: 12px;">If you didn't create an account, you can safely ignore this email.</p>
             </div>
             <div style="padding: 20px; text-align: center; background: #f9fafb; border-top: 1px solid #e5e7eb;">
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Care Compliance Management System</p>
@@ -120,7 +150,7 @@ export const authRouter = router({
         `
       });
 
-      console.log(`[REGISTER] Welcome email sent to ${input.email}`);
+      console.log(`[REGISTER] Verification email sent to ${input.email}`);
 
       return {
         success: true,
@@ -135,6 +165,7 @@ export const authRouter = router({
       z.object({
         email: z.string().email(),
         password: z.string(),
+        rememberMe: z.boolean().optional().default(false),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -162,12 +193,20 @@ export const authRouter = router({
         });
       }
       
+      // Check if email is verified
+      if (user.emailVerified === 0) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Please verify your email address before logging in. Check your inbox for the verification link.",
+        });
+      }
+      
       // Reset failed attempts on successful login
       resetFailedLoginAttempts(input.email, ipAddress);
       
       // Log successful login
       logSecurityEvent({
-        eventType: "failed_login",
+        eventType: "successful_login",
         severity: "low",
         userId: user.id,
         email: user.email,
@@ -178,7 +217,8 @@ export const authRouter = router({
       // Update last sign in
       await db.updateUserLastSignIn(user.id);
 
-      // Create JWT token
+      // Create JWT token with extended expiry if remember me is checked
+      const tokenExpiry = input.rememberMe ? "30d" : "7d";
       const token = jwt.sign(
         {
           userId: user.id,
@@ -187,7 +227,7 @@ export const authRouter = router({
           role: user.role,
         },
         JWT_SECRET,
-        { expiresIn: "7d" }
+        { expiresIn: tokenExpiry }
       );
 
       console.log("[AUTH] Login successful for user:", user.email, "Token generated");
@@ -231,6 +271,129 @@ export const authRouter = router({
     console.log('[Logout] Cookies cleared');
     return { success: true };
   }),
+
+  // Verify email address
+  verifyEmail: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input }) => {
+      const user = await db.getUserByVerificationToken(input.token);
+      
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invalid or expired verification link. Please request a new one.",
+        });
+      }
+      
+      // Check if token is expired
+      if (user.emailVerificationExpires && new Date(user.emailVerificationExpires) < new Date()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Verification link has expired. Please request a new one.",
+        });
+      }
+      
+      // Mark email as verified
+      await db.verifyUserEmail(user.id);
+      
+      // Send welcome email now that email is verified
+      const { sendEmail } = await import("./_core/email");
+      const baseUrl = process.env.NODE_ENV === "production" 
+        ? "https://care-compliance-system-production.up.railway.app" 
+        : "http://localhost:3000";
+      
+      await sendEmail({
+        to: user.email,
+        subject: "Welcome to CCMS - Your 14-Day Free Trial Has Started!",
+        text: `Welcome to Care Compliance Management System!\n\nYour email has been verified and your 14-day free trial has started.\n\nLog in now: ${baseUrl}/login\n\nBest regards,\nThe CCMS Team`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #1F7AE0; padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Email Verified!</h1>
+            </div>
+            <div style="padding: 30px; background: #ffffff;">
+              <h2 style="color: #1f2937; margin-top: 0;">Welcome to CCMS!</h2>
+              <p style="color: #4b5563; font-size: 16px;">Your email has been verified and your <strong>14-day free trial</strong> has started!</p>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${baseUrl}/login" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Log In Now</a>
+              </div>
+              
+              <div style="background: #f0f9ff; border-left: 4px solid #1F7AE0; padding: 20px; margin: 25px 0;">
+                <h3 style="color: #1F7AE0; margin-top: 0;">What's included in your trial:</h3>
+                <ul style="color: #4b5563; margin: 0; padding-left: 20px;">
+                  <li>Unlimited compliance audits</li>
+                  <li>AI-powered care plan auditing</li>
+                  <li>Incident reporting and tracking</li>
+                  <li>Staff training management</li>
+                  <li>CQC inspection preparation tools</li>
+                </ul>
+              </div>
+            </div>
+            <div style="padding: 20px; text-align: center; background: #f9fafb; border-top: 1px solid #e5e7eb;">
+              <p style="color: #9ca3af; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Care Compliance Management System</p>
+            </div>
+          </div>
+        `
+      });
+      
+      return { success: true, message: "Email verified successfully! You can now log in." };
+    }),
+
+  // Resend verification email
+  resendVerification: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ input }) => {
+      const user = await db.getUserByEmail(input.email);
+      
+      if (!user) {
+        // Don't reveal if user exists
+        return { success: true, message: "If an account exists with this email, a verification link has been sent." };
+      }
+      
+      if (user.emailVerified === 1) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Email is already verified. You can log in.",
+        });
+      }
+      
+      // Generate new token
+      const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+      const emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      
+      await db.updateUserVerificationToken(user.id, emailVerificationToken, emailVerificationExpires.toISOString().slice(0, 19).replace('T', ' '));
+      
+      // Send verification email
+      const { sendEmail } = await import("./_core/email");
+      const baseUrl = process.env.NODE_ENV === "production" 
+        ? "https://care-compliance-system-production.up.railway.app" 
+        : "http://localhost:3000";
+      
+      const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
+      
+      await sendEmail({
+        to: user.email,
+        subject: "Verify Your Email - CCMS",
+        text: `Please verify your email address.\n\nClick here to verify: ${verificationUrl}\n\nThis link expires in 24 hours.`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: #1F7AE0; padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Verify Your Email</h1>
+            </div>
+            <div style="padding: 30px; background: #ffffff;">
+              <p style="color: #4b5563; font-size: 16px;">Click the button below to verify your email address.</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verificationUrl}" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Verify Email Address</a>
+              </div>
+              <p style="color: #6b7280; font-size: 14px;">This link expires in 24 hours.</p>
+            </div>
+          </div>
+        `
+      });
+      
+      return { success: true, message: "Verification email sent. Please check your inbox." };
+    }),
 
   // Update profile (name)
   updateProfile: protectedProcedure
@@ -288,6 +451,14 @@ export const authRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      // Check rate limit
+      if (!checkPasswordResetRateLimit(input.email)) {
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: "Too many password reset requests. Please try again in an hour.",
+        });
+      }
+      
       const user = await db.getUserByEmail(input.email);
       
       // Always return success to prevent email enumeration

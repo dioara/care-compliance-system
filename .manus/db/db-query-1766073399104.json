@@ -1,0 +1,31 @@
+{
+  "query": "SELECT * FROM users LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT * FROM users LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Tolulope Olufohunsi",
+      "email": "olufohunsi@gmail.com",
+      "role": "admin",
+      "createdAt": "2025-12-14 08:07:47",
+      "updatedAt": "2025-12-14 08:08:58",
+      "lastSignedIn": "2025-12-14 08:08:59",
+      "tenantId": "1",
+      "locationId": "NULL",
+      "twoFaEnabled": "0",
+      "twoFaSecret": "NULL",
+      "password": "",
+      "twoFaVerified": "0",
+      "superAdmin": "0",
+      "openId": "NULL",
+      "loginMethod": "NULL",
+      "emailVerified": "0",
+      "emailVerificationToken": "NULL",
+      "emailVerificationExpires": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\trole\tcreatedAt\tupdatedAt\tlastSignedIn\ttenantId\tlocationId\ttwoFaEnabled\ttwoFaSecret\tpassword\ttwoFaVerified\tsuperAdmin\topenId\tloginMethod\temailVerified\temailVerificationToken\temailVerificationExpires\n1\tTolulope Olufohunsi\tolufohunsi@gmail.com\tadmin\t2025-12-14 08:07:47\t2025-12-14 08:08:58\t2025-12-14 08:08:59\t1\tNULL\t0\tNULL\t\t0\t0\tNULL\tNULL\t0\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

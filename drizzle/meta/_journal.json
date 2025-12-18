@@ -211,6 +211,13 @@
       "when": 1766004378294,
       "tag": "0029_solid_fantastic_four",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "5",
+      "when": 1766073276104,
+      "tag": "0030_spicy_tusk",
+      "breakpoints": true
     }
   ]
 }
