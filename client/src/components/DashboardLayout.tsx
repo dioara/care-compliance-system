@@ -60,6 +60,7 @@ import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { NotificationCenter } from "./NotificationCenter";
 import { OnboardingTour } from "./OnboardingTour";
 import { TrialBanner } from "./TrialBanner";
+import { trpc } from "@/lib/trpc";
 import {
   Tooltip,
   TooltipContent,
@@ -134,7 +135,13 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user } = useAuth();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  // Check subscription status
+  const { data: subscription, isLoading: subscriptionLoading } = trpc.subscription.getSubscription.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -147,7 +154,31 @@ export default function DashboardLayout({
     }
   }, [loading, user, setLocation]);
 
-  if (loading || !user) {
+  // Check if subscription is required (trial expired and no active subscription)
+  useEffect(() => {
+    if (!subscriptionLoading && subscription && user) {
+      const isTrialExpired = subscription.isTrial && subscription.trialEndsAt && new Date(subscription.trialEndsAt) < new Date();
+      const hasActiveSubscription = subscription.status === 'active';
+      const isOnSubscriptionPage = location === '/subscription-required' || location === '/admin/subscription';
+      
+      // If trial expired and no active subscription, redirect to subscription page
+      if (isTrialExpired && !hasActiveSubscription && !isOnSubscriptionPage) {
+        setLocation('/subscription-required');
+      }
+    }
+  }, [subscription, subscriptionLoading, user, location, setLocation]);
+
+  if (loading || !user || subscriptionLoading) {
+    return <DashboardLayoutSkeleton />;
+  }
+
+  // Check if user should be blocked (trial expired, no active subscription)
+  const isTrialExpired = subscription?.isTrial && subscription?.trialEndsAt && new Date(subscription.trialEndsAt) < new Date();
+  const hasActiveSubscription = subscription?.status === 'active';
+  const isOnSubscriptionPage = location === '/subscription-required' || location === '/admin/subscription';
+  
+  if (isTrialExpired && !hasActiveSubscription && !isOnSubscriptionPage) {
+    // This will trigger the useEffect redirect, but show skeleton while redirecting
     return <DashboardLayoutSkeleton />;
   }
 

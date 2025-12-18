@@ -53,6 +53,7 @@ import ErrorMonitoring from "./pages/ErrorMonitoring";
 import Notifications from "./pages/Notifications";
 import HelpCenter from "./pages/HelpCenter";
 import HelpArticle from "./pages/HelpArticle";
+import SubscriptionRequired from "./pages/SubscriptionRequired";
 import { useSessionKeepalive } from "./hooks/useSessionKeepalive";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -67,6 +68,7 @@ function Router() {
       <Route path="/privacy" component={PublicPrivacyPolicy} />
       <Route path="/terms" component={PublicTermsOfService} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/subscription-required" component={SubscriptionRequired} />
       
       <Route path="/">
         <DashboardLayout>

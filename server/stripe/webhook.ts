@@ -105,16 +105,26 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log(`[Stripe Webhook] Checkout completed for tenant ${tenantId}: ${quantity} licenses (${billingInterval})`);
   const db = await requireDb();
 
+  // Clear trial status and activate subscription
   await db.update(tenantSubscriptions).set({
     stripeSubscriptionId: session.subscription as string,
     status: "active",
     licensesCount: quantity,
     billingInterval,
+    isTrial: 0, // Clear trial flag
+    trialEndsAt: null, // Clear trial end date
   }).where(eq(tenantSubscriptions.tenantId, tenantId));
 
+  // Deactivate any existing trial licenses first
+  await db.update(userLicenses).set({ 
+    isActive: 0, 
+    deactivatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ') 
+  }).where(eq(userLicenses.tenantId, tenantId));
+
+  // Create new paid licenses
   const licenses = Array.from({ length: quantity }, () => ({ tenantId, isActive: 1 }));
   await db.insert(userLicenses).values(licenses);
-  console.log(`[Stripe Webhook] Created ${quantity} license records for tenant ${tenantId}`);
+  console.log(`[Stripe Webhook] Created ${quantity} paid license records for tenant ${tenantId}, trial cleared`);
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {

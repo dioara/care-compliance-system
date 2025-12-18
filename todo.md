@@ -2736,3 +2736,14 @@
 - [x] Show clear message on login page when email verification is required
 - [x] Add option to resend verification email from login error
 - [x] Show success screen after registration with email verification instructions
+
+## Subscription Enforcement System
+- [x] Review current Stripe setup and pricing configuration
+- [x] Create "Subscription Required" page that blocks all access after trial expires
+- [x] Add subscription status check middleware to all protected routes
+- [x] Build subscription page with license quantity selector (default 5)
+- [x] Integrate Stripe Checkout for monthly/yearly billing
+- [x] Handle subscription webhook events (payment success, failure, cancellation)
+- [x] Redirect expired trial users to subscription page (non-dismissible)
+- [x] Restore access after successful payment
+- [ ] Test complete subscription flow end-to-end
