@@ -103,7 +103,8 @@ export async function startFreeTrial(tenantId: number): Promise<void> {
   const db = await requireDb();
   const trialEndsAtDate = new Date();
   trialEndsAtDate.setDate(trialEndsAtDate.getDate() + 30); // 30 days trial
-  const trialEndsAt = trialEndsAtDate.toISOString();
+  // Convert to MySQL datetime format: 'YYYY-MM-DD HH:MM:SS'
+  const trialEndsAt = trialEndsAtDate.toISOString().slice(0, 19).replace('T', ' ');
 
   // Check if subscription already exists
   const [existing] = await db.select().from(tenantSubscriptions).where(eq(tenantSubscriptions.tenantId, tenantId));
@@ -496,7 +497,7 @@ export const subscriptionRouter = router({
 
       await db.update(tenantSubscriptions).set({
         cancelAtPeriodEnd: input.cancelImmediately ? 0 : 1,
-        canceledAt: input.cancelImmediately ? new Date().toISOString() : null,
+        canceledAt: input.cancelImmediately ? new Date().toISOString().slice(0, 19).replace('T', ' ') : null,
         status: input.cancelImmediately ? "canceled" : subscription.status,
       }).where(eq(tenantSubscriptions.tenantId, ctx.user.tenantId));
 
@@ -560,7 +561,7 @@ export const subscriptionRouter = router({
         .where(and(eq(userLicenses.id, input.licenseId), eq(userLicenses.tenantId, ctx.user.tenantId), isNull(userLicenses.userId), eq(userLicenses.isActive, 1)));
       if (!license) throw new TRPCError({ code: "BAD_REQUEST", message: "License not available" });
 
-      await db.update(userLicenses).set({ userId: input.userId, assignedAt: new Date().toISOString(), assignedById: ctx.user.id }).where(eq(userLicenses.id, input.licenseId));
+      await db.update(userLicenses).set({ userId: input.userId, assignedAt: new Date().toISOString().slice(0, 19).replace('T', ' '), assignedById: ctx.user.id }).where(eq(userLicenses.id, input.licenseId));
       return { success: true };
     }),
 
@@ -681,7 +682,7 @@ export const subscriptionRouter = router({
 
       // Assign the license
       await db.update(userLicenses)
-        .set({ userId: input.userId, assignedAt: new Date().toISOString(), assignedById: ctx.user.id })
+        .set({ userId: input.userId, assignedAt: new Date().toISOString().slice(0, 19).replace('T', ' '), assignedById: ctx.user.id })
         .where(eq(userLicenses.id, availableLicense.id));
 
       return { success: true, licenseId: availableLicense.id };

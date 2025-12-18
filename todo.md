@@ -2726,3 +2726,8 @@
 - [x] Fix super admin license display - should show Licensed/Unlicensed not N/A
 - [x] Fix license count - should be 2 of 5 available (3 users, only 1 licensed)
 
+
+## BUG: Registration Failing with 'Already Registered' Error
+- [x] Fix trialEndsAt datetime format - using ISO 8601 instead of MySQL format
+- [x] Convert trialEndsAt to MySQL datetime format in startFreeTrial function
+- [ ] Test registration flow end-to-end

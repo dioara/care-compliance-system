@@ -136,10 +136,10 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     stripeSubscriptionId: subscription.id,
     status,
     licensesCount: quantity,
-    currentPeriodStart: new Date(sub.current_period_start * 1000).toISOString(),
-    currentPeriodEnd: new Date(sub.current_period_end * 1000).toISOString(),
+    currentPeriodStart: new Date(sub.current_period_start * 1000).toISOString().slice(0, 19).replace('T', ' '),
+    currentPeriodEnd: new Date(sub.current_period_end * 1000).toISOString().slice(0, 19).replace('T', ' '),
     cancelAtPeriodEnd: subscription.cancel_at_period_end ? 1 : 0,
-    canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString() : null,
+    canceledAt: subscription.canceled_at ? new Date(subscription.canceled_at * 1000).toISOString().slice(0, 19).replace('T', ' ') : null,
   }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
 
   console.log(`[Stripe Webhook] Updated subscription for tenant ${tenantSub.tenantId}: status=${status}, licenses=${quantity}`);
@@ -154,8 +154,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     return;
   }
 
-  await db.update(tenantSubscriptions).set({ status: "canceled", canceledAt: new Date().toISOString() }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
-  await db.update(userLicenses).set({ isActive: 0, deactivatedAt: new Date().toISOString() }).where(eq(userLicenses.tenantId, tenantSub.tenantId));
+  await db.update(tenantSubscriptions).set({ status: "canceled", canceledAt: new Date().toISOString().slice(0, 19).replace('T', ' ') }).where(eq(tenantSubscriptions.tenantId, tenantSub.tenantId));
+  await db.update(userLicenses).set({ isActive: 0, deactivatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ') }).where(eq(userLicenses.tenantId, tenantSub.tenantId));
   console.log(`[Stripe Webhook] Subscription canceled for tenant ${tenantSub.tenantId}`);
 }
 
