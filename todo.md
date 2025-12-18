@@ -2502,3 +2502,8 @@
 - [x] Update primary colour to #1F7AE0
 - [x] Update Help Center to clean grey/white backgrounds
 - [x] British spelling verified in Help Center content
+
+## Login Page & Colour Scheme Updates
+- [x] Update login page text from "Continue to launch the login flow" to clearer message
+- [x] Apply #1F7AE0 blue colour scheme to dashboard sidebar
+- [x] Apply clean colour scheme to dashboard pages

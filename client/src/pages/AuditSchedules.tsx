@@ -155,7 +155,7 @@ export default function AuditSchedules() {
     const colors: Record<string, string> = {
       daily: "bg-blue-100 text-blue-800",
       weekly: "bg-green-100 text-green-800",
-      monthly: "bg-purple-100 text-purple-800",
+      monthly: "bg-blue-100 text-blue-800",
       quarterly: "bg-orange-100 text-orange-800",
       annually: "bg-red-100 text-red-800",
     };

@@ -40,12 +40,12 @@ export default function Login() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#1F7AE0] to-[#1a6bc7] relative overflow-hidden">
         {/* Decorative Elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-indigo-400/15 rounded-full blur-2xl" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-[#1F7AE0]/20 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/3 w-64 h-64 bg-[#1F7AE0]/15 rounded-full blur-2xl" />
         </div>
         
         {/* Grid Pattern */}
@@ -139,7 +139,7 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="w-14 h-14 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-14 h-14 bg-gradient-to-br bg-[#1F7AE0] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
               <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2L4 6V12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12V6L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -174,7 +174,7 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={isLoading}
-                  className="pl-10 h-12 bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500"
+                  className="pl-10 h-12 bg-white border-gray-200 focus:border-[#1F7AE0] focus:ring-[#1F7AE0]"
                 />
               </div>
             </div>
@@ -184,7 +184,7 @@ export default function Login() {
                 <Label htmlFor="password" className="text-sm font-medium text-gray-700">
                   Password
                 </Label>
-                <button type="button" onClick={() => setLocation("/forgot-password")} className="text-sm text-violet-600 hover:text-violet-700 font-medium">
+                <button type="button" onClick={() => setLocation("/forgot-password")} className="text-sm text-[#1F7AE0] hover:text-[#1a6bc7] font-medium">
                   Forgot password?
                 </button>
               </div>
@@ -203,7 +203,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
-                  className="pl-10 pr-10 h-12 bg-white border-gray-200 focus:border-violet-500 focus:ring-violet-500"
+                  className="pl-10 pr-10 h-12 bg-white border-gray-200 focus:border-[#1F7AE0] focus:ring-[#1F7AE0]"
                 />
                 <button
                   type="button"
@@ -227,7 +227,7 @@ export default function Login() {
 
             <Button 
               type="submit" 
-              className="w-full h-12 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-violet-500/30 transition-all duration-200" 
+              className="w-full h-12 bg-[#1F7AE0] hover:bg-[#1a6bc7] text-white font-semibold shadow-lg shadow-[#1F7AE0]/30 transition-all duration-200" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -307,7 +307,7 @@ export default function Login() {
           <button
             onClick={() => setLocation("/register")}
             disabled={isLoading}
-            className="w-full h-12 border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-violet-300 hover:bg-violet-50 transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full h-12 border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 transition-all duration-200 flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M16 21V19C16 16.7909 14.2091 15 12 15H5C2.79086 15 1 16.7909 1 19V21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -320,9 +320,9 @@ export default function Login() {
           {/* Footer */}
           <p className="mt-8 text-center text-sm text-gray-500">
             By signing in, you agree to our{" "}
-            <a href="#" className="text-violet-600 hover:underline">Terms of Service</a>
+            <a href="#" className="text-[#1F7AE0] hover:underline">Terms of Service</a>
             {" "}and{" "}
-            <a href="#" className="text-violet-600 hover:underline">Privacy Policy</a>
+            <a href="#" className="text-[#1F7AE0] hover:underline">Privacy Policy</a>
           </p>
         </div>
       </div>

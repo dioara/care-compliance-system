@@ -119,7 +119,7 @@ export default function Audits() {
     const statusConfig = {
       in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-800", icon: Clock },
       completed: { label: "Completed", color: "bg-green-100 text-green-800", icon: CheckCircle2 },
-      reviewed: { label: "Reviewed", color: "bg-purple-100 text-purple-800", icon: FileText },
+      reviewed: { label: "Reviewed", color: "bg-blue-100 text-blue-800", icon: FileText },
       archived: { label: "Archived", color: "bg-gray-100 text-gray-800", icon: FileText },
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.in_progress;
