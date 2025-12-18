@@ -21,7 +21,29 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Building2, MapPin, ClipboardCheck, ClipboardList, Brain, AlertTriangle, FileText, Heart, UserCheck, BarChart3, Shield, UserCog, Settings, Mail, ChevronRight, Moon, Sun, CreditCard, Menu, Calendar, Bug } from "lucide-react";
+import { LogOut, Moon, Sun, ChevronRight } from "lucide-react";
+import { 
+  SquaresFour, 
+  Users, 
+  Buildings, 
+  MapPin, 
+  ClipboardText, 
+  ListChecks, 
+  Brain, 
+  Warning, 
+  FileText, 
+  HeartStraight, 
+  UserCheck, 
+  ChartBar, 
+  ShieldCheck, 
+  UserGear, 
+  Gear, 
+  EnvelopeSimple, 
+  CreditCard, 
+  List, 
+  CalendarBlank, 
+  Bug 
+} from "@phosphor-icons/react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 // LocationSwitcher removed from header per user request
@@ -68,28 +90,28 @@ function ThemeToggleItem() {
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/", description: "Overview & metrics" },
-  { icon: Heart, label: "Service Users", path: "/service-users", description: "Manage residents" },
+  { icon: SquaresFour, label: "Dashboard", path: "/", description: "Overview & metrics" },
+  { icon: HeartStraight, label: "Service Users", path: "/service-users", description: "Manage residents" },
   { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
-  { icon: ClipboardList, label: "Audits", path: "/audits", description: "Compliance audits" },
-  { icon: Calendar, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track" },
+  { icon: ListChecks, label: "Audits", path: "/audits", description: "Compliance audits" },
+  { icon: CalendarBlank, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track" },
   { icon: FileText, label: "Audit History", path: "/audit-history", description: "View all audits" },
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
-  { icon: AlertTriangle, label: "Incidents", path: "/incidents", description: "Track incidents" },
-  { icon: BarChart3, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends" },
+  { icon: Warning, label: "Incidents", path: "/incidents", description: "Track incidents" },
+  { icon: ChartBar, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends" },
   // { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" }, // Hidden until feature is defined
-  { icon: ClipboardCheck, label: "Action Log", path: "/action-log", description: "Track actions" },
+  { icon: ClipboardText, label: "Action Log", path: "/action-log", description: "Track actions" },
 ];
 
 // Admin-only menu items (shown only to super admins)
 const adminMenuItems = [
-  { icon: LayoutDashboard, label: "Admin Dashboard", path: "/admin-dashboard" },
-  { icon: Building2, label: "Company Profile", path: "/company-profile" },
+  { icon: SquaresFour, label: "Admin Dashboard", path: "/admin-dashboard" },
+  { icon: Buildings, label: "Company Profile", path: "/company-profile" },
   { icon: MapPin, label: "Locations", path: "/locations" },
-  { icon: Shield, label: "Role Management", path: "/role-management" },
-  { icon: UserCog, label: "User Management", path: "/user-management" },
+  { icon: ShieldCheck, label: "Role Management", path: "/role-management" },
+  { icon: UserGear, label: "User Management", path: "/user-management" },
   { icon: CreditCard, label: "Subscription", path: "/admin/subscription" },
-  { icon: Mail, label: "Email Settings", path: "/email-settings" },
+  { icon: EnvelopeSimple, label: "Email Settings", path: "/email-settings" },
   { icon: Bug, label: "Error Monitoring", path: "/admin/error-monitoring" },
 ];
 
@@ -270,7 +292,7 @@ function DashboardLayoutContent({
                     className="h-9 w-9 flex items-center justify-center hover:bg-primary/10 rounded-xl transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0 group"
                     aria-label="Toggle navigation"
                   >
-                    <PanelLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <List className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" weight="bold" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="right">
@@ -354,7 +376,7 @@ function DashboardLayoutContent({
                   onClick={() => setLocation("/settings")}
                   className="cursor-pointer"
                 >
-                  <Settings className="mr-2 h-4 w-4" />
+                  <Gear className="mr-2 h-4 w-4" weight="bold" />
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
