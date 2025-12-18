@@ -226,10 +226,10 @@ export async function getUsersByTenant(tenantId: number) {
   // Create a set of user IDs that have licenses
   const licensedUserIds = new Set(activeLicenses.filter(l => l.userId).map(l => l.userId));
   
-  // Add hasLicense field to each user
+  // Add hasLicense field to each user - ALL users need licenses including super admins
   return allUsers.map(user => ({
     ...user,
-    hasLicense: Boolean(user.superAdmin === 1) || licensedUserIds.has(user.id)
+    hasLicense: licensedUserIds.has(user.id)
   }));
 }
 

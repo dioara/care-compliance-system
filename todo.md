@@ -2721,3 +2721,8 @@
 - [x] Update wording to remove no license required for super admins
 - [x] Add Lampstand Consulting link to https://lampstand.consulting
 
+
+## Bug Fixes - Dec 18 (continued)
+- [x] Fix super admin license display - should show Licensed/Unlicensed not N/A
+- [x] Fix license count - should be 2 of 5 available (3 users, only 1 licensed)
+

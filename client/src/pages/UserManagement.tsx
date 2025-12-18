@@ -76,23 +76,21 @@ export default function UserManagement() {
       return;
     }
     
-    // Check license availability before creating non-super-admin users
-    if (!formData.superAdmin) {
-      const hasAvailableLicense = licenseInfo && licenseInfo.availableLicenses > 0;
-      
-      if (!hasAvailableLicense) {
-        // Store the pending user data and show license warning
-        setPendingUserData({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          superAdmin: formData.superAdmin,
-          roleIds: createRoleIds,
-        });
-        setIsCreateOpen(false);
-        setIsLicenseWarningOpen(true);
-        return;
-      }
+    // Check license availability before creating ANY user (all users need licenses)
+    const hasAvailableLicense = licenseInfo && licenseInfo.availableLicenses > 0;
+    
+    if (!hasAvailableLicense) {
+      // Store the pending user data and show license warning
+      setPendingUserData({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        superAdmin: formData.superAdmin,
+        roleIds: createRoleIds,
+      });
+      setIsCreateOpen(false);
+      setIsLicenseWarningOpen(true);
+      return;
     }
     
     await createUserWithLicense();
@@ -113,7 +111,7 @@ export default function UserManagement() {
         email: userData.email,
         password: userData.password,
         superAdmin: userData.superAdmin,
-        assignLicense: !userData.superAdmin && !skipLicenseAssignment,
+        assignLicense: !skipLicenseAssignment, // All users need licenses, including super admins
       });
       
       // Assign roles if any selected
@@ -121,7 +119,7 @@ export default function UserManagement() {
         await assignRoles.mutateAsync({ userId: newUser.id, roleIds });
       }
       
-      toast.success("User created successfully" + (!userData.superAdmin && !skipLicenseAssignment ? " and license assigned" : ""));
+      toast.success("User created successfully" + (!skipLicenseAssignment ? " and license assigned" : ""));
       setIsCreateOpen(false);
       setIsLicenseWarningOpen(false);
       resetForm();
@@ -553,9 +551,7 @@ export default function UserManagement() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {user.superAdmin ? (
-                          <span className="text-xs text-muted-foreground">N/A</span>
-                        ) : user.hasLicense ? (
+                        {user.hasLicense ? (
                           <Badge variant="outline" className="text-green-600 border-green-600">
                             <CheckCircle className="mr-1 h-3 w-3" weight="bold" />
                             Licensed
@@ -569,27 +565,25 @@ export default function UserManagement() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {!user.superAdmin && (
-                            user.hasLicense ? (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUnassignLicense(user.id)}
-                                title="Remove License"
-                              >
-                                <Ticket className="h-4 w-4 text-red-500" weight="bold" />
-                              </Button>
-                            ) : (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleAssignLicense(user.id)}
-                                title="Assign License"
-                                disabled={!subscription?.licenseStats?.unassigned}
-                              >
-                                <Ticket className="h-4 w-4 text-green-500" weight="bold" />
-                              </Button>
-                            )
+                          {user.hasLicense ? (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUnassignLicense(user.id)}
+                              title="Remove License"
+                            >
+                              <Ticket className="h-4 w-4 text-red-500" weight="bold" />
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleAssignLicense(user.id)}
+                              title="Assign License"
+                              disabled={!subscription?.licenseStats?.unassigned}
+                            >
+                              <Ticket className="h-4 w-4 text-green-500" weight="bold" />
+                            </Button>
                           )}
                           {!user.superAdmin && (
                             <Button

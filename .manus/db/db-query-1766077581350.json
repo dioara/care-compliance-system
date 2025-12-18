@@ -1,0 +1,55 @@
+{
+  "query": "SELECT ul.id, ul.tenantId, ul.userId, ul.isActive, u.name, u.email, u.superAdmin \nFROM userLicenses ul \nLEFT JOIN users u ON ul.userId = u.id \nWHERE ul.tenantId = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT ul.id, ul.tenantId, ul.userId, ul.isActive, u.name, u.email, u.superAdmin \nFROM userLicenses ul \nLEFT JOIN users u ON ul.userId = u.id \nWHERE ul.tenantId = 1;",
+  "rows": [
+    {
+      "id": "1",
+      "tenantId": "1",
+      "userId": "NULL",
+      "isActive": "1",
+      "name": "NULL",
+      "email": "NULL",
+      "superAdmin": "NULL"
+    },
+    {
+      "id": "2",
+      "tenantId": "1",
+      "userId": "NULL",
+      "isActive": "1",
+      "name": "NULL",
+      "email": "NULL",
+      "superAdmin": "NULL"
+    },
+    {
+      "id": "3",
+      "tenantId": "1",
+      "userId": "NULL",
+      "isActive": "1",
+      "name": "NULL",
+      "email": "NULL",
+      "superAdmin": "NULL"
+    },
+    {
+      "id": "4",
+      "tenantId": "1",
+      "userId": "NULL",
+      "isActive": "1",
+      "name": "NULL",
+      "email": "NULL",
+      "superAdmin": "NULL"
+    },
+    {
+      "id": "5",
+      "tenantId": "1",
+      "userId": "NULL",
+      "isActive": "1",
+      "name": "NULL",
+      "email": "NULL",
+      "superAdmin": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttenantId\tuserId\tisActive\tname\temail\tsuperAdmin\n1\t1\tNULL\t1\tNULL\tNULL\tNULL\n2\t1\tNULL\t1\tNULL\tNULL\tNULL\n3\t1\tNULL\t1\tNULL\tNULL\tNULL\n4\t1\tNULL\t1\tNULL\tNULL\tNULL\n5\t1\tNULL\t1\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 150
+}
