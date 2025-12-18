@@ -984,10 +984,12 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ input }) => {
+        // Convert to MySQL datetime format (YYYY-MM-DD HH:MM:SS)
+        const completedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
         await db.updateAuditInstanceStatus(
           input.id,
           'completed',
-          new Date().toISOString(),
+          completedAt,
           input.overallScore,
           input.summary,
           input.recommendations

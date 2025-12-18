@@ -2651,3 +2651,8 @@
 - [x] Fixed isAuditInPast variable being used before auditInstance was defined
 - [x] Moved isAuditInPast calculation after auditInstance query hook
 - [x] Tested conduct audit page loads correctly
+
+
+## Fix Complete Audit DateTime Error (December 18, 2025)
+- [x] Fixed MySQL datetime format error in completeAudit mutation
+- [x] Converted ISO 8601 format to MySQL format (YYYY-MM-DD HH:MM:SS)
