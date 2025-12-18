@@ -3,7 +3,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import { cn } from "@/lib/utils";
 import DOMPurify from 'dompurify';
-import { Bold, Italic, List, ListOrdered, Undo, Redo } from 'lucide-react';
+import { TextB, TextItalic, ListBullets, ListNumbers, ArrowCounterClockwise, ArrowClockwise } from '@phosphor-icons/react';
 import { Button } from './button';
 
 interface RichTextEditorProps {
@@ -56,7 +56,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={cn('h-8 w-8 p-0', editor.isActive('bold') && 'bg-muted')}
         >
-          <Bold className="h-4 w-4" />
+          <TextB className="h-4 w-4" weight="bold" />
         </Button>
         <Button
           type="button"
@@ -65,7 +65,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={cn('h-8 w-8 p-0', editor.isActive('italic') && 'bg-muted')}
         >
-          <Italic className="h-4 w-4" />
+          <TextItalic className="h-4 w-4" weight="bold" />
         </Button>
         <div className="w-px h-5 bg-border/50 mx-1" />
         <Button
@@ -75,7 +75,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={cn('h-8 w-8 p-0', editor.isActive('bulletList') && 'bg-muted')}
         >
-          <List className="h-4 w-4" />
+          <ListBullets className="h-4 w-4" weight="bold" />
         </Button>
         <Button
           type="button"
@@ -84,7 +84,7 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={cn('h-8 w-8 p-0', editor.isActive('orderedList') && 'bg-muted')}
         >
-          <ListOrdered className="h-4 w-4" />
+          <ListNumbers className="h-4 w-4" weight="bold" />
         </Button>
         <div className="flex-1" />
         <Button
@@ -95,7 +95,7 @@ export function RichTextEditor({
           disabled={!editor.can().undo()}
           className="h-8 w-8 p-0"
         >
-          <Undo className="h-4 w-4" />
+          <ArrowCounterClockwise className="h-4 w-4" weight="bold" />
         </Button>
         <Button
           type="button"
@@ -105,7 +105,7 @@ export function RichTextEditor({
           disabled={!editor.can().redo()}
           className="h-8 w-8 p-0"
         >
-          <Redo className="h-4 w-4" />
+          <ArrowClockwise className="h-4 w-4" weight="bold" />
         </Button>
       </div>
       

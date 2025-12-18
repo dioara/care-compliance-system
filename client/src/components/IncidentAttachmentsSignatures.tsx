@@ -9,9 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Paperclip, Upload, Trash2, Image, FileText, File, Loader2, 
-  PenTool, CheckCircle, X, Download, Eye
-} from "lucide-react";
+  Paperclip, UploadSimple, Trash, Image, FileText, File, 
+  PenNib, CheckCircle, X, DownloadSimple, Eye, Spinner
+} from "@phosphor-icons/react";
 import { toast } from "sonner";
 
 interface IncidentAttachmentsSignaturesProps {
@@ -92,9 +92,9 @@ export function IncidentAttachments({ incidentId, incidentStatus }: IncidentAtta
   };
   
   const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) return <Image className="h-4 w-4" />;
-    if (fileType === 'application/pdf') return <FileText className="h-4 w-4" />;
-    return <File className="h-4 w-4" />;
+    if (fileType.startsWith('image/')) return <Image className="h-4 w-4" weight="bold" />;
+    if (fileType === 'application/pdf') return <FileText className="h-4 w-4" weight="bold" />;
+    return <File className="h-4 w-4" weight="bold" />;
   };
   
   const formatFileSize = (bytes: number) => {
@@ -109,7 +109,7 @@ export function IncidentAttachments({ incidentId, incidentStatus }: IncidentAtta
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
-          <Paperclip className="h-4 w-4" />
+          <Paperclip className="h-4 w-4" weight="bold" />
           Attachments
         </CardTitle>
         <CardDescription>Photos and supporting documents</CardDescription>
@@ -140,9 +140,9 @@ export function IncidentAttachments({ incidentId, incidentStatus }: IncidentAtta
                 disabled={isUploading}
               >
                 {isUploading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Spinner className="mr-2 h-4 w-4 animate-spin" weight="bold" />
                 ) : (
-                  <Upload className="mr-2 h-4 w-4" />
+                  <UploadSimple className="mr-2 h-4 w-4" weight="bold" />
                 )}
                 {isUploading ? "Uploading..." : "Upload File"}
               </Button>
@@ -195,9 +195,9 @@ export function IncidentAttachments({ incidentId, incidentStatus }: IncidentAtta
                     onClick={() => window.open(attachment.fileUrl, '_blank')}
                   >
                     {attachment.fileType.startsWith('image/') ? (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4" weight="bold" />
                     ) : (
-                      <Download className="h-4 w-4" />
+                      <DownloadSimple className="h-4 w-4" weight="bold" />
                     )}
                   </Button>
                   {canEdit && (
@@ -212,7 +212,7 @@ export function IncidentAttachments({ incidentId, incidentStatus }: IncidentAtta
                       }}
                       disabled={deleteMutation.isPending}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash className="h-4 w-4" weight="bold" />
                     </Button>
                   )}
                 </div>
@@ -389,7 +389,7 @@ export function IncidentSignatures({ incidentId, incidentStatus }: IncidentAttac
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
-            <PenTool className="h-4 w-4" />
+            <PenNib className="h-4 w-4" weight="bold" />
             Digital Signatures
           </CardTitle>
           <CardDescription>Sign off on this incident report</CardDescription>
@@ -406,7 +406,7 @@ export function IncidentSignatures({ incidentId, incidentStatus }: IncidentAttac
                 setTimeout(initCanvas, 100);
               }}
             >
-              <PenTool className="mr-2 h-4 w-4" />
+              <PenNib className="mr-2 h-4 w-4" weight="bold" />
               Add Signature
             </Button>
           )}
@@ -429,7 +429,7 @@ export function IncidentSignatures({ incidentId, incidentStatus }: IncidentAttac
                         {getSignatureTypeLabel(signature.signatureType)}
                       </Badge>
                     </div>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <CheckCircle className="h-4 w-4 text-green-600" weight="bold" />
                   </div>
                   <div className="flex items-center gap-3">
                     <img
@@ -564,7 +564,7 @@ export function IncidentSignatures({ incidentId, incidentStatus }: IncidentAttac
               disabled={addSignatureMutation.isPending}
             >
               {addSignatureMutation.isPending ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Spinner className="mr-2 h-4 w-4 animate-spin" weight="bold" />
               ) : (
                 <CheckCircle className="mr-2 h-4 w-4" />
               )}

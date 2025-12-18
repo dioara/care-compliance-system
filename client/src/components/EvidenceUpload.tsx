@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Upload, X, FileText, Image as ImageIcon } from "lucide-react";
+import { UploadSimple, X, FileText, Image as ImageIcon } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
 interface EvidenceUploadProps {
@@ -98,9 +98,9 @@ export function EvidenceUpload({ auditInstanceId, questionId, onUploadComplete }
 
   const getFileIcon = (file: File) => {
     if (file.type.startsWith("image/")) {
-      return <ImageIcon className="h-8 w-8 text-blue-500" />;
+      return <ImageIcon className="h-8 w-8 text-blue-500" weight="bold" />;
     }
-    return <FileText className="h-8 w-8 text-gray-500" />;
+    return <FileText className="h-8 w-8 text-gray-500" weight="bold" />;
   };
 
   return (
@@ -117,7 +117,7 @@ export function EvidenceUpload({ auditInstanceId, questionId, onUploadComplete }
             disabled={uploading}
           />
           <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
-            <Upload className="h-4 w-4 mr-2" />
+            <UploadSimple className="h-4 w-4 mr-2" weight="bold" />
             {uploading ? "Uploading..." : "Upload"}
           </Button>
         </div>
@@ -148,7 +148,7 @@ export function EvidenceUpload({ auditInstanceId, questionId, onUploadComplete }
                     }
                   }}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" weight="bold" />
                 </Button>
               )}
             </div>

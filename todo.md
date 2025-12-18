@@ -2559,3 +2559,28 @@
 - [x] Migrate remaining page components
 - [x] Migrate shared components and dialogs (DashboardLayout, GlobalSearch, NotificationCenter, QuickActions, TrialBanner, Breadcrumb)
 - [x] Test all icon changes
+
+## Migrate Remaining Dialogs and Modals to Phosphor Icons
+- [ ] Search for all Lucide icon imports in components folder
+- [ ] Migrate dialog and modal components to Phosphor Icons
+- [ ] Test all icon changes
+
+
+
+## Migrate Remaining Dialogs and Modals to Phosphor Icons
+- [x] Search for all Lucide icon imports in components folder
+- [x] Migrate AIChatBox.tsx to Phosphor Icons
+- [x] Migrate IncidentAttachmentsSignatures.tsx to Phosphor Icons
+- [x] Migrate ui/context-menu.tsx to Phosphor Icons
+- [x] Migrate ui/input-otp.tsx to Phosphor Icons
+- [x] Migrate ui/menubar.tsx to Phosphor Icons
+- [x] Migrate ui/navigation-menu.tsx to Phosphor Icons
+- [x] Migrate ui/pagination.tsx to Phosphor Icons
+- [x] Migrate ui/radio-group.tsx to Phosphor Icons
+- [x] Migrate ui/resizable.tsx to Phosphor Icons
+- [x] Migrate ui/rich-text-editor.tsx to Phosphor Icons
+- [x] Migrate ui/spinner.tsx to Phosphor Icons
+- [x] Migrate ui/sheet.tsx to Phosphor Icons
+- [x] Migrate ui/sidebar.tsx to Phosphor Icons
+- [x] Verify no Lucide imports remain in components folder
+- [ ] Note: 33 pages still have Lucide imports (separate migration task)

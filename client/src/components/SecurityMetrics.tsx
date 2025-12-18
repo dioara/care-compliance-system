@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, AlertTriangle, RefreshCw, Clock } from "lucide-react";
+import { Shield, Warning, ArrowsClockwise, Clock } from "@phosphor-icons/react";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 
@@ -24,7 +24,7 @@ export function SecurityMetrics() {
     return (
       <Card className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Shield className="h-5 w-5 text-primary" />
+          <Shield className="h-5 w-5 text-primary" weight="bold" />
           <h3 className="text-lg font-semibold">Security Metrics</h3>
         </div>
         <div className="space-y-3">
@@ -40,7 +40,7 @@ export function SecurityMetrics() {
     return (
       <Card className="p-6">
         <div className="flex items-center gap-3 mb-4">
-          <Shield className="h-5 w-5 text-primary" />
+          <Shield className="h-5 w-5 text-primary" weight="bold" />
           <h3 className="text-lg font-semibold">Security Metrics</h3>
         </div>
         <p className="text-sm text-muted-foreground">No security data available</p>
@@ -52,7 +52,7 @@ export function SecurityMetrics() {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <Shield className="h-5 w-5 text-primary" />
+          <Shield className="h-5 w-5 text-primary" weight="bold" />
           <h3 className="text-lg font-semibold">Security Metrics</h3>
         </div>
         <Button
@@ -61,7 +61,7 @@ export function SecurityMetrics() {
           onClick={handleRefresh}
           className="h-8 w-8 p-0"
         >
-          <RefreshCw className="h-4 w-4" />
+          <ArrowsClockwise className="h-4 w-4" weight="bold" />
         </Button>
       </div>
 
@@ -76,7 +76,7 @@ export function SecurityMetrics() {
                 ? "bg-yellow-500/10 text-yellow-600"
                 : "bg-green-500/10 text-green-600"
             }`}>
-              <AlertTriangle className="h-4 w-4" />
+              <Warning className="h-4 w-4" weight="bold" />
             </div>
             <div>
               <p className="text-sm font-medium">Failed Login Attempts</p>
@@ -102,7 +102,7 @@ export function SecurityMetrics() {
                 ? "bg-destructive/10 text-destructive" 
                 : "bg-green-500/10 text-green-600"
             }`}>
-              <Shield className="h-4 w-4" />
+              <Shield className="h-4 w-4" weight="bold" />
             </div>
             <div>
               <p className="text-sm font-medium">Suspicious IPs Blocked</p>
@@ -136,7 +136,7 @@ export function SecurityMetrics() {
         <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-primary/10 text-primary">
-              <Clock className="h-4 w-4" />
+              <Clock className="h-4 w-4" weight="bold" />
             </div>
             <div>
               <p className="text-sm font-medium">Recent Security Events</p>

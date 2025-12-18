@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Loader2, Send, CheckCircle2 } from "lucide-react";
+import { Spinner, PaperPlaneTilt, CheckCircle } from "@phosphor-icons/react";
 
 interface ContactSupportModalProps {
   open: boolean;
@@ -72,7 +72,7 @@ export function ContactSupportModal({ open, onOpenChange }: ContactSupportModalP
         {submitted ? (
           <div className="py-8 text-center">
             <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <CheckCircle className="h-8 w-8 text-green-600" weight="bold" />
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">Ticket Created!</h3>
             <p className="text-gray-600">
@@ -193,12 +193,12 @@ export function ContactSupportModal({ open, onOpenChange }: ContactSupportModalP
                 >
                   {createTicket.isPending ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <Spinner className="h-4 w-4 animate-spin" weight="bold" />
                       Submitting...
                     </>
                   ) : (
                     <>
-                      <Send className="h-4 w-4" />
+                      <PaperPlaneTilt className="h-4 w-4" weight="bold" />
                       Submit Ticket
                     </>
                   )}

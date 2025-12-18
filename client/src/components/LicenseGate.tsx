@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Lock, Mail } from "lucide-react";
+import { Warning, Lock, Envelope } from "@phosphor-icons/react";
 import { useLocation } from "wouter";
 
 interface LicenseGateProps {
@@ -45,7 +45,7 @@ export function LicenseGate({ children, fallback }: LicenseGateProps) {
       <Card className="max-w-md w-full">
         <CardHeader className="text-center">
           <div className="mx-auto w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
-            <Lock className="h-6 w-6 text-orange-600" />
+            <Lock className="h-6 w-6 text-orange-600" weight="bold" />
           </div>
           <CardTitle className="text-xl">License Required</CardTitle>
           <CardDescription>
@@ -54,7 +54,7 @@ export function LicenseGate({ children, fallback }: LicenseGateProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert variant="default" className="border-orange-200 bg-orange-50">
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
+            <Warning className="h-4 w-4 text-orange-600" weight="bold" />
             <AlertTitle className="text-orange-800">No License Assigned</AlertTitle>
             <AlertDescription className="text-orange-700">
               {licenseStatus?.reason || "Please contact your administrator to assign a license to your account."}
@@ -80,7 +80,7 @@ export function LicenseGate({ children, fallback }: LicenseGateProps) {
               className="w-full text-muted-foreground"
               onClick={() => window.location.href = "mailto:support@example.com?subject=License Request"}
             >
-              <Mail className="h-4 w-4 mr-2" />
+              <Envelope className="h-4 w-4 mr-2" weight="bold" />
               Contact Support
             </Button>
           </div>

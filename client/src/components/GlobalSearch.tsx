@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { MagnifyingGlass, Users, Warning, ClipboardText } from "@phosphor-icons/react";
+import { Spinner, MagnifyingGlass, Users, Warning, ClipboardText } from "@phosphor-icons/react";
 import { useLocation } from "wouter";
 import {
   CommandDialog,
@@ -93,7 +92,7 @@ export function GlobalSearch() {
         <CommandList>
           {isLoading && (
             <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <Spinner className="h-6 w-6 animate-spin text-muted-foreground" weight="bold" />
             </div>
           )}
           

@@ -3,16 +3,16 @@ import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
 import { 
-  Bold, 
-  Italic, 
-  List, 
-  ListOrdered, 
-  Quote, 
-  Undo, 
-  Redo,
+  TextB, 
+  TextItalic, 
+  ListBullets, 
+  ListNumbers, 
+  Quotes, 
+  ArrowCounterClockwise, 
+  ArrowClockwise,
   Link as LinkIcon,
-  Heading2
-} from 'lucide-react';
+  TextHTwo
+} from '@phosphor-icons/react';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
 
@@ -101,7 +101,7 @@ export function RichTextEditor({
           )}
           title="Bold"
         >
-          <Bold className="h-4 w-4" />
+          <TextB className="h-4 w-4" weight="bold" />
         </Button>
         
         <Button
@@ -115,7 +115,7 @@ export function RichTextEditor({
           )}
           title="Italic"
         >
-          <Italic className="h-4 w-4" />
+          <TextItalic className="h-4 w-4" weight="bold" />
         </Button>
 
         <Button
@@ -129,7 +129,7 @@ export function RichTextEditor({
           )}
           title="Heading"
         >
-          <Heading2 className="h-4 w-4" />
+          <TextHTwo className="h-4 w-4" weight="bold" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -145,7 +145,7 @@ export function RichTextEditor({
           )}
           title="Bullet List"
         >
-          <List className="h-4 w-4" />
+          <ListBullets className="h-4 w-4" weight="bold" />
         </Button>
 
         <Button
@@ -159,7 +159,7 @@ export function RichTextEditor({
           )}
           title="Numbered List"
         >
-          <ListOrdered className="h-4 w-4" />
+          <ListNumbers className="h-4 w-4" weight="bold" />
         </Button>
 
         <Button
@@ -173,7 +173,7 @@ export function RichTextEditor({
           )}
           title="Quote"
         >
-          <Quote className="h-4 w-4" />
+          <Quotes className="h-4 w-4" weight="bold" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -189,7 +189,7 @@ export function RichTextEditor({
           )}
           title="Add Link"
         >
-          <LinkIcon className="h-4 w-4" />
+          <LinkIcon className="h-4 w-4" weight="bold" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -203,7 +203,7 @@ export function RichTextEditor({
           className="h-8 w-8 p-0"
           title="Undo"
         >
-          <Undo className="h-4 w-4" />
+          <ArrowCounterClockwise className="h-4 w-4" weight="bold" />
         </Button>
 
         <Button
@@ -215,7 +215,7 @@ export function RichTextEditor({
           className="h-8 w-8 p-0"
           title="Redo"
         >
-          <Redo className="h-4 w-4" />
+          <ArrowClockwise className="h-4 w-4" weight="bold" />
         </Button>
       </div>
 

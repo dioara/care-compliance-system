@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Lock } from "lucide-react";
+import { MapPin, Lock } from "@phosphor-icons/react";
 
 export function LocationSwitcher() {
   const { activeLocationId, setActiveLocationId, permissions, canWrite, isLoading } = useLocation();
@@ -29,7 +29,7 @@ export function LocationSwitcher() {
 
   return (
     <div className="flex items-center gap-1.5 sm:gap-2">
-      <MapPin className="h-4 w-4 text-muted-foreground hidden sm:block" />
+      <MapPin className="h-4 w-4 text-muted-foreground hidden sm:block" weight="bold" />
       <Select
         value={activeLocationId?.toString() || ""}
         onValueChange={(value) => setActiveLocationId(parseInt(value))}
@@ -45,7 +45,7 @@ export function LocationSwitcher() {
                 <div className="flex items-center justify-between w-full">
                   <span className="truncate">{location.name}</span>
                   {permission && !permission.canWrite && (
-                    <Lock className="h-3 w-3 ml-2 text-muted-foreground shrink-0" />
+                    <Lock className="h-3 w-3 ml-2 text-muted-foreground shrink-0" weight="bold" />
                   )}
                 </div>
               </SelectItem>
@@ -55,7 +55,7 @@ export function LocationSwitcher() {
       </Select>
       {activeLocation && !canWrite && (
         <Badge variant="secondary" className="text-xs hidden md:flex">
-          <Lock className="h-3 w-3 mr-1" />
+          <Lock className="h-3 w-3 mr-1" weight="bold" />
           Read Only
         </Badge>
       )}

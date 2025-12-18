@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { AlertCircle } from "lucide-react";
+import { WarningCircle } from "@phosphor-icons/react";
 
 interface ErrorReportDialogProps {
   error?: Error | null;
@@ -64,7 +64,7 @@ export function ErrorReportDialog({ error, errorMessage, trigger }: ErrorReportD
       <DialogTrigger asChild>
         {trigger || (
           <Button variant="outline" size="sm">
-            <AlertCircle className="h-4 w-4 mr-2" />
+            <WarningCircle className="h-4 w-4 mr-2" weight="bold" />
             Report Problem
           </Button>
         )}

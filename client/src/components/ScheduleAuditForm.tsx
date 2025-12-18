@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Spinner } from '@phosphor-icons/react';
 import { format } from 'date-fns';
 
 interface ScheduleAuditFormProps {
@@ -197,7 +197,7 @@ export function ScheduleAuditForm({ locationId, prefilledDate, onSuccess, onCanc
           Cancel
         </Button>
         <Button type="submit" disabled={!auditTypeId || !scheduledDate || scheduleMutation.isPending}>
-          {scheduleMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          {scheduleMutation.isPending && <Spinner className="h-4 w-4 mr-2 animate-spin" weight="bold" />}
           Schedule Audit
         </Button>
       </div>

@@ -3,10 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { 
-  LayoutDashboard, Heart, UserCheck, ClipboardList, AlertTriangle, 
-  ClipboardCheck, ChevronRight, ChevronLeft, X, Sparkles, CheckCircle2,
+  SquaresFour, Heart, UserCheck, ClipboardText, Warning, 
+  CheckSquare, CaretRight, CaretLeft, X, Sparkle, CheckCircle,
   Calendar, FileText, Brain, Shield, Bell
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
@@ -24,14 +24,14 @@ const tourSteps: TourStep[] = [
     id: "welcome",
     title: "Welcome to Care Compliance",
     description: "Your comprehensive compliance management system for care homes. Let's take a quick tour of the key features to help you get started.",
-    icon: <Sparkles className="h-8 w-8 text-primary" />,
+    icon: <Sparkle className="h-8 w-8 text-primary" weight="bold" />,
     tip: "This tour will only take about 2 minutes",
   },
   {
     id: "dashboard",
     title: "Dashboard Overview",
     description: "Your dashboard provides a real-time snapshot of compliance status, upcoming audits, recent incidents, and action items that need attention.",
-    icon: <LayoutDashboard className="h-8 w-8 text-blue-500" />,
+    icon: <SquaresFour className="h-8 w-8 text-blue-500" weight="bold" />,
     highlight: "Dashboard",
     tip: "Check your dashboard daily to stay on top of compliance",
   },
@@ -39,7 +39,7 @@ const tourSteps: TourStep[] = [
     id: "service-users",
     title: "Service Users",
     description: "Manage all your service users (residents) in one place. Track their care plans, compliance records, and important documentation.",
-    icon: <Heart className="h-8 w-8 text-pink-500" />,
+    icon: <Heart className="h-8 w-8 text-pink-500" weight="bold" />,
     highlight: "Service Users",
     tip: "Keep service user records up-to-date for CQC inspections",
   },
@@ -47,7 +47,7 @@ const tourSteps: TourStep[] = [
     id: "staff",
     title: "Staff Management",
     description: "Track staff compliance including DBS checks, training records, and employment documentation. Never miss an expiring certificate again.",
-    icon: <UserCheck className="h-8 w-8 text-green-500" />,
+    icon: <UserCheck className="h-8 w-8 text-green-500" weight="bold" />,
     highlight: "Staff",
     tip: "Set up alerts for expiring DBS certificates and training",
   },
@@ -55,7 +55,7 @@ const tourSteps: TourStep[] = [
     id: "audits",
     title: "Compliance Audits",
     description: "Conduct and manage audits across all your locations. Choose from pre-built audit templates or create custom ones for your specific needs.",
-    icon: <ClipboardList className="h-8 w-8 text-[#1F7AE0]" />,
+    icon: <ClipboardText className="h-8 w-8 text-[#1F7AE0]" weight="bold" />,
     highlight: "Audits",
     tip: "Schedule regular audits to maintain continuous compliance",
   },
@@ -63,7 +63,7 @@ const tourSteps: TourStep[] = [
     id: "incidents",
     title: "Incident Reporting",
     description: "Log and track incidents with comprehensive documentation. The system helps ensure proper reporting to CQC and other regulatory bodies.",
-    icon: <AlertTriangle className="h-8 w-8 text-orange-500" />,
+    icon: <Warning className="h-8 w-8 text-orange-500" weight="bold" />,
     highlight: "Incidents",
     tip: "Report incidents promptly - delays can affect compliance ratings",
   },
@@ -71,7 +71,7 @@ const tourSteps: TourStep[] = [
     id: "action-log",
     title: "Action Log",
     description: "Track all action items from audits and incidents in one central location. Assign tasks, set deadlines, and monitor progress.",
-    icon: <ClipboardCheck className="h-8 w-8 text-amber-500" />,
+    icon: <CheckSquare className="h-8 w-8 text-amber-500" weight="bold" />,
     highlight: "Action Log",
     tip: "Review the action log weekly to ensure nothing falls through the cracks",
   },
@@ -79,7 +79,7 @@ const tourSteps: TourStep[] = [
     id: "audit-calendar",
     title: "Audit Calendar",
     description: "Visualize all scheduled audits in month, week, or day views. Auto-schedule audits intelligently or manually schedule them. Export calendars to PDF for staff areas.",
-    icon: <Calendar className="h-8 w-8 text-[#1F7AE0]" />,
+    icon: <Calendar className="h-8 w-8 text-[#1F7AE0]" weight="bold" />,
     highlight: "Audit Calendar",
     tip: "Use auto-scheduling to create staff and service-user specific audits automatically",
   },
@@ -87,7 +87,7 @@ const tourSteps: TourStep[] = [
     id: "audit-history",
     title: "Audit History",
     description: "Search, filter, and sort through all past audits with powerful pagination. Filter by status, type, location, and date range to find exactly what you need.",
-    icon: <FileText className="h-8 w-8 text-cyan-500" />,
+    icon: <FileText className="h-8 w-8 text-cyan-500" weight="bold" />,
     highlight: "Audit History",
     tip: "Use the search bar to quickly find specific audits by name, location, or auditor",
   },
@@ -95,7 +95,7 @@ const tourSteps: TourStep[] = [
     id: "ai-audits",
     title: "AI-Powered Audits",
     description: "Let AI assist with audit analysis and recommendations. Get intelligent insights to improve compliance scores and identify areas for improvement.",
-    icon: <Brain className="h-8 w-8 text-[#1F7AE0]" />,
+    icon: <Brain className="h-8 w-8 text-[#1F7AE0]" weight="bold" />,
     highlight: "AI Audits",
     tip: "AI can help identify patterns and suggest corrective actions",
   },
@@ -103,7 +103,7 @@ const tourSteps: TourStep[] = [
     id: "notifications",
     title: "Smart Notifications",
     description: "Stay informed with real-time notifications for upcoming audits, overdue actions, compliance alerts, and security events. Click the bell icon anytime to check.",
-    icon: <Bell className="h-8 w-8 text-yellow-500" />,
+    icon: <Bell className="h-8 w-8 text-yellow-500" weight="bold" />,
     highlight: "Notifications",
     tip: "Enable email reminders for audits due tomorrow in your settings",
   },
@@ -111,14 +111,14 @@ const tourSteps: TourStep[] = [
     id: "2fa-optional",
     title: "Two-Factor Authentication (Optional)",
     description: "For admin accounts, we recommend enabling 2FA for extra security. You can set this up now or skip and do it later in Settings. It only takes 30 seconds with Google Authenticator.",
-    icon: <Shield className="h-8 w-8 text-emerald-500" />,
+    icon: <Shield className="h-8 w-8 text-emerald-500" weight="bold" />,
     tip: "2FA adds an extra layer of protection against unauthorized access",
   },
   {
     id: "complete",
     title: "You're All Set!",
     description: "You now know all the key features of Care Compliance. Start by exploring the dashboard, scheduling your first audit, or setting up 2FA. We're here to help!",
-    icon: <CheckCircle2 className="h-8 w-8 text-green-500" />,
+    icon: <CheckCircle className="h-8 w-8 text-green-500" weight="bold" />,
     tip: "Need help? Contact support anytime from the settings menu",
   },
 ];
@@ -219,7 +219,7 @@ export function OnboardingTour() {
               className="h-8 w-8 rounded-full hover:bg-muted"
               onClick={skipTour}
             >
-              <X className="h-4 w-4" />
+              <X className="h-4 w-4" weight="bold" />
             </Button>
           </div>
         </CardHeader>
@@ -232,7 +232,7 @@ export function OnboardingTour() {
           {step.tip && (
             <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
               <p className="text-sm text-primary flex items-start gap-2">
-                <Sparkles className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <Sparkle className="h-4 w-4 mt-0.5 flex-shrink-0" weight="bold" />
                 <span><strong>Pro tip:</strong> {step.tip}</span>
               </p>
             </div>
@@ -247,7 +247,7 @@ export function OnboardingTour() {
                 onClick={prevStep}
                 className="gap-1"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <CaretLeft className="h-4 w-4" weight="bold" />
                 Back
               </Button>
             )}
@@ -266,12 +266,12 @@ export function OnboardingTour() {
             {currentStep === tourSteps.length - 1 ? (
               <>
                 Get Started
-                <CheckCircle2 className="h-4 w-4" />
+                <CheckCircle className="h-4 w-4" weight="bold" />
               </>
             ) : (
               <>
                 Next
-                <ChevronRight className="h-4 w-4" />
+                <CaretRight className="h-4 w-4" weight="bold" />
               </>
             )}
           </Button>
