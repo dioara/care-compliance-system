@@ -9,6 +9,8 @@ import Markdown from "react-markdown";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { ContactSupportModal } from "@/components/ContactSupportModal";
+import { useAuth } from "@/hooks/useAuth";
+import { getLoginUrl } from "@/const";
 
 export default function HelpArticle() {
   const [, setLocation] = useLocation();
@@ -101,9 +103,22 @@ export default function HelpArticle() {
     }
   };
 
+  const { user } = useAuth();
+
   // Handle bookmark toggle
   const handleBookmarkToggle = () => {
     if (!article) return;
+    
+    // Redirect to login if not authenticated
+    if (!user) {
+      toast.info("Please sign in to bookmark articles", {
+        description: "You'll be redirected to the login page",
+      });
+      setTimeout(() => {
+        window.location.href = getLoginUrl();
+      }, 1500);
+      return;
+    }
     
     if (isBookmarked) {
       removeBookmark.mutate({ articleId: article.id });
@@ -115,6 +130,18 @@ export default function HelpArticle() {
   // Handle feedback
   const handleFeedback = (helpful: boolean) => {
     if (!article) return;
+    
+    // Redirect to login if not authenticated
+    if (!user) {
+      toast.info("Please sign in to submit feedback", {
+        description: "You'll be redirected to the login page",
+      });
+      setTimeout(() => {
+        window.location.href = getLoginUrl();
+      }, 1500);
+      return;
+    }
+    
     submitFeedback.mutate({
       articleId: article.id,
       helpful,

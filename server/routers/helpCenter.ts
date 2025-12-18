@@ -203,9 +203,13 @@ export const helpCenterRouter = router({
       });
     }),
 
-  getUserFeedback: protectedProcedure
+  getUserFeedback: publicProcedure
     .input(z.object({ articleId: z.string() }))
     .query(async ({ ctx, input }) => {
+      // Return null for unauthenticated users
+      if (!ctx.user) {
+        return null;
+      }
       return await getArticleFeedback(input.articleId, ctx.user.id);
     }),
 
@@ -247,9 +251,13 @@ export const helpCenterRouter = router({
     return await getUserBookmarks(ctx.user.id);
   }),
 
-  isBookmarked: protectedProcedure
+  isBookmarked: publicProcedure
     .input(z.object({ articleId: z.string() }))
     .query(async ({ ctx, input }) => {
+      // Return false for unauthenticated users
+      if (!ctx.user) {
+        return false;
+      }
       return await isArticleBookmarked(input.articleId, ctx.user.id);
     }),
 });

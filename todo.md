@@ -2450,3 +2450,12 @@
 - [x] Check for overlapping elements covering buttons - No overlapping elements
 - [x] Verify onClick handlers are properly attached - All handlers properly attached
 - [x] Test button clickability on mobile and desktop - Buttons work correctly
+
+
+## BUG: Help Center Authentication Issues (RESOLVED)
+- [x] Fix helpCenter.isBookmarked to allow public access (return false for unauthenticated users)
+- [x] Fix helpCenter.getUserFeedback to allow public access (return null for unauthenticated users)
+- [x] Keep write actions (addBookmark, removeBookmark, submitFeedback) as protected procedures
+- [x] Update frontend to handle unauthenticated state gracefully (show login prompt when trying to bookmark/feedback)
+- [x] Test Help Center works for both authenticated and unauthenticated users
+- [x] Add cache-busting version comment to CSS to force browser reload
