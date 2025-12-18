@@ -2471,3 +2471,11 @@
   - H3: Left indigo border accent for subsections
   - Proper paragraph spacing and line height
 - [x] Ensure consistent heading hierarchy across all articles
+
+
+## Help Center Content Fact-Checking
+- [x] Remove all Manus references from Help Center articles
+- [x] Change all URLs to https://app.ccms.co.uk only
+- [x] Fix authentication description (email/password, not OAuth/Manus)
+- [x] Verify British spelling throughout (organisation, colour, centre, etc.)
+- [x] Review all articles for accuracy and context

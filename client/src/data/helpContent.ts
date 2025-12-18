@@ -58,7 +58,7 @@ Generate detailed compliance reports, track trends, and identify areas for impro
 
 ## Getting Help
 
-This help center provides comprehensive guides for all CCMS features. Use the search function to find specific topics, or browse by category. If you need additional assistance, contact your system administrator or support team.
+This help centre provides comprehensive guides for all CCMS features. Use the search function to find specific topics, or browse by category. If you need additional assistance, contact your system administrator or support team.
 `
   },
 
@@ -72,18 +72,18 @@ This help center provides comprehensive guides for all CCMS features. Use the se
 
 ## Accessing CCMS
 
-Navigate to your organization's CCMS URL (typically https://app.ccms.co.uk or your custom domain). You'll see the sign-in page.
+Navigate to your organisation's CCMS URL (typically https://app.ccms.co.uk or your custom domain). You'll see the sign-in page.
 
 ## Signing In
 
-Click the "Sign in" button to launch the authentication flow. CCMS uses secure OAuth authentication to protect your account. You'll be redirected to the Manus authentication portal where you can sign in with your email address.
+Enter your email address and password to sign in. CCMS uses secure authentication to protect your account. If you've forgotten your password, click the "Forgot Password" link to reset it.
 
 ## After Login
 
 Upon successful authentication, you'll be redirected to the CCMS dashboard. The dashboard provides an overview of:
 
 ### Compliance Status
-Current compliance score and recent audit results across your organization.
+Current compliance score and recent audit results across your organisation.
 
 ### Pending Tasks
 Outstanding action plans, scheduled audits, and items requiring attention.
@@ -100,7 +100,7 @@ The left sidebar provides access to all CCMS modules. Key sections include Dashb
 
 ## Getting Oriented
 
-Take time to explore the dashboard and familiarize yourself with the navigation. The onboarding tour (if enabled) will guide you through key features. You can restart the tour anytime from your user profile settings.
+Take time to explore the dashboard and familiarise yourself with the navigation. The onboarding tour (if enabled) will guide you through key features. You can restart the tour anytime from your user profile settings.
 `
   },
 
@@ -114,7 +114,7 @@ Take time to explore the dashboard and familiarize yourself with the navigation.
 
 ## Dashboard Layout
 
-The CCMS dashboard provides a real-time overview of your organization's compliance status and key metrics. The dashboard is divided into several sections providing different insights.
+The CCMS dashboard provides a real-time overview of your organisation's compliance status and key metrics. The dashboard is divided into several sections providing different insights.
 
 ## Compliance Score
 
@@ -122,11 +122,11 @@ The compliance score card shows your overall compliance percentage based on rece
 
 ## Audit Statistics
 
-View the total number of audits conducted, completion rate, and average scores. Track trends over time to identify improvements or areas of concern. The audit statistics help you understand your organization's audit performance at a glance.
+View the total number of audits conducted, completion rate, and average scores. Track trends over time to identify improvements or areas of concern. The audit statistics help you understand your organisation's audit performance at a glance.
 
 ## Incident Overview
 
-See the number of incidents reported, categorized by severity. Monitor incident resolution rates and identify patterns that may require policy changes or additional training.
+See the number of incidents reported, categorised by severity. Monitor incident resolution rates and identify patterns that may require policy changes or additional training.
 
 ## Upcoming Audits
 
@@ -134,15 +134,15 @@ The dashboard displays scheduled audits for the coming weeks. Click on any audit
 
 ## Recent Activity
 
-Track the latest system activity including completed audits, new incidents, and user actions. This helps you stay informed about what's happening across your organization.
+Track the latest system activity including completed audits, new incidents, and user actions. This helps you stay informed about what's happening across your organisation.
 
 ## Filtering by Location
 
-If your organization has multiple locations, use the location filter at the top of the dashboard to view metrics for specific sites. This allows you to compare performance across locations and identify where additional support may be needed.
+If your organisation has multiple locations, use the location filter at the top of the dashboard to view metrics for specific sites. This allows you to compare performance across locations and identify where additional support may be needed.
 
 ## Customizing Your View
 
-The dashboard automatically updates based on your role and permissions. Administrators see organization-wide data, while location managers see data specific to their assigned locations.
+The dashboard automatically updates based on your role and permissions. Administrators see organisation-wide data, while location managers see data specific to their assigned locations.
 `
   },
 
@@ -413,7 +413,7 @@ Generate reports showing all action plans, completion rates, and overdue items. 
 
 ## Calendar Overview
 
-The Audit Calendar provides a visual representation of all scheduled audits across your organization. Access it from the main menu to see upcoming audits, plan your compliance activities, and ensure no audits are missed.
+The Audit Calendar provides a visual representation of all scheduled audits across your organisation. Access it from the main menu to see upcoming audits, plan your compliance activities, and ensure no audits are missed.
 
 ## Calendar Views
 
@@ -437,7 +437,7 @@ Chronological list of upcoming audits with full details.
 
 ## Color Coding
 
-Audits are color-coded by type for easy identification. For example, medication audits might appear in blue, while health and safety audits appear in orange. The legend at the top of the calendar shows what each color represents.
+Audits are colour-coded by type for easy identification. For example, medication audits might appear in blue, while health and safety audits appear in orange. The legend at the top of the calendar shows what each colour represents.
 
 ## Adding Audits from Calendar
 
@@ -453,7 +453,7 @@ Filter the calendar to show only specific audit types, locations, or auditors. T
 
 ## Exporting Calendar
 
-Export your audit calendar to integrate with external calendar applications like Outlook or Google Calendar. This ensures audit schedules are visible alongside other organizational activities.
+Export your audit calendar to integrate with external calendar applications like Outlook or Google Calendar. This ensures audit schedules are visible alongside other organisational activities.
 `
   },
 
@@ -675,7 +675,7 @@ Each service user has an individualized care plan outlining their needs, goals, 
 
 ## Risk Assessments
 
-Maintain current risk assessments for each service user covering areas like falls, nutrition, pressure injuries, and behavior. Risk assessments inform care planning and staff training needs.
+Maintain current risk assessments for each service user covering areas like falls, nutrition, pressure injuries, and behaviour. Risk assessments inform care planning and staff training needs.
 
 ## Service User History
 
@@ -717,7 +717,7 @@ Job title, start date, employment type (full-time, part-time, agency).
 
 ### Qualifications
 
-Relevant certifications, licenses, and professional registrations.
+Relevant certifications, licences, and professional registrations.
 
 ### DBS Check
 
@@ -975,13 +975,13 @@ Recognize improvements and share successes with the team.
 
 Administrators can access system settings from the user menu in the top right corner. Settings are organized into categories for easy navigation.
 
-## Organization Settings
+## Organisation Settings
 
-Configure basic organization information:
+Configure basic organisation information:
 
-### Organization Name
+### Organisation Name
 
-Your care home or organization name displayed throughout the system.
+Your care home or organisation name displayed throughout the system.
 
 ### Locations
 
@@ -989,11 +989,11 @@ Add and manage multiple care home locations if you operate more than one site.
 
 ### Contact Information
 
-Main contact details for your organization.
+Main contact details for your organisation.
 
 ### Logo
 
-Upload your organization logo to appear on reports and documents.
+Upload your organisation logo to appear on reports and documents.
 
 ## User Management
 
@@ -1263,7 +1263,7 @@ Password reset links expire after 24 hours. If your link has expired, request a 
 
 ## Account Locked
 
-Accounts are temporarily locked after multiple failed login attempts (typically 5 attempts within 15 minutes). This security measure prevents unauthorized access.
+Accounts are temporarily locked after multiple failed login attempts (typically 5 attempts within 15 minutes). This security measure prevents unauthorised access.
 
 If your account is locked:
 
@@ -1583,9 +1583,9 @@ Contact your administrator if data needs to be restored to a previous state.
     content: `
 # Getting Additional Help
 
-## Help Center
+## Help Centre
 
-This help center provides comprehensive documentation for all CCMS features. Use the search function to find specific topics quickly.
+This help centre provides comprehensive documentation for all CCMS features. Use the search function to find specific topics quickly.
 
 ## In-App Guidance
 
@@ -1593,12 +1593,12 @@ Look for help icons (?) throughout the system. Clicking these provides context-s
 
 ## Contacting Your Administrator
 
-For account-related issues, permissions, or organization-specific questions, contact your system administrator. They can:
+For account-related issues, permissions, or organisation-specific questions, contact your system administrator. They can:
 
 - Reset your password
 - Adjust your permissions
 - Create or modify user accounts
-- Configure organization settings
+- Configure organisation settings
 - Provide training on specific features
 
 ## Technical Support
@@ -1619,7 +1619,7 @@ For critical system issues affecting care delivery, use the emergency support li
 
 When contacting support, provide:
 
-- Your organization name
+- Your organisation name
 - Your user email address
 - Detailed description of the issue
 - Steps to reproduce the problem
@@ -1628,7 +1628,7 @@ When contacting support, provide:
 
 ## Feature Requests
 
-Have ideas for improving CCMS? Submit feature requests through the feedback form in your user profile settings. The development team reviews all suggestions and prioritizes based on user needs and regulatory requirements.
+Have ideas for improving CCMS? Submit feature requests through the feedback form in your user profile settings. The development team reviews all suggestions and prioritises based on user needs and regulatory requirements.
 
 ## Training
 
@@ -1857,7 +1857,7 @@ Scheduled reports are automatically generated and emailed to specified recipient
   },
 
   {
-    id: "notification-center",
+    id: "notification-centre",
     category: "settings",
     title: "Managing Notifications",
     keywords: ["notifications", "alerts", "email", "preferences", "reminders"],
@@ -2892,7 +2892,7 @@ Go to Settings
 
 ### Alt + 8
 
-Go to Help Center
+Go to Help Centre
 
 ### Alt + Left Arrow
 
@@ -3443,7 +3443,6 @@ Ensure strong signal strength
 Ensure these domains are whitelisted:
 
 - *.ccms.co.uk
-- *.manusvm.computer (if applicable)
 - api.ccms.co.uk
 - cdn.ccms.co.uk
 
