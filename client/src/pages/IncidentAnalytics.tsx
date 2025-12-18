@@ -148,7 +148,7 @@ export default function IncidentAnalytics() {
         <div>
           <h1 className="text-2xl font-bold">Incident Analytics</h1>
           <p className="text-muted-foreground mt-1">
-            Visualize incident trends and patterns across your organization
+            Visualise incident trends and patterns across your organisation
           </p>
         </div>
         <div className="flex gap-3">

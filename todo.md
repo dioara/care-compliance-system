@@ -2546,3 +2546,9 @@
 - [x] Update Error Monitoring page to Phosphor icons
 - [x] Standardise all Phosphor icons to use 'bold' weight (applied to migrated pages)
 - [x] Create icon reference guide documentation
+
+
+## British Spelling Corrections
+- [x] Fix "organization" → "organisation"
+- [x] Fix "categorization" → "categorisation" (none found)
+- [x] Fix other American spellings - Note: CSS/Tailwind classes and JS APIs use American English by convention

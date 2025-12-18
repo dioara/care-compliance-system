@@ -252,7 +252,7 @@ export default function ActionLog() {
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Master Action Log</h1>
             <p className="text-muted-foreground mt-1">
-              Track and manage all action items from audits across your organization
+              Track and manage all action items from audits across your organisation
             </p>
           </div>
         </div>

@@ -101,7 +101,7 @@ export default function AuditHistory() {
       <div className="mb-8">
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Audit History</h1>
         <p className="text-muted-foreground">
-          View and search all audit records across your organization
+          View and search all audit records across your organisation
         </p>
       </div>
 
