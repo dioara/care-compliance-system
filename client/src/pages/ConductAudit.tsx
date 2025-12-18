@@ -29,9 +29,6 @@ export default function ConductAudit() {
   const [expandedActions, setExpandedActions] = useState<Record<number, boolean>>({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Check if audit is in the past (read-only)
-  const isAuditInPast = auditInstance ? new Date(auditInstance.auditDate) < new Date(new Date().setHours(0, 0, 0, 0)) : false;
-
   // Fetch audit instance
   const { data: auditInstance, isLoading: loadingInstance } = trpc.audits.getAuditInstance.useQuery(
     { id: auditId },
@@ -55,6 +52,9 @@ export default function ConductAudit() {
     { locationId: auditInstance?.locationId },
     { enabled: !!auditInstance?.locationId }
   );
+
+  // Check if audit is in the past (read-only)
+  const isAuditInPast = auditInstance ? new Date(auditInstance.auditDate) < new Date(new Date().setHours(0, 0, 0, 0)) : false;
 
   // Load existing responses into state
   useEffect(() => {

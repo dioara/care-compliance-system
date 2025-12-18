@@ -2645,3 +2645,9 @@
 - [x] Fixed icon reference errors (ClipboardCheck → ClipboardText, CheckCircle2 → CheckCircle)
 - [x] Verified compliance assessment save functionality works
 - [x] Tested on staff compliance page - save successful
+
+
+## Fix ConductAudit Page Crash (December 18, 2025)
+- [x] Fixed isAuditInPast variable being used before auditInstance was defined
+- [x] Moved isAuditInPast calculation after auditInstance query hook
+- [x] Tested conduct audit page loads correctly
