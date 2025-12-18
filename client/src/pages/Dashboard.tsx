@@ -350,58 +350,58 @@ export default function Dashboard() {
           <CardContent className="space-y-3">
             <button 
               onClick={() => setLocation('/audits')}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-gradient-to-r from-blue-50 to-indigo-50 hover:border-blue-200 hover:shadow-md transition-all group"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
-              <div className="p-3 bg-blue-100 rounded-xl group-hover:bg-blue-200 transition-colors">
-                <ClipboardCheck className="h-5 w-5 text-blue-600" />
+              <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
+                <ClipboardCheck className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Schedule Audit</p>
                 <p className="text-sm text-muted-foreground">Start a new compliance audit</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-blue-600 transition-colors" />
+              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
             </button>
             
             <button 
               onClick={() => setLocation('/ai-audits')}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-gradient-to-r from-purple-50 to-pink-50 hover:border-purple-200 hover:shadow-md transition-all group"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
-              <div className="p-3 bg-purple-100 rounded-xl group-hover:bg-purple-200 transition-colors">
-                <FileText className="h-5 w-5 text-purple-600" />
+              <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
+                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">AI Care Plan Audit</p>
                 <p className="text-sm text-muted-foreground">Get quality feedback in minutes</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-purple-600 transition-colors" />
+              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
             </button>
             
             <button 
               onClick={() => setLocation('/incidents')}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-gradient-to-r from-amber-50 to-orange-50 hover:border-amber-200 hover:shadow-md transition-all group"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
-              <div className="p-3 bg-amber-100 rounded-xl group-hover:bg-amber-200 transition-colors">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
+                <AlertTriangle className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Report Incident</p>
                 <p className="text-sm text-muted-foreground">Log and track incidents</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-amber-600 transition-colors" />
+              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
             </button>
             
             <button 
               onClick={() => setLocation('/reports')}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-transparent bg-gradient-to-r from-green-50 to-emerald-50 hover:border-green-200 hover:shadow-md transition-all group"
+              className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
-              <div className="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors">
-                <FileText className="h-5 w-5 text-green-600" />
+              <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
+                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" />
               </div>
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Generate Report</p>
                 <p className="text-sm text-muted-foreground">Export branded reports for CQC</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-green-600 transition-colors" />
+              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
             </button>
           </CardContent>
         </Card>

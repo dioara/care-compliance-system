@@ -2512,3 +2512,6 @@
 - [x] Remove organisation count (+500 organisations)
 - [x] Remove organisation logos/avatars
 - [x] Make text factual without exaggerated claims
+
+## Quick Action Buttons
+- [x] Make Quick Action buttons uniform (consistent icon colours)
