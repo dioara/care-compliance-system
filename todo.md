@@ -2751,3 +2751,4 @@
 ## Bug Fixes
 - [x] Fix company profile image upload - improved error handling
 - [x] Review TypeScript errors in auditReminderService.ts - fixed Date type
+- [x] Store company logo as base64 in database instead of S3

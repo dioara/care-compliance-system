@@ -308,24 +308,26 @@ export const appRouter = router({
         }
 
         try {
-          // Convert base64 to buffer - fileData should already have prefix removed by frontend
-          const buffer = Buffer.from(input.fileData, "base64");
-          
-          if (buffer.length === 0) {
+          // Validate base64 data
+          if (!input.fileData || input.fileData.length === 0) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid file data" });
           }
 
-          // Upload to S3
-          const fileKey = `logos/${ctx.user.tenantId}/${Date.now()}-${input.fileName}`;
-          console.log(`[UPLOAD] Uploading logo for tenant ${ctx.user.tenantId}: ${fileKey}, size: ${buffer.length} bytes`);
+          // Store as data URL directly in database (no S3 needed)
+          const dataUrl = `data:${input.mimeType};base64,${input.fileData}`;
           
-          const { url } = await storagePut(fileKey, buffer, input.mimeType);
-          console.log(`[UPLOAD] Logo uploaded successfully: ${url}`);
+          // Check size - limit to ~2MB for database storage
+          if (input.fileData.length > 2 * 1024 * 1024) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "File too large. Please use an image under 2MB." });
+          }
 
-          // Update tenant with logo URL
-          await db.updateTenant(ctx.user.tenantId, { logoUrl: url });
+          console.log(`[UPLOAD] Storing logo for tenant ${ctx.user.tenantId} as base64, size: ${input.fileData.length} chars`);
 
-          return { success: true, url };
+          // Update tenant with base64 data URL
+          await db.updateTenant(ctx.user.tenantId, { logoUrl: dataUrl });
+          console.log(`[UPLOAD] Logo stored successfully for tenant ${ctx.user.tenantId}`);
+
+          return { success: true, url: dataUrl };
         } catch (error: any) {
           console.error(`[UPLOAD] Logo upload failed:`, error);
           throw new TRPCError({ 
