@@ -350,7 +350,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-3">
             <button 
-              onClick={() => setLocation('/audits')}
+              onClick={() => setLocation('/audit-calendar?schedule=true')}
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
@@ -378,7 +378,7 @@ export default function Dashboard() {
             </button>
             
             <button 
-              onClick={() => setLocation('/incidents')}
+              onClick={() => setLocation('/incidents?report=true')}
               className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
             >
               <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
@@ -387,20 +387,6 @@ export default function Dashboard() {
               <div className="text-left flex-1">
                 <p className="font-semibold text-gray-900">Report Incident</p>
                 <p className="text-sm text-muted-foreground">Log and track incidents</p>
-              </div>
-              <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
-            </button>
-            
-            <button 
-              onClick={() => setLocation('/reports')}
-              className="w-full flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-white hover:border-[#1F7AE0]/30 hover:bg-[#1F7AE0]/5 hover:shadow-sm transition-all group"
-            >
-              <div className="p-3 bg-gray-100 rounded-xl group-hover:bg-[#1F7AE0]/10 transition-colors">
-                <FileText className="h-5 w-5 text-gray-600 group-hover:text-[#1F7AE0]" weight="bold" />
-              </div>
-              <div className="text-left flex-1">
-                <p className="font-semibold text-gray-900">Generate Report</p>
-                <p className="text-sm text-muted-foreground">Export branded reports for CQC</p>
               </div>
               <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
             </button>

@@ -42,6 +42,16 @@ const SEVERITY_LEVELS = [
 
 export default function Incidents() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  // Check URL params to auto-open report dialog
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('report') === 'true') {
+      setIsCreateDialogOpen(true);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
   const [selectedIncident, setSelectedIncident] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [formStep, setFormStep] = useState(1);

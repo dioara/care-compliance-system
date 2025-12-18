@@ -2656,3 +2656,9 @@
 ## Fix Complete Audit DateTime Error (December 18, 2025)
 - [x] Fixed MySQL datetime format error in completeAudit mutation
 - [x] Converted ISO 8601 format to MySQL format (YYYY-MM-DD HH:MM:SS)
+
+
+## Update Quick Actions (December 18, 2025)
+- [x] Remove Generate Report from Quick Actions
+- [x] Make Schedule Audit go directly to schedule audit flow
+- [x] Make Report Incident go directly to incident reporting flow

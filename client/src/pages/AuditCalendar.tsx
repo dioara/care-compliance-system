@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
 import { useLocation } from '@/contexts/LocationContext';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,16 @@ export default function AuditCalendar() {
   const [selectedSuggestions, setSelectedSuggestions] = useState<Set<number>>(new Set());
   const [scheduleStartDate, setScheduleStartDate] = useState<Date>(new Date());
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
+
+  // Check URL params to auto-open schedule dialog
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('schedule') === 'true') {
+      setShowScheduleDialog(true);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
   const [scheduleFormDate, setScheduleFormDate] = useState<Date | null>(null);
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
