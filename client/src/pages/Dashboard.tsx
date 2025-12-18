@@ -4,27 +4,24 @@ import { useLocation as useLocationContext } from "@/contexts/LocationContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { 
-  CheckCircle2, 
-  AlertCircle, 
-  Clock, 
-  TrendingUp,
-  Users,
-  AlertTriangle,
-  Bell,
-  X,
-  Activity,
-  ChevronRight,
-  Shield,
-  BarChart3
-} from "lucide-react";
+
 import { 
   ClipboardText, 
   FileText, 
   Warning, 
   Buildings, 
   Sparkle,
-  CaretRight
+  CaretRight,
+  CheckCircle,
+  WarningCircle,
+  Clock,
+  TrendingUp,
+  Users,
+  Bell,
+  X,
+  Pulse,
+  Shield,
+  ChartBar
 } from "@phosphor-icons/react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -105,7 +102,7 @@ export default function Dashboard() {
       {/* Compliance Alert Banner */}
       {alertStatus?.hasAlerts && !alertDismissed && (
         <Alert variant="destructive" className="relative border-red-200 bg-red-50 shadow-sm">
-          <AlertTriangle className="h-5 w-5" />
+          <Warning className="h-5 w-5" weight="bold" />
           <AlertTitle className="flex items-center justify-between text-red-800">
             <span className="font-semibold">Compliance Alerts Detected</span>
             <div className="flex gap-2">
@@ -147,7 +144,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-start gap-3 md:gap-4 min-w-0 flex-1">
             <div className="p-2 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl shrink-0">
-              <Activity className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+              <Pulse className="h-5 w-5 md:h-6 md:w-6 text-primary" weight="bold" />
             </div>
             <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent truncate">
@@ -212,7 +209,7 @@ export default function Dashboard() {
               Overdue Actions
             </CardTitle>
             <div className={`p-2 rounded-lg ${stats.overdueActions > 0 ? 'bg-red-100' : 'bg-muted'}`}>
-              <AlertCircle className={`h-4 w-4 ${stats.overdueActions > 0 ? 'text-red-600' : 'text-muted-foreground'}`} />
+              <WarningCircle className={`h-4 w-4 ${stats.overdueActions > 0 ? 'text-red-600' : 'text-muted-foreground'}`} weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -250,7 +247,7 @@ export default function Dashboard() {
               Recent Incidents
             </CardTitle>
             <div className={`p-2 rounded-lg ${stats.recentIncidents > 0 ? 'bg-amber-100' : 'bg-muted'}`}>
-              <AlertTriangle className={`h-4 w-4 ${stats.recentIncidents > 0 ? 'text-amber-600' : 'text-muted-foreground'}`} />
+              <Warning className={`h-4 w-4 ${stats.recentIncidents > 0 ? 'text-amber-600' : 'text-muted-foreground'}`} weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -272,7 +269,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5 text-primary" />
+                  <ChartBar className="h-5 w-5 text-primary" weight="bold" />
                   Compliance Status
                 </CardTitle>
                 <CardDescription className="mt-1">
@@ -363,7 +360,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-gray-900">Schedule Audit</p>
                 <p className="text-sm text-muted-foreground">Start a new compliance audit</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
+              <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
             </button>
             
             <button 
@@ -377,7 +374,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-gray-900">AI Care Plan Audit</p>
                 <p className="text-sm text-muted-foreground">Get quality feedback in minutes</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
+              <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
             </button>
             
             <button 
@@ -391,7 +388,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-gray-900">Report Incident</p>
                 <p className="text-sm text-muted-foreground">Log and track incidents</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
+              <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
             </button>
             
             <button 
@@ -405,7 +402,7 @@ export default function Dashboard() {
                 <p className="font-semibold text-gray-900">Generate Report</p>
                 <p className="text-sm text-muted-foreground">Export branded reports for CQC</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" />
+              <CaretRight className="h-5 w-5 text-muted-foreground group-hover:text-[#1F7AE0] transition-colors" weight="bold" />
             </button>
           </CardContent>
         </Card>
@@ -457,7 +454,7 @@ export default function Dashboard() {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                  <CaretRight className="h-5 w-5 text-muted-foreground" weight="bold" />
                 </div>
               ))}
             </div>
@@ -479,7 +476,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4 p-3 bg-green-50 rounded-lg border border-green-200">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+              <CheckCircle className="h-6 w-6 text-green-600" weight="bold" />
               <div>
                 <p className="font-medium text-green-800">Company profile created</p>
                 <p className="text-sm text-green-600">Your organisation is set up</p>

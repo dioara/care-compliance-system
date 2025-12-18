@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Search, Users, AlertTriangle, ClipboardCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { MagnifyingGlass, Users, Warning, ClipboardText } from "@phosphor-icons/react";
 import { useLocation } from "wouter";
 import {
   CommandDialog,
@@ -76,7 +77,7 @@ export function GlobalSearch() {
         className="h-9 w-9 md:w-auto md:justify-start md:px-3 text-muted-foreground"
         onClick={() => setOpen(true)}
       >
-        <Search className="h-4 w-4" />
+        <MagnifyingGlass className="h-4 w-4" weight="bold" />
         <span className="hidden md:inline ml-2">Search...</span>
         <kbd className="pointer-events-none hidden md:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground ml-auto">
           <span className="text-xs">⌘</span>K
@@ -112,7 +113,7 @@ export function GlobalSearch() {
                   onSelect={() => handleSelect(`/staff`)}
                   className="flex items-center gap-2"
                 >
-                  <Users className="h-4 w-4" />
+                  <Users className="h-4 w-4" weight="bold" />
                   <div className="flex flex-col">
                     <span>{staff.name}</span>
                     <span className="text-xs text-muted-foreground">{staff.role}</span>
@@ -130,7 +131,7 @@ export function GlobalSearch() {
                   onSelect={() => handleSelect(`/incidents`)}
                   className="flex items-center gap-2"
                 >
-                  <AlertTriangle className="h-4 w-4" />
+                  <Warning className="h-4 w-4" weight="bold" />
                   <div className="flex flex-col">
                     <span>{incident.type} - {incident.serviceUserName}</span>
                     <span className="text-xs text-muted-foreground">
@@ -150,7 +151,7 @@ export function GlobalSearch() {
                   onSelect={() => handleSelect(`/audits`)}
                   className="flex items-center gap-2"
                 >
-                  <ClipboardCheck className="h-4 w-4" />
+                  <ClipboardText className="h-4 w-4" weight="bold" />
                   <div className="flex flex-col">
                     <span>{audit.title}</span>
                     <span className="text-xs text-muted-foreground">

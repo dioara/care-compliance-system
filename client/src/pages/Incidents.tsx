@@ -11,14 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { 
-  Plus, CheckCircle, Clock, XCircle, Download, Loader2,
-  MapPin, Calendar, AlertCircle, Mail, 
-  ChevronRight, Activity
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { 
   Warning, FileText, User, Shield, Phone, Buildings, 
-  Stethoscope, ClipboardText, Users, Eye, FileXls
+  Stethoscope, ClipboardText, Users, Eye, FileXls,
+  Plus, CheckCircle, Clock, XCircle, DownloadSimple,
+  MapPin, CalendarBlank, WarningCircle, Envelope,
+  CaretRight, Pulse
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { RichTextEditor, RichTextDisplay } from "@/components/ui/rich-text-editor";
@@ -376,10 +375,10 @@ export default function Incidents() {
 
   const getStatusBadge = (status: string | null) => {
     switch (status) {
-      case "open": return <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50"><Clock className="h-3 w-3 mr-1" />Open</Badge>;
+      case "open": return <Badge variant="outline" className="border-orange-500 text-orange-600 bg-orange-50"><Clock className="h-3 w-3 mr-1" weight="bold" />Open</Badge>;
       case "under_investigation": return <Badge variant="outline" className="border-blue-500 text-blue-600 bg-blue-50"><Warning className="h-3 w-3 mr-1" weight="bold" />Investigating</Badge>;
-      case "resolved": return <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
-      case "closed": return <Badge variant="outline" className="border-gray-500 text-gray-600 bg-gray-50"><XCircle className="h-3 w-3 mr-1" />Closed</Badge>;
+      case "resolved": return <Badge variant="outline" className="border-green-500 text-green-600 bg-green-50"><CheckCircle className="h-3 w-3 mr-1" weight="bold" />Resolved</Badge>;
+      case "closed": return <Badge variant="outline" className="border-gray-500 text-gray-600 bg-gray-50"><XCircle className="h-3 w-3 mr-1" weight="bold" />Closed</Badge>;
       default: return <Badge variant="outline"><FileText className="h-3 w-3 mr-1" />Unknown</Badge>;
     }
   };
@@ -418,7 +417,7 @@ export default function Incidents() {
             {generatePDFMutation.isPending ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Download className="mr-2 h-4 w-4" />
+              <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
             )}
             Export PDF
           </Button>
@@ -438,7 +437,7 @@ export default function Incidents() {
           <Dialog open={isCreateDialogOpen} onOpenChange={(open) => { setIsCreateDialogOpen(open); if (!open) resetForm(); }}>
             <DialogTrigger asChild>
               <Button className="shadow-md hover:shadow-lg transition-shadow">
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
                 Report Incident
               </Button>
             </DialogTrigger>
@@ -521,7 +520,7 @@ export default function Incidents() {
                       {/* Date */}
                       <div className="space-y-2">
                         <Label htmlFor="incidentDate" className="text-sm font-medium flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
+                          <CalendarBlank className="h-4 w-4" weight="bold" />
                           Date of Incident *
                         </Label>
                         <Input
@@ -537,7 +536,7 @@ export default function Incidents() {
                       {/* Time */}
                       <div className="space-y-2">
                         <Label htmlFor="incidentTime" className="text-sm font-medium flex items-center gap-2">
-                          <Clock className="h-4 w-4" />
+                          <Clock className="h-4 w-4" weight="bold" />
                           Time of Incident
                         </Label>
                         <Input
@@ -599,7 +598,7 @@ export default function Incidents() {
                     {/* Exact Location */}
                     <div className="space-y-2">
                       <Label htmlFor="locationDescription" className="text-sm font-medium flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
+                        <MapPin className="h-4 w-4" weight="bold" />
                         Exact Location of Incident
                       </Label>
                       <Input
@@ -1014,7 +1013,7 @@ export default function Incidents() {
                       onClick={handleNextStep}
                     >
                       Next
-                      <ChevronRight className="ml-2 h-4 w-4" />
+                      <CaretRight className="ml-2 h-4 w-4" weight="bold" />
                     </Button>
                   ) : (
                     <Button type="submit" disabled={createMutation.isPending} className="min-w-[150px]">
@@ -1025,7 +1024,7 @@ export default function Incidents() {
                         </>
                       ) : (
                         <>
-                          <CheckCircle className="mr-2 h-4 w-4" />
+                          <CheckCircle className="mr-2 h-4 w-4" weight="bold" />
                           Submit Incident
                         </>
                       )}
@@ -1044,7 +1043,7 @@ export default function Incidents() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Total Incidents</CardTitle>
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Activity className="h-4 w-4 text-gray-600" />
+              <Pulse className="h-4 w-4 text-gray-600" weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -1057,7 +1056,7 @@ export default function Incidents() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Open</CardTitle>
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Clock className="h-4 w-4 text-gray-600" />
+              <Clock className="h-4 w-4 text-gray-600" weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -1083,7 +1082,7 @@ export default function Incidents() {
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">This Month</CardTitle>
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Calendar className="h-4 w-4 text-gray-600" />
+              <CalendarBlank className="h-4 w-4 text-gray-600" weight="bold" />
             </div>
           </CardHeader>
           <CardContent>
@@ -1121,7 +1120,7 @@ export default function Incidents() {
                 onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
               >
                 <SelectTrigger className="w-[200px]">
-                  <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                  <MapPin className="h-4 w-4 mr-2 text-muted-foreground" weight="bold" />
                   <SelectValue placeholder="All Locations" />
                 </SelectTrigger>
                 <SelectContent>
@@ -1183,7 +1182,7 @@ export default function Incidents() {
                       </div>
                       <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <Calendar className="h-3.5 w-3.5" />
+                          <CalendarBlank className="h-3.5 w-3.5" weight="bold" />
                           {new Date(incident.incidentDate).toLocaleDateString('en-GB', { 
                             day: 'numeric', 
                             month: 'short', 
@@ -1192,7 +1191,7 @@ export default function Incidents() {
                           {incident.incidentTime && ` at ${incident.incidentTime}`}
                         </span>
                         <span className="capitalize flex items-center gap-1">
-                          <AlertCircle className="h-3.5 w-3.5" />
+                          <WarningCircle className="h-3.5 w-3.5" weight="bold" />
                           {incident.incidentType?.replace(/_/g, ' ')}
                         </span>
                       </div>
@@ -1210,7 +1209,7 @@ export default function Incidents() {
                         {incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <CaretRight className="h-5 w-5 text-muted-foreground flex-shrink-0" weight="bold" />
                   </div>
                 </div>
               ))}
@@ -1271,7 +1270,7 @@ export default function Incidents() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                        <MapPin className="h-4 w-4" />
+                        <MapPin className="h-4 w-4" weight="bold" />
                         Location
                       </div>
                       <div className="font-medium">
@@ -1316,7 +1315,7 @@ export default function Incidents() {
                   {selectedIncident.immediateActions && (
                     <div>
                       <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <Activity className="h-4 w-4" />
+                        <Pulse className="h-4 w-4" weight="bold" />
                         Immediate Actions Taken
                       </h4>
                       <div className="p-4 bg-muted/30 rounded-lg">
@@ -1342,12 +1341,12 @@ export default function Incidents() {
                         <div className="flex flex-wrap gap-3">
                           {selectedIncident.firstAidGiven && (
                             <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                              <CheckCircle className="h-3 w-3 mr-1" /> First Aid Given
+                              <CheckCircle className="h-3 w-3 mr-1" weight="bold" /> First Aid Given
                             </Badge>
                           )}
                           {selectedIncident.medicalAttentionRequired && (
                             <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
-                              <AlertCircle className="h-3 w-3 mr-1" /> Medical Attention Required
+                              <WarningCircle className="h-3 w-3 mr-1" weight="bold" /> Medical Attention Required
                             </Badge>
                           )}
                           {selectedIncident.hospitalAttendance && (
@@ -1442,7 +1441,7 @@ export default function Incidents() {
                                   disabled={logNotificationMutation.isPending}
                                 />
                               ) : (
-                                isNotified && <CheckCircle className="h-4 w-4 text-green-600" />
+                                isNotified && <CheckCircle className="h-4 w-4 text-green-600" weight="bold" />
                               )}
                             </div>
                             {isNotified && notifiedAt && (
@@ -1499,7 +1498,7 @@ export default function Incidents() {
                           className="w-full justify-start text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                           onClick={() => setShowFollowUpDialog(true)}
                         >
-                          <Plus className="mr-2 h-4 w-4" />
+                          <Plus className="mr-2 h-4 w-4" weight="bold" />
                           Add Follow-up Action
                         </Button>
                       )}
@@ -1580,7 +1579,7 @@ export default function Incidents() {
                             {closeMutation.isPending ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             ) : (
-                              <XCircle className="mr-2 h-4 w-4" />
+                              <XCircle className="mr-2 h-4 w-4" weight="bold" />
                             )}
                             Close Incident
                           </Button>
@@ -1595,7 +1594,7 @@ export default function Incidents() {
                         {generateSinglePDFMutation.isPending ? (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
-                          <Download className="mr-2 h-4 w-4" />
+                          <DownloadSimple className="mr-2 h-4 w-4" weight="bold" />
                         )}
                         Download PDF Report
                       </Button>
@@ -1680,7 +1679,7 @@ export default function Incidents() {
               {addFollowUpMutation.isPending ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
               )}
               Add to Action Log
             </Button>

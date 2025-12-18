@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LogOut, Moon, Sun, ChevronRight } from "lucide-react";
+
 import { 
   SquaresFour, 
   Users, 
@@ -42,7 +42,11 @@ import {
   CreditCard, 
   List, 
   CalendarBlank, 
-  Bug 
+  Bug,
+  SignOut,
+  Moon,
+  Sun,
+  CaretRight
 } from "@phosphor-icons/react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -76,12 +80,12 @@ function ThemeToggleItem() {
     >
       {theme === "dark" ? (
         <>
-          <Sun className="mr-2 h-4 w-4" />
+          <Sun className="mr-2 h-4 w-4" weight="bold" />
           <span>Light Mode</span>
         </>
       ) : (
         <>
-          <Moon className="mr-2 h-4 w-4" />
+          <Moon className="mr-2 h-4 w-4" weight="bold" />
           <span>Dark Mode</span>
         </>
       )}
@@ -252,7 +256,7 @@ function DashboardLayoutContent({
         {!isCollapsed && (
           <>
             <span className="truncate">{item.label}</span>
-            {isActive && <ChevronRight className="h-4 w-4 ml-auto opacity-50 shrink-0" />}
+            {isActive && <CaretRight className="h-4 w-4 ml-auto opacity-50 shrink-0" weight="bold" />}
           </>
         )}
       </SidebarMenuButton>
@@ -386,7 +390,7 @@ function DashboardLayoutContent({
                   onClick={logout}
                   className="cursor-pointer text-destructive focus:text-destructive"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <SignOut className="mr-2 h-4 w-4" weight="bold" />
                   <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

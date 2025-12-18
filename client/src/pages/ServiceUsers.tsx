@@ -6,8 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Plus, Pencil, Trash2, Loader2, Calendar, Heart, Filter, Lock, History } from "lucide-react";
-import { Users, ClipboardText } from "@phosphor-icons/react";
+import { Loader2 } from "lucide-react";
+import { Users, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Heart, Funnel, Lock, ClockCounterClockwise } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
@@ -256,7 +256,7 @@ export default function ServiceUsers() {
           {/* Location Filter */}
           {accessibleLocations.length > 1 && (
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Funnel className="h-4 w-4 text-muted-foreground" weight="bold" />
               <span className="text-sm text-muted-foreground">Location:</span>
               <Select
                 value={filterLocationId?.toString() || "all"}
@@ -316,7 +316,7 @@ export default function ServiceUsers() {
       <div className="flex items-center justify-between">
         {!canWrite && (
           <Badge variant="secondary" className="text-amber-600 bg-amber-50 border-amber-200">
-            <Lock className="h-3 w-3 mr-1" />
+            <Lock className="h-3 w-3 mr-1" weight="bold" />
             Read Only Access
           </Badge>
         )}
@@ -324,7 +324,7 @@ export default function ServiceUsers() {
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button disabled={!canWrite} title={!canWrite ? "You have read-only access to this location" : undefined}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" weight="bold" />
               Add Service User
             </Button>
           </DialogTrigger>
@@ -439,7 +439,7 @@ export default function ServiceUsers() {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
                     <CardTitle className="flex items-center gap-2">
-                      <Heart className={`h-5 w-5 ${serviceUser.isActive === false ? 'text-gray-400' : 'text-pink-500'}`} />
+                      <Heart className={`h-5 w-5 ${serviceUser.isActive === false ? 'text-gray-400' : 'text-pink-500'}`} weight="fill" />
                       {serviceUser.name}
                       {serviceUser.isActive === false && (
                         <Badge variant="secondary" className="text-xs">Inactive</Badge>
@@ -459,7 +459,7 @@ export default function ServiceUsers() {
                       }}
                       title="View History"
                     >
-                      <History className="h-4 w-4" />
+                      <ClockCounterClockwise className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -467,7 +467,7 @@ export default function ServiceUsers() {
                       onClick={() => handleEdit(serviceUser)}
                       disabled={!canWrite}
                     >
-                      <Pencil className="h-4 w-4" />
+                      <PencilSimple className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -475,7 +475,7 @@ export default function ServiceUsers() {
                       onClick={() => handleDelete(serviceUser.id)}
                       disabled={!canWrite}
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash className="h-4 w-4 text-destructive" weight="bold" />
                     </Button>
                   </div>
                 </div>
@@ -483,14 +483,14 @@ export default function ServiceUsers() {
               <CardContent className="space-y-3">
                 {serviceUser.dateOfBirth && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <span className="text-muted-foreground">DOB:</span>
                     <span>{new Date(serviceUser.dateOfBirth).toLocaleDateString()}</span>
                   </div>
                 )}
                 {serviceUser.admissionDate && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <span className="text-muted-foreground">Admitted:</span>
                     <span>{new Date(serviceUser.admissionDate).toLocaleDateString()}</span>
                   </div>
@@ -550,7 +550,7 @@ export default function ServiceUsers() {
             </p>
             {canWrite && (
               <Button onClick={() => setIsCreateOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
                 Add Service User
               </Button>
             )}
@@ -736,7 +736,7 @@ export default function ServiceUsers() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+              <ClockCounterClockwise className="h-5 w-5" weight="bold" />
               Service User History
             </DialogTitle>
             <DialogDescription>
@@ -746,7 +746,7 @@ export default function ServiceUsers() {
           <div className="py-4">
             {serviceUserHistory.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <ClockCounterClockwise className="h-12 w-12 mx-auto mb-3 opacity-50" weight="bold" />
                 <p>No history records found</p>
                 <p className="text-sm">Changes to this service user will appear here</p>
               </div>

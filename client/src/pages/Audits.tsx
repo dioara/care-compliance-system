@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, AlertCircle, CheckCircle2, Clock, Plus } from "lucide-react";
-import { ClipboardText, FileText } from "@phosphor-icons/react";
+
+import { ClipboardText, FileText, CalendarBlank, WarningCircle, CheckCircle, Clock, Plus } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
@@ -158,7 +158,7 @@ export default function Audits() {
         <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
           <DialogTrigger asChild>
             <Button size="lg" className="shadow-md hover:shadow-lg transition-all duration-200">
-              <Plus className="h-5 w-5 mr-2" />
+              <Plus className="h-5 w-5 mr-2" weight="bold" />
               Schedule Audit
             </Button>
           </DialogTrigger>
@@ -264,7 +264,7 @@ export default function Audits() {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarBlank className="mr-2 h-4 w-4" weight="bold" />
                       {format(auditDate, "PPP")}
                     </Button>
                   </PopoverTrigger>
@@ -444,7 +444,7 @@ export default function Audits() {
           {!selectedLocation ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+                <WarningCircle className="h-12 w-12 text-muted-foreground mb-4" weight="bold" />
                 <p className="text-muted-foreground">Please select a location to view audit history</p>
               </CardContent>
             </Card>

@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
-import { Plus, Pencil, Trash2, Loader2, Calendar, Shield, CheckCircle2, XCircle, Filter, Lock, History, Mail, Send } from "lucide-react";
-import { UserCheck, ClipboardText } from "@phosphor-icons/react";
+import { Loader2 } from "lucide-react";
+import { UserCheck, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Shield, CheckCircle, XCircle, Funnel, Lock, ClockCounterClockwise, Envelope, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -290,7 +290,7 @@ export default function Staff() {
       {/* Location Filter */}
       {accessibleLocations.length > 1 && (
         <div className="flex flex-wrap items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Funnel className="h-4 w-4 text-muted-foreground" weight="bold" />
           <span className="text-sm text-muted-foreground">Filter by location:</span>
           <Select
             value={filterLocationId?.toString() || "all"}
@@ -314,7 +314,7 @@ export default function Staff() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         {!canWrite && (
           <Badge variant="secondary" className="text-amber-600 bg-amber-50 border-amber-200">
-            <Lock className="h-3 w-3 mr-1" />
+            <Lock className="h-3 w-3 mr-1" weight="bold" />
             Read Only Access
           </Badge>
         )}
@@ -322,7 +322,7 @@ export default function Staff() {
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button disabled={!canWrite} title={!canWrite ? "You have read-only access to this location" : undefined}>
-              <Plus className="mr-2 h-4 w-4" />
+              <Plus className="mr-2 h-4 w-4" weight="bold" />
               Add Staff Member
             </Button>
           </DialogTrigger>
@@ -473,12 +473,12 @@ export default function Staff() {
                       </CardTitle>
                       {staffMember.isActive ? (
                         <Badge variant="default" className="bg-green-500">
-                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          <CheckCircle className="h-3 w-3 mr-1" weight="bold" />
                           Active
                         </Badge>
                       ) : (
                         <Badge variant="secondary">
-                          <XCircle className="h-3 w-3 mr-1" />
+                          <XCircle className="h-3 w-3 mr-1" weight="bold" />
                           Inactive
                         </Badge>
                       )}
@@ -494,7 +494,7 @@ export default function Staff() {
                       onClick={() => openHistory(staffMember)}
                       title="View History"
                     >
-                      <History className="h-4 w-4" />
+                      <ClockCounterClockwise className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -503,7 +503,7 @@ export default function Staff() {
                       title="Send Account Invitation"
                       disabled={!canWrite}
                     >
-                      <Mail className="h-4 w-4" />
+                      <Envelope className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -512,7 +512,7 @@ export default function Staff() {
                       disabled={!canWrite}
                       title="Edit"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <PencilSimple className="h-4 w-4" weight="bold" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -521,7 +521,7 @@ export default function Staff() {
                       disabled={!canWrite}
                       title="Delete"
                     >
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <Trash className="h-4 w-4 text-destructive" weight="bold" />
                     </Button>
                   </div>
                 </div>
@@ -529,21 +529,21 @@ export default function Staff() {
               <CardContent className="space-y-3">
                 {staffMember.employmentDate && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <span className="text-muted-foreground">Employed:</span>
                     <span>{new Date(staffMember.employmentDate).toLocaleDateString()}</span>
                   </div>
                 )}
                 {staffMember.dbsCertificateNumber && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <Shield className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <span className="text-muted-foreground">DBS:</span>
                     <span className="font-mono text-xs">{staffMember.dbsCertificateNumber}</span>
                   </div>
                 )}
                 {staffMember.dbsDate && (
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
                     <span className="text-muted-foreground">DBS Date:</span>
                     <span>{new Date(staffMember.dbsDate).toLocaleDateString()}</span>
                   </div>
@@ -579,7 +579,7 @@ export default function Staff() {
                     className="w-full"
                     onClick={() => window.location.href = `/staff/${staffMember.id}/compliance`}
                   >
-                    <ClipboardCheck className="mr-2 h-4 w-4" />
+                    <Checks className="mr-2 h-4 w-4" weight="bold" />
                     View Compliance ({staffMember.complianceProgress?.completed || 0}/{staffMember.complianceProgress?.total || 7} complete)
                   </Button>
                 </div>
@@ -597,7 +597,7 @@ export default function Staff() {
             </p>
             {canWrite && (
               <Button onClick={() => setIsCreateOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" weight="bold" />
                 Add Staff Member
               </Button>
             )}
@@ -743,7 +743,7 @@ export default function Staff() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
+              <ClockCounterClockwise className="h-5 w-5" weight="bold" />
               Staff History
             </DialogTitle>
             <DialogDescription>
@@ -784,7 +784,7 @@ export default function Staff() {
               </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <ClockCounterClockwise className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                 <p>No history records found</p>
                 <p className="text-sm">Changes to this staff member will be tracked here.</p>
               </div>
@@ -798,7 +798,7 @@ export default function Staff() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
+              <Envelope className="h-5 w-5" weight="bold" />
               Send Account Invitation
             </DialogTitle>
             <DialogDescription>
@@ -830,7 +830,7 @@ export default function Staff() {
                 {sendInvitation.isPending ? (
                   <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending...</>
                 ) : (
-                  <><Send className="mr-2 h-4 w-4" /> Send Invitation</>
+                  <><PaperPlaneTilt className="mr-2 h-4 w-4" weight="bold" /> Send Invitation</>
                 )}
               </Button>
             </DialogFooter>

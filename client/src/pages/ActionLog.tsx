@@ -10,8 +10,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Search, Filter, Download, CheckCircle2, Clock, AlertCircle, Calendar, Plus } from "lucide-react";
-import { ClipboardText, User, FileText } from "@phosphor-icons/react";
+
+import { ClipboardText, User, FileText, MagnifyingGlass, Funnel, DownloadSimple, CheckCircle, Clock, WarningCircle, CalendarBlank, Plus } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -258,7 +258,7 @@ export default function ActionLog() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleDownloadCSV} className="shadow-sm">
-            <Download className="h-4 w-4 mr-2" />
+            <DownloadSimple className="h-4 w-4 mr-2" weight="bold" />
             CSV
           </Button>
           <Button variant="outline" onClick={handleDownloadPDF} disabled={generatePdfMutation.isPending} className="shadow-sm">
@@ -266,7 +266,7 @@ export default function ActionLog() {
             {generatePdfMutation.isPending ? "Generating..." : "PDF"}
           </Button>
           <Button onClick={() => setIsAddDialogOpen(true)} className="shadow-md hover:shadow-lg transition-all duration-200">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-2" weight="bold" />
             Add Action
           </Button>
         </div>
@@ -277,7 +277,7 @@ export default function ActionLog() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" weight="bold" />
               <Input
                 placeholder="Search actions..."
                 value={searchQuery}
@@ -405,7 +405,7 @@ export default function ActionLog() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
                         {format(new Date(action.targetCompletionDate), "dd MMM yyyy")}
                         {action.status !== "completed" && isOverdue(action.targetCompletionDate) && (
                           <Badge variant="destructive" className="text-xs">Overdue</Badge>

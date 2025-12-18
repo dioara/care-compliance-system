@@ -1,4 +1,4 @@
-import { ChevronRight, Home } from "lucide-react";
+import { CaretRight, House } from "@phosphor-icons/react";
 import { Link } from "wouter";
 
 interface BreadcrumbItem {
@@ -14,7 +14,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
     <nav className="flex items-center gap-1 text-sm text-muted-foreground">
       <Link href="/dashboard" className="hover:text-foreground transition-colors flex items-center gap-1">
-        <Home className="h-3.5 w-3.5" />
+        <House className="h-3.5 w-3.5" weight="bold" />
         <span className="hidden sm:inline">Home</span>
       </Link>
       
@@ -23,7 +23,7 @@ export function Breadcrumb({ items }: BreadcrumbProps) {
         
         return (
           <div key={index} className="flex items-center gap-1">
-            <ChevronRight className="h-3.5 w-3.5 shrink-0" />
+            <CaretRight className="h-3.5 w-3.5 shrink-0" weight="bold" />
             {item.href && !isLast ? (
               <Link href={item.href} className="hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-none">
                 {item.label}
