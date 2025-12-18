@@ -37,6 +37,8 @@ import AuditScheduling from "./pages/AuditScheduling";
 import AuditComparison from "./pages/AuditComparison";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import DataPrivacy from "./pages/DataPrivacy";
+import PublicPrivacyPolicy from "./pages/PublicPrivacyPolicy";
+import PublicTermsOfService from "./pages/PublicTermsOfService";
 import RoleManagement from "./pages/RoleManagement";
 import UserManagement from "./pages/UserManagement";
 import TermsOfService from "./pages/TermsOfService";
@@ -61,6 +63,8 @@ function Router() {
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/accept-invitation" component={AcceptInvitation} />
+      <Route path="/privacy" component={PublicPrivacyPolicy} />
+      <Route path="/terms" component={PublicTermsOfService} />
       
       <Route path="/">
         <DashboardLayout>

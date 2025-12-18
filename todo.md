@@ -2678,3 +2678,15 @@
 ## UI Redesign (December 18, 2025)
 - [x] Redesign Login page - simple centered white card on clean gray background
 - [x] Redesign Register page - matching simple style with centered card
+
+
+## Authentication Updates (December 18, 2025)
+- [x] Remove Google/Microsoft social login buttons from Login page
+- [x] Remove Google social login button from Register page
+- [x] Implement forgot password flow with email reset
+- [x] Add signup confirmation email with trial info and payment options
+- [x] Fix Stripe customer not found error - recreate customer if missing in new Stripe account
+- [x] Create public Privacy Policy page (/privacy)
+- [x] Create public Terms of Service page (/terms)
+- [x] Add Help Center link to login/register pages
+- [x] Update footer links on login/register to point to correct pages

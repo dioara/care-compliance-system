@@ -54,7 +54,25 @@ async function getOrCreateStripeCustomer(tenantId: number, email: string, name: 
     .where(eq(tenantSubscriptions.tenantId, tenantId));
 
   if (subscription?.stripeCustomerId) {
-    return subscription.stripeCustomerId;
+    // Verify the customer still exists in Stripe
+    try {
+      await stripe.customers.retrieve(subscription.stripeCustomerId);
+      return subscription.stripeCustomerId;
+    } catch (error: any) {
+      // Customer doesn't exist in Stripe (maybe different Stripe account)
+      // Create a new customer
+      console.log(`[Stripe] Customer ${subscription.stripeCustomerId} not found, creating new one`);
+      const newCustomer = await stripe.customers.create({
+        email,
+        name,
+        metadata: { tenantId: tenantId.toString() },
+      });
+      await db
+        .update(tenantSubscriptions)
+        .set({ stripeCustomerId: newCustomer.id })
+        .where(eq(tenantSubscriptions.tenantId, tenantId));
+      return newCustomer.id;
+    }
   }
 
   const customer = await stripe.customers.create({
