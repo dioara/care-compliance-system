@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 import { Spinner, Buildings, UploadSimple, Key, ArrowSquareOut, Eye, EyeSlash } from "@phosphor-icons/react";
+import { compressImage, formatFileSize } from "@/lib/imageCompression";
 export default function CompanyProfile() {
   const { user } = useAuth();
   const { data: profile, isLoading, refetch } = trpc.company.getProfile.useQuery();
@@ -85,47 +86,40 @@ export default function CompanyProfile() {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB");
+    // Validate file size (max 10MB before compression)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be less than 10MB");
       return;
     }
 
     setIsUploading(true);
 
-    // Convert file to base64
-    const reader = new FileReader();
-    reader.onerror = () => {
-      toast.error("Failed to read file");
+    try {
+      // Compress image before upload
+      toast.info("Compressing image...");
+      const { base64, mimeType, originalSize, compressedSize } = await compressImage(file, {
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.8,
+        maxSizeKB: 500,
+      });
+
+      console.log(`Image compressed: ${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)}`);
+
+      await uploadLogo.mutateAsync({
+        fileData: base64,
+        fileName: file.name.replace(/\.[^.]+$/, '.jpg'), // Change extension to jpg
+        mimeType,
+      });
+
+      toast.success(`Logo uploaded successfully (${formatFileSize(originalSize)} → ${formatFileSize(compressedSize)})`);
+      refetch();
+    } catch (error: any) {
+      console.error("Logo upload error:", error);
+      toast.error(error?.message || "Failed to upload logo");
+    } finally {
       setIsUploading(false);
-    };
-    reader.onload = async () => {
-      try {
-        const base64 = reader.result as string;
-        const fileData = base64.split(',')[1]; // Remove data:image/...;base64, prefix
-
-        if (!fileData) {
-          toast.error("Invalid file data");
-          setIsUploading(false);
-          return;
-        }
-
-        await uploadLogo.mutateAsync({
-          fileData,
-          fileName: file.name,
-          mimeType: file.type,
-        });
-
-        toast.success("Logo uploaded successfully");
-        refetch();
-      } catch (error: any) {
-        console.error("Logo upload error:", error);
-        toast.error(error?.message || "Failed to upload logo");
-      } finally {
-        setIsUploading(false);
-      }
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   if (isLoading) {
