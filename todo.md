@@ -2756,3 +2756,4 @@
 - [x] Update Evidence Provided field to include storage location guidance
 - [x] Make logo clickable and link to ccms.co.uk
 - [x] Rebrand from CCMS to Care Compliance with new logo
+- [x] Update footer copyright to "Care Compliance Management System"

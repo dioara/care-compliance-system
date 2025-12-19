@@ -94,7 +94,7 @@ export default function Register() {
               </h1>
               
               <p className="text-gray-600 mb-6">
-                Welcome to Care Compliance System. Your 30-day free trial has started.
+                Welcome to Care Compliance Management System. Your 30-day free trial has started.
               </p>
 
               {/* Email Verification Notice */}
@@ -132,7 +132,7 @@ export default function Register() {
 
             {/* Footer */}
             <div className="mt-8 text-center text-sm text-gray-500">
-              <p>© {new Date().getFullYear()} Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
+              <p>© {new Date().getFullYear()} Care Compliance Management System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
             </div>
           </div>
         </main>

@@ -440,7 +440,7 @@ function DashboardLayoutContent({
         <footer className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
-              <span>© 2025 Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Lampstand Consulting</a>.</span>
+              <span>© 2025 Care Compliance Management System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Lampstand Consulting</a>.</span>
             </div>
             <div className="flex items-center gap-6">
               <a
