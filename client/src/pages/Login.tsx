@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { AlertCircle, Mail, RefreshCw } from "lucide-react";
+import { AlertCircle, Mail, RefreshCw, ShieldCheck } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -67,9 +67,9 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header with logo */}
       <header className="p-6">
-        <a href="https://ccms.co.uk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit">
-          <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
-          <span className="font-semibold text-gray-900">CCMS</span>
+        <a href="https://ccms.co.uk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit font-bold text-xl text-primary">
+          <ShieldCheck className="h-8 w-8" />
+          <span>Care Compliance</span>
         </a>
       </header>
 
@@ -179,7 +179,7 @@ export default function Login() {
             {/* Register link */}
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <p className="text-sm text-gray-600">
-                New to CCMS?{" "}
+                New to Care Compliance?{" "}
                 <button 
                   type="button"
                   onClick={() => setLocation("/register")} 
@@ -193,7 +193,7 @@ export default function Login() {
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>© {new Date().getFullYear()} CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
+              <p>© {new Date().getFullYear()} Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
             <div className="mt-2 space-x-4">
               <a href="/privacy" className="hover:text-gray-700">Privacy</a>
               <a href="/terms" className="hover:text-gray-700">Terms</a>

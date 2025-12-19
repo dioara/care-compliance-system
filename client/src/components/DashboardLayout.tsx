@@ -317,16 +317,12 @@ function DashboardLayoutContent({
               </Tooltip>
               {!isCollapsed && (
                 <div className="flex items-center gap-2 min-w-0">
-                  <img 
-                    src="/logo.png" 
-                    alt="CCMS Logo" 
-                    className="h-8 w-8 shrink-0 object-contain"
-                  />
+                  <ShieldCheck className="h-8 w-8 shrink-0 text-primary" />
                   <div className="flex flex-col min-w-0">
                     <span className="font-bold tracking-tight truncate text-sm">
-                      CCMS
+                      Care Compliance
                     </span>
-                    <span className="text-[10px] text-muted-foreground -mt-0.5 truncate">Care Compliance</span>
+                    <span className="text-[10px] text-muted-foreground -mt-0.5 truncate">Management System</span>
                   </div>
                 </div>
               )}
@@ -444,7 +440,7 @@ function DashboardLayoutContent({
         <footer className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-4">
-              <span>© 2025 CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Lampstand Consulting</a>.</span>
+              <span>© 2025 Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Lampstand Consulting</a>.</span>
             </div>
             <div className="flex items-center gap-6">
               <a

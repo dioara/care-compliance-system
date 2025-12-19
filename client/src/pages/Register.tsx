@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Mail } from "lucide-react";
+import { CheckCircle2, Mail, ShieldCheck } from "lucide-react";
 
 export default function Register() {
   const [, setLocation] = useLocation();
@@ -94,7 +94,7 @@ export default function Register() {
               </h1>
               
               <p className="text-gray-600 mb-6">
-                Welcome to CCMS. Your 30-day free trial has started.
+                Welcome to Care Compliance System. Your 30-day free trial has started.
               </p>
 
               {/* Email Verification Notice */}
@@ -132,7 +132,7 @@ export default function Register() {
 
             {/* Footer */}
             <div className="mt-8 text-center text-sm text-gray-500">
-              <p>© {new Date().getFullYear()} CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
+              <p>© {new Date().getFullYear()} Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
             </div>
           </div>
         </main>
@@ -144,9 +144,9 @@ export default function Register() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header with logo */}
       <header className="p-6">
-        <a href="https://ccms.co.uk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit">
-          <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
-          <span className="font-semibold text-gray-900">CCMS</span>
+        <a href="https://ccms.co.uk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit font-bold text-xl text-primary">
+          <ShieldCheck className="h-8 w-8" />
+          <span>Care Compliance</span>
         </a>
       </header>
 
@@ -296,7 +296,7 @@ export default function Register() {
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>© {new Date().getFullYear()} CCMS. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
+            <p>© {new Date().getFullYear()} Care Compliance System. Built by <a href="https://lampstand.consulting" target="_blank" rel="noopener noreferrer" className="hover:text-[#1F7AE0] transition-colors">Lampstand Consulting</a>.</p>
             <div className="mt-2 space-x-4">
               <a href="/privacy" className="hover:text-gray-700">Privacy</a>
               <a href="/terms" className="hover:text-gray-700">Terms</a>
