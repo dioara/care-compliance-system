@@ -67,10 +67,10 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header with logo */}
       <header className="p-6">
-        <div className="flex items-center gap-2">
+        <a href="https://ccms.co.uk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:opacity-80 transition-opacity w-fit">
           <img src="/logo.png" alt="CCMS" className="h-8 w-8" />
           <span className="font-semibold text-gray-900">CCMS</span>
-        </div>
+        </a>
       </header>
 
       {/* Main content */}
