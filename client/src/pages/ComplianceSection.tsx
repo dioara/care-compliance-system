@@ -274,10 +274,10 @@ export default function ComplianceSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor={`evidence-${question.id}`}>Evidence Provided</Label>
+                    <Label htmlFor={`evidence-${question.id}`}>Evidence Provided <span className="text-muted-foreground font-normal">(include storage location for easy retrieval)</span></Label>
                     <Textarea
                       id={`evidence-${question.id}`}
-                      placeholder="Describe the evidence you have for compliance..."
+                      placeholder="Describe the evidence and where it is stored (e.g., 'Care plan folder in filing cabinet A', 'Staff training records - SharePoint', 'Medication folder - Room 3')..."
                       value={currentFormData.evidenceProvided || existingAssessment?.evidenceProvided || ''}
                       onChange={(e) => updateFormData(question.id, 'evidenceProvided', e.target.value)}
                       disabled={!canWrite}

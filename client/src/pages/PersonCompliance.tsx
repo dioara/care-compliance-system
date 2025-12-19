@@ -428,10 +428,10 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                                 </div>
 
                                 <div className="space-y-2">
-                                  <Label htmlFor={`evidence-${question.id}`}>Evidence Provided</Label>
+                                  <Label htmlFor={`evidence-${question.id}`}>Evidence Provided <span className="text-muted-foreground font-normal">(include storage location for easy retrieval)</span></Label>
                                   <Textarea
                                     id={`evidence-${question.id}`}
-                                    placeholder="Describe the evidence you have for this requirement..."
+                                    placeholder="Describe the evidence and where it is stored (e.g., 'Personnel file - Filing cabinet B', 'Training certificates - HR SharePoint', 'DBS folder - Office safe')..."
                                     value={currentFormData.evidenceProvided || existingAssessment?.evidenceProvided || ''}
                                     onChange={(e) => updateFormData(question.id, 'evidenceProvided', e.target.value)}
                                     disabled={!canWrite}

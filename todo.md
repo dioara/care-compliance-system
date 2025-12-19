@@ -2753,3 +2753,4 @@
 - [x] Review TypeScript errors in auditReminderService.ts - fixed Date type
 - [x] Store company logo as base64 in database instead of S3
 - [x] Add client-side image compression before logo upload
+- [x] Update Evidence Provided field to include storage location guidance
