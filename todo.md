@@ -2765,3 +2765,9 @@
 - [x] Add question reference sheet in Excel for full question text
 - [x] Build Reports page UI with download buttons
 - [x] Test Excel export functionality
+
+## Excel Report Enhancements
+- [x] Add conditional formatting with colour coding (green=C, red=NC, amber=P)
+- [x] Add compliance percentage calculations per person
+- [x] Add compliance percentage calculations per section
+- [x] Add summary row with overall percentages

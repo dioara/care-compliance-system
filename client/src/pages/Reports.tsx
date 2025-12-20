@@ -7,7 +7,83 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FileSpreadsheet, Download, Users, UserCheck, Loader2, AlertCircle, FileText } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { WarningCircle } from "@phosphor-icons/react";
-import * as XLSX from "xlsx";
+import XLSX from "xlsx-js-style";
+
+// Cell styles for conditional formatting
+const styles = {
+  compliant: {
+    fill: { fgColor: { rgb: "C6EFCE" } }, // Light green
+    font: { color: { rgb: "006100" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  nonCompliant: {
+    fill: { fgColor: { rgb: "FFC7CE" } }, // Light red
+    font: { color: { rgb: "9C0006" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  partial: {
+    fill: { fgColor: { rgb: "FFEB9C" } }, // Light amber
+    font: { color: { rgb: "9C5700" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  notAssessed: {
+    fill: { fgColor: { rgb: "E0E0E0" } }, // Light grey
+    font: { color: { rgb: "666666" } },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  header: {
+    fill: { fgColor: { rgb: "4472C4" } }, // Blue header
+    font: { color: { rgb: "FFFFFF" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  subHeader: {
+    fill: { fgColor: { rgb: "8EA9DB" } }, // Lighter blue
+    font: { color: { rgb: "000000" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  percentage: {
+    fill: { fgColor: { rgb: "F2F2F2" } },
+    font: { bold: true },
+    alignment: { horizontal: "center", vertical: "center" },
+    numFmt: "0.0%"
+  },
+  percentageGood: {
+    fill: { fgColor: { rgb: "C6EFCE" } },
+    font: { color: { rgb: "006100" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  percentageMedium: {
+    fill: { fgColor: { rgb: "FFEB9C" } },
+    font: { color: { rgb: "9C5700" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  percentageLow: {
+    fill: { fgColor: { rgb: "FFC7CE" } },
+    font: { color: { rgb: "9C0006" }, bold: true },
+    alignment: { horizontal: "center", vertical: "center" }
+  },
+  label: {
+    font: { bold: true },
+    alignment: { horizontal: "left", vertical: "center" }
+  }
+};
+
+// Helper to get percentage style based on value
+const getPercentageStyle = (percentage: number) => {
+  if (percentage >= 80) return styles.percentageGood;
+  if (percentage >= 50) return styles.percentageMedium;
+  return styles.percentageLow;
+};
+
+// Helper to get cell style based on status
+const getStatusStyle = (status: string) => {
+  switch (status) {
+    case "C": return styles.compliant;
+    case "NC": return styles.nonCompliant;
+    case "P": return styles.partial;
+    default: return styles.notAssessed;
+  }
+};
 
 export default function Reports() {
   const { activeLocationId, permissions, isLoading: locationLoading } = useLocation();
@@ -47,14 +123,7 @@ export default function Reports() {
     try {
       const workbook = XLSX.utils.book_new();
 
-      // Sheet 1: Compliance Matrix
-      const matrixData: any[][] = [];
-      
-      // Header row: Name, Location, then question numbers grouped by section
-      const headerRow1 = ["Service User", "Location"];
-      const headerRow2 = ["", ""];
-      
-      // Group questions by section for headers
+      // Group questions by section
       const questionsBySection = new Map<number, typeof serviceUserData.questions>();
       serviceUserData.questions.forEach(q => {
         if (!questionsBySection.has(q.sectionId)) {
@@ -63,21 +132,57 @@ export default function Reports() {
         questionsBySection.get(q.sectionId)!.push(q);
       });
 
-      // Build headers with section grouping
+      // Calculate total questions count
+      const totalQuestions = serviceUserData.questions.length;
+      const fixedCols = 2; // Name, Location
+
+      // Build matrix data with styles
+      const matrixData: any[][] = [];
+      
+      // Header row 1: Name, Location, Section IDs, then "% Compliant"
+      const headerRow1 = [
+        { v: "Service User", s: styles.header },
+        { v: "Location", s: styles.header }
+      ];
+      
+      serviceUserData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        sectionQuestions.forEach((_, idx) => {
+          if (idx === 0) {
+            headerRow1.push({ v: `S${section.sectionNumber}`, s: styles.header });
+          } else {
+            headerRow1.push({ v: "", s: styles.header });
+          }
+        });
+      });
+      headerRow1.push({ v: "% Compliant", s: styles.header });
+
+      // Header row 2: Empty, Empty, Question numbers, then empty
+      const headerRow2 = [
+        { v: "", s: styles.subHeader },
+        { v: "", s: styles.subHeader }
+      ];
+      
       serviceUserData.sections.forEach(section => {
         const sectionQuestions = questionsBySection.get(section.id) || [];
         sectionQuestions.forEach(q => {
-          headerRow1.push(`S${section.sectionNumber}`);
-          headerRow2.push(q.questionNumber);
+          headerRow2.push({ v: q.questionNumber, s: styles.subHeader });
         });
       });
+      headerRow2.push({ v: "", s: styles.subHeader });
 
       matrixData.push(headerRow1);
       matrixData.push(headerRow2);
 
-      // Data rows: one per service user
+      // Data rows with compliance calculations
       serviceUserData.serviceUsers.forEach(su => {
-        const row = [su.name, su.locationName];
+        const row: any[] = [
+          { v: su.name, s: styles.label },
+          { v: su.locationName, s: { alignment: { horizontal: "left" } } }
+        ];
+        
+        let compliantCount = 0;
+        let assessedCount = 0;
         
         serviceUserData.sections.forEach(section => {
           const sectionQuestions = questionsBySection.get(section.id) || [];
@@ -85,23 +190,89 @@ export default function Reports() {
             const assessment = serviceUserData.assessments.find(
               a => a.serviceUserId === su.id && a.questionId === q.id
             );
+            
+            let status = "NA";
             if (assessment) {
-              // Use status abbreviations: C=Compliant, NC=Non-Compliant, P=Partial, NA=Not Assessed
               const statusMap: Record<string, string> = {
                 compliant: "C",
                 non_compliant: "NC",
                 partial: "P",
                 not_assessed: "NA"
               };
-              row.push(statusMap[assessment.complianceStatus] || "NA");
-            } else {
-              row.push("NA");
+              status = statusMap[assessment.complianceStatus] || "NA";
             }
+            
+            // Count for percentage calculation
+            if (status !== "NA") {
+              assessedCount++;
+              if (status === "C") compliantCount++;
+              if (status === "P") compliantCount += 0.5; // Partial counts as 50%
+            }
+            
+            row.push({ v: status, s: getStatusStyle(status) });
           });
+        });
+        
+        // Calculate and add percentage
+        const percentage = assessedCount > 0 ? (compliantCount / assessedCount) * 100 : 0;
+        row.push({ 
+          v: `${percentage.toFixed(1)}%`, 
+          s: getPercentageStyle(percentage)
         });
         
         matrixData.push(row);
       });
+
+      // Section compliance summary row
+      const sectionSummaryRow: any[] = [
+        { v: "Section Compliance %", s: { ...styles.header, alignment: { horizontal: "left" } } },
+        { v: "", s: styles.header }
+      ];
+      
+      let overallCompliant = 0;
+      let overallAssessed = 0;
+      
+      serviceUserData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        sectionQuestions.forEach(q => {
+          let sectionCompliant = 0;
+          let sectionAssessed = 0;
+          
+          serviceUserData.serviceUsers.forEach(su => {
+            const assessment = serviceUserData.assessments.find(
+              a => a.serviceUserId === su.id && a.questionId === q.id
+            );
+            
+            if (assessment && assessment.complianceStatus !== "not_assessed") {
+              sectionAssessed++;
+              overallAssessed++;
+              if (assessment.complianceStatus === "compliant") {
+                sectionCompliant++;
+                overallCompliant++;
+              }
+              if (assessment.complianceStatus === "partial") {
+                sectionCompliant += 0.5;
+                overallCompliant += 0.5;
+              }
+            }
+          });
+          
+          const percentage = sectionAssessed > 0 ? (sectionCompliant / sectionAssessed) * 100 : 0;
+          sectionSummaryRow.push({ 
+            v: `${percentage.toFixed(0)}%`, 
+            s: getPercentageStyle(percentage)
+          });
+        });
+      });
+      
+      // Overall percentage
+      const overallPercentage = overallAssessed > 0 ? (overallCompliant / overallAssessed) * 100 : 0;
+      sectionSummaryRow.push({ 
+        v: `${overallPercentage.toFixed(1)}%`, 
+        s: { ...getPercentageStyle(overallPercentage), font: { ...getPercentageStyle(overallPercentage).font, sz: 12 } }
+      });
+      
+      matrixData.push(sectionSummaryRow);
 
       const matrixSheet = XLSX.utils.aoa_to_sheet(matrixData);
       
@@ -109,25 +280,47 @@ export default function Reports() {
       matrixSheet["!cols"] = [
         { wch: 25 }, // Service User name
         { wch: 20 }, // Location
-        ...Array(serviceUserData.questions.length).fill({ wch: 6 })
+        ...Array(totalQuestions).fill({ wch: 6 }),
+        { wch: 12 } // Percentage column
       ];
+
+      // Merge cells for section headers
+      const merges: XLSX.Range[] = [];
+      let colIndex = fixedCols;
+      serviceUserData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        if (sectionQuestions.length > 1) {
+          merges.push({
+            s: { r: 0, c: colIndex },
+            e: { r: 0, c: colIndex + sectionQuestions.length - 1 }
+          });
+        }
+        colIndex += sectionQuestions.length;
+      });
+      matrixSheet["!merges"] = merges;
 
       XLSX.utils.book_append_sheet(workbook, matrixSheet, "Compliance Matrix");
 
       // Sheet 2: Question Reference
-      const referenceData = [
-        ["Section", "Section Name", "Question No.", "Question Text", "Evidence Required"]
+      const referenceData: any[][] = [
+        [
+          { v: "Section", s: styles.header },
+          { v: "Section Name", s: styles.header },
+          { v: "Question No.", s: styles.header },
+          { v: "Question Text", s: styles.header },
+          { v: "Evidence Required", s: styles.header }
+        ]
       ];
 
       serviceUserData.sections.forEach(section => {
         const sectionQuestions = questionsBySection.get(section.id) || [];
         sectionQuestions.forEach(q => {
           referenceData.push([
-            `S${section.sectionNumber}`,
-            section.sectionName,
-            q.questionNumber,
-            q.questionText,
-            q.evidenceRequirement || ""
+            { v: `S${section.sectionNumber}`, s: { alignment: { horizontal: "center" } } },
+            { v: section.sectionName },
+            { v: q.questionNumber, s: { alignment: { horizontal: "center" } } },
+            { v: q.questionText },
+            { v: q.evidenceRequirement || "" }
           ]);
         });
       });
@@ -144,20 +337,26 @@ export default function Reports() {
       XLSX.utils.book_append_sheet(workbook, referenceSheet, "Question Reference");
 
       // Sheet 3: Summary Statistics
-      const summaryData = [
-        ["Service User Compliance Summary Report"],
-        ["Generated:", new Date().toLocaleDateString("en-GB")],
-        ["Location:", selectedLocationId ? accessibleLocations.find(l => l.id === selectedLocationId)?.name || "All Locations" : "All Locations"],
-        [""],
-        ["Total Service Users:", serviceUserData.serviceUsers.length],
-        ["Total Sections:", serviceUserData.sections.length],
-        ["Total Questions:", serviceUserData.questions.length],
-        [""],
-        ["Status Legend:"],
-        ["C", "Compliant"],
-        ["NC", "Non-Compliant"],
-        ["P", "Partial"],
-        ["NA", "Not Assessed"]
+      const summaryData: any[][] = [
+        [{ v: "Service User Compliance Summary Report", s: { font: { bold: true, sz: 14 } } }],
+        [{ v: "Generated:", s: styles.label }, { v: new Date().toLocaleDateString("en-GB") }],
+        [{ v: "Location:", s: styles.label }, { v: selectedLocationId ? accessibleLocations.find(l => l.id === selectedLocationId)?.name || "All Locations" : "All Locations" }],
+        [{ v: "" }],
+        [{ v: "Total Service Users:", s: styles.label }, { v: serviceUserData.serviceUsers.length }],
+        [{ v: "Total Sections:", s: styles.label }, { v: serviceUserData.sections.length }],
+        [{ v: "Total Questions:", s: styles.label }, { v: serviceUserData.questions.length }],
+        [{ v: "Overall Compliance:", s: styles.label }, { v: `${overallPercentage.toFixed(1)}%`, s: getPercentageStyle(overallPercentage) }],
+        [{ v: "" }],
+        [{ v: "Status Legend:", s: { font: { bold: true } } }],
+        [{ v: "C", s: styles.compliant }, { v: "Compliant" }],
+        [{ v: "NC", s: styles.nonCompliant }, { v: "Non-Compliant" }],
+        [{ v: "P", s: styles.partial }, { v: "Partial" }],
+        [{ v: "NA", s: styles.notAssessed }, { v: "Not Assessed" }],
+        [{ v: "" }],
+        [{ v: "Colour Coding:", s: { font: { bold: true } } }],
+        [{ v: "≥80%", s: styles.percentageGood }, { v: "Good compliance" }],
+        [{ v: "50-79%", s: styles.percentageMedium }, { v: "Needs improvement" }],
+        [{ v: "<50%", s: styles.percentageLow }, { v: "Critical attention required" }]
       ];
 
       const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
@@ -183,13 +382,6 @@ export default function Reports() {
     try {
       const workbook = XLSX.utils.book_new();
 
-      // Sheet 1: Compliance Matrix
-      const matrixData: any[][] = [];
-      
-      // Header rows
-      const headerRow1 = ["Staff Member", "Role", "Location"];
-      const headerRow2 = ["", "", ""];
-      
       // Group questions by section
       const questionsBySection = new Map<number, typeof staffData.questions>();
       staffData.questions.forEach(q => {
@@ -199,21 +391,59 @@ export default function Reports() {
         questionsBySection.get(q.sectionId)!.push(q);
       });
 
-      // Build headers
+      const totalQuestions = staffData.questions.length;
+      const fixedCols = 3; // Name, Role, Location
+
+      // Build matrix data
+      const matrixData: any[][] = [];
+      
+      // Header row 1
+      const headerRow1 = [
+        { v: "Staff Member", s: styles.header },
+        { v: "Role", s: styles.header },
+        { v: "Location", s: styles.header }
+      ];
+      
+      staffData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        sectionQuestions.forEach((_, idx) => {
+          if (idx === 0) {
+            headerRow1.push({ v: `S${section.sectionNumber}`, s: styles.header });
+          } else {
+            headerRow1.push({ v: "", s: styles.header });
+          }
+        });
+      });
+      headerRow1.push({ v: "% Compliant", s: styles.header });
+
+      // Header row 2
+      const headerRow2 = [
+        { v: "", s: styles.subHeader },
+        { v: "", s: styles.subHeader },
+        { v: "", s: styles.subHeader }
+      ];
+      
       staffData.sections.forEach(section => {
         const sectionQuestions = questionsBySection.get(section.id) || [];
         sectionQuestions.forEach(q => {
-          headerRow1.push(`S${section.sectionNumber}`);
-          headerRow2.push(q.questionNumber);
+          headerRow2.push({ v: q.questionNumber, s: styles.subHeader });
         });
       });
+      headerRow2.push({ v: "", s: styles.subHeader });
 
       matrixData.push(headerRow1);
       matrixData.push(headerRow2);
 
       // Data rows
       staffData.staffMembers.forEach(staff => {
-        const row = [staff.name, staff.role || "", staff.locationName];
+        const row: any[] = [
+          { v: staff.name, s: styles.label },
+          { v: staff.role || "", s: { alignment: { horizontal: "left" } } },
+          { v: staff.locationName, s: { alignment: { horizontal: "left" } } }
+        ];
+        
+        let compliantCount = 0;
+        let assessedCount = 0;
         
         staffData.sections.forEach(section => {
           const sectionQuestions = questionsBySection.get(section.id) || [];
@@ -221,6 +451,8 @@ export default function Reports() {
             const assessment = staffData.assessments.find(
               a => a.staffMemberId === staff.id && a.questionId === q.id
             );
+            
+            let status = "NA";
             if (assessment) {
               const statusMap: Record<string, string> = {
                 compliant: "C",
@@ -228,40 +460,125 @@ export default function Reports() {
                 partial: "P",
                 not_assessed: "NA"
               };
-              row.push(statusMap[assessment.complianceStatus] || "NA");
-            } else {
-              row.push("NA");
+              status = statusMap[assessment.complianceStatus] || "NA";
             }
+            
+            if (status !== "NA") {
+              assessedCount++;
+              if (status === "C") compliantCount++;
+              if (status === "P") compliantCount += 0.5;
+            }
+            
+            row.push({ v: status, s: getStatusStyle(status) });
           });
+        });
+        
+        const percentage = assessedCount > 0 ? (compliantCount / assessedCount) * 100 : 0;
+        row.push({ 
+          v: `${percentage.toFixed(1)}%`, 
+          s: getPercentageStyle(percentage)
         });
         
         matrixData.push(row);
       });
+
+      // Section compliance summary row
+      const sectionSummaryRow: any[] = [
+        { v: "Section Compliance %", s: { ...styles.header, alignment: { horizontal: "left" } } },
+        { v: "", s: styles.header },
+        { v: "", s: styles.header }
+      ];
+      
+      let overallCompliant = 0;
+      let overallAssessed = 0;
+      
+      staffData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        sectionQuestions.forEach(q => {
+          let sectionCompliant = 0;
+          let sectionAssessed = 0;
+          
+          staffData.staffMembers.forEach(staff => {
+            const assessment = staffData.assessments.find(
+              a => a.staffMemberId === staff.id && a.questionId === q.id
+            );
+            
+            if (assessment && assessment.complianceStatus !== "not_assessed") {
+              sectionAssessed++;
+              overallAssessed++;
+              if (assessment.complianceStatus === "compliant") {
+                sectionCompliant++;
+                overallCompliant++;
+              }
+              if (assessment.complianceStatus === "partial") {
+                sectionCompliant += 0.5;
+                overallCompliant += 0.5;
+              }
+            }
+          });
+          
+          const percentage = sectionAssessed > 0 ? (sectionCompliant / sectionAssessed) * 100 : 0;
+          sectionSummaryRow.push({ 
+            v: `${percentage.toFixed(0)}%`, 
+            s: getPercentageStyle(percentage)
+          });
+        });
+      });
+      
+      const overallPercentage = overallAssessed > 0 ? (overallCompliant / overallAssessed) * 100 : 0;
+      sectionSummaryRow.push({ 
+        v: `${overallPercentage.toFixed(1)}%`, 
+        s: { ...getPercentageStyle(overallPercentage), font: { ...getPercentageStyle(overallPercentage).font, sz: 12 } }
+      });
+      
+      matrixData.push(sectionSummaryRow);
 
       const matrixSheet = XLSX.utils.aoa_to_sheet(matrixData);
       matrixSheet["!cols"] = [
         { wch: 25 },
         { wch: 20 },
         { wch: 20 },
-        ...Array(staffData.questions.length).fill({ wch: 6 })
+        ...Array(totalQuestions).fill({ wch: 6 }),
+        { wch: 12 }
       ];
+
+      // Merge cells for section headers
+      const merges: XLSX.Range[] = [];
+      let colIndex = fixedCols;
+      staffData.sections.forEach(section => {
+        const sectionQuestions = questionsBySection.get(section.id) || [];
+        if (sectionQuestions.length > 1) {
+          merges.push({
+            s: { r: 0, c: colIndex },
+            e: { r: 0, c: colIndex + sectionQuestions.length - 1 }
+          });
+        }
+        colIndex += sectionQuestions.length;
+      });
+      matrixSheet["!merges"] = merges;
 
       XLSX.utils.book_append_sheet(workbook, matrixSheet, "Compliance Matrix");
 
       // Sheet 2: Question Reference
-      const referenceData = [
-        ["Section", "Section Name", "Question No.", "Question Text", "Evidence Required"]
+      const referenceData: any[][] = [
+        [
+          { v: "Section", s: styles.header },
+          { v: "Section Name", s: styles.header },
+          { v: "Question No.", s: styles.header },
+          { v: "Question Text", s: styles.header },
+          { v: "Evidence Required", s: styles.header }
+        ]
       ];
 
       staffData.sections.forEach(section => {
         const sectionQuestions = questionsBySection.get(section.id) || [];
         sectionQuestions.forEach(q => {
           referenceData.push([
-            `S${section.sectionNumber}`,
-            section.sectionName,
-            q.questionNumber,
-            q.questionText,
-            q.evidenceRequirement || ""
+            { v: `S${section.sectionNumber}`, s: { alignment: { horizontal: "center" } } },
+            { v: section.sectionName },
+            { v: q.questionNumber, s: { alignment: { horizontal: "center" } } },
+            { v: q.questionText },
+            { v: q.evidenceRequirement || "" }
           ]);
         });
       });
@@ -278,20 +595,26 @@ export default function Reports() {
       XLSX.utils.book_append_sheet(workbook, referenceSheet, "Question Reference");
 
       // Sheet 3: Summary
-      const summaryData = [
-        ["Staff Compliance Summary Report"],
-        ["Generated:", new Date().toLocaleDateString("en-GB")],
-        ["Location:", selectedLocationId ? accessibleLocations.find(l => l.id === selectedLocationId)?.name || "All Locations" : "All Locations"],
-        [""],
-        ["Total Staff Members:", staffData.staffMembers.length],
-        ["Total Sections:", staffData.sections.length],
-        ["Total Questions:", staffData.questions.length],
-        [""],
-        ["Status Legend:"],
-        ["C", "Compliant"],
-        ["NC", "Non-Compliant"],
-        ["P", "Partial"],
-        ["NA", "Not Assessed"]
+      const summaryData: any[][] = [
+        [{ v: "Staff Compliance Summary Report", s: { font: { bold: true, sz: 14 } } }],
+        [{ v: "Generated:", s: styles.label }, { v: new Date().toLocaleDateString("en-GB") }],
+        [{ v: "Location:", s: styles.label }, { v: selectedLocationId ? accessibleLocations.find(l => l.id === selectedLocationId)?.name || "All Locations" : "All Locations" }],
+        [{ v: "" }],
+        [{ v: "Total Staff Members:", s: styles.label }, { v: staffData.staffMembers.length }],
+        [{ v: "Total Sections:", s: styles.label }, { v: staffData.sections.length }],
+        [{ v: "Total Questions:", s: styles.label }, { v: staffData.questions.length }],
+        [{ v: "Overall Compliance:", s: styles.label }, { v: `${overallPercentage.toFixed(1)}%`, s: getPercentageStyle(overallPercentage) }],
+        [{ v: "" }],
+        [{ v: "Status Legend:", s: { font: { bold: true } } }],
+        [{ v: "C", s: styles.compliant }, { v: "Compliant" }],
+        [{ v: "NC", s: styles.nonCompliant }, { v: "Non-Compliant" }],
+        [{ v: "P", s: styles.partial }, { v: "Partial" }],
+        [{ v: "NA", s: styles.notAssessed }, { v: "Not Assessed" }],
+        [{ v: "" }],
+        [{ v: "Colour Coding:", s: { font: { bold: true } } }],
+        [{ v: "≥80%", s: styles.percentageGood }, { v: "Good compliance" }],
+        [{ v: "50-79%", s: styles.percentageMedium }, { v: "Needs improvement" }],
+        [{ v: "<50%", s: styles.percentageLow }, { v: "Critical attention required" }]
       ];
 
       const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
@@ -328,7 +651,7 @@ export default function Reports() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Compliance Reports</h1>
           <p className="text-muted-foreground">
-            Download compliance assessment reports in Excel format
+            Download compliance assessment reports in Excel format with colour coding
           </p>
         </div>
 
@@ -393,9 +716,10 @@ export default function Reports() {
               <div className="text-sm text-muted-foreground">
                 <p>The Excel report includes:</p>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Compliance matrix with all service users and questions</li>
-                  <li>Question reference sheet with full question text</li>
-                  <li>Summary statistics</li>
+                  <li>Colour-coded compliance matrix (green/amber/red)</li>
+                  <li>Compliance % per person and per section</li>
+                  <li>Question reference sheet with full text</li>
+                  <li>Summary with overall compliance statistics</li>
                 </ul>
               </div>
 
@@ -451,9 +775,10 @@ export default function Reports() {
               <div className="text-sm text-muted-foreground">
                 <p>The Excel report includes:</p>
                 <ul className="list-disc list-inside mt-2 space-y-1">
-                  <li>Compliance matrix with all staff and questions</li>
-                  <li>Question reference sheet with full question text</li>
-                  <li>Summary statistics</li>
+                  <li>Colour-coded compliance matrix (green/amber/red)</li>
+                  <li>Compliance % per person and per section</li>
+                  <li>Question reference sheet with full text</li>
+                  <li>Summary with overall compliance statistics</li>
                 </ul>
               </div>
 
@@ -493,23 +818,22 @@ export default function Reports() {
               <h4 className="font-medium mb-2">Compliance Matrix Sheet</h4>
               <p className="text-sm text-muted-foreground">
                 Shows each person as a row with columns for each compliance question. 
-                Section numbers (S1, S2, etc.) group the questions, with question numbers below.
+                Cells are colour-coded: green (compliant), amber (partial), red (non-compliant).
               </p>
             </div>
             <div>
-              <h4 className="font-medium mb-2">Question Reference Sheet</h4>
+              <h4 className="font-medium mb-2">Percentage Calculations</h4>
               <p className="text-sm text-muted-foreground">
-                Full text of each compliance question organised by section, 
-                including evidence requirements for easy reference.
+                Each row shows the person's overall compliance %. 
+                Bottom row shows compliance % per question across all people.
               </p>
             </div>
             <div>
-              <h4 className="font-medium mb-2">Status Codes</h4>
+              <h4 className="font-medium mb-2">Colour Coding</h4>
               <div className="text-sm space-y-1">
-                <p><span className="font-mono bg-green-100 text-green-800 px-1 rounded">C</span> - Compliant</p>
-                <p><span className="font-mono bg-red-100 text-red-800 px-1 rounded">NC</span> - Non-Compliant</p>
-                <p><span className="font-mono bg-amber-100 text-amber-800 px-1 rounded">P</span> - Partial</p>
-                <p><span className="font-mono bg-gray-100 text-gray-800 px-1 rounded">NA</span> - Not Assessed</p>
+                <p><span className="inline-block w-4 h-4 bg-green-200 rounded mr-2 align-middle"></span>≥80% - Good compliance</p>
+                <p><span className="inline-block w-4 h-4 bg-amber-200 rounded mr-2 align-middle"></span>50-79% - Needs improvement</p>
+                <p><span className="inline-block w-4 h-4 bg-red-200 rounded mr-2 align-middle"></span>&lt;50% - Critical attention</p>
               </div>
             </div>
           </div>
