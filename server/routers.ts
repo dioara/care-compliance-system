@@ -2997,6 +2997,29 @@ export const appRouter = router({
       return { success: true };
     }),
   }),
+
+  // Compliance Reports
+  reports: router({
+    // Get service user compliance report data
+    serviceUserCompliance: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getServiceUserComplianceReportData(ctx.user.tenantId, input.locationId);
+      }),
+
+    // Get staff compliance report data
+    staffCompliance: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getStaffComplianceReportData(ctx.user.tenantId, input.locationId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

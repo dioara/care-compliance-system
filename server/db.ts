@@ -3184,3 +3184,128 @@ export async function getIncidentAnalytics(params: {
     timeSeries,
   };
 }
+
+
+// ============================================
+// COMPLIANCE REPORTS - Service Users & Staff
+// ============================================
+
+/**
+ * Get all service user compliance data for Excel export
+ * Returns all service users with their compliance assessments for all questions
+ */
+export async function getServiceUserComplianceReportData(tenantId: number, locationId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  // Get all service user sections
+  const sections = await db.select().from(complianceSections)
+    .where(and(
+      eq(complianceSections.sectionType, 'service_user'),
+      eq(complianceSections.isActive, 1)
+    ))
+    .orderBy(complianceSections.sectionNumber);
+
+  // Get all questions for service user sections
+  const sectionIds = sections.map(s => s.id);
+  const questions = sectionIds.length > 0 
+    ? await db.select().from(complianceQuestions)
+        .where(inArray(complianceQuestions.sectionId, sectionIds))
+        .orderBy(complianceQuestions.sectionId, complianceQuestions.questionNumber)
+    : [];
+
+  // Get service users (filtered by location if specified)
+  const serviceUserConditions = [eq(serviceUsers.tenantId, tenantId)];
+  if (locationId) {
+    serviceUserConditions.push(eq(serviceUsers.locationId, locationId));
+  }
+  const serviceUserList = await db.select().from(serviceUsers)
+    .where(and(...serviceUserConditions))
+    .orderBy(serviceUsers.name);
+
+  // Get all compliance assessments for these service users
+  const serviceUserIds = serviceUserList.map(su => su.id);
+  const assessments = serviceUserIds.length > 0
+    ? await db.select().from(complianceAssessments)
+        .where(and(
+          eq(complianceAssessments.tenantId, tenantId),
+          eq(complianceAssessments.assessmentType, 'service_user'),
+          inArray(complianceAssessments.serviceUserId, serviceUserIds)
+        ))
+    : [];
+
+  // Get location names
+  const locationList = await db.select().from(locations)
+    .where(eq(locations.tenantId, tenantId));
+  const locationMap = new Map(locationList.map(l => [l.id, l.name]));
+
+  return {
+    sections,
+    questions,
+    serviceUsers: serviceUserList.map(su => ({
+      ...su,
+      locationName: locationMap.get(su.locationId) || 'Unknown'
+    })),
+    assessments
+  };
+}
+
+/**
+ * Get all staff compliance data for Excel export
+ * Returns all staff members with their compliance assessments for all questions
+ */
+export async function getStaffComplianceReportData(tenantId: number, locationId?: number) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  // Get all staff sections
+  const sections = await db.select().from(complianceSections)
+    .where(and(
+      eq(complianceSections.sectionType, 'staff'),
+      eq(complianceSections.isActive, 1)
+    ))
+    .orderBy(complianceSections.sectionNumber);
+
+  // Get all questions for staff sections
+  const sectionIds = sections.map(s => s.id);
+  const questions = sectionIds.length > 0
+    ? await db.select().from(complianceQuestions)
+        .where(inArray(complianceQuestions.sectionId, sectionIds))
+        .orderBy(complianceQuestions.sectionId, complianceQuestions.questionNumber)
+    : [];
+
+  // Get staff members (filtered by location if specified)
+  const staffConditions = [eq(staffMembers.tenantId, tenantId)];
+  if (locationId) {
+    staffConditions.push(eq(staffMembers.locationId, locationId));
+  }
+  const staffList = await db.select().from(staffMembers)
+    .where(and(...staffConditions))
+    .orderBy(staffMembers.name);
+
+  // Get all compliance assessments for these staff members
+  const staffIds = staffList.map(s => s.id);
+  const assessments = staffIds.length > 0
+    ? await db.select().from(complianceAssessments)
+        .where(and(
+          eq(complianceAssessments.tenantId, tenantId),
+          eq(complianceAssessments.assessmentType, 'staff'),
+          inArray(complianceAssessments.staffMemberId, staffIds)
+        ))
+    : [];
+
+  // Get location names
+  const locationList = await db.select().from(locations)
+    .where(eq(locations.tenantId, tenantId));
+  const locationMap = new Map(locationList.map(l => [l.id, l.name]));
+
+  return {
+    sections,
+    questions,
+    staffMembers: staffList.map(s => ({
+      ...s,
+      locationName: locationMap.get(s.locationId) || 'Unknown'
+    })),
+    assessments
+  };
+}

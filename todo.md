@@ -2757,3 +2757,11 @@
 - [x] Make logo clickable and link to ccms.co.uk
 - [x] Rebrand from CCMS to Care Compliance with new logo
 - [x] Update footer copyright to "Care Compliance Management System"
+
+## Compliance Reports Feature
+- [x] Create Service User Compliance Report (Excel export)
+- [x] Create Staff Compliance Report (Excel export)
+- [x] Design report structure with section IDs and question references
+- [x] Add question reference sheet in Excel for full question text
+- [x] Build Reports page UI with download buttons
+- [x] Test Excel export functionality
