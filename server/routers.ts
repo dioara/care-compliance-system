@@ -823,7 +823,7 @@ export const appRouter = router({
           auditTypeId: z.number().optional(),
           search: z.string().optional(),
           page: z.number().default(1),
-          pageSize: z.number().default(20),
+          pageSize: z.number().default(1000),  // Default to large page for calendar view
           sortBy: z.enum(['scheduledDate', 'auditName', 'status']).default('scheduledDate'),
           sortOrder: z.enum(['asc', 'desc']).default('desc'),
         })

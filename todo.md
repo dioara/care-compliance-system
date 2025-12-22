@@ -2771,3 +2771,17 @@
 - [x] Add compliance percentage calculations per person
 - [x] Add compliance percentage calculations per section
 - [x] Add summary row with overall percentages
+
+
+## BUG FIXES - December 2024
+
+### Audit Calendar Not Showing Audits in Production
+- [x] Investigated: audits.list query uses pagination with default pageSize of 20
+- [x] Fixed: Increased default pageSize to 1000 for calendar view to show all audits
+- [ ] Consider adding "all" option or dedicated calendar endpoint without pagination
+
+### Incident Form Premature Submission
+- [x] Investigated: Form was submitting when pressing Enter on input fields in steps 1-3
+- [x] Fixed: Added onKeyDown handler to prevent Enter key from submitting form on steps 1-3
+- [x] Form now only submits on step 4 when Submit button is clicked
+
