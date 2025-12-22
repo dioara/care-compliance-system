@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc';
+import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/contexts/LocationContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import { ScheduleAuditForm } from '@/components/ScheduleAuditForm';
 
 import { CaretLeft, CaretRight, Plus, Spinner, CalendarBlank, Sparkle, Printer } from "@phosphor-icons/react";
 export default function AuditCalendar() {
+  const { user, loading: authLoading } = useAuth();
   const { activeLocationId, setActiveLocationId } = useLocation();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -83,7 +85,7 @@ export default function AuditCalendar() {
     // Don't filter by date range - fetch all audits and let frontend filter
     // This prevents audits from disappearing when invalidating the query
   }, {
-    enabled: !!activeLocationId,
+    enabled: !!activeLocationId && !!user && !authLoading,
   });
   
   // Extract audits array from the response

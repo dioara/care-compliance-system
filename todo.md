@@ -2785,3 +2785,20 @@
 - [x] Fixed: Added onKeyDown handler to prevent Enter key from submitting form on steps 1-3
 - [x] Form now only submits on step 4 when Submit button is clicked
 
+
+
+## Critical Bug Fixes (Dec 22, 2025)
+
+### Issue 1: Audit Calendar Intermittent Display
+- [x] Add authentication check to audits.list query enabled condition
+- [x] Ensure query waits for auth to complete before firing
+- [ ] Add proper error handling for 401 responses
+
+### Issue 2: Auto-Schedule Service User Audits Bug
+- [x] Fix line 1505 in routers.ts: change `suggestion.serviceUserId` to `user.id`
+- [ ] Verify service user audits are created with correct serviceUserId
+
+### Issue 3: Incident Form Premature Submission
+- [x] Make form submission defensive - only execute when formStep === 4 (already implemented)
+- [x] Ensure Next button on step 3 advances to step 4 instead of submitting (already implemented)
+
