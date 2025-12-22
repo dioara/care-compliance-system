@@ -1502,7 +1502,7 @@ export const appRouter = router({
                   auditorId: ctx.user.id,
                   auditorName: ctx.user.name || undefined,
                   auditorRole: ctx.user.role || undefined,
-                  serviceUserId: suggestion.serviceUserId,
+                  serviceUserId: user.id,
                   status: 'in_progress',});
                 createdAudits.push({ id: instanceId, auditTypeId: suggestion.auditTypeId, serviceUserId: user.id });
               }

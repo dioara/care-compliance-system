@@ -198,12 +198,6 @@ function Router() {
         </DashboardLayout>
       </Route>
 
-      <Route path="/reports">
-        <DashboardLayout>
-          <ComplianceReports />
-        </DashboardLayout>
-      </Route>
-
       <Route path="/audit-schedules">
         <DashboardLayout>
           <AuditSchedules />

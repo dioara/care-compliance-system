@@ -2757,3 +2757,48 @@
 - [x] Make logo clickable and link to ccms.co.uk
 - [x] Rebrand from CCMS to Care Compliance with new logo
 - [x] Update footer copyright to "Care Compliance Management System"
+
+## Compliance Reports Feature
+- [x] Create Service User Compliance Report (Excel export)
+- [x] Create Staff Compliance Report (Excel export)
+- [x] Design report structure with section IDs and question references
+- [x] Add question reference sheet in Excel for full question text
+- [x] Build Reports page UI with download buttons
+- [x] Test Excel export functionality
+
+## Excel Report Enhancements
+- [x] Add conditional formatting with colour coding (green=C, red=NC, amber=P)
+- [x] Add compliance percentage calculations per person
+- [x] Add compliance percentage calculations per section
+- [x] Add summary row with overall percentages
+
+
+## BUG FIXES - December 2024
+
+### Audit Calendar Not Showing Audits in Production
+- [x] Investigated: audits.list query uses pagination with default pageSize of 20
+- [x] Fixed: Increased default pageSize to 1000 for calendar view to show all audits
+- [ ] Consider adding "all" option or dedicated calendar endpoint without pagination
+
+### Incident Form Premature Submission
+- [x] Investigated: Form was submitting when pressing Enter on input fields in steps 1-3
+- [x] Fixed: Added onKeyDown handler to prevent Enter key from submitting form on steps 1-3
+- [x] Form now only submits on step 4 when Submit button is clicked
+
+
+
+## Critical Bug Fixes (Dec 22, 2025)
+
+### Issue 1: Audit Calendar Intermittent Display
+- [x] Add authentication check to audits.list query enabled condition
+- [x] Ensure query waits for auth to complete before firing
+- [ ] Add proper error handling for 401 responses
+
+### Issue 2: Auto-Schedule Service User Audits Bug
+- [x] Fix line 1505 in routers.ts: change `suggestion.serviceUserId` to `user.id`
+- [ ] Verify service user audits are created with correct serviceUserId
+
+### Issue 3: Incident Form Premature Submission
+- [x] Make form submission defensive - only execute when formStep === 4 (already implemented)
+- [x] Ensure Next button on step 3 advances to step 4 instead of submitting (already implemented)
+
