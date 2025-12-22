@@ -82,10 +82,9 @@ export default function AuditCalendar() {
 
   const { data: auditData, isLoading } = trpc.audits.list.useQuery({
     locationId: activeLocationId || 0,
-    // Fetch all audits for the location - use large pageSize to ensure all audits are returned
-    // Sort ascending so older audits are included when there are many audits
-    pageSize: 10000,
-    sortOrder: 'asc',
+    // Fetch ALL audits for the location without pagination
+    // This ensures the calendar displays all audits regardless of how many exist
+    noPagination: true,
   }, {
     enabled: !!activeLocationId && !!user && !authLoading,
   });

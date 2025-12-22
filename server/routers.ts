@@ -823,7 +823,8 @@ export const appRouter = router({
           auditTypeId: z.number().optional(),
           search: z.string().optional(),
           page: z.number().default(1),
-          pageSize: z.number().default(1000),  // Default to large page for calendar view
+          pageSize: z.number().default(50000),  // Default to very large page to ensure all audits are returned
+          noPagination: z.boolean().default(false),  // When true, return all audits without pagination
           sortBy: z.enum(['scheduledDate', 'auditName', 'status']).default('scheduledDate'),
           sortOrder: z.enum(['asc', 'desc']).default('desc'),
         })
@@ -891,6 +892,20 @@ export const appRouter = router({
         
         // Calculate pagination
         const totalCount = audits.length;
+        
+        // If noPagination is true, return all audits
+        if (input.noPagination) {
+          return {
+            audits,
+            pagination: {
+              page: 1,
+              pageSize: totalCount,
+              totalCount,
+              totalPages: 1,
+            },
+          };
+        }
+        
         const totalPages = Math.ceil(totalCount / input.pageSize);
         const startIndex = (input.page - 1) * input.pageSize;
         const endIndex = startIndex + input.pageSize;
