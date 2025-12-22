@@ -325,10 +325,21 @@ export default function Incidents() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
-    // Only allow submission on step 4
+    // CRITICAL: Only allow submission on step 4
+    // This is a defensive check - the Submit button should only appear on step 4
+    // but we double-check here to prevent any accidental submissions
     if (formStep !== 4) {
+      console.warn(`[Incident Form] Blocked submission attempt on step ${formStep}. Advancing to next step instead.`);
       handleNextStep();
+      return;
+    }
+    
+    // Additional safety: verify we're truly on step 4 before proceeding
+    if (formStep < 4) {
+      console.error(`[Incident Form] Critical: formStep is ${formStep}, blocking submission`);
+      toast.error("Please complete all steps before submitting");
       return;
     }
     
@@ -1019,7 +1030,11 @@ export default function Incidents() {
                   {formStep < 4 ? (
                     <Button
                       type="button"
-                      onClick={handleNextStep}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleNextStep();
+                      }}
                     >
                       Next
                       <CaretRight className="ml-2 h-4 w-4" weight="bold" />
