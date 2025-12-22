@@ -484,7 +484,12 @@ export default function Incidents() {
                 <span className={formStep === 4 ? 'text-primary font-medium' : ''}>Follow-up</span>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" onKeyDown={(e) => {
+                // Prevent Enter key from submitting the form on steps 1-3
+                if (e.key === 'Enter' && formStep !== 4 && e.target instanceof HTMLInputElement) {
+                  e.preventDefault();
+                }
+              }}>
                 {/* Step 1: Basic Information */}
                 {formStep === 1 && (
                   <div className="space-y-6">

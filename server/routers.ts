@@ -823,7 +823,7 @@ export const appRouter = router({
           auditTypeId: z.number().optional(),
           search: z.string().optional(),
           page: z.number().default(1),
-          pageSize: z.number().default(20),
+          pageSize: z.number().default(1000),  // Default to large page for calendar view
           sortBy: z.enum(['scheduledDate', 'auditName', 'status']).default('scheduledDate'),
           sortOrder: z.enum(['asc', 'desc']).default('desc'),
         })
@@ -2996,6 +2996,29 @@ export const appRouter = router({
       await db.createDefaultEmailTemplates(ctx.user.tenantId);
       return { success: true };
     }),
+  }),
+
+  // Compliance Reports
+  reports: router({
+    // Get service user compliance report data
+    serviceUserCompliance: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getServiceUserComplianceReportData(ctx.user.tenantId, input.locationId);
+      }),
+
+    // Get staff compliance report data
+    staffCompliance: protectedProcedure
+      .input(z.object({ locationId: z.number().optional() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+        return db.getStaffComplianceReportData(ctx.user.tenantId, input.locationId);
+      }),
   }),
 });
 
