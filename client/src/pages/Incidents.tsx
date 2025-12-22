@@ -400,12 +400,19 @@ export default function Incidents() {
     }
   };
 
-  // Apply both status and location filters
-  const filteredIncidents = incidents.filter((i: any) => {
-    const statusMatch = activeTab === "all" || i.status === activeTab;
-    const locationMatch = !filterLocationId || i.locationId === filterLocationId;
-    return statusMatch && locationMatch;
-  });
+  // Apply both status and location filters, then sort by date (latest first)
+  const filteredIncidents = incidents
+    .filter((i: any) => {
+      const statusMatch = activeTab === "all" || i.status === activeTab;
+      const locationMatch = !filterLocationId || i.locationId === filterLocationId;
+      return statusMatch && locationMatch;
+    })
+    .sort((a: any, b: any) => {
+      // Sort by incident date descending (latest first)
+      const dateA = new Date(a.incidentDate).getTime();
+      const dateB = new Date(b.incidentDate).getTime();
+      return dateB - dateA;
+    });
 
   return (
     <div className="space-y-6 md:space-y-4 md:space-y-6 lg:space-y-8">
@@ -1234,10 +1241,10 @@ export default function Incidents() {
                         )}
                       </p>
                       <div className="flex gap-2 mt-3 flex-wrap">
-                        {incident.reportedToCqc && <Badge variant="secondary" className="text-xs">CQC Notified</Badge>}
-                        {incident.reportedToCouncil && <Badge variant="secondary" className="text-xs">Council Notified</Badge>}
-                        {incident.reportedToPolice && <Badge variant="secondary" className="text-xs">Police Notified</Badge>}
-                        {incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
+                        {!!incident.reportedToCqc && <Badge variant="secondary" className="text-xs">CQC Notified</Badge>}
+                        {!!incident.reportedToCouncil && <Badge variant="secondary" className="text-xs">Council Notified</Badge>}
+                        {!!incident.reportedToPolice && <Badge variant="secondary" className="text-xs">Police Notified</Badge>}
+                        {!!incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
                       </div>
                     </div>
                     <CaretRight className="h-5 w-5 text-muted-foreground flex-shrink-0" weight="bold" />
@@ -1475,7 +1482,7 @@ export default function Incidents() {
                                 isNotified && <CheckCircle className="h-4 w-4 text-green-600" weight="bold" />
                               )}
                             </div>
-                            {isNotified && notifiedAt && (
+                            {isNotified && notifiedAt ? (
                               <div className="text-xs text-muted-foreground mt-1 ml-6">
                                 Notified: {new Date(notifiedAt).toLocaleDateString('en-GB', {
                                   day: 'numeric',
@@ -1484,6 +1491,10 @@ export default function Incidents() {
                                   hour: '2-digit',
                                   minute: '2-digit'
                                 })}
+                              </div>
+                            ) : !isNotified && (
+                              <div className="text-xs text-muted-foreground mt-1 ml-6">
+                                Not notified
                               </div>
                             )}
                           </div>

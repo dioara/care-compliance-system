@@ -2813,3 +2813,10 @@
 - [x] Added e.preventDefault() and e.stopPropagation() to Next button onClick handler
 - [x] Added defensive checks in handleSubmit with console logging
 - [ ] Push to GitHub and verify fix on production
+
+## UI Improvements - Notification Status Display
+- [x] Update notification status display to show "Not notified" instead of "0" in incident detail modal
+- [x] Update notification status display in incident list cards (fixed "0000" rendering issue)
+- [x] Sort incident list with latest incidents at the top
+- [x] Sort Action Log with latest actions first
+- [x] Add sort toggle arrow to Action Log
