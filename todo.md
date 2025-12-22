@@ -2802,3 +2802,7 @@
 - [x] Make form submission defensive - only execute when formStep === 4 (already implemented)
 - [x] Ensure Next button on step 3 advances to step 4 instead of submitting (already implemented)
 
+
+### Issue 4: Audit Calendar Not Showing All Audits (Pagination Bug)
+- [x] Identified root cause: Default pageSize of 1000 with descending sort excludes older audits
+- [x] Fix: Increased pageSize to 10000 and changed sortOrder to 'asc' in AuditCalendar.tsx
