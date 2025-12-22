@@ -2806,3 +2806,10 @@
 ### Issue 4: Audit Calendar Not Showing All Audits (Pagination Bug)
 - [x] Identified root cause: Default pageSize of 1000 with descending sort excludes older audits
 - [x] Fix: Increased pageSize to 10000 and changed sortOrder to 'asc' in AuditCalendar.tsx
+
+
+## BUG FIX: Incident Form Premature Submission (Dec 22, 2025)
+- [x] Reproduced bug on production: clicking Next on Step 3 submits form instead of advancing to Step 4
+- [x] Added e.preventDefault() and e.stopPropagation() to Next button onClick handler
+- [x] Added defensive checks in handleSubmit with console logging
+- [ ] Push to GitHub and verify fix on production

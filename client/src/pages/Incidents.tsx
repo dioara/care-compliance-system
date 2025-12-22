@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ export default function Incidents() {
   const [selectedIncident, setSelectedIncident] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("all");
   const [formStep, setFormStep] = useState(1);
+  const intentionalSubmitRef = useRef(false); // Track if submission is intentional
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
   const [showFollowUpDialog, setShowFollowUpDialog] = useState(false);
   const [followUpData, setFollowUpData] = useState({
@@ -325,12 +326,24 @@ export default function Incidents() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     
-    // Only allow submission on step 4
+    // CRITICAL: Triple-check submission is intentional
+    // 1. Must be on step 4
+    // 2. Must have intentionalSubmitRef set to true (set by Submit button click)
     if (formStep !== 4) {
-      handleNextStep();
+      console.warn(`[Incident Form] Blocked submission attempt on step ${formStep}. Not advancing.`);
+      return; // Don't even advance - just block completely
+    }
+    
+    // Check if this is an intentional submission from the Submit button
+    if (!intentionalSubmitRef.current) {
+      console.warn(`[Incident Form] Blocked unintentional submission on step ${formStep}`);
       return;
     }
+    
+    // Reset the ref for next submission
+    intentionalSubmitRef.current = false;
     
     if (!formData.locationId || !formData.incidentType || !formData.severity) {
       toast.error("Please fill in all required fields");
@@ -1019,13 +1032,22 @@ export default function Incidents() {
                   {formStep < 4 ? (
                     <Button
                       type="button"
-                      onClick={handleNextStep}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleNextStep();
+                      }}
                     >
                       Next
                       <CaretRight className="ml-2 h-4 w-4" weight="bold" />
                     </Button>
                   ) : (
-                    <Button type="submit" disabled={createMutation.isPending} className="min-w-[150px]">
+                    <Button 
+                      type="submit" 
+                      disabled={createMutation.isPending} 
+                      className="min-w-[150px]"
+                      onClick={() => { intentionalSubmitRef.current = true; }}
+                    >
                       {createMutation.isPending ? (
                         <>
                           <Spinner className="mr-2 h-4 w-4 animate-spin" />
