@@ -82,8 +82,10 @@ export default function AuditCalendar() {
 
   const { data: auditData, isLoading } = trpc.audits.list.useQuery({
     locationId: activeLocationId || 0,
-    // Don't filter by date range - fetch all audits and let frontend filter
-    // This prevents audits from disappearing when invalidating the query
+    // Fetch all audits for the location - use large pageSize to ensure all audits are returned
+    // Sort ascending so older audits are included when there are many audits
+    pageSize: 10000,
+    sortOrder: 'asc',
   }, {
     enabled: !!activeLocationId && !!user && !authLoading,
   });
