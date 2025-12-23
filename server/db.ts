@@ -1770,7 +1770,7 @@ export async function updateIncident(id: number, tenantId: number, data: Partial
     .update(incidents)
     .set({
       ...data,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date(),
     })
     .where(and(eq(incidents.id, id), eq(incidents.tenantId, tenantId)));
 }
@@ -1876,8 +1876,8 @@ export async function closeIncident(id: number, closedById: number) {
     .set({
       status: "closed",
       closedById,
-      closedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      closedAt: new Date(),
+      updatedAt: new Date(),
     })
     .where(eq(incidents.id, id));
 }
