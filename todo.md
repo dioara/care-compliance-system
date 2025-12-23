@@ -2824,4 +2824,7 @@
 ## Date Range Filter for Incidents
 - [x] Add date range filter (from/to date pickers) to Incidents page
 - [x] Filter incidents by selected date range
-- [ ] Push all changes to GitHub
+- [x] Push all changes to GitHub
+
+## Bug Fix - Datetime Format Error
+- [x] Fix datetime format error when closing/updating incidents (MySQL receiving ISO string instead of proper datetime)
