@@ -353,11 +353,14 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
                                   <p className="text-sm">{question.questionText}</p>
                                 </div>
 
-                                {/* Guidance/Example */}
-                                {question.guidance && (
-                                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                    <p className="text-sm font-medium text-blue-900 mb-1">Example Evidence:</p>
-                                    <p className="text-sm text-blue-800">{question.guidance}</p>
+                                {/* How to Evidence Guidance */}
+                                {question.exampleEvidence && (
+                                  <div className="p-3 bg-muted rounded-lg">
+                                    <p className="text-sm font-medium mb-1 flex items-center gap-2">
+                                      <Question className="h-4 w-4" />
+                                      How to Evidence:
+                                    </p>
+                                    <p className="text-sm">{question.exampleEvidence}</p>
                                   </div>
                                 )}
 
