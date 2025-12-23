@@ -2828,3 +2828,4 @@
 
 ## Bug Fix - Datetime Format Error
 - [x] Fix datetime format error when closing/updating incidents (MySQL receiving ISO string instead of proper datetime)
+- [x] Update How to Evidence section styling to match question background color

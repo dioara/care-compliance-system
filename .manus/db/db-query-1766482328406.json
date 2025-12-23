@@ -1,0 +1,45 @@
+{
+  "query": "SELECT q.id, q.sectionId, q.questionNumber, LEFT(q.questionText, 100) as questionText, LEFT(q.exampleEvidence, 200) as howToEvidence\nFROM complianceQuestions q\nWHERE q.sectionId BETWEEN 1 AND 10\nORDER BY q.sectionId, q.id\nLIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user aVmfAzGaFwUYThZ.5c3d77929c0b --database mF7Zux5nFuxUoJfuPYEPAJ --execute SELECT q.id, q.sectionId, q.questionNumber, LEFT(q.questionText, 100) as questionText, LEFT(q.exampleEvidence, 200) as howToEvidence\nFROM complianceQuestions q\nWHERE q.sectionId BETWEEN 1 AND 10\nORDER BY q.sectionId, q.id\nLIMIT 5;",
+  "rows": [
+    {
+      "id": "30173",
+      "sectionId": "1",
+      "questionNumber": "1.1",
+      "questionText": "There is evidence that care and support files express individual’s views, choices, and preferences. ",
+      "howToEvidence": "This can be evidenced by providing Care Plan entries showing the person's views, choices, and preferences documented in their own words where possible. Include Pre-admission Assessment, Life History d"
+    },
+    {
+      "id": "30174",
+      "sectionId": "1",
+      "questionNumber": "1.8",
+      "questionText": "There is evidence that care, and support files have been written with involvement from the person an",
+      "howToEvidence": "This can be evidenced by Care Plan signature pages showing involvement from the person and/or family, review meeting records with attendees listed."
+    },
+    {
+      "id": "30175",
+      "sectionId": "1",
+      "questionNumber": "1.9",
+      "questionText": "The provider has a process in place to ensure that relevant documentation is available upon request ",
+      "howToEvidence": "This can be evidenced by providing your Subject Access Request (SAR) policy, records of SAR requests processed within timescales, and evidence of how records are made available."
+    },
+    {
+      "id": "30176",
+      "sectionId": "1",
+      "questionNumber": "1.10",
+      "questionText": "There is evidence that care, and support files are available and accessible to the person and their ",
+      "howToEvidence": "This can be evidenced by showing how care files are stored accessibly (not locked away from person), evidence of people reviewing their own files, and policy on record access."
+    },
+    {
+      "id": "30177",
+      "sectionId": "1",
+      "questionNumber": "1.11",
+      "questionText": "There is evidence that care, and support files demonstrate privacy, dignity, and independence. In li",
+      "howToEvidence": "This can be evidenced by showing Care Plan entries detailing what the person can do independently, goals for maintaining independence, and Daily Notes demonstrating staff encouraged independence rathe"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsectionId\tquestionNumber\tquestionText\thowToEvidence\n30173\t1\t1.1\tThere is evidence that care and support files express individual’s views, choices, and preferences. \tThis can be evidenced by providing Care Plan entries showing the person's views, choices, and preferences documented in their own words where possible. Include Pre-admission Assessment, Life History d\n30174\t1\t1.8\tThere is evidence that care, and support files have been written with involvement from the person an\tThis can be evidenced by Care Plan signature pages showing involvement from the person and/or family, review meeting records with attendees listed.\n30175\t1\t1.9\tThe provider has a process in place to ensure that relevant documentation is available upon request \tThis can be evidenced by providing your Subject Access Request (SAR) policy, records of SAR requests processed within timescales, and evidence of how records are made available.\n30176\t1\t1.10\tThere is evidence that care, and support files are available and accessible to the person and their \tThis can be evidenced by showing how care files are stored accessibly (not locked away from person), evidence of people reviewing their own files, and policy on record access.\n30177\t1\t1.11\tThere is evidence that care, and support files demonstrate privacy, dignity, and independence. In li\tThis can be evidenced by showing Care Plan entries detailing what the person can do independently, goals for maintaining independence, and Daily Notes demonstrating staff encouraged independence rathe\n",
+  "stderr": "",
+  "execution_time_ms": 53
+}
