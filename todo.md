@@ -2820,3 +2820,8 @@
 - [x] Sort incident list with latest incidents at the top
 - [x] Sort Action Log with latest actions first
 - [x] Add sort toggle arrow to Action Log
+
+## Date Range Filter for Incidents
+- [x] Add date range filter (from/to date pickers) to Incidents page
+- [x] Filter incidents by selected date range
+- [ ] Push all changes to GitHub
