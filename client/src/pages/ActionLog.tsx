@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
-import { ClipboardText, User, FileText, MagnifyingGlass, Funnel, DownloadSimple, CheckCircle, Clock, WarningCircle, CalendarBlank, Plus, Clipboard } from "@phosphor-icons/react";
+import { ClipboardText, User, FileText, MagnifyingGlass, Funnel, DownloadSimple, CheckCircle, Clock, WarningCircle, CalendarBlank, Plus, Clipboard, ArrowUp, ArrowDown, ArrowsDownUp } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useLocation } from "@/contexts/LocationContext";
@@ -29,6 +29,7 @@ export default function ActionLog() {
   const [updateNotes, setUpdateNotes] = useState("");
   const [updateStatus, setUpdateStatus] = useState<string>("");
   const [updateCompletionDate, setUpdateCompletionDate] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); // desc = latest first
   
   // Add action dialog state
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -145,20 +146,27 @@ export default function ActionLog() {
     setIsUpdateDialogOpen(true);
   };
 
-  // Filter actions
-  const filteredActions = actionPlans?.filter((action) => {
-    if (filterStatus !== "all" && action.status !== filterStatus) return false;
-    if (filterRag !== "all" && action.ragStatus !== filterRag) return false;
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      return (
-        action.issueDescription?.toLowerCase().includes(query) ||
-        action.auditOrigin?.toLowerCase().includes(query) ||
-        action.responsiblePersonName?.toLowerCase().includes(query)
-      );
-    }
-    return true;
-  });
+  // Filter and sort actions
+  const filteredActions = actionPlans
+    ?.filter((action) => {
+      if (filterStatus !== "all" && action.status !== filterStatus) return false;
+      if (filterRag !== "all" && action.ragStatus !== filterRag) return false;
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          action.issueDescription?.toLowerCase().includes(query) ||
+          action.auditOrigin?.toLowerCase().includes(query) ||
+          action.responsiblePersonName?.toLowerCase().includes(query)
+        );
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by target completion date
+      const dateA = new Date(a.targetCompletionDate).getTime();
+      const dateB = new Date(b.targetCompletionDate).getTime();
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
@@ -362,10 +370,32 @@ export default function ActionLog() {
       {/* Actions Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Action Items</CardTitle>
-          <CardDescription>
-            {filteredActions?.length || 0} actions found
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Action Items</CardTitle>
+              <CardDescription>
+                {filteredActions?.length || 0} actions found
+              </CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+              className="flex items-center gap-2"
+            >
+              {sortOrder === "desc" ? (
+                <>
+                  <ArrowDown className="h-4 w-4" weight="bold" />
+                  Latest First
+                </>
+              ) : (
+                <>
+                  <ArrowUp className="h-4 w-4" weight="bold" />
+                  Oldest First
+                </>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (

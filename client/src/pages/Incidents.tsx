@@ -57,6 +57,8 @@ export default function Incidents() {
   const [formStep, setFormStep] = useState(1);
   const intentionalSubmitRef = useRef(false); // Track if submission is intentional
   const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
+  const [dateRangeFrom, setDateRangeFrom] = useState<string>("");
+  const [dateRangeTo, setDateRangeTo] = useState<string>("");
   const [showFollowUpDialog, setShowFollowUpDialog] = useState(false);
   const [followUpData, setFollowUpData] = useState({
     actionDescription: "",
@@ -400,12 +402,34 @@ export default function Incidents() {
     }
   };
 
-  // Apply both status and location filters
-  const filteredIncidents = incidents.filter((i: any) => {
-    const statusMatch = activeTab === "all" || i.status === activeTab;
-    const locationMatch = !filterLocationId || i.locationId === filterLocationId;
-    return statusMatch && locationMatch;
-  });
+  // Apply status, location, and date range filters, then sort by date (latest first)
+  const filteredIncidents = incidents
+    .filter((i: any) => {
+      const statusMatch = activeTab === "all" || i.status === activeTab;
+      const locationMatch = !filterLocationId || i.locationId === filterLocationId;
+      
+      // Date range filter
+      let dateMatch = true;
+      if (dateRangeFrom || dateRangeTo) {
+        const incidentDate = new Date(i.incidentDate).getTime();
+        if (dateRangeFrom) {
+          const fromDate = new Date(dateRangeFrom).setHours(0, 0, 0, 0);
+          if (incidentDate < fromDate) dateMatch = false;
+        }
+        if (dateRangeTo) {
+          const toDate = new Date(dateRangeTo).setHours(23, 59, 59, 999);
+          if (incidentDate > toDate) dateMatch = false;
+        }
+      }
+      
+      return statusMatch && locationMatch && dateMatch;
+    })
+    .sort((a: any, b: any) => {
+      // Sort by incident date descending (latest first)
+      const dateA = new Date(a.incidentDate).getTime();
+      const dateB = new Date(b.incidentDate).getTime();
+      return dateB - dateA;
+    });
 
   return (
     <div className="space-y-6 md:space-y-4 md:space-y-6 lg:space-y-8">
@@ -1144,7 +1168,40 @@ export default function Incidents() {
               <CardTitle className="text-xl">Incident Records</CardTitle>
               <CardDescription>View and manage all reported incidents</CardDescription>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Date Range Filter */}
+              <div className="flex items-center gap-2">
+                <CalendarBlank className="h-4 w-4 text-muted-foreground" weight="bold" />
+                <Input
+                  type="date"
+                  value={dateRangeFrom}
+                  onChange={(e) => setDateRangeFrom(e.target.value)}
+                  className="w-[140px] h-9"
+                  placeholder="From"
+                />
+                <span className="text-muted-foreground text-sm">to</span>
+                <Input
+                  type="date"
+                  value={dateRangeTo}
+                  onChange={(e) => setDateRangeTo(e.target.value)}
+                  className="w-[140px] h-9"
+                  placeholder="To"
+                />
+                {(dateRangeFrom || dateRangeTo) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDateRangeFrom("");
+                      setDateRangeTo("");
+                    }}
+                    className="h-9 px-2 text-muted-foreground hover:text-foreground"
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+              
               {/* Location Filter */}
               <Select
                 value={filterLocationId?.toString() || "all"}
@@ -1234,10 +1291,10 @@ export default function Incidents() {
                         )}
                       </p>
                       <div className="flex gap-2 mt-3 flex-wrap">
-                        {incident.reportedToCqc && <Badge variant="secondary" className="text-xs">CQC Notified</Badge>}
-                        {incident.reportedToCouncil && <Badge variant="secondary" className="text-xs">Council Notified</Badge>}
-                        {incident.reportedToPolice && <Badge variant="secondary" className="text-xs">Police Notified</Badge>}
-                        {incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
+                        {!!incident.reportedToCqc && <Badge variant="secondary" className="text-xs">CQC Notified</Badge>}
+                        {!!incident.reportedToCouncil && <Badge variant="secondary" className="text-xs">Council Notified</Badge>}
+                        {!!incident.reportedToPolice && <Badge variant="secondary" className="text-xs">Police Notified</Badge>}
+                        {!!incident.reportedToFamily && <Badge variant="secondary" className="text-xs">Family Notified</Badge>}
                       </div>
                     </div>
                     <CaretRight className="h-5 w-5 text-muted-foreground flex-shrink-0" weight="bold" />
@@ -1475,7 +1532,7 @@ export default function Incidents() {
                                 isNotified && <CheckCircle className="h-4 w-4 text-green-600" weight="bold" />
                               )}
                             </div>
-                            {isNotified && notifiedAt && (
+                            {isNotified && notifiedAt ? (
                               <div className="text-xs text-muted-foreground mt-1 ml-6">
                                 Notified: {new Date(notifiedAt).toLocaleDateString('en-GB', {
                                   day: 'numeric',
@@ -1484,6 +1541,10 @@ export default function Incidents() {
                                   hour: '2-digit',
                                   minute: '2-digit'
                                 })}
+                              </div>
+                            ) : !isNotified && (
+                              <div className="text-xs text-muted-foreground mt-1 ml-6">
+                                Not notified
                               </div>
                             )}
                           </div>
