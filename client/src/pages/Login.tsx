@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { trpc } from "@/lib/trpc";
-import { AlertCircle, Mail, RefreshCw, ShieldCheck } from "lucide-react";
+import { Mail, RefreshCw, ShieldCheck } from "lucide-react";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -16,8 +16,35 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  
+  // Rate limiting for resend verification
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [lastResendTime, setLastResendTime] = useState<number | null>(null);
+  const RESEND_COOLDOWN_SECONDS = 60; // 1 minute cooldown
 
   const utils = trpc.useUtils();
+  
+  // Countdown timer for resend cooldown
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown(resendCooldown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  // Check for stored cooldown on mount
+  useEffect(() => {
+    const storedTime = localStorage.getItem('resend_verification_time');
+    if (storedTime) {
+      const elapsed = Math.floor((Date.now() - parseInt(storedTime)) / 1000);
+      if (elapsed < RESEND_COOLDOWN_SECONDS) {
+        setResendCooldown(RESEND_COOLDOWN_SECONDS - elapsed);
+        setLastResendTime(parseInt(storedTime));
+      }
+    }
+  }, []);
   
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: async (data) => {
@@ -28,25 +55,40 @@ export default function Login() {
       await utils.auth.me.invalidate();
       setLocation("/");
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      setIsLoading(false);
+      
       // Check if the error is about email verification
-      if (error.message?.toLowerCase().includes('verify your email') || 
-          error.message?.toLowerCase().includes('verification')) {
+      // Check both the message content and the error code
+      const errorMessage = error.message?.toLowerCase() || '';
+      const errorCode = error.data?.code || error.shape?.data?.code || '';
+      
+      const isVerificationError = 
+        errorMessage.includes('verify your email') || 
+        errorMessage.includes('verification') ||
+        errorMessage.includes('verify email') ||
+        (errorCode === 'FORBIDDEN' && errorMessage.includes('verify'));
+      
+      if (isVerificationError) {
         setShowVerificationMessage(true);
         setUnverifiedEmail(email);
       } else {
-        toast.error(error.message || "Login failed");
+        toast.error(error.message || "Invalid email or password. Please try again.");
       }
-      setIsLoading(false);
     },
   });
 
   const resendVerificationMutation = trpc.auth.resendVerification.useMutation({
     onSuccess: () => {
       toast.success("Verification email sent! Please check your inbox.");
+      // Set cooldown
+      const now = Date.now();
+      setLastResendTime(now);
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
+      localStorage.setItem('resend_verification_time', now.toString());
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to resend verification email");
+      toast.error(error.message || "Failed to resend verification email. Please try again later.");
     },
   });
 
@@ -58,7 +100,7 @@ export default function Login() {
   };
 
   const handleResendVerification = () => {
-    if (unverifiedEmail) {
+    if (unverifiedEmail && resendCooldown === 0) {
       resendVerificationMutation.mutate({ email: unverifiedEmail });
     }
   };
@@ -94,12 +136,21 @@ export default function Login() {
                     variant="outline"
                     size="sm"
                     onClick={handleResendVerification}
-                    disabled={resendVerificationMutation.isPending}
+                    disabled={resendVerificationMutation.isPending || resendCooldown > 0}
                     className="mt-3 text-amber-700 border-amber-300 hover:bg-amber-100"
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${resendVerificationMutation.isPending ? 'animate-spin' : ''}`} />
-                    {resendVerificationMutation.isPending ? "Sending..." : "Resend Verification Email"}
+                    {resendVerificationMutation.isPending 
+                      ? "Sending..." 
+                      : resendCooldown > 0 
+                        ? `Resend in ${resendCooldown}s` 
+                        : "Resend Verification Email"}
                   </Button>
+                  {resendCooldown > 0 && (
+                    <p className="text-xs text-amber-600 mt-2">
+                      You can request a new verification email in {resendCooldown} seconds.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

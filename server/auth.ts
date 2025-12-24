@@ -19,6 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-producti
 
 // Rate limiting for password reset - max 3 requests per email per hour
 const passwordResetAttempts = new Map<string, { count: number; firstAttempt: number }>();
+const verificationResendAttempts = new Map<string, { count: number; firstAttempt: number }>();
 const PASSWORD_RESET_MAX_ATTEMPTS = 3;
 const PASSWORD_RESET_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 
@@ -340,10 +341,32 @@ export const authRouter = router({
       return { success: true, message: "Email verified successfully! You can now log in." };
     }),
 
-  // Resend verification email
+  // Resend verification email - with rate limiting
   resendVerification: publicProcedure
     .input(z.object({ email: z.string().email() }))
     .mutation(async ({ input }) => {
+      // Rate limiting: max 3 resend requests per email per hour
+      const key = `resend_${input.email.toLowerCase()}`;
+      const now = Date.now();
+      const record = verificationResendAttempts.get(key);
+      
+      if (record) {
+        // Clean up old attempts (older than 1 hour)
+        const oneHourAgo = now - 60 * 60 * 1000;
+        if (record.firstAttempt < oneHourAgo) {
+          verificationResendAttempts.set(key, { count: 1, firstAttempt: now });
+        } else if (record.count >= 3) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: "Too many verification requests. Please try again in an hour.",
+          });
+        } else {
+          record.count++;
+        }
+      } else {
+        verificationResendAttempts.set(key, { count: 1, firstAttempt: now });
+      }
+      
       const user = await db.getUserByEmail(input.email);
       
       if (!user) {
