@@ -127,7 +127,7 @@ export default function PublicTermsOfService() {
             <div>
               <h4 className="font-medium text-gray-900 mb-2">Free Trial</h4>
               <p className="text-sm">
-                We offer a 14-day free trial for new users. No credit card is required to start your trial. 
+                We offer a 30-day free trial for new users. No credit card is required to start your trial. 
                 At the end of your trial period, you will need to subscribe to a paid plan to continue using 
                 the Service.
               </p>

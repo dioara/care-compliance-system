@@ -105,7 +105,7 @@ export const authRouter = router({
       // Send email verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://care-compliance-system-production.up.railway.app" 
+        ? "https://ccms.co.uk" 
         : "http://localhost:3000";
       
       const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
@@ -113,7 +113,7 @@ export const authRouter = router({
       await sendEmail({
         to: input.email,
         subject: "Verify Your Email - CCMS",
-        text: `Welcome to Care Compliance Management System, ${input.name}!\n\nPlease verify your email address to activate your account and start your 14-day free trial.\n\nClick here to verify: ${verificationUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can safely ignore this email.\n\nBest regards,\nThe CCMS Team`,
+        text: `Welcome to Care Compliance Management System, ${input.name}!\n\nPlease verify your email address to activate your account and start your 30-day free trial.\n\nClick here to verify: ${verificationUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can safely ignore this email.\n\nBest regards,\nThe CCMS Team`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: #1F7AE0; padding: 30px; text-align: center;">
@@ -121,7 +121,7 @@ export const authRouter = router({
             </div>
             <div style="padding: 30px; background: #ffffff;">
               <h2 style="color: #1f2937; margin-top: 0;">Hi ${input.name},</h2>
-              <p style="color: #4b5563; font-size: 16px;">Welcome to CCMS! Please verify your email address to activate your account and start your <strong>14-day free trial</strong>.</p>
+              <p style="color: #4b5563; font-size: 16px;">Welcome to CCMS! Please verify your email address to activate your account and start your <strong>30-day free trial</strong>.</p>
               
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${verificationUrl}" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Verify Email Address</a>
@@ -299,13 +299,13 @@ export const authRouter = router({
       // Send welcome email now that email is verified
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://care-compliance-system-production.up.railway.app" 
+        ? "https://ccms.co.uk" 
         : "http://localhost:3000";
       
       await sendEmail({
         to: user.email,
-        subject: "Welcome to CCMS - Your 14-Day Free Trial Has Started!",
-        text: `Welcome to Care Compliance Management System!\n\nYour email has been verified and your 14-day free trial has started.\n\nLog in now: ${baseUrl}/login\n\nBest regards,\nThe CCMS Team`,
+        subject: "Welcome to CCMS - Your 30-Day Free Trial Has Started!",
+        text: `Welcome to Care Compliance Management System!\n\nYour email has been verified and your 30-day free trial has started.\n\nLog in now: ${baseUrl}/login\n\nBest regards,\nThe CCMS Team`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: #1F7AE0; padding: 30px; text-align: center;">
@@ -313,7 +313,7 @@ export const authRouter = router({
             </div>
             <div style="padding: 30px; background: #ffffff;">
               <h2 style="color: #1f2937; margin-top: 0;">Welcome to CCMS!</h2>
-              <p style="color: #4b5563; font-size: 16px;">Your email has been verified and your <strong>14-day free trial</strong> has started!</p>
+              <p style="color: #4b5563; font-size: 16px;">Your email has been verified and your <strong>30-day free trial</strong> has started!</p>
               
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${baseUrl}/login" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Log In Now</a>
@@ -367,7 +367,7 @@ export const authRouter = router({
       // Send verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://care-compliance-system-production.up.railway.app" 
+        ? "https://ccms.co.uk" 
         : "http://localhost:3000";
       
       const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
@@ -476,7 +476,7 @@ export const authRouter = router({
       // Send password reset email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://care-compliance-system-production.up.railway.app" 
+        ? "https://ccms.co.uk" 
         : "http://localhost:3000";
       const resetLink = `${baseUrl}/reset-password?token=${token}`;
       
