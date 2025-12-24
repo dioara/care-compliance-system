@@ -19,6 +19,7 @@ export const ERROR_MESSAGES = {
   AUTH_INVALID: "Invalid email or password. Please try again.",
   AUTH_FORBIDDEN: "You don't have permission to perform this action.",
   SESSION_EXPIRED: "Your session has expired. Please sign in again.",
+  EMAIL_VERIFICATION_REQUIRED: "Please verify your email address before logging in. Check your inbox for the verification link.",
   
   // Data operations
   SAVE_FAILED: "Unable to save changes. Please try again.",
@@ -68,7 +69,16 @@ export function sanitizeErrorMessage(error: unknown): string {
     }
     
     if (message.includes('forbidden') || message.includes('permission')) {
+      // Don't sanitize email verification errors - they need to be shown to the user
+      if (message.includes('verify') || message.includes('verification')) {
+        return message;
+      }
       return ERROR_MESSAGES.AUTH_FORBIDDEN;
+    }
+    
+    // Check for email verification errors - these should be passed through
+    if (message.includes('verify your email') || message.includes('verification')) {
+      return message;
     }
     
     // Default to generic error

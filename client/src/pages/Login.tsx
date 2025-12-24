@@ -58,20 +58,28 @@ export default function Login() {
     onError: (error: any) => {
       setIsLoading(false);
       
-      // Check if the error is about email verification
-      // Check both the message content and the error code
-      const errorMessage = error.message?.toLowerCase() || '';
-      const errorCode = error.data?.code || error.shape?.data?.code || '';
+      // Debug logging to see the full error structure
+      console.log('[Login Error] Full error object:', error);
+      console.log('[Login Error] error.message:', error.message);
+      console.log('[Login Error] error.data:', error.data);
+      console.log('[Login Error] error.shape:', error.shape);
       
+      // Get the error message - tRPC errors have the message in error.message
+      const errorMessage = (error.message || '').toLowerCase();
+      
+      // Check if the error is about email verification
+      // The backend sends: "Please verify your email address before logging in. Check your inbox for the verification link."
       const isVerificationError = 
         errorMessage.includes('verify your email') || 
-        errorMessage.includes('verification') ||
         errorMessage.includes('verify email') ||
-        (errorCode === 'FORBIDDEN' && errorMessage.includes('verify'));
+        errorMessage.includes('verification');
+      
+      console.log('[Login Error] Is verification error:', isVerificationError);
       
       if (isVerificationError) {
         setShowVerificationMessage(true);
         setUnverifiedEmail(email);
+        // Don't show toast for verification errors - the UI message is enough
       } else {
         toast.error(error.message || "Invalid email or password. Please try again.");
       }
