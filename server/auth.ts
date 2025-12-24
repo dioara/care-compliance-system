@@ -105,7 +105,7 @@ export const authRouter = router({
       // Send email verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://ccms.co.uk" 
+        ? "https://app.ccms.co.uk" 
         : "http://localhost:3000";
       
       const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
@@ -299,7 +299,7 @@ export const authRouter = router({
       // Send welcome email now that email is verified
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://ccms.co.uk" 
+        ? "https://app.ccms.co.uk" 
         : "http://localhost:3000";
       
       await sendEmail({
@@ -367,7 +367,7 @@ export const authRouter = router({
       // Send verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://ccms.co.uk" 
+        ? "https://app.ccms.co.uk" 
         : "http://localhost:3000";
       
       const verificationUrl = `${baseUrl}/verify-email?token=${emailVerificationToken}`;
@@ -476,7 +476,7 @@ export const authRouter = router({
       // Send password reset email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
-        ? "https://ccms.co.uk" 
+        ? "https://app.ccms.co.uk" 
         : "http://localhost:3000";
       const resetLink = `${baseUrl}/reset-password?token=${token}`;
       
