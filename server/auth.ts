@@ -103,6 +103,16 @@ export const authRouter = router({
       // Start free trial for the new company
       await startFreeTrial(tenant.id);
 
+      // Auto-assign license to the account creator
+      const userId = (userResult as any).insertId;
+      try {
+        await db.assignLicenseToUser(tenant.id, userId, userId);
+        console.log(`[REGISTRATION] Auto-assigned license to user ${userId}`);
+      } catch (error) {
+        console.error('[REGISTRATION] Failed to auto-assign license to account creator:', error);
+        // Continue with registration even if license assignment fails
+      }
+
       // Send email verification email
       const { sendEmail } = await import("./_core/email");
       const baseUrl = process.env.NODE_ENV === "production" 
