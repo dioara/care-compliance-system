@@ -202,7 +202,7 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
     try {
       await saveAssessment.mutateAsync({
         tenantId: user.tenantId!,
-        locationId: activeLocationId,
+        locationId: person?.locationId || activeLocationId,
         questionId: questionId,
         assessmentType: personType,
         staffMemberId: personType === "staff" ? personId : undefined,

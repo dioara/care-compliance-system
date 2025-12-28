@@ -2389,6 +2389,56 @@ export const appRouter = router({
           }
         }
         
+        // Send welcome email to the new user
+        try {
+          const { sendEmail } = await import("./_core/email");
+          const baseUrl = process.env.NODE_ENV === "production" 
+            ? "https://app.ccms.co.uk" 
+            : "http://localhost:3000";
+          
+          const tenant = await db.getTenantById(ctx.user.tenantId);
+          const creatorName = ctx.user.name || "Your administrator";
+          
+          await sendEmail({
+            to: input.email,
+            subject: `Welcome to ${tenant?.name || "Care Compliance Management System"}`,
+            text: `Hi ${input.name},\n\nAn account has been created for you on the Care Compliance Management System by ${creatorName}.\n\nYour login details:\nEmail: ${input.email}\nPassword: ${input.password}\n\nPlease log in and change your password: ${baseUrl}/login\n\nBest regards,\nThe CCMS Team`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: #1F7AE0; padding: 30px; text-align: center;">
+                  <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to CCMS</h1>
+                </div>
+                <div style="padding: 30px; background: #ffffff;">
+                  <h2 style="color: #1f2937; margin-top: 0;">Hi ${input.name},</h2>
+                  <p style="color: #4b5563; font-size: 16px;">An account has been created for you on the Care Compliance Management System by <strong>${creatorName}</strong>.</p>
+                  
+                  <div style="background: #f0f9ff; border-left: 4px solid #1F7AE0; padding: 20px; margin: 25px 0;">
+                    <h3 style="color: #1F7AE0; margin-top: 0;">Your Login Details:</h3>
+                    <p style="color: #4b5563; margin: 5px 0;"><strong>Email:</strong> ${input.email}</p>
+                    <p style="color: #4b5563; margin: 5px 0;"><strong>Temporary Password:</strong> ${input.password}</p>
+                  </div>
+                  
+                  <p style="color: #ef4444; font-size: 14px; font-weight: 600;">⚠️ Important: Please change your password after your first login for security.</p>
+                  
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${baseUrl}/login" style="background: #1F7AE0; color: white; padding: 14px 40px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Log In Now</a>
+                  </div>
+                  
+                  <p style="color: #6b7280; font-size: 14px;">If you have any questions, please contact your administrator.</p>
+                </div>
+                <div style="padding: 20px; text-align: center; background: #f9fafb; border-top: 1px solid #e5e7eb;">
+                  <p style="color: #9ca3af; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Care Compliance Management System</p>
+                  <p style="color: #9ca3af; font-size: 12px; margin: 5px 0 0 0;">UK Health Kits LTD</p>
+                </div>
+              </div>
+            `
+          });
+          console.log(`[USER CREATION] Welcome email sent to ${input.email}`);
+        } catch (error) {
+          console.error('[USER CREATION] Failed to send welcome email:', error);
+          // Continue even if email fails
+        }
+        
         return { success: true, userId, id: userId };
       }),
 
