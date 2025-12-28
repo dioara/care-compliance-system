@@ -1284,7 +1284,26 @@ export async function getTemplateQuestionsWithDetails(templateId: number) {
 export async function getAllAuditTypes() {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(auditTypes).orderBy(auditTypes.auditCategory, auditTypes.auditName);
+  
+  // Explicitly select all fields including serviceTypes
+  const results = await db.select({
+    id: auditTypes.id,
+    auditName: auditTypes.auditName,
+    auditCategory: auditTypes.auditCategory,
+    targetType: auditTypes.targetType,
+    description: auditTypes.description,
+    tooltip: auditTypes.tooltip,
+    processSteps: auditTypes.processSteps,
+    recommendedFrequency: auditTypes.recommendedFrequency,
+    isAiPowered: auditTypes.isAiPowered,
+    templateReference: auditTypes.templateReference,
+    isActive: auditTypes.isActive,
+    createdAt: auditTypes.createdAt,
+    serviceType: auditTypes.serviceType,
+    serviceTypes: auditTypes.serviceTypes, // Explicitly include this field
+  }).from(auditTypes).orderBy(auditTypes.auditCategory, auditTypes.auditName);
+  
+  return results;
 }
 
 export async function getAuditTypeById(id: number) {

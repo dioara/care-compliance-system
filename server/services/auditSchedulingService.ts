@@ -50,6 +50,7 @@ interface AuditType {
   auditName: string;
   recommendedFrequency: string;
   targetType?: 'general' | 'staff' | 'serviceUser';
+  serviceTypes?: string; // JSON array string
 }
 
 interface ExistingAudit {
@@ -64,6 +65,7 @@ interface SuggestedAudit {
   suggestedDate: Date;
   frequency: string;
   reason: string;
+  serviceTypes: string; // JSON array string
 }
 
 /**
@@ -183,12 +185,15 @@ export function generateAuditSchedule(
         reason = `Initial ${auditType.recommendedFrequency.toLowerCase()} audit`;
       }
       
+      const serviceTypesValue = auditType.serviceTypes || '["all"]';
+      
       suggestions.push({
         auditTypeId: auditType.id,
         auditTypeName: auditType.auditName,
         suggestedDate,
         frequency: auditType.recommendedFrequency,
         reason,
+        serviceTypes: serviceTypesValue,
       });
       
       // Move to next interval
