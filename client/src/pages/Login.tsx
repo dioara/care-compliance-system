@@ -58,23 +58,18 @@ export default function Login() {
     onError: (error: any) => {
       setIsLoading(false);
       
-      // Debug logging to see the full error structure
-      console.log('[Login Error] Full error object:', error);
-      console.log('[Login Error] error.message:', error.message);
-      console.log('[Login Error] error.data:', error.data);
-      console.log('[Login Error] error.shape:', error.shape);
-      
-      // Get the error message - tRPC errors have the message in error.message
+      // Get the error message and code - tRPC errors have the message in error.message
       const errorMessage = (error.message || '').toLowerCase();
+      const errorCode = error.data?.code || error.code;
       
       // Check if the error is about email verification
-      // The backend sends: "Please verify your email address before logging in. Check your inbox for the verification link."
+      // Backend sends FORBIDDEN code with verification message
       const isVerificationError = 
+        errorCode === 'FORBIDDEN' ||
         errorMessage.includes('verify your email') || 
         errorMessage.includes('verify email') ||
+        errorMessage.includes('email verification') ||
         errorMessage.includes('verification');
-      
-      console.log('[Login Error] Is verification error:', isVerificationError);
       
       if (isVerificationError) {
         setShowVerificationMessage(true);
@@ -128,15 +123,15 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Email Verification Required Message */}
           {showVerificationMessage && (
-            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-start gap-3">
-                <Mail className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <Mail className="h-5 w-5 text-[#1F7AE0] mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-amber-800">Email Verification Required</h3>
-                  <p className="text-sm text-amber-700 mt-1">
+                  <h3 className="font-medium text-[#1F7AE0]">Email Verification Required</h3>
+                  <p className="text-sm text-gray-700 mt-1">
                     Please verify your email address before signing in. We sent a verification link to <strong>{unverifiedEmail}</strong>.
                   </p>
-                  <p className="text-sm text-amber-700 mt-2">
+                  <p className="text-sm text-gray-600 mt-2">
                     Check your inbox and spam folder for the verification email.
                   </p>
                   <Button
@@ -145,7 +140,7 @@ export default function Login() {
                     size="sm"
                     onClick={handleResendVerification}
                     disabled={resendVerificationMutation.isPending || resendCooldown > 0}
-                    className="mt-3 text-amber-700 border-amber-300 hover:bg-amber-100"
+                    className="mt-3 text-[#1F7AE0] border-blue-300 hover:bg-blue-100"
                   >
                     <RefreshCw className={`h-4 w-4 mr-2 ${resendVerificationMutation.isPending ? 'animate-spin' : ''}`} />
                     {resendVerificationMutation.isPending 
@@ -155,7 +150,7 @@ export default function Login() {
                         : "Resend Verification Email"}
                   </Button>
                   {resendCooldown > 0 && (
-                    <p className="text-xs text-amber-600 mt-2">
+                    <p className="text-xs text-gray-600 mt-2">
                       You can request a new verification email in {resendCooldown} seconds.
                     </p>
                   )}
