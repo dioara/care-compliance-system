@@ -45,11 +45,13 @@ export default function PersonCompliance({ personType }: PersonComplianceProps) 
   // Fetch all questions
   const { data: allQuestions } = trpc.compliance.questions.useQuery();
 
-  // Fetch assessments for this person
+  // Fetch assessments for this person - use person's location, not active location
+  // This ensures we get assessments even if the user is viewing from a different location context
+  const personLocationId = person?.locationId || activeLocationId;
   const { data: assessments, refetch: refetchAssessments } = trpc.compliance.assessmentsByLocation.useQuery(
-    { locationId: activeLocationId || 0 },
+    { locationId: personLocationId || 0 },
     { 
-      enabled: !!activeLocationId,
+      enabled: !!personLocationId,
       select: (data) => data.filter(a => 
         personType === "staff" ? a.staffMemberId === personId : a.serviceUserId === personId
       )
