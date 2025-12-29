@@ -551,24 +551,48 @@ export default function Staff() {
                 
                 {/* Compliance Progress */}
                 {staffMember.complianceProgress && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Compliance Progress</span>
-                      <span className="font-medium">
-                        {staffMember.complianceProgress.completed}/{staffMember.complianceProgress.total} sections
-                      </span>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Compliance Progress</span>
+                        <span className="font-medium">
+                          {staffMember.complianceProgress.completed}/{staffMember.complianceProgress.total} sections
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            staffMember.complianceProgress.percentage >= 80
+                              ? 'bg-green-500'
+                              : staffMember.complianceProgress.percentage >= 50
+                              ? 'bg-amber-500'
+                              : 'bg-red-500'
+                          }`}
+                          style={{ width: `${staffMember.complianceProgress.percentage}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          staffMember.complianceProgress.percentage >= 80
-                            ? 'bg-green-500'
-                            : staffMember.complianceProgress.percentage >= 50
-                            ? 'bg-amber-500'
-                            : 'bg-red-500'
-                        }`}
-                        style={{ width: `${staffMember.complianceProgress.percentage}%` }}
-                      />
+                    
+                    {/* Compliance Score */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Compliance Score</span>
+                        <span className="font-medium">
+                          {staffMember.complianceProgress.compliantQuestions}/{staffMember.complianceProgress.totalQuestions} questions ({staffMember.complianceProgress.score}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            staffMember.complianceProgress.score >= 80
+                              ? 'bg-green-500'
+                              : staffMember.complianceProgress.score >= 50
+                              ? 'bg-amber-500'
+                              : 'bg-red-500'
+                          }`}
+                          style={{ width: `${staffMember.complianceProgress.score}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}

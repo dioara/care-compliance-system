@@ -504,24 +504,48 @@ export default function ServiceUsers() {
                 
                 {/* Compliance Progress */}
                 {serviceUser.complianceProgress && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Compliance Progress</span>
-                      <span className="font-medium">
-                        {serviceUser.complianceProgress.completed}/{serviceUser.complianceProgress.total} sections
-                      </span>
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Compliance Progress</span>
+                        <span className="font-medium">
+                          {serviceUser.complianceProgress.completed}/{serviceUser.complianceProgress.total} sections
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            serviceUser.complianceProgress.percentage >= 80
+                              ? 'bg-green-500'
+                              : serviceUser.complianceProgress.percentage >= 50
+                              ? 'bg-amber-500'
+                              : 'bg-red-500'
+                          }`}
+                          style={{ width: `${serviceUser.complianceProgress.percentage}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          serviceUser.complianceProgress.percentage >= 80
-                            ? 'bg-green-500'
-                            : serviceUser.complianceProgress.percentage >= 50
-                            ? 'bg-amber-500'
-                            : 'bg-red-500'
-                        }`}
-                        style={{ width: `${serviceUser.complianceProgress.percentage}%` }}
-                      />
+                    
+                    {/* Compliance Score */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Compliance Score</span>
+                        <span className="font-medium">
+                          {serviceUser.complianceProgress.compliantQuestions}/{serviceUser.complianceProgress.totalQuestions} questions ({serviceUser.complianceProgress.score}%)
+                        </span>
+                      </div>
+                      <div className="w-full bg-secondary rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${
+                            serviceUser.complianceProgress.score >= 80
+                              ? 'bg-green-500'
+                              : serviceUser.complianceProgress.score >= 50
+                              ? 'bg-amber-500'
+                              : 'bg-red-500'
+                          }`}
+                          style={{ width: `${serviceUser.complianceProgress.score}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 )}

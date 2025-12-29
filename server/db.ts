@@ -1087,7 +1087,7 @@ export async function getOverdueActionsByLocation(locationId: number) {
 // Get compliance progress for a staff member
 export async function getStaffComplianceProgress(staffMemberId: number) {
   const db = await getDb();
-  if (!db) return { completed: 0, total: 7, percentage: 0 };
+  if (!db) return { completed: 0, total: 7, percentage: 0, score: 0, compliantQuestions: 0, totalQuestions: 0 };
 
   // Get all staff sections (7 sections)
   const staffSections = await db.select().from(complianceSections)
@@ -1100,6 +1100,28 @@ export async function getStaffComplianceProgress(staffMemberId: number) {
 
   // Count completed sections (sections with at least one assessed question)
   let completedSections = 0;
+  
+  // Get all questions for staff compliance
+  const allQuestions = await db.select().from(complianceQuestions)
+    .where(sql`${complianceQuestions.sectionId} IN (${sql.join(staffSections.map(s => sql`${s.id}`), sql`, `)})`);
+  
+  const totalQuestions = allQuestions.length;
+  
+  // Get all assessments for this staff member
+  const allAssessments = await db.select({
+    id: complianceAssessments.id,
+    questionId: complianceAssessments.questionId,
+    ragStatus: complianceAssessments.ragStatus,
+    complianceStatus: complianceAssessments.complianceStatus
+  }).from(complianceAssessments)
+    .where(eq(complianceAssessments.staffMemberId, staffMemberId));
+  
+  // Calculate compliance score: count questions with (compliant + green) OR (not_assessed + green)
+  const compliantQuestions = allAssessments.filter(a => 
+    a.ragStatus === 'green' && (a.complianceStatus === 'compliant' || a.complianceStatus === 'not_assessed')
+  ).length;
+  
+  const score = totalQuestions > 0 ? Math.round((compliantQuestions / totalQuestions) * 100) : 0;
   
   for (const section of staffSections) {
     const questions = await db.select().from(complianceQuestions)
@@ -1123,14 +1145,17 @@ export async function getStaffComplianceProgress(staffMemberId: number) {
   return {
     completed: completedSections,
     total: totalSections,
-    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
+    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0,
+    score,
+    compliantQuestions,
+    totalQuestions
   };
 }
 
 // Get compliance progress for a service user
 export async function getServiceUserComplianceProgress(serviceUserId: number) {
   const db = await getDb();
-  if (!db) return { completed: 0, total: 19, percentage: 0 };
+  if (!db) return { completed: 0, total: 19, percentage: 0, score: 0, compliantQuestions: 0, totalQuestions: 0 };
 
   // Get all service user sections (19 sections)
   const serviceUserSections = await db.select().from(complianceSections)
@@ -1143,6 +1168,28 @@ export async function getServiceUserComplianceProgress(serviceUserId: number) {
 
   // Count completed sections (sections with at least one assessed question)
   let completedSections = 0;
+  
+  // Get all questions for service user compliance
+  const allQuestions = await db.select().from(complianceQuestions)
+    .where(sql`${complianceQuestions.sectionId} IN (${sql.join(serviceUserSections.map(s => sql`${s.id}`), sql`, `)})`);
+  
+  const totalQuestions = allQuestions.length;
+  
+  // Get all assessments for this service user
+  const allAssessments = await db.select({
+    id: complianceAssessments.id,
+    questionId: complianceAssessments.questionId,
+    ragStatus: complianceAssessments.ragStatus,
+    complianceStatus: complianceAssessments.complianceStatus
+  }).from(complianceAssessments)
+    .where(eq(complianceAssessments.serviceUserId, serviceUserId));
+  
+  // Calculate compliance score: count questions with (compliant + green) OR (not_assessed + green)
+  const compliantQuestions = allAssessments.filter(a => 
+    a.ragStatus === 'green' && (a.complianceStatus === 'compliant' || a.complianceStatus === 'not_assessed')
+  ).length;
+  
+  const score = totalQuestions > 0 ? Math.round((compliantQuestions / totalQuestions) * 100) : 0;
   
   for (const section of serviceUserSections) {
     const questions = await db.select().from(complianceQuestions)
@@ -1166,7 +1213,10 @@ export async function getServiceUserComplianceProgress(serviceUserId: number) {
   return {
     completed: completedSections,
     total: totalSections,
-    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0
+    percentage: totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 0,
+    score,
+    compliantQuestions,
+    totalQuestions
   };
 }
 
