@@ -947,7 +947,31 @@ export async function getComplianceAssessmentsByLocation(locationId: number) {
   const db = await getDb();
   if (!db) return [];
 
-  return await db.select().from(complianceAssessments).where(eq(complianceAssessments.locationId, locationId));
+  // Explicitly select all fields to ensure they're returned
+  return await db.select({
+    id: complianceAssessments.id,
+    tenantId: complianceAssessments.tenantId,
+    locationId: complianceAssessments.locationId,
+    questionId: complianceAssessments.questionId,
+    assessmentType: complianceAssessments.assessmentType,
+    serviceUserId: complianceAssessments.serviceUserId,
+    staffMemberId: complianceAssessments.staffMemberId,
+    complianceStatus: complianceAssessments.complianceStatus,
+    evidenceProvided: complianceAssessments.evidenceProvided,
+    identifiedGaps: complianceAssessments.identifiedGaps,
+    actionRequired: complianceAssessments.actionRequired,
+    responsiblePersonId: complianceAssessments.responsiblePersonId,
+    targetCompletionDate: complianceAssessments.targetCompletionDate,
+    actualCompletionDate: complianceAssessments.actualCompletionDate,
+    ragStatus: complianceAssessments.ragStatus,
+    notes: complianceAssessments.notes,
+    lastAuditDate: complianceAssessments.lastAuditDate,
+    nextAuditDue: complianceAssessments.nextAuditDue,
+    assessedById: complianceAssessments.assessedById,
+    assessedAt: complianceAssessments.assessedAt,
+    createdAt: complianceAssessments.createdAt,
+    updatedAt: complianceAssessments.updatedAt,
+  }).from(complianceAssessments).where(eq(complianceAssessments.locationId, locationId));
 }
 
 export async function getComplianceAssessmentByQuestion(locationId: number, questionId: number) {
