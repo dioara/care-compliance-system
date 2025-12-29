@@ -45,6 +45,7 @@ export default function AuditCalendar() {
   const [printRange, setPrintRange] = useState<'last_week' | 'week' | 'next_week' | 'last_month' | 'month' | 'next_month' | 'last_quarter' | 'quarter' | 'next_quarter' | 'last_year' | 'year' | 'next_year' | 'custom'>('year');
   const [customStartDate, setCustomStartDate] = useState<Date>(startOfMonth(new Date()));
   const [customEndDate, setCustomEndDate] = useState<Date>(endOfMonth(new Date()));
+  const [careTypeFilter, setCareTypeFilter] = useState<string>('all');
 
   // Save view preference to localStorage
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -412,10 +413,29 @@ export default function AuditCalendar() {
   };
 
   const handleToggleAll = () => {
-    if (selectedSuggestions.size === (generateSuggestions.data?.length || 0)) {
-      setSelectedSuggestions(new Set());
+    if (!generateSuggestions.data) return;
+    
+    const filteredIndices = generateSuggestions.data
+      .map((s, i) => ({ suggestion: s, originalIndex: i }))
+      .filter(({ suggestion }) => {
+        if (careTypeFilter === 'all') return true;
+        const typeServiceTypes: string[] = suggestion.serviceTypes ? JSON.parse(suggestion.serviceTypes) : ["all"];
+        return typeServiceTypes.includes("all") || typeServiceTypes.includes(careTypeFilter);
+      })
+      .map(({ originalIndex }) => originalIndex);
+    
+    const allFilteredSelected = filteredIndices.every(i => selectedSuggestions.has(i));
+    
+    if (allFilteredSelected) {
+      // Deselect all filtered items
+      const newSelected = new Set(selectedSuggestions);
+      filteredIndices.forEach(i => newSelected.delete(i));
+      setSelectedSuggestions(newSelected);
     } else {
-      setSelectedSuggestions(new Set(generateSuggestions.data?.map((_, i) => i) || []));
+      // Select all filtered items
+      const newSelected = new Set(selectedSuggestions);
+      filteredIndices.forEach(i => newSelected.add(i));
+      setSelectedSuggestions(newSelected);
     }
   };
 
@@ -699,13 +719,50 @@ export default function AuditCalendar() {
           
           {generateSuggestions.data && (
             <div>
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  {generateSuggestions.data.length} suggestions generated
-                </p>
-                <Button variant="outline" size="sm" onClick={handleToggleAll}>
-                  {selectedSuggestions.size === generateSuggestions.data.length ? 'Deselect All' : 'Select All'}
-                </Button>
+              {/* Care Type Filter and Actions */}
+              <div className="mb-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-medium">Filter by Care Type:</label>
+                  <Select value={careTypeFilter} onValueChange={setCareTypeFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Care Types</SelectItem>
+                      <SelectItem value="domiciliary_care">Domiciliary Care</SelectItem>
+                      <SelectItem value="supported_living">Supported Living</SelectItem>
+                      <SelectItem value="residential">Residential</SelectItem>
+                      <SelectItem value="nursing">Nursing</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {generateSuggestions.data.filter(s => {
+                      if (careTypeFilter === 'all') return true;
+                      const typeServiceTypes: string[] = s.serviceTypes ? JSON.parse(s.serviceTypes) : ["all"];
+                      return typeServiceTypes.includes("all") || typeServiceTypes.includes(careTypeFilter);
+                    }).length} suggestions {careTypeFilter !== 'all' ? `(filtered from ${generateSuggestions.data.length})` : 'generated'}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={handleToggleAll}>
+                      {selectedSuggestions.size === generateSuggestions.data.filter(s => {
+                        if (careTypeFilter === 'all') return true;
+                        const typeServiceTypes: string[] = s.serviceTypes ? JSON.parse(s.serviceTypes) : ["all"];
+                        return typeServiceTypes.includes("all") || typeServiceTypes.includes(careTypeFilter);
+                      }).length ? 'Deselect All' : 'Select All'}
+                    </Button>
+                    <Button 
+                      size="sm"
+                      onClick={handleAcceptSelected}
+                      disabled={selectedSuggestions.size === 0 || acceptSuggestions.isPending}
+                    >
+                      {acceptSuggestions.isPending && <Spinner className="h-4 w-4 mr-2 animate-spin" />}
+                      Accept Selected ({selectedSuggestions.size})
+                    </Button>
+                  </div>
+                </div>
               </div>
               
               <Table>
@@ -719,12 +776,19 @@ export default function AuditCalendar() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {generateSuggestions.data.map((suggestion, index) => (
-                    <TableRow key={index}>
+                  {generateSuggestions.data
+                    .map((suggestion, originalIndex) => ({ suggestion, originalIndex }))
+                    .filter(({ suggestion }) => {
+                      if (careTypeFilter === 'all') return true;
+                      const typeServiceTypes: string[] = suggestion.serviceTypes ? JSON.parse(suggestion.serviceTypes) : ["all"];
+                      return typeServiceTypes.includes("all") || typeServiceTypes.includes(careTypeFilter);
+                    })
+                    .map(({ suggestion, originalIndex }) => (
+                    <TableRow key={originalIndex}>
                       <TableCell>
                         <Checkbox
-                          checked={selectedSuggestions.has(index)}
-                          onCheckedChange={() => handleToggleSuggestion(index)}
+                          checked={selectedSuggestions.has(originalIndex)}
+                          onCheckedChange={() => handleToggleSuggestion(originalIndex)}
                         />
                       </TableCell>
                       <TableCell className="font-medium">{suggestion.auditTypeName}</TableCell>
