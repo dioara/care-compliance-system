@@ -974,15 +974,30 @@ export async function getComplianceAssessmentsByLocation(locationId: number) {
   }).from(complianceAssessments).where(eq(complianceAssessments.locationId, locationId));
 }
 
-export async function getComplianceAssessmentByQuestion(locationId: number, questionId: number) {
+export async function getComplianceAssessmentByQuestion(
+  locationId: number, 
+  questionId: number,
+  staffMemberId?: number,
+  serviceUserId?: number
+) {
   const db = await getDb();
   if (!db) return undefined;
 
+  // Build where conditions based on what IDs are provided
+  const conditions = [
+    eq(complianceAssessments.locationId, locationId),
+    eq(complianceAssessments.questionId, questionId)
+  ];
+
+  // Add person-specific condition
+  if (staffMemberId) {
+    conditions.push(eq(complianceAssessments.staffMemberId, staffMemberId));
+  } else if (serviceUserId) {
+    conditions.push(eq(complianceAssessments.serviceUserId, serviceUserId));
+  }
+
   const result = await db.select().from(complianceAssessments)
-    .where(and(
-      eq(complianceAssessments.locationId, locationId),
-      eq(complianceAssessments.questionId, questionId)
-    ))
+    .where(and(...conditions))
     .limit(1);
   
   return result.length > 0 ? result[0] : undefined;
@@ -992,8 +1007,13 @@ export async function createOrUpdateComplianceAssessment(data: any) {
   const db = await getDb();
   if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
 
-  // Check if assessment exists
-  const existing = await getComplianceAssessmentByQuestion(data.locationId, data.questionId);
+  // Check if assessment exists for this specific person
+  const existing = await getComplianceAssessmentByQuestion(
+    data.locationId, 
+    data.questionId,
+    data.staffMemberId,
+    data.serviceUserId
+  );
   
   // Convert Date objects to MySQL-compatible format strings
   const formatForMySQL = (date: Date | string | undefined) => {
