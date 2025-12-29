@@ -1393,25 +1393,6 @@ export async function getAuditInstanceById(id: number) {
   return instance || null;
 }
 
-export async function getAuditInstancesByLocationAndDate(locationId: number, auditDate: string) {
-  const db = await getDb();
-  if (!db) return [];
-  return db
-    .select({
-      id: auditInstances.id,
-      auditTypeId: auditInstances.auditTypeId,
-      auditDate: auditInstances.auditDate,
-      status: auditInstances.status,
-    })
-    .from(auditInstances)
-    .where(
-      and(
-        eq(auditInstances.locationId, locationId),
-        eq(auditInstances.auditDate, auditDate)
-      )
-    );
-}
-
 export async function getAllAuditInstances(tenantId: number) {
   const db = await getDb();
   if (!db) return [];

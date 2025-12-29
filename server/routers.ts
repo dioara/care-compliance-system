@@ -1487,21 +1487,6 @@ export const appRouter = router({
           if (!auditType) continue;
           
           try {
-            // Check if audit already exists for this date/type/location to prevent duplicates
-            const existingAudits = await db.getAuditInstancesByLocationAndDate(
-              input.locationId,
-              toMySQLDate(suggestion.suggestedDate)
-            );
-            
-            const auditAlreadyExists = existingAudits.some(
-              (audit: any) => audit.auditTypeId === suggestion.auditTypeId
-            );
-            
-            if (auditAlreadyExists) {
-              console.log('[acceptScheduleSuggestions] Audit already exists, skipping:', suggestion.auditTypeId, toMySQLDate(suggestion.suggestedDate));
-              continue;
-            }
-            
             // For staff-specific audits, create one instance per staff member
             if (auditType.targetType === 'staff' && staffMembers.length > 0) {
               for (const staff of staffMembers) {
