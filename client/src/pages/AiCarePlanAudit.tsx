@@ -278,10 +278,48 @@ export default function AiCarePlanAudit() {
 
       {/* Results */}
       {analysisResult && (
-        <CarePlanResults 
-          analysis={analysisResult.analysis} 
-          nameMappings={analysisResult.nameMappings}
-        />
+        <div className="space-y-4">
+          {/* Download Button */}
+          {analysisResult.documentBase64 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Download Detailed Report</CardTitle>
+                <CardDescription>
+                  Download the complete ultra-pedantic analysis as a Word document
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <button
+                  onClick={() => {
+                    const blob = new Blob(
+                      [Uint8Array.from(atob(analysisResult.documentBase64!), c => c.charCodeAt(0))],
+                      { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+                    );
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `Care_Plan_Analysis_${serviceUserName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download Full Analysis Report (.docx)
+                </button>
+              </CardContent>
+            </Card>
+          )}
+          
+          <CarePlanResults 
+            analysis={analysisResult.analysis} 
+            nameMappings={analysisResult.nameMappings}
+          />
+        </div>
       )}
     </div>
   );
