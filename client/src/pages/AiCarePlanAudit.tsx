@@ -10,6 +10,8 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CarePlanResults } from '@/components/CarePlanResults';
+import { fileToBase64 } from '@/lib/fileUtils';
 
 export default function AiCarePlanAudit() {
   const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
@@ -23,6 +25,16 @@ export default function AiCarePlanAudit() {
   const hasOpenAiKey = !!orgSettings?.openaiApiKey;
 
   const analyzeCarePlanMutation = trpc.ai.analyzeCarePlan.useMutation({
+    onSuccess: (result) => {
+      setAnalysisResult(result);
+      toast.success('Care plan analysis complete!');
+    },
+    onError: (error) => {
+      toast.error(`Analysis failed: ${error.message}`);
+    },
+  });
+
+  const analyzeCarePlanFileMutation = trpc.ai.analyzeCarePlanFile.useMutation({
     onSuccess: (result) => {
       setAnalysisResult(result);
       toast.success('Care plan analysis complete!');
@@ -56,9 +68,16 @@ export default function AiCarePlanAudit() {
         return;
       }
 
-      // For now, we'll handle file upload in the backend
-      // TODO: Implement file upload endpoint
-      toast.info('File upload processing...');
+      try {
+        const fileData = await fileToBase64(selectedFile);
+        analyzeCarePlanFileMutation.mutate({
+          fileData,
+          filename: selectedFile.name,
+          anonymize,
+        });
+      } catch (error) {
+        toast.error('Failed to read file');
+      }
       return;
     }
 
@@ -161,11 +180,11 @@ export default function AiCarePlanAudit() {
       <div className="space-y-2">
         <Button
           onClick={handleAnalyze}
-          disabled={analyzeCarePlanMutation.isPending || !hasOpenAiKey}
+          disabled={analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending || !hasOpenAiKey}
           size="lg"
           className="w-full"
         >
-          {analyzeCarePlanMutation.isPending ? (
+          {(analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending) ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Analyzing...
@@ -184,16 +203,10 @@ export default function AiCarePlanAudit() {
 
       {/* Results */}
       {analysisResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Analysis Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="text-sm bg-muted p-4 rounded-lg overflow-auto">
-              {JSON.stringify(analysisResult, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+        <CarePlanResults 
+          analysis={analysisResult.analysis} 
+          nameMappings={analysisResult.nameMappings}
+        />
       )}
     </div>
   );

@@ -11,6 +11,8 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CareNotesResults } from '@/components/CareNotesResults';
+import { fileToBase64 } from '@/lib/fileUtils';
 
 export default function AiCareNotesAudit() {
   const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
@@ -25,6 +27,16 @@ export default function AiCareNotesAudit() {
   const hasOpenAiKey = !!orgSettings?.openaiApiKey;
 
   const analyzeCareNotesMutation = trpc.ai.analyzeCareNotes.useMutation({
+    onSuccess: (result) => {
+      setAnalysisResult(result);
+      toast.success('Care notes analysis complete!');
+    },
+    onError: (error) => {
+      toast.error(`Analysis failed: ${error.message}`);
+    },
+  });
+
+  const analyzeCareNotesFileMutation = trpc.ai.analyzeCareNotesFile.useMutation({
     onSuccess: (result) => {
       setAnalysisResult(result);
       toast.success('Care notes analysis complete!');
@@ -63,9 +75,17 @@ export default function AiCareNotesAudit() {
         return;
       }
 
-      // For now, we'll handle file upload in the backend
-      // TODO: Implement file upload endpoint
-      toast.info('File upload processing...');
+      try {
+        const fileData = await fileToBase64(selectedFile);
+        analyzeCareNotesFileMutation.mutate({
+          fileData,
+          filename: selectedFile.name,
+          serviceUserName,
+          anonymize,
+        });
+      } catch (error) {
+        toast.error('Failed to read file');
+      }
       return;
     }
 
@@ -182,11 +202,11 @@ export default function AiCareNotesAudit() {
       <div className="space-y-2">
         <Button
           onClick={handleAnalyze}
-          disabled={analyzeCareNotesMutation.isPending || !hasOpenAiKey}
+          disabled={analyzeCareNotesMutation.isPending || analyzeCareNotesFileMutation.isPending || !hasOpenAiKey}
           size="lg"
           className="w-full"
         >
-          {analyzeCareNotesMutation.isPending ? (
+          {(analyzeCareNotesMutation.isPending || analyzeCareNotesFileMutation.isPending) ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               Analyzing...
@@ -205,16 +225,10 @@ export default function AiCareNotesAudit() {
 
       {/* Results */}
       {analysisResult && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Analysis Results</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <pre className="text-sm bg-muted p-4 rounded-lg overflow-auto">
-              {JSON.stringify(analysisResult, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
+        <CareNotesResults 
+          analysis={analysisResult.analysis} 
+          nameMappings={analysisResult.nameMappings}
+        />
       )}
     </div>
   );
