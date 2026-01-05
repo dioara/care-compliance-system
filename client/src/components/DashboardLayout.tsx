@@ -104,7 +104,7 @@ const menuItems = [
   { icon: Brain, label: "AI Audits", path: "/ai-audits", description: "Smart analysis" },
   { icon: Warning, label: "Incidents", path: "/incidents", description: "Track incidents" },
   { icon: ChartBar, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends" },
-  // { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" }, // Hidden until feature is defined
+  { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },
   { icon: ClipboardText, label: "Action Log", path: "/action-log", description: "Track actions" },
 ];
 

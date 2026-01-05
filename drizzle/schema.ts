@@ -202,6 +202,7 @@ export const auditTemplateQuestions = mysqlTable("auditTemplateQuestions", {
 	isRequired: tinyint().default(1).notNull(),
 	guidance: text(),
 	displayOrder: int().notNull(),
+	kloes: text(),
 	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
 });
 
