@@ -132,16 +132,31 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
     console.log('[Upload Endpoint] Parsed text length:', parsed.text.length, 'characters');
     console.log('[Upload Endpoint] Parsed metadata:', parsed.metadata);
     
-    // Analyze the extracted text
-    console.log('[Upload Endpoint] Importing ai-analysis module');
-    const { analyzeCarePlan } = await import('./ai-analysis');
+    // Analyze the extracted text with multi-pass analyzer
+    console.log('[Upload Endpoint] Importing multi-pass analyzer');
+    const { analyzeCarePlanMultiPass } = await import('./multi-pass-analyzer');
+    const { anonymizeSpecificName } = await import('./anonymization');
     
-    console.log('[Upload Endpoint] Calling analyzeCarePlan with OpenAI');
-    const result = await analyzeCarePlan(
+    // Anonymize the content if requested
+    let processedContent = parsed.text;
+    let nameMappings;
+    
+    if (anonymise && serviceUserName) {
+      console.log('[Upload Endpoint] Anonymizing content - only replacing:', serviceUserName);
+      const anonymized = anonymizeSpecificName(parsed.text, serviceUserName);
+      processedContent = anonymized.anonymizedText;
+      nameMappings = [{
+        original: serviceUserName,
+        abbreviated: anonymized.abbreviation
+      }];
+      console.log('[Upload Endpoint] Anonymization complete:', serviceUserName, '->', anonymized.abbreviation);
+    }
+    
+    console.log('[Upload Endpoint] Calling multi-pass analyzer');
+    const result = await analyzeCarePlanMultiPass(
       company.openaiApiKey,
-      parsed.text,
-      serviceUserName,
-      anonymise
+      processedContent,
+      anonymise && serviceUserName ? nameMappings![0].abbreviated : serviceUserName
     );
     
     console.log('[Upload Endpoint] Multi-pass analysis complete successfully');
