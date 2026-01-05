@@ -3,12 +3,9 @@
  * Supports: PDF, Word (DOC/DOCX), CSV, Excel (XLS/XLSX)
  */
 
-import { createRequire } from 'module';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
-
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
+import pdfParse from 'pdf-parse';
 
 export interface ParsedFileResult {
   text: string;
