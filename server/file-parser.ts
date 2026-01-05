@@ -5,6 +5,7 @@
 
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
+import pdfParse from '@cedrugs/pdf-parse';
 
 export interface ParsedFileResult {
   text: string;
@@ -20,9 +21,6 @@ export interface ParsedFileResult {
  */
 export async function parsePDF(buffer: Buffer): Promise<ParsedFileResult> {
   try {
-    // Dynamic import to handle CommonJS module properly
-    const pdfParseModule = await import('pdf-parse');
-    const pdfParse = (pdfParseModule as any).default || pdfParseModule;
     const data = await pdfParse(buffer);
     
     return {
