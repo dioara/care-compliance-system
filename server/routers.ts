@@ -11,6 +11,7 @@ import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_co
 import { subscriptionRouter } from "./subscription";
 import { errorMonitoringRouter } from "./errorMonitoringRouter";
 import { helpCenterRouter } from "./routers/helpCenter";
+import { aiAuditJobsRouter } from "./routers/aiAuditJobs";
 import { auditInstances, auditTrail, auditTypes, auditTemplateQuestions, staffMembers, serviceUsers } from "../drizzle/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { format } from "date-fns";
@@ -33,6 +34,7 @@ export const appRouter = router({
   subscription: subscriptionRouter,
   errorMonitoring: errorMonitoringRouter,
   helpCenter: helpCenterRouter,
+  aiAuditJobs: aiAuditJobsRouter,
 
   // Dashboard statistics
   dashboard: router({

@@ -213,6 +213,13 @@ async function startServer() {
     }).catch(error => {
       console.error("Failed to initialize scheduler:", error);
     });
+    
+    // Start background job worker for AI audits
+    import("../job-worker").then(({ startJobWorker }) => {
+      startJobWorker();
+    }).catch(error => {
+      console.error("Failed to start job worker:", error);
+    });
   });
 }
 

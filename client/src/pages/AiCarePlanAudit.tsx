@@ -124,16 +124,17 @@ export default function AiCarePlanAudit() {
         }
         
         const result = await response.json();
-        console.log('[Frontend] Analysis complete successfully');
-        console.log('[Frontend] Result summary:', {
-          hasAnalysis: !!result.analysis,
-          hasNameMappings: !!result.nameMappings,
-          hasFileMetadata: !!result.fileMetadata
-        });
+        console.log('[Frontend] Job created successfully');
+        console.log('[Frontend] Job ID:', result.jobId);
+        console.log('[Frontend] Status:', result.status);
         
-        setAnalysisResult(result);
         toast.dismiss(toastId);
-        toast.success('Care plan analysis complete!');
+        toast.success('Analysis job submitted! Redirecting to audits list...');
+        
+        // Redirect to audits list after a short delay
+        setTimeout(() => {
+          window.location.href = '/ai-care-plan-audits';
+        }, 1500);
       } catch (error) {
         console.error('[Frontend] ERROR: Failed to analyze file');
         console.error('[Frontend] Error type:', error?.constructor?.name);

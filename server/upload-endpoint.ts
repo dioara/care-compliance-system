@@ -132,59 +132,44 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
     console.log('[Upload Endpoint] Parsed text length:', parsed.text.length, 'characters');
     console.log('[Upload Endpoint] Parsed metadata:', parsed.metadata);
     
-    // Analyze the extracted text with multi-pass analyzer
-    console.log('[Upload Endpoint] Importing multi-pass analyzer');
-    const { analyzeCarePlanMultiPass } = await import('./multi-pass-analyzer');
-    const { anonymizeSpecificName } = await import('./anonymization');
-    
-    // Anonymize the content if requested
-    let processedContent = parsed.text;
-    let nameMappings;
-    
-    if (anonymise && serviceUserName) {
-      console.log('[Upload Endpoint] Anonymizing content - only replacing:', serviceUserName);
-      const anonymized = anonymizeSpecificName(parsed.text, serviceUserName);
-      processedContent = anonymized.anonymizedText;
-      nameMappings = [{
-        original: serviceUserName,
-        abbreviated: anonymized.abbreviation
-      }];
-      console.log('[Upload Endpoint] Anonymization complete:', serviceUserName, '->', anonymized.abbreviation);
+    // Create async job instead of processing immediately
+    console.log('[Upload Endpoint] Creating async analysis job');
+    const dbModule = await import('./db');
+    const db = await dbModule.getDb();
+    if (!db) {
+      return res.status(500).json({ error: 'Database not available' });
     }
+    const { aiAudits } = await import('../drizzle/schema');
     
-    console.log('[Upload Endpoint] Calling multi-pass analyzer');
-    const result = await analyzeCarePlanMultiPass(
-      company.openaiApiKey,
-      processedContent,
-      anonymise && serviceUserName ? nameMappings![0].abbreviated : serviceUserName
-    );
+    // Store file temporarily (in production, upload to S3)
+    // For now, we'll store the file buffer as base64 in a temporary location
+    // and pass it to the worker
+    const fileBase64 = req.file.buffer.toString('base64');
     
-    console.log('[Upload Endpoint] Multi-pass analysis complete successfully');
-    console.log('[Upload Endpoint] Result summary:', {
-      sectionsAnalyzed: result.summary.sections_analyzed,
-      overallScore: result.overall_score,
-      totalIssues: result.summary.critical_issues + result.summary.major_issues + result.summary.minor_issues
+    // Create job record
+    const [job] = await db.insert(aiAudits).values({
+      tenantId: user.tenantId,
+      locationId: 0, // TODO: Get from user context or request
+      auditType: 'care_plan',
+      documentName: req.file.originalname,
+      documentUrl: `data:${req.file.mimetype};base64,${fileBase64}`, // Temporary: store as data URL
+      documentKey: '', // Will be set when uploaded to S3
+      serviceUserName: serviceUserName || '',
+      anonymise: anonymise ? 1 : 0,
+      status: 'pending',
+      progress: 'Queued for processing',
+      requestedById: user.userId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
-
-    // Generate Word document with the multi-pass results
-    console.log('[Upload Endpoint] Generating Word document');
-    const { generateCarePlanAnalysisDocument } = await import('./document-generator');
-    const { Packer } = await import('docx');
     
-    const doc = generateCarePlanAnalysisDocument(
-      serviceUserName,
-      new Date().toISOString().split('T')[0],
-      result as any
-    );
+    console.log('[Upload Endpoint] Job created with ID:', job.insertId);
     
-    const documentBuffer = await Packer.toBuffer(doc);
-    console.log('[Upload Endpoint] Word document generated, size:', documentBuffer.length, 'bytes');
-
+    // Return job ID immediately
     return res.json({
-      analysis: result,
-      nameMappings: nameMappings,
-      fileMetadata: parsed.metadata,
-      documentBase64: documentBuffer ? documentBuffer.toString('base64') : undefined,
+      jobId: Number(job.insertId),
+      status: 'pending',
+      message: 'Analysis job created successfully. You will be notified when complete.',
     });
     
   } catch (error) {
