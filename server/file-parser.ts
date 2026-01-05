@@ -3,7 +3,7 @@
  * Supports: PDF, Word (DOC/DOCX), CSV, Excel (XLS/XLSX)
  */
 
-import * as pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 
@@ -21,7 +21,7 @@ export interface ParsedFileResult {
  */
 export async function parsePDF(buffer: Buffer): Promise<ParsedFileResult> {
   try {
-    const data = await pdfParse(buffer);
+    const data = await (pdfParse as any)(buffer);
     
     return {
       text: data.text,
