@@ -3,7 +3,7 @@
  * Supports: PDF, Word (DOC/DOCX), CSV, Excel (XLS/XLSX)
  */
 
-import pdfParse from 'pdf-parse';
+import * as pdfParse from 'pdf-parse';
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
 
