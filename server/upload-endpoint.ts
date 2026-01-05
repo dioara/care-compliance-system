@@ -144,33 +144,30 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
       anonymise
     );
     
-    console.log('[Upload Endpoint] Analysis complete successfully');
+    console.log('[Upload Endpoint] Multi-pass analysis complete successfully');
     console.log('[Upload Endpoint] Result summary:', {
-      hasOverallAssessment: !!result.analysis.enhanced_version,
-      hasRecommendations: !!result.analysis.recommendations,
-      complianceScore: result.analysis.compliance_score
+      sectionsAnalyzed: result.summary.sections_analyzed,
+      overallScore: result.overall_score,
+      totalIssues: result.summary.critical_issues + result.summary.major_issues + result.summary.minor_issues
     });
 
-    // Generate Word document if the analysis has the new detailed format
-    let documentBuffer;
-    if (result.analysis.sections) {
-      console.log('[Upload Endpoint] Generating Word document');
-      const { generateCarePlanAnalysisDocument } = await import('./document-generator');
-      const { Packer } = await import('docx');
-      
-      const doc = generateCarePlanAnalysisDocument(
-        serviceUserName,
-        new Date().toISOString().split('T')[0],
-        result.analysis as any
-      );
-      
-      documentBuffer = await Packer.toBuffer(doc);
-      console.log('[Upload Endpoint] Word document generated, size:', documentBuffer.length, 'bytes');
-    }
+    // Generate Word document with the multi-pass results
+    console.log('[Upload Endpoint] Generating Word document');
+    const { generateCarePlanAnalysisDocument } = await import('./document-generator');
+    const { Packer } = await import('docx');
+    
+    const doc = generateCarePlanAnalysisDocument(
+      serviceUserName,
+      new Date().toISOString().split('T')[0],
+      result as any
+    );
+    
+    const documentBuffer = await Packer.toBuffer(doc);
+    console.log('[Upload Endpoint] Word document generated, size:', documentBuffer.length, 'bytes');
 
     return res.json({
-      analysis: result.analysis,
-      nameMappings: result.nameMappings,
+      analysis: result,
+      nameMappings: nameMappings,
       fileMetadata: parsed.metadata,
       documentBase64: documentBuffer ? documentBuffer.toString('base64') : undefined,
     });
@@ -240,13 +237,29 @@ uploadRouter.post('/ai/analyze-care-notes-file', upload.single('file'), async (r
 
     const parsed = await parseFile(req.file.buffer, req.file.originalname);
     
-    // Analyze the extracted text
-    const { analyzeCareNotes } = await import('./ai-analysis');
-    const result = await analyzeCareNotes(
+    // Analy    // Call multi-pass AI analysis
+    const { analyzeCarePlanMultiPass } = await import('./multi-pass-analyzer');
+    const { anonymizeSpecificName } = await import('./anonymization');
+    
+    // Anonymize the content if requested
+    let processedContent = parsed.text;
+    let nameMappings;
+    
+    if (anonymise && serviceUserName) {
+      console.log('[Upload Endpoint] Anonymizing content - only replacing:', serviceUserName);
+      const anonymized = anonymizeSpecificName(parsed.text, serviceUserName);
+      processedContent = anonymized.anonymizedText;
+      nameMappings = [{
+        original: serviceUserName,
+        abbreviated: anonymized.abbreviation
+      }];
+      console.log('[Upload Endpoint] Anonymization complete:', serviceUserName, '->', anonymized.abbreviation);
+    }
+    
+    const result = await analyzeCarePlanMultiPass(
       company.openaiApiKey,
-      parsed.text,
-      serviceUserName,
-      anonymise
+      processedContent,
+      anonymise && serviceUserName ? nameMappings![0].abbreviated : serviceUserName
     );
 
     return res.json({
