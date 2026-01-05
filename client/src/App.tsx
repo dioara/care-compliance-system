@@ -57,6 +57,8 @@ import SubscriptionRequired from "./pages/SubscriptionRequired";
 import KloeManagement from "./pages/KloeManagement";
 import AiCarePlanAudit from "./pages/AiCarePlanAudit";
 import AiCareNotesAudit from "./pages/AiCareNotesAudit";
+import AiCarePlanAudits from "./pages/AiCarePlanAudits";
+import AiCarePlanAuditDetail from "./pages/AiCarePlanAuditDetail";
 import { useSessionKeepalive } from "./hooks/useSessionKeepalive";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -301,6 +303,18 @@ function Router() {
       <Route path="/ai-care-plan-audit">
         <DashboardLayout>
           <AiCarePlanAudit />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/ai-care-plan-audits">
+        <DashboardLayout>
+          <AiCarePlanAudits />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/ai-care-plan-audits/:id">
+        <DashboardLayout>
+          <AiCarePlanAuditDetail />
         </DashboardLayout>
       </Route>
       
