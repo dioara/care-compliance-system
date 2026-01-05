@@ -228,6 +228,7 @@ export async function analyzeCarePlan(
       ],
       temperature: 0.3,
       max_tokens: 16000, // Increased for detailed section-by-section analysis
+      response_format: { type: 'json_object' }, // Enforce JSON output
     });
     const duration = Date.now() - startTime;
     
@@ -247,8 +248,45 @@ export async function analyzeCarePlan(
     }
 
     console.log('[AI Analysis] Parsing JSON response');
-    const analysis = JSON.parse(cleanedText) as CarePlanAnalysisResult;
-    console.log('[AI Analysis] JSON parsed successfully');
+    let analysis: CarePlanAnalysisResult;
+    
+    try {
+      analysis = JSON.parse(cleanedText) as CarePlanAnalysisResult;
+      console.log('[AI Analysis] JSON parsed successfully');
+    } catch (parseError) {
+      console.error('[AI Analysis] JSON parse error:', parseError instanceof Error ? parseError.message : String(parseError));
+      console.error('[AI Analysis] Attempting to fix common JSON issues...');
+      
+      // Try to fix common JSON issues
+      let fixedText = cleanedText;
+      
+      // Remove trailing commas
+      fixedText = fixedText.replace(/,\s*([}\]])/g, '$1');
+      
+      // Try to find where the JSON was cut off and close it properly
+      const openBraces = (fixedText.match(/{/g) || []).length;
+      const closeBraces = (fixedText.match(/}/g) || []).length;
+      const openBrackets = (fixedText.match(/\[/g) || []).length;
+      const closeBrackets = (fixedText.match(/\]/g) || []).length;
+      
+      // Add missing closing braces/brackets
+      for (let i = 0; i < (openBrackets - closeBrackets); i++) {
+        fixedText += ']';
+      }
+      for (let i = 0; i < (openBraces - closeBraces); i++) {
+        fixedText += '}';
+      }
+      
+      try {
+        analysis = JSON.parse(fixedText) as CarePlanAnalysisResult;
+        console.log('[AI Analysis] JSON parsed successfully after fixes');
+      } catch (secondError) {
+        console.error('[AI Analysis] Still unable to parse JSON after fixes');
+        console.error('[AI Analysis] First 500 chars:', cleanedText.substring(0, 500));
+        console.error('[AI Analysis] Last 500 chars:', cleanedText.substring(cleanedText.length - 500));
+        throw parseError; // Throw original error
+      }
+    }
 
     return {
       analysis,
