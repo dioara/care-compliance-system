@@ -1270,10 +1270,11 @@ export async function getDashboardStats(tenantId: number, locationId?: number) {
   const unassessedCount = Math.max(0, totalQuestions - assessments.length);
   const nonCompliantCount = assessedRedCount + unassessedCount;
 
-  // Calculate overall compliance percentage based on total questions, not just assessed items
+  // Calculate overall compliance percentage based on total assessments
   // Only green items are considered compliant
-  const overallCompliance = totalQuestions > 0 
-    ? Math.round((compliantCount / totalQuestions) * 100) 
+  const totalAssessments = assessments.length;
+  const overallCompliance = totalAssessments > 0 
+    ? Math.round((compliantCount / totalAssessments) * 100) 
     : 0;
 
   // Count overdue actions (red status with past target date and no completion date)
