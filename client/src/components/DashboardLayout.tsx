@@ -115,6 +115,7 @@ const adminMenuItems = [
   { icon: MapPin, label: "Locations", path: "/locations" },
   { icon: ShieldCheck, label: "Role Management", path: "/role-management" },
   { icon: UserGear, label: "User Management", path: "/user-management" },
+  { icon: ListChecks, label: "KLOE Management", path: "/kloe-management" },
   { icon: CreditCard, label: "Subscription", path: "/admin/subscription" },
   { icon: EnvelopeSimple, label: "Email Settings", path: "/email-settings" },
   { icon: Bug, label: "Error Monitoring", path: "/admin/error-monitoring" },

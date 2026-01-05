@@ -11,7 +11,7 @@ import { sendComplianceAlertEmail, sendComplianceAlertToRecipients } from "./_co
 import { subscriptionRouter } from "./subscription";
 import { errorMonitoringRouter } from "./errorMonitoringRouter";
 import { helpCenterRouter } from "./routers/helpCenter";
-import { auditInstances, auditTrail, auditTypes, staffMembers, serviceUsers } from "../drizzle/schema";
+import { auditInstances, auditTrail, auditTypes, auditTemplateQuestions, staffMembers, serviceUsers } from "../drizzle/schema";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { format } from "date-fns";
 
@@ -1768,6 +1768,20 @@ export const appRouter = router({
           failed: result.failed,
           message: `Sent ${result.sent} reminders, ${result.failed} failed`,
         };
+      }),
+
+    // Update question KLOEs
+    updateQuestionKloes: protectedProcedure
+      .input(z.object({
+        questionId: z.number(),
+        kloes: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user || !ctx.user.tenantId) throw new TRPCError({ code: "UNAUTHORIZED" });
+        
+        await db.updateAuditTemplateQuestionKloes(input.questionId, input.kloes);
+        
+        return { success: true };
       }),
 
   }),

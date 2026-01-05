@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 import { ArrowLeft, FloppyDisk, CheckCircle, UploadSimple, WarningCircle, Plus, X, User, Calendar } from "@phosphor-icons/react";
+import { KloeTags } from "@/components/KloeTags";
 export default function ConductAudit() {
   const { id } = useParams<{ id: string }>();
   const [, setLocation] = useLocation();
@@ -417,6 +418,7 @@ export default function ConductAudit() {
                           Evidence required: {question.evidenceRequired}
                         </CardDescription>
                       )}
+                      <KloeTags kloes={question.kloes} className="mt-2" />
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {/* Question Input */}
