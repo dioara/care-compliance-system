@@ -65,13 +65,31 @@ export default function AiCarePlanAudit() {
         return;
       }
     } else if (inputMethod === 'file') {
+      console.log('[Frontend] File upload analysis starting');
+      console.log('[Frontend] Selected file:', selectedFile);
+      
       if (!selectedFile) {
+        console.error('[Frontend] ERROR: No file selected');
         toast.error('Please select a file to upload');
         return;
       }
 
+      console.log('[Frontend] File details:', {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type,
+        lastModified: new Date(selectedFile.lastModified).toISOString()
+      });
+
       try {
+        console.log('[Frontend] Converting file to base64');
         const fileData = await fileToBase64(selectedFile);
+        console.log('[Frontend] Base64 conversion complete');
+        console.log('[Frontend] Base64 length:', fileData.length);
+        console.log('[Frontend] Base64 preview (first 100 chars):', fileData.substring(0, 100));
+        console.log('[Frontend] Estimated payload size:', Math.round(fileData.length / 1024), 'KB');
+        
+        console.log('[Frontend] Calling analyzeCarePlanFile mutation');
         analyzeCarePlanFileMutation.mutate({
           fileData,
           filename: selectedFile.name,
@@ -79,6 +97,9 @@ export default function AiCarePlanAudit() {
           anonymise,
         });
       } catch (error) {
+        console.error('[Frontend] ERROR: Failed to read file');
+        console.error('[Frontend] Error type:', error?.constructor?.name);
+        console.error('[Frontend] Error message:', error instanceof Error ? error.message : String(error));
         toast.error('Failed to read file');
       }
       return;
