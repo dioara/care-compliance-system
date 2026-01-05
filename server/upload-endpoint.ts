@@ -151,10 +151,28 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
       complianceScore: result.analysis.compliance_score
     });
 
+    // Generate Word document if the analysis has the new detailed format
+    let documentBuffer;
+    if (result.analysis.sections) {
+      console.log('[Upload Endpoint] Generating Word document');
+      const { generateCarePlanAnalysisDocument } = await import('./document-generator');
+      const { Packer } = await import('docx');
+      
+      const doc = generateCarePlanAnalysisDocument(
+        serviceUserName,
+        new Date().toISOString().split('T')[0],
+        result.analysis as any
+      );
+      
+      documentBuffer = await Packer.toBuffer(doc);
+      console.log('[Upload Endpoint] Word document generated, size:', documentBuffer.length, 'bytes');
+    }
+
     return res.json({
       analysis: result.analysis,
       nameMappings: result.nameMappings,
       fileMetadata: parsed.metadata,
+      documentBase64: documentBuffer ? documentBuffer.toString('base64') : undefined,
     });
     
   } catch (error) {
