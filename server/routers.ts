@@ -3106,7 +3106,7 @@ export const appRouter = router({
       if (!ctx.user?.tenantId) {
         throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
       }
-      const company = await db.getCompanyById(ctx.user.tenantId);
+      const company = await db.getCompanyByTenantId(ctx.user.tenantId);
       return {
         openaiApiKey: company?.openaiApiKey || null,
       };
@@ -3130,7 +3130,7 @@ export const appRouter = router({
         }
 
         // Get organization's OpenAI API key
-        const company = await db.getCompanyById(ctx.user.tenantId);
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
         if (!company?.openaiApiKey) {
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
@@ -3165,7 +3165,7 @@ export const appRouter = router({
         }
 
         // Get organization's OpenAI API key
-        const company = await db.getCompanyById(ctx.user.tenantId);
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
         if (!company?.openaiApiKey) {
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
@@ -3201,7 +3201,7 @@ export const appRouter = router({
         }
 
         // Get organization's OpenAI API key
-        const company = await db.getCompanyById(ctx.user.tenantId);
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
         if (!company?.openaiApiKey) {
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
@@ -3257,7 +3257,7 @@ export const appRouter = router({
         }
 
         // Get organization's OpenAI API key
-        const company = await db.getCompanyById(ctx.user.tenantId);
+        const company = await db.getCompanyByTenantId(ctx.user.tenantId);
         if (!company?.openaiApiKey) {
           throw new TRPCError({
             code: "PRECONDITION_FAILED",

@@ -46,7 +46,7 @@ export default function AiCareNotesAudit() {
     },
   });
 
-  const handleAnalyze = async () => {
+  const handleAnalyse = async () => {
     if (!hasOpenAiKey) {
       toast.error('OpenAI API key not configured. Please contact your administrator.');
       return;
@@ -105,7 +105,7 @@ export default function AiCareNotesAudit() {
       <div>
         <h1 className="text-3xl font-bold">AI Care Notes Audit</h1>
         <p className="text-muted-foreground mt-1">
-          Analyze care notes for CQC compliance and provide carer feedback
+          Analyse care notes for CQC compliance and provide carer feedback
         </p>
       </div>
 
@@ -198,10 +198,10 @@ export default function AiCareNotesAudit() {
         </CardContent>
       </Card>
 
-      {/* Analyze Button */}
+      {/* Analyse Button */}
       <div className="space-y-2">
         <Button
-          onClick={handleAnalyze}
+          onClick={handleAnalyse}
           disabled={analyzeCareNotesMutation.isPending || analyzeCareNotesFileMutation.isPending || !hasOpenAiKey}
           size="lg"
           className="w-full"
@@ -209,12 +209,12 @@ export default function AiCareNotesAudit() {
           {(analyzeCareNotesMutation.isPending || analyzeCareNotesFileMutation.isPending) ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Analyzing...
+              Analysing...
             </>
           ) : (
             <>
               <Sparkles className="mr-2 h-5 w-5" />
-              Analyze Care Notes
+              Analyse Care Notes
             </>
           )}
         </Button>
