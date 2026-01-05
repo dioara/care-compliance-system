@@ -11,6 +11,7 @@ import { createCustomContext } from "../customContext";
 import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
 import { stripeWebhookRouter } from "../stripe/webhook";
+import { uploadRouter } from "../upload-endpoint";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -46,6 +47,9 @@ async function startServer() {
   
   // Stripe webhook endpoint (must be before body parser middleware)
   app.use("/api/webhooks/stripe", stripeWebhookRouter);
+  
+  // File upload endpoints for AI analysis (multipart/form-data)
+  app.use("/api/upload", uploadRouter);
   
   // Rate limiting middleware - 100 requests per 15 minutes per IP
   const limiter = rateLimit({
