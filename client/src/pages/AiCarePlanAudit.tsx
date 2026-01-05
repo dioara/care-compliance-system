@@ -82,25 +82,61 @@ export default function AiCarePlanAudit() {
       });
 
       try {
-        console.log('[Frontend] Converting file to base64');
-        const fileData = await fileToBase64(selectedFile);
-        console.log('[Frontend] Base64 conversion complete');
-        console.log('[Frontend] Base64 length:', fileData.length);
-        console.log('[Frontend] Base64 preview (first 100 chars):', fileData.substring(0, 100));
-        console.log('[Frontend] Estimated payload size:', Math.round(fileData.length / 1024), 'KB');
+        console.log('[Frontend] Creating FormData for multipart upload');
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('serviceUserName', serviceUserName);
+        formData.append('anonymise', anonymise.toString());
         
-        console.log('[Frontend] Calling analyzeCarePlanFile mutation');
-        analyzeCarePlanFileMutation.mutate({
-          fileData,
-          filename: selectedFile.name,
-          serviceUserName,
-          anonymise,
+        console.log('[Frontend] Payload size (file only):', Math.round(selectedFile.size / 1024), 'KB');
+        console.log('[Frontend] Calling multipart upload endpoint');
+        
+        // Get auth token
+        const token = localStorage.getItem('token');
+        if (!token) {
+          toast.error('Authentication required');
+          return;
+        }
+        
+        // Set analyzing state
+        setAnalysisResult(null);
+        const toastId = toast.loading('Analyzing care plan...');
+        
+        const response = await fetch('/api/upload/ai/analyze-care-plan-file', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
         });
+        
+        console.log('[Frontend] Response status:', response.status);
+        console.log('[Frontend] Response headers:', Object.fromEntries(response.headers.entries()));
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('[Frontend] ERROR: Request failed:', errorData);
+          toast.dismiss(toastId);
+          toast.error(`Analysis failed: ${errorData.error || response.statusText}`);
+          return;
+        }
+        
+        const result = await response.json();
+        console.log('[Frontend] Analysis complete successfully');
+        console.log('[Frontend] Result summary:', {
+          hasAnalysis: !!result.analysis,
+          hasNameMappings: !!result.nameMappings,
+          hasFileMetadata: !!result.fileMetadata
+        });
+        
+        setAnalysisResult(result);
+        toast.dismiss(toastId);
+        toast.success('Care plan analysis complete!');
       } catch (error) {
-        console.error('[Frontend] ERROR: Failed to read file');
+        console.error('[Frontend] ERROR: Failed to analyze file');
         console.error('[Frontend] Error type:', error?.constructor?.name);
         console.error('[Frontend] Error message:', error instanceof Error ? error.message : String(error));
-        toast.error('Failed to read file');
+        toast.error('Failed to analyze file');
       }
       return;
     }
