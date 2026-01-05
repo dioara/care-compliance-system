@@ -7,17 +7,38 @@ import { trpc } from "@/lib/trpc";
 import { useLocation } from "@/contexts/LocationContext";
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { useLocation as useRouter } from "wouter";
+import { useLocation as useRouter, useSearch } from "wouter";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { PageHeader } from "@/components/PageHeader";
 
 import { Spinner, UserCheck, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Shield, CheckCircle, XCircle, Funnel, Lock, ClockCounterClockwise, Envelope, PaperPlaneTilt, Checks } from "@phosphor-icons/react";
 export default function Staff() {
   const { activeLocationId, canWrite, permissions } = useLocation();
-  const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
+  const [, setLocation] = useRouter();
+  const searchParams = new URLSearchParams(useSearch());
+  const locationParam = searchParams.get('location');
+  
+  const [filterLocationId, setFilterLocationId] = useState<number | null>(
+    locationParam ? parseInt(locationParam) : null
+  );
+  
+  // Update URL when filter changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (filterLocationId) {
+      params.set('location', filterLocationId.toString());
+    } else {
+      params.delete('location');
+    }
+    const newSearch = params.toString();
+    const newUrl = newSearch ? `/staff?${newSearch}` : '/staff';
+    if (window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [filterLocationId]);
   
   // Use filter location if set, otherwise use active location
   const effectiveLocationId = filterLocationId || activeLocationId;
@@ -294,7 +315,9 @@ export default function Staff() {
           <span className="text-sm text-muted-foreground">Filter by location:</span>
           <Select
             value={filterLocationId?.toString() || "all"}
-            onValueChange={(value) => setFilterLocationId(value === "all" ? null : parseInt(value))}
+            onValueChange={(value) => {
+              setFilterLocationId(value === "all" ? null : parseInt(value));
+            }}
           >
             <SelectTrigger className="w-[160px] md:w-[200px]">
               <SelectValue placeholder="All locations" />

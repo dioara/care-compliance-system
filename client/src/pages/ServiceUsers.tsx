@@ -11,13 +11,34 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { useLocation as useRouter } from "wouter";
+import { useLocation as useRouter, useSearch } from "wouter";
 
 import { Spinner, Users, ClipboardText, Plus, PencilSimple, Trash, CalendarBlank, Heart, Funnel, Lock, ClockCounterClockwise } from "@phosphor-icons/react";
 export default function ServiceUsers() {
   const { activeLocationId, canWrite, permissions } = useLocation();
-  const [filterLocationId, setFilterLocationId] = useState<number | null>(null);
+  const [, setLocation] = useRouter();
+  const searchParams = new URLSearchParams(useSearch());
+  const locationParam = searchParams.get('location');
+  
+  const [filterLocationId, setFilterLocationId] = useState<number | null>(
+    locationParam ? parseInt(locationParam) : null
+  );
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
+  
+  // Update URL when filter changes
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (filterLocationId) {
+      params.set('location', filterLocationId.toString());
+    } else {
+      params.delete('location');
+    }
+    const newSearch = params.toString();
+    const newUrl = newSearch ? `/service-users?${newSearch}` : '/service-users';
+    if (window.location.pathname + window.location.search !== newUrl) {
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [filterLocationId]);
   
   // Use filter location if set, otherwise use active location
   const effectiveLocationId = filterLocationId || activeLocationId;
