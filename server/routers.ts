@@ -3196,49 +3196,92 @@ export const appRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
+        console.log('[AI Analysis] analyzeCarePlanFile called');
+        console.log('[AI Analysis] User:', ctx.user?.email);
+        console.log('[AI Analysis] Filename:', input.filename);
+        console.log('[AI Analysis] Service User Name:', input.serviceUserName);
+        console.log('[AI Analysis] Anonymise:', input.anonymise);
+        console.log('[AI Analysis] File data length (base64):', input.fileData.length);
+        console.log('[AI Analysis] Estimated file size:', Math.round(input.fileData.length * 0.75 / 1024), 'KB');
+        
         if (!ctx.user?.tenantId) {
+          console.error('[AI Analysis] ERROR: No tenantId found');
           throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
         }
 
+        console.log('[AI Analysis] Getting company by tenantId:', ctx.user.tenantId);
         // Get organization's OpenAI API key
         const company = await db.getCompanyByTenantId(ctx.user.tenantId);
+        console.log('[AI Analysis] Company found:', company?.name);
+        console.log('[AI Analysis] OpenAI API key configured:', !!company?.openaiApiKey);
+        
         if (!company?.openaiApiKey) {
+          console.error('[AI Analysis] ERROR: OpenAI API key not configured');
           throw new TRPCError({
             code: "PRECONDITION_FAILED",
             message: "OpenAI API key not configured. Please contact your administrator.",
           });
         }
 
-        // Parse file
-        const { parseFile, validateFile } = await import('./file-parser');
-        const buffer = Buffer.from(input.fileData, 'base64');
-        
-        // Validate file
-        const validation = validateFile(buffer, input.filename, 10);
-        if (!validation.valid) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: validation.error || "Invalid file",
+        try {
+          console.log('[AI Analysis] Importing file-parser module');
+          // Parse file
+          const { parseFile, validateFile } = await import('./file-parser');
+          
+          console.log('[AI Analysis] Converting base64 to buffer');
+          const buffer = Buffer.from(input.fileData, 'base64');
+          console.log('[AI Analysis] Buffer size:', buffer.length, 'bytes');
+          console.log('[AI Analysis] Buffer first 50 bytes:', buffer.slice(0, 50).toString('hex'));
+          
+          // Validate file
+          console.log('[AI Analysis] Validating file');
+          const validation = validateFile(buffer, input.filename, 10);
+          console.log('[AI Analysis] Validation result:', validation);
+          
+          if (!validation.valid) {
+            console.error('[AI Analysis] ERROR: File validation failed:', validation.error);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: validation.error || "Invalid file",
+            });
+          }
+
+          // Parse file to extract text
+          console.log('[AI Analysis] Parsing file to extract text');
+          const parsed = await parseFile(buffer, input.filename);
+          console.log('[AI Analysis] Parsed text length:', parsed.text.length, 'characters');
+          console.log('[AI Analysis] Parsed metadata:', parsed.metadata);
+          
+          // Analyze the extracted text
+          console.log('[AI Analysis] Importing ai-analysis module');
+          const { analyzeCarePlan } = await import('./ai-analysis');
+          
+          console.log('[AI Analysis] Calling analyzeCarePlan with OpenAI');
+          const result = await analyzeCarePlan(
+            company.openaiApiKey,
+            parsed.text,
+            input.serviceUserName || '',
+            input.anonymise
+          );
+          
+          console.log('[AI Analysis] Analysis complete successfully');
+          console.log('[AI Analysis] Result summary:', {
+            hasOverallAssessment: !!result.overallAssessment,
+            hasRecommendations: !!result.recommendations,
+            complianceScore: result.complianceScore
           });
+
+          return {
+            ...result,
+            fileMetadata: parsed.metadata,
+          };
+        } catch (error) {
+          console.error('[AI Analysis] ERROR: Exception occurred');
+          console.error('[AI Analysis] Error type:', error?.constructor?.name);
+          console.error('[AI Analysis] Error message:', error?.message);
+          console.error('[AI Analysis] Error stack:', error?.stack);
+          throw error;
         }
-
-        // Parse file to extract text
-        const parsed = await parseFile(buffer, input.filename);
-        
-        // Analyze the extracted text
-        const { analyzeCarePlan } = await import('./ai-analysis');
-        
-        const result = await analyzeCarePlan(
-          company.openaiApiKey,
-          parsed.text,
-          input.serviceUserName || '',
-          input.anonymise
-        );
-
-        return {
-          ...result,
-          fileMetadata: parsed.metadata,
-        };
       }),
 
     // Analyze care notes from file

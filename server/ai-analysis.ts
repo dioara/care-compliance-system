@@ -179,7 +179,14 @@ export async function analyzeCarePlan(
   analysis: CarePlanAnalysisResult;
   nameMappings?: Array<{ original: string; abbreviated: string }>;
 }> {
+  console.log('[AI Analysis] analyzeCarePlan function called');
+  console.log('[AI Analysis] Content length:', content.length, 'characters');
+  console.log('[AI Analysis] Service user name:', serviceUserName);
+  console.log('[AI Analysis] Anonymise:', anonymise);
+  console.log('[AI Analysis] API key provided:', apiKey ? `Yes (${apiKey.substring(0, 10)}...)` : 'No');
+  
   const openai = new OpenAI({ apiKey });
+  console.log('[AI Analysis] OpenAI client initialized');
 
   // Anonymize if requested
   let processedContent = content;
@@ -187,9 +194,11 @@ export async function analyzeCarePlan(
   const clientName = serviceUserName || 'the service user';
 
   if (anonymise) {
+    console.log('[AI Analysis] Anonymizing content');
     const anonymized = anonymizeText(content);
     processedContent = anonymized.anonymizedText;
     nameMappings = anonymized.nameMappings;
+    console.log('[AI Analysis] Anonymization complete. Name mappings:', nameMappings?.length || 0);
   }
 
   const systemMessage = `You are an ultra-pedantic CQC compliance expert with zero tolerance for vagueness. Analyze care plans with the scrutiny of a council improvement officer conducting a critical inspection.`;
@@ -260,6 +269,12 @@ Provide comprehensive analysis in JSON format with these fields:
 Return ONLY valid JSON. No markdown formatting.`;
 
   try {
+    console.log('[AI Analysis] Calling OpenAI API');
+    console.log('[AI Analysis] Model: gpt-4.1-mini');
+    console.log('[AI Analysis] Prompt length:', userPrompt.length, 'characters');
+    console.log('[AI Analysis] Max tokens: 4000');
+    
+    const startTime = Date.now();
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
       messages: [
@@ -269,24 +284,39 @@ Return ONLY valid JSON. No markdown formatting.`;
       temperature: 0.3,
       max_tokens: 4000,
     });
+    const duration = Date.now() - startTime;
+    
+    console.log('[AI Analysis] OpenAI API call completed in', duration, 'ms');
+    console.log('[AI Analysis] Response usage:', response.usage);
 
     const resultText = response.choices[0]?.message?.content || '{}';
+    console.log('[AI Analysis] Response content length:', resultText.length, 'characters');
+    console.log('[AI Analysis] Response preview:', resultText.substring(0, 200));
     
     // Clean markdown if present
     let cleanedText = resultText;
     if (cleanedText.startsWith('```')) {
+      console.log('[AI Analysis] Cleaning markdown formatting');
       cleanedText = cleanedText.replace(/^```json?\s*/, '');
       cleanedText = cleanedText.replace(/\s*```$/, '');
     }
 
+    console.log('[AI Analysis] Parsing JSON response');
     const analysis = JSON.parse(cleanedText) as CarePlanAnalysisResult;
+    console.log('[AI Analysis] JSON parsed successfully');
 
     return {
       analysis,
       nameMappings: anonymise ? nameMappings : undefined,
     };
   } catch (error) {
-    console.error('AI Analysis Error:', error);
+    console.error('[AI Analysis] ERROR in analyzeCarePlan:');
+    console.error('[AI Analysis] Error type:', error?.constructor?.name);
+    console.error('[AI Analysis] Error message:', error instanceof Error ? error.message : String(error));
+    console.error('[AI Analysis] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    if (error?.response) {
+      console.error('[AI Analysis] OpenAI API error response:', error.response);
+    }
     throw new Error(`Failed to analyze care plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
