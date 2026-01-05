@@ -92,11 +92,13 @@ export default function AiCarePlanAudit() {
         console.log('[Frontend] Calling multipart upload endpoint');
         
         // Get auth token
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('auth_token');
         if (!token) {
-          toast.error('Authentication required');
+          console.error('[Frontend] ERROR: No auth token found in localStorage');
+          toast.error('Authentication required. Please log in again.');
           return;
         }
+        console.log('[Frontend] Auth token found:', token ? 'Yes' : 'No');
         
         // Set analyzing state
         setAnalysisResult(null);
