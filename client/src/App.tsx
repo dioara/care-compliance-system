@@ -54,6 +54,7 @@ import Notifications from "./pages/Notifications";
 import HelpCenter from "./pages/HelpCenter";
 import HelpArticle from "./pages/HelpArticle";
 import SubscriptionRequired from "./pages/SubscriptionRequired";
+import KloeManagement from "./pages/KloeManagement";
 import { useSessionKeepalive } from "./hooks/useSessionKeepalive";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -286,6 +287,12 @@ function Router() {
       <Route path="/user-management">
         <DashboardLayout>
           <UserManagement />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/kloe-management">
+        <DashboardLayout>
+          <KloeManagement />
         </DashboardLayout>
       </Route>
       

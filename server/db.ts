@@ -3423,3 +3423,13 @@ export async function getStaffComplianceReportData(tenantId: number, locationId?
     assessments
   };
 }
+
+export async function updateAuditTemplateQuestionKloes(questionId: number, kloes: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database unavailable");
+  
+  await db
+    .update(auditTemplateQuestions)
+    .set({ kloes })
+    .where(eq(auditTemplateQuestions.id, questionId));
+}
