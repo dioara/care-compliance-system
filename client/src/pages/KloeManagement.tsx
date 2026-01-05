@@ -115,7 +115,7 @@ export default function KloeManagement() {
             <SelectContent>
               {auditTypes?.map((type) => (
                 <SelectItem key={type.id} value={type.id.toString()}>
-                  {type.name}
+                  {type.auditName}
                 </SelectItem>
               ))}
             </SelectContent>
