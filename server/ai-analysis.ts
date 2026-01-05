@@ -58,15 +58,16 @@ export async function analyzeCareNotes(
   let nameMappings;
   let clientName = serviceUserName;
 
-  if (anonymise) {
+  if (anonymise && serviceUserName) {
+    // Only anonymize the specific service user name - nothing else
     const anonymized = anonymizeSpecificName(notesText, serviceUserName);
     processedText = anonymized.anonymizedText;
     clientName = anonymized.abbreviation;
     
-    // Also extract other names
-    const fullAnonymization = anonymizeText(processedText);
-    nameMappings = fullAnonymization.nameMappings;
-    processedText = fullAnonymization.anonymizedText;
+    nameMappings = [{
+      original: serviceUserName,
+      abbreviated: anonymized.abbreviation
+    }];
   }
 
   // Parse notes
@@ -191,82 +192,26 @@ export async function analyzeCarePlan(
   // Anonymize if requested
   let processedContent = content;
   let nameMappings;
-  const clientName = serviceUserName || 'the service user';
+  let clientName = serviceUserName || 'the service user';
 
-  if (anonymise) {
-    console.log('[AI Analysis] Anonymizing content');
-    const anonymized = anonymizeText(content);
+  if (anonymise && serviceUserName) {
+    console.log('[AI Analysis] Anonymizing content - only replacing service user name:', serviceUserName);
+    // Only anonymize the specific service user name - nothing else
+    const anonymized = anonymizeSpecificName(content, serviceUserName);
     processedContent = anonymized.anonymizedText;
-    nameMappings = anonymized.nameMappings;
-    console.log('[AI Analysis] Anonymization complete. Name mappings:', nameMappings?.length || 0);
+    clientName = anonymized.abbreviation;
+    
+    nameMappings = [{
+      original: serviceUserName,
+      abbreviated: anonymized.abbreviation
+    }];
+    console.log('[AI Analysis] Anonymization complete. Replaced:', serviceUserName, '->', anonymized.abbreviation);
   }
 
-  const systemMessage = `You are an ultra-pedantic CQC compliance expert with zero tolerance for vagueness. Analyze care plans with the scrutiny of a council improvement officer conducting a critical inspection.`;
+  const systemMessage = `You are an ULTRA-PEDANTIC CQC compliance expert with ZERO TOLERANCE. Analyze with extreme scrutiny.`;
 
-  const userPrompt = `You are an ultra-pedantic CQC compliance expert. Analyze this care plan for ${clientName} with ZERO TOLERANCE for vagueness or missing information.
-
-**Current Content**:
-${processedContent}
-
-**Service User Name**: ${clientName}
-
-Provide comprehensive analysis in JSON format with these fields:
-
-1. **compliance_score** (0-100): Rate the care plan's overall CQC compliance
-   - Deduct heavily for vague language, missing specifics, or generic content
-   - Deduct for missing CQC-required areas
-   - 85+ only if truly excellent with no issues
-
-2. **area_coverage**: Array of objects checking CQC-required care plan areas:
-   For EACH of these essential areas, provide:
-   - **area**: Name of the CQC-required area
-   - **status**: 'present' (adequately covered), 'partial' (mentioned but inadequate), or 'missing' (not addressed)
-   - **issues**: If partial or missing, explain what's inadequate or absent
-   
-   Essential CQC Care Plan Areas to check:
-   - Personal Care & Hygiene
-   - Nutrition & Hydration
-   - Mobility & Positioning
-   - Communication Needs
-   - Mental Health & Wellbeing
-   - Social Needs & Activities
-   - Medication Management
-   - Health Conditions & Monitoring
-   - Risk Assessments
-   - End of Life Wishes (if applicable)
-   - Cultural & Religious Needs
-   - Capacity & Consent
-
-3. **problems**: Array of NUMBERED specific problems found:
-   - Quote the exact problematic text
-   - Explain WHY it's problematic for CQC
-   - Be ultra-specific about what's wrong
-   - Example: "1. '${clientName} likes to be comfortable' - This is vague and subjective. What specifically makes ${clientName} comfortable? Temperature preferences? Pillow positioning? Lighting levels?"
-
-4. **enhanced_version**: COMPLETE rewrite of the ENTIRE care plan that:
-   - Fixes ALL problems identified
-   - Uses ${clientName}'s actual name (not generic examples)
-   - Adds specific details, measurements, preferences
-   - Includes times, frequencies, methods
-   - Uses professional CQC-compliant language
-   - Is 2-3x longer than original with rich detail
-   - Ready to copy/paste into care plan
-
-5. **whats_missing**: Array of specific elements that should be added:
-   - Be ultra-specific about what information is absent
-   - Example: "Specific temperature preferences (e.g., room at 21°C, warm blanket)"
-   - Example: "Exact positioning details (e.g., two pillows, left side preferred)"
-
-6. **cqc_requirements**: Array of specific CQC requirements this care plan must meet:
-   - Quote relevant CQC fundamental standards
-   - Explain how current content fails to meet them
-   - Example: "CQC Fundamental Standard 9 (Person-centred care) requires documenting individual preferences in detail, not generic statements"
-
-7. **recommendations**: Array of specific actionable improvements:
-   - Be prescriptive about what to add/change
-   - Example: "Interview ${clientName} to document: (1) preferred wake-up time, (2) breakfast preferences with specific examples, (3) morning routine step-by-step"
-
-Return ONLY valid JSON. No markdown formatting.`;
+  const { buildCarePlanAnalysisPrompt } = await import('./care-plan-analysis-prompt');
+  const userPrompt = buildCarePlanAnalysisPrompt(clientName, processedContent);
 
   try {
     console.log('[AI Analysis] Calling OpenAI API');
@@ -282,7 +227,7 @@ Return ONLY valid JSON. No markdown formatting.`;
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.3,
-      max_tokens: 4000,
+      max_tokens: 16000, // Increased for detailed section-by-section analysis
     });
     const duration = Date.now() - startTime;
     
