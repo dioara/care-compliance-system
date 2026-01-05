@@ -5,7 +5,10 @@
 
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
-import pdfParse from 'pdf-parse';
+import * as pdfParseModule from 'pdf-parse';
+
+// pdf-parse is a CommonJS module, handle both default and named exports
+const pdfParse = (pdfParseModule as any).default || pdfParseModule;
 
 export interface ParsedFileResult {
   text: string;
