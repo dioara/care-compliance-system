@@ -5,10 +5,6 @@
 
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
-import * as pdfParseModule from 'pdf-parse';
-
-// pdf-parse is a CommonJS module, handle both default and named exports
-const pdfParse = (pdfParseModule as any).default || pdfParseModule;
 
 export interface ParsedFileResult {
   text: string;
@@ -24,6 +20,9 @@ export interface ParsedFileResult {
  */
 export async function parsePDF(buffer: Buffer): Promise<ParsedFileResult> {
   try {
+    // Dynamic import to handle CommonJS module properly
+    const pdfParseModule = await import('pdf-parse');
+    const pdfParse = (pdfParseModule as any).default || pdfParseModule;
     const data = await pdfParse(buffer);
     
     return {
