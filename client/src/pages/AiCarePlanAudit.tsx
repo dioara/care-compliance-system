@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { FileUpload } from '@/components/FileUpload';
 import { trpc } from '@/lib/trpc';
@@ -17,7 +18,8 @@ export default function AiCarePlanAudit() {
   const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [anonymize, setAnonymize] = useState(true);
+  const [serviceUserName, setServiceUserName] = useState('');
+  const [anonymise, setAnonymise] = useState(true);
   const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Check if OpenAI key is configured
@@ -73,7 +75,8 @@ export default function AiCarePlanAudit() {
         analyzeCarePlanFileMutation.mutate({
           fileData,
           filename: selectedFile.name,
-          anonymize,
+          serviceUserName,
+          anonymise,
         });
       } catch (error) {
         toast.error('Failed to read file');
@@ -83,7 +86,8 @@ export default function AiCarePlanAudit() {
 
     analyzeCarePlanMutation.mutate({
       content: textContent,
-      anonymize,
+      serviceUserName,
+      anonymise,
     });
   };
 
@@ -154,23 +158,35 @@ export default function AiCarePlanAudit() {
         </CardContent>
       </Card>
 
-      {/* Privacy Settings */}
+      {/* Analysis Settings */}
       <Card>
         <CardHeader>
-          <CardTitle>Privacy Settings</CardTitle>
+          <CardTitle>Analysis Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="serviceUserName">Service User Name</Label>
+            <Input
+              id="serviceUserName"
+              placeholder="e.g., John Smith"
+              value={serviceUserName}
+              onChange={(e) => setServiceUserName(e.target.value)}
+            />
+            <p className="text-sm text-muted-foreground">
+              Used for context in the AI analysis
+            </p>
+          </div>
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="anonymize">Anonymize names (e.g., Anthony Hicks → AH)</Label>
+              <Label htmlFor="anonymise">Anonymise names (e.g., John Smith → JS)</Label>
               <p className="text-sm text-muted-foreground">
                 Names will be abbreviated in the analysis results
               </p>
             </div>
             <Switch
-              id="anonymize"
-              checked={anonymize}
-              onCheckedChange={setAnonymize}
+              id="anonymise"
+              checked={anonymise}
+              onCheckedChange={setAnonymise}
             />
           </div>
         </CardContent>

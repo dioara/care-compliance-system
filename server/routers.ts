@@ -3120,9 +3120,8 @@ export const appRouter = router({
       .input(
         z.object({
           content: z.string(),
-          anonymize: z.boolean().default(true),
-          sectionName: z.string().optional(),
-          clientName: z.string().optional(),
+          serviceUserName: z.string().optional(),
+          anonymise: z.boolean().default(true),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3144,9 +3143,8 @@ export const appRouter = router({
         const result = await analyzeCarePlan(
           company.openaiApiKey,
           input.content,
-          input.sectionName,
-          input.clientName,
-          input.anonymize
+          input.serviceUserName || '',
+          input.anonymise
         );
 
         return result;
@@ -3158,7 +3156,7 @@ export const appRouter = router({
         z.object({
           content: z.string(),
           serviceUserName: z.string(),
-          anonymize: z.boolean().default(true),
+          anonymise: z.boolean().default(true),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3181,7 +3179,7 @@ export const appRouter = router({
           company.openaiApiKey,
           input.content,
           input.serviceUserName,
-          input.anonymize
+          input.anonymise
         );
 
         return result;
@@ -3193,9 +3191,8 @@ export const appRouter = router({
         z.object({
           fileData: z.string(), // base64 encoded file
           filename: z.string(),
-          anonymize: z.boolean().default(true),
-          sectionName: z.string().optional(),
-          clientName: z.string().optional(),
+          serviceUserName: z.string().optional(),
+          anonymise: z.boolean().default(true),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3234,9 +3231,8 @@ export const appRouter = router({
         const result = await analyzeCarePlan(
           company.openaiApiKey,
           parsed.text,
-          input.sectionName,
-          input.clientName,
-          input.anonymize
+          input.serviceUserName || '',
+          input.anonymise
         );
 
         return {
@@ -3252,7 +3248,7 @@ export const appRouter = router({
           fileData: z.string(), // base64 encoded file
           filename: z.string(),
           serviceUserName: z.string(),
-          anonymize: z.boolean().default(true),
+          anonymise: z.boolean().default(true),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3292,7 +3288,7 @@ export const appRouter = router({
           company.openaiApiKey,
           parsed.text,
           input.serviceUserName,
-          input.anonymize
+          input.anonymise
         );
 
         return {

@@ -18,7 +18,7 @@ export default function AiCareNotesAudit() {
   const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [anonymize, setAnonymize] = useState(true);
+  const [anonymise, setAnonymise] = useState(true);
   const [serviceUserName, setServiceUserName] = useState('');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
 
@@ -81,7 +81,7 @@ export default function AiCareNotesAudit() {
           fileData,
           filename: selectedFile.name,
           serviceUserName,
-          anonymize,
+          anonymise,
         });
       } catch (error) {
         toast.error('Failed to read file');
@@ -92,7 +92,7 @@ export default function AiCareNotesAudit() {
     analyzeCareNotesMutation.mutate({
       content: textContent,
       serviceUserName,
-      anonymize,
+      anonymise,
     });
   };
 
@@ -171,15 +171,15 @@ export default function AiCareNotesAudit() {
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="anonymize">Anonymize names (e.g., John Smith → JS)</Label>
+              <Label htmlFor="anonymise">Anonymise names (e.g., John Smith → JS)</Label>
               <p className="text-sm text-muted-foreground">
                 Names will be abbreviated in feedback and results
               </p>
             </div>
             <Switch
-              id="anonymize"
-              checked={anonymize}
-              onCheckedChange={setAnonymize}
+              id="anonymise"
+              checked={anonymise}
+              onCheckedChange={setAnonymise}
             />
           </div>
 
@@ -187,7 +187,7 @@ export default function AiCareNotesAudit() {
             <Label htmlFor="serviceUserName">Service User Name</Label>
             <Input
               id="serviceUserName"
-              placeholder="e.g., Ann Boyes"
+              placeholder="e.g., John Smith"
               value={serviceUserName}
               onChange={(e) => setServiceUserName(e.target.value)}
             />

@@ -41,7 +41,7 @@ export async function analyzeCareNotes(
   apiKey: string,
   notesText: string,
   serviceUserName: string,
-  anonymize: boolean = true
+  anonymise: boolean = true
 ): Promise<{
   analysis: CareNoteAnalysisResult;
   nameMappings?: Array<{ original: string; abbreviated: string }>;
@@ -53,7 +53,7 @@ export async function analyzeCareNotes(
   let nameMappings;
   let clientName = serviceUserName;
 
-  if (anonymize) {
+  if (anonymise) {
     const anonymized = anonymizeSpecificName(notesText, serviceUserName);
     processedText = anonymized.anonymizedText;
     clientName = anonymized.abbreviation;
@@ -154,7 +154,7 @@ Example: {"0": {"length_detail_score": 50, "language_issues": [{"problematic_tex
 
     return {
       analysis,
-      nameMappings: anonymize ? nameMappings : undefined,
+      nameMappings: anonymise ? nameMappings : undefined,
     };
   } catch (error) {
     console.error('AI Analysis Error:', error);
@@ -168,9 +168,8 @@ Example: {"0": {"length_detail_score": 50, "language_issues": [{"problematic_tex
 export async function analyzeCarePlan(
   apiKey: string,
   content: string,
-  sectionName: string = 'Care Plan',
-  clientName: string = 'the service user',
-  anonymize: boolean = true
+  serviceUserName: string = '',
+  anonymise: boolean = true
 ): Promise<{
   analysis: CarePlanAnalysisResult;
   nameMappings?: Array<{ original: string; abbreviated: string }>;
@@ -180,8 +179,9 @@ export async function analyzeCarePlan(
   // Anonymize if requested
   let processedContent = content;
   let nameMappings;
+  const clientName = serviceUserName || 'the service user';
 
-  if (anonymize) {
+  if (anonymise) {
     const anonymized = anonymizeText(content);
     processedContent = anonymized.anonymizedText;
     nameMappings = anonymized.nameMappings;
@@ -189,14 +189,12 @@ export async function analyzeCarePlan(
 
   const systemMessage = `You are an ultra-pedantic CQC compliance expert with zero tolerance for vagueness. Analyze care plans with the scrutiny of a council improvement officer conducting a critical inspection.`;
 
-  const userPrompt = `You are an ultra-pedantic CQC compliance expert. Analyze this care plan section for ${clientName} with ZERO TOLERANCE for vagueness or missing information.
-
-**Section**: ${sectionName}
+  const userPrompt = `You are an ultra-pedantic CQC compliance expert. Analyze this care plan for ${clientName} with ZERO TOLERANCE for vagueness or missing information.
 
 **Current Content**:
 ${processedContent}
 
-**Client Name**: ${clientName}
+**Service User Name**: ${clientName}
 
 Provide comprehensive analysis in JSON format with these fields:
 
@@ -259,7 +257,7 @@ Return ONLY valid JSON. No markdown formatting.`;
 
     return {
       analysis,
-      nameMappings: anonymize ? nameMappings : undefined,
+      nameMappings: anonymise ? nameMappings : undefined,
     };
   } catch (error) {
     console.error('AI Analysis Error:', error);
