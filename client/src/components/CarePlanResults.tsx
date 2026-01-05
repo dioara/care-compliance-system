@@ -8,6 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 interface CarePlanResultsProps {
   analysis: {
     compliance_score: number;
+    area_coverage: {
+      area: string;
+      status: 'present' | 'partial' | 'missing';
+      issues?: string;
+    }[];
     problems: string[];
     enhanced_version: string;
     whats_missing: string[];
@@ -18,7 +23,7 @@ interface CarePlanResultsProps {
 }
 
 export function CarePlanResults({ analysis, nameMappings }: CarePlanResultsProps) {
-  const { compliance_score, problems, enhanced_version, whats_missing, cqc_requirements, recommendations } = analysis;
+  const { compliance_score, area_coverage, problems, enhanced_version, whats_missing, cqc_requirements, recommendations } = analysis;
 
   // Determine compliance level
   const getComplianceLevel = (score: number) => {
@@ -78,13 +83,61 @@ export function CarePlanResults({ analysis, nameMappings }: CarePlanResultsProps
         </Alert>
       )}
 
-      <Tabs defaultValue="problems" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="coverage" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="coverage">Area Coverage</TabsTrigger>
           <TabsTrigger value="problems">Problems ({problems.length})</TabsTrigger>
           <TabsTrigger value="missing">Missing ({whats_missing.length})</TabsTrigger>
           <TabsTrigger value="enhanced">Enhanced Version</TabsTrigger>
           <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
         </TabsList>
+
+        {/* Area Coverage Tab */}
+        <TabsContent value="coverage" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-600" />
+                CQC-Required Care Plan Areas
+              </CardTitle>
+              <CardDescription>
+                Coverage status of essential care plan sections
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {area_coverage.map((area, index) => {
+                  const statusConfig = {
+                    present: { icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50', label: 'Present' },
+                    partial: { icon: AlertCircle, color: 'text-yellow-600', bg: 'bg-yellow-50', label: 'Partial' },
+                    missing: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', label: 'Missing' },
+                  };
+                  const config = statusConfig[area.status];
+                  const StatusIcon = config.icon;
+
+                  return (
+                    <div key={index} className={`p-4 rounded-lg border ${config.bg}`}>
+                      <div className="flex items-start gap-3">
+                        <StatusIcon className={`h-5 w-5 ${config.color} mt-0.5`} />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold">{area.area}</h4>
+                            <Badge variant={area.status === 'present' ? 'default' : 'secondary'} className={config.color}>
+                              {config.label}
+                            </Badge>
+                          </div>
+                          {area.issues && (
+                            <p className="text-sm text-muted-foreground mt-2">{area.issues}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Problems Tab */}
         <TabsContent value="problems" className="space-y-4">

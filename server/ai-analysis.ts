@@ -27,6 +27,11 @@ interface CareNoteAnalysisResult {
 
 interface CarePlanAnalysisResult {
   compliance_score: number;
+  area_coverage: {
+    area: string;
+    status: 'present' | 'partial' | 'missing';
+    issues?: string;
+  }[];
   problems: string[];
   enhanced_version: string;
   whats_missing: string[];
@@ -198,17 +203,38 @@ ${processedContent}
 
 Provide comprehensive analysis in JSON format with these fields:
 
-1. **compliance_score** (0-100): Rate the section's CQC compliance
+1. **compliance_score** (0-100): Rate the care plan's overall CQC compliance
    - Deduct heavily for vague language, missing specifics, or generic content
+   - Deduct for missing CQC-required areas
    - 85+ only if truly excellent with no issues
 
-2. **problems**: Array of NUMBERED specific problems found:
+2. **area_coverage**: Array of objects checking CQC-required care plan areas:
+   For EACH of these essential areas, provide:
+   - **area**: Name of the CQC-required area
+   - **status**: 'present' (adequately covered), 'partial' (mentioned but inadequate), or 'missing' (not addressed)
+   - **issues**: If partial or missing, explain what's inadequate or absent
+   
+   Essential CQC Care Plan Areas to check:
+   - Personal Care & Hygiene
+   - Nutrition & Hydration
+   - Mobility & Positioning
+   - Communication Needs
+   - Mental Health & Wellbeing
+   - Social Needs & Activities
+   - Medication Management
+   - Health Conditions & Monitoring
+   - Risk Assessments
+   - End of Life Wishes (if applicable)
+   - Cultural & Religious Needs
+   - Capacity & Consent
+
+3. **problems**: Array of NUMBERED specific problems found:
    - Quote the exact problematic text
    - Explain WHY it's problematic for CQC
    - Be ultra-specific about what's wrong
    - Example: "1. '${clientName} likes to be comfortable' - This is vague and subjective. What specifically makes ${clientName} comfortable? Temperature preferences? Pillow positioning? Lighting levels?"
 
-3. **enhanced_version**: COMPLETE rewrite of the ENTIRE section that:
+4. **enhanced_version**: COMPLETE rewrite of the ENTIRE care plan that:
    - Fixes ALL problems identified
    - Uses ${clientName}'s actual name (not generic examples)
    - Adds specific details, measurements, preferences
@@ -217,17 +243,17 @@ Provide comprehensive analysis in JSON format with these fields:
    - Is 2-3x longer than original with rich detail
    - Ready to copy/paste into care plan
 
-4. **whats_missing**: Array of specific elements that should be added:
+5. **whats_missing**: Array of specific elements that should be added:
    - Be ultra-specific about what information is absent
    - Example: "Specific temperature preferences (e.g., room at 21°C, warm blanket)"
    - Example: "Exact positioning details (e.g., two pillows, left side preferred)"
 
-5. **cqc_requirements**: Array of specific CQC requirements this section must meet:
+6. **cqc_requirements**: Array of specific CQC requirements this care plan must meet:
    - Quote relevant CQC fundamental standards
    - Explain how current content fails to meet them
    - Example: "CQC Fundamental Standard 9 (Person-centred care) requires documenting individual preferences in detail, not generic statements"
 
-6. **recommendations**: Array of specific actionable improvements:
+7. **recommendations**: Array of specific actionable improvements:
    - Be prescriptive about what to add/change
    - Example: "Interview ${clientName} to document: (1) preferred wake-up time, (2) breakfast preferences with specific examples, (3) morning routine step-by-step"
 
