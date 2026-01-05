@@ -1,0 +1,213 @@
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { RichTextEditor } from '@/components/RichTextEditor';
+import { FileUpload } from '@/components/FileUpload';
+import { trpc } from '@/lib/trpc';
+import { toast } from 'sonner';
+import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { CarePlanResults } from '@/components/CarePlanResults';
+import { fileToBase64 } from '@/lib/fileUtils';
+
+export default function AiCarePlanAudit() {
+  const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
+  const [content, setContent] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [anonymize, setAnonymize] = useState(true);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  // Check if OpenAI key is configured
+  const { data: orgSettings } = trpc.organization.getSettings.useQuery();
+  const hasOpenAiKey = !!orgSettings?.openaiApiKey;
+
+  const analyzeCarePlanMutation = trpc.ai.analyzeCarePlan.useMutation({
+    onSuccess: (result) => {
+      setAnalysisResult(result);
+      toast.success('Care plan analysis complete!');
+    },
+    onError: (error) => {
+      toast.error(`Analysis failed: ${error.message}`);
+    },
+  });
+
+  const analyzeCarePlanFileMutation = trpc.ai.analyzeCarePlanFile.useMutation({
+    onSuccess: (result) => {
+      setAnalysisResult(result);
+      toast.success('Care plan analysis complete!');
+    },
+    onError: (error) => {
+      toast.error(`Analysis failed: ${error.message}`);
+    },
+  });
+
+  const handleAnalyze = async () => {
+    if (!hasOpenAiKey) {
+      toast.error('OpenAI API key not configured. Please contact your administrator.');
+      return;
+    }
+
+    let textContent = '';
+
+    if (inputMethod === 'editor') {
+      // Extract plain text from HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      textContent = tempDiv.textContent || tempDiv.innerText || '';
+      
+      if (!textContent.trim()) {
+        toast.error('Please enter care plan content');
+        return;
+      }
+    } else if (inputMethod === 'file') {
+      if (!selectedFile) {
+        toast.error('Please select a file to upload');
+        return;
+      }
+
+      try {
+        const fileData = await fileToBase64(selectedFile);
+        analyzeCarePlanFileMutation.mutate({
+          fileData,
+          filename: selectedFile.name,
+          anonymize,
+        });
+      } catch (error) {
+        toast.error('Failed to read file');
+      }
+      return;
+    }
+
+    analyzeCarePlanMutation.mutate({
+      content: textContent,
+      anonymize,
+    });
+  };
+
+  const characterCount = content.replace(/<[^>]*>/g, '').length;
+  const maxCharacters = 50000;
+
+  return (
+    <div className="p-4 md:p-6 lg:p-8 space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold">AI Care Plan Audit</h1>
+        <p className="text-muted-foreground mt-1">
+          Analyze care plans for CQC compliance using AI
+        </p>
+      </div>
+
+      {/* OpenAI Key Warning */}
+      {!hasOpenAiKey && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            OpenAI API key is not configured. Please contact your administrator to set up the API key in organization settings.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Input Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Care Plan Input</CardTitle>
+          <CardDescription>
+            Choose an audit type to manage its question KLOEs
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Tabs value={inputMethod} onValueChange={(v) => setInputMethod(v as 'editor' | 'file')}>
+            <TabsList>
+              <TabsTrigger value="editor">Rich Text Editor</TabsTrigger>
+              <TabsTrigger value="file">Upload File</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="editor" className="space-y-2">
+              <RichTextEditor
+                content={content}
+                onChange={setContent}
+                placeholder="Paste or type care plan content here..."
+                minHeight="300px"
+              />
+              <div className="text-sm text-muted-foreground text-right">
+                {characterCount.toLocaleString()} / {maxCharacters.toLocaleString()} characters
+              </div>
+            </TabsContent>
+
+            <TabsContent value="file">
+              <FileUpload
+                selectedFile={selectedFile}
+                onFileSelect={setSelectedFile}
+                onFileRemove={() => setSelectedFile(null)}
+                maxSizeMB={10}
+                acceptedFormats={['.pdf', '.doc', '.docx', '.csv', '.xlsx', '.xls']}
+              />
+            </TabsContent>
+          </Tabs>
+
+          <p className="text-xs text-muted-foreground">
+            Maximum file size: 10MB. Supported formats: PDF, Word, CSV, Excel
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Privacy Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Privacy Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="anonymize">Anonymize names (e.g., Anthony Hicks → AH)</Label>
+              <p className="text-sm text-muted-foreground">
+                Names will be abbreviated in the analysis results
+              </p>
+            </div>
+            <Switch
+              id="anonymize"
+              checked={anonymize}
+              onCheckedChange={setAnonymize}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Analyze Button */}
+      <div className="space-y-2">
+        <Button
+          onClick={handleAnalyze}
+          disabled={analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending || !hasOpenAiKey}
+          size="lg"
+          className="w-full"
+        >
+          {(analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending) ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Analyzing...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-5 w-5" />
+              Analyze Care Plan
+            </>
+          )}
+        </Button>
+        <p className="text-sm text-muted-foreground text-center">
+          Analysis typically takes 2-3 minutes
+        </p>
+      </div>
+
+      {/* Results */}
+      {analysisResult && (
+        <CarePlanResults 
+          analysis={analysisResult.analysis} 
+          nameMappings={analysisResult.nameMappings}
+        />
+      )}
+    </div>
+  );
+}

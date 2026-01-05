@@ -3099,6 +3099,208 @@ export const appRouter = router({
         return db.getStaffComplianceReportData(ctx.user.tenantId, input.locationId);
       }),
   }),
+
+  // Organization settings
+  organization: router({
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+      }
+      const company = await db.getCompanyById(ctx.user.tenantId);
+      return {
+        openaiApiKey: company?.openaiApiKey || null,
+      };
+    }),
+  }),
+
+  // AI Analysis
+  ai: router({
+    // Analyze care plan
+    analyzeCarePlan: protectedProcedure
+      .input(
+        z.object({
+          content: z.string(),
+          anonymize: z.boolean().default(true),
+          sectionName: z.string().optional(),
+          clientName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+
+        // Get organization's OpenAI API key
+        const company = await db.getCompanyById(ctx.user.tenantId);
+        if (!company?.openaiApiKey) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "OpenAI API key not configured. Please contact your administrator.",
+          });
+        }
+
+        const { analyzeCarePlan } = await import('./ai-analysis');
+        
+        const result = await analyzeCarePlan(
+          company.openaiApiKey,
+          input.content,
+          input.sectionName,
+          input.clientName,
+          input.anonymize
+        );
+
+        return result;
+      }),
+
+    // Analyze care notes
+    analyzeCareNotes: protectedProcedure
+      .input(
+        z.object({
+          content: z.string(),
+          serviceUserName: z.string(),
+          anonymize: z.boolean().default(true),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+
+        // Get organization's OpenAI API key
+        const company = await db.getCompanyById(ctx.user.tenantId);
+        if (!company?.openaiApiKey) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "OpenAI API key not configured. Please contact your administrator.",
+          });
+        }
+
+        const { analyzeCareNotes } = await import('./ai-analysis');
+        
+        const result = await analyzeCareNotes(
+          company.openaiApiKey,
+          input.content,
+          input.serviceUserName,
+          input.anonymize
+        );
+
+        return result;
+      }),
+
+    // Analyze care plan from file
+    analyzeCarePlanFile: protectedProcedure
+      .input(
+        z.object({
+          fileData: z.string(), // base64 encoded file
+          filename: z.string(),
+          anonymize: z.boolean().default(true),
+          sectionName: z.string().optional(),
+          clientName: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+
+        // Get organization's OpenAI API key
+        const company = await db.getCompanyById(ctx.user.tenantId);
+        if (!company?.openaiApiKey) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "OpenAI API key not configured. Please contact your administrator.",
+          });
+        }
+
+        // Parse file
+        const { parseFile, validateFile } = await import('./file-parser');
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Validate file
+        const validation = validateFile(buffer, input.filename, 10);
+        if (!validation.valid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: validation.error || "Invalid file",
+          });
+        }
+
+        // Parse file to extract text
+        const parsed = await parseFile(buffer, input.filename);
+        
+        // Analyze the extracted text
+        const { analyzeCarePlan } = await import('./ai-analysis');
+        
+        const result = await analyzeCarePlan(
+          company.openaiApiKey,
+          parsed.text,
+          input.sectionName,
+          input.clientName,
+          input.anonymize
+        );
+
+        return {
+          ...result,
+          fileMetadata: parsed.metadata,
+        };
+      }),
+
+    // Analyze care notes from file
+    analyzeCareNotesFile: protectedProcedure
+      .input(
+        z.object({
+          fileData: z.string(), // base64 encoded file
+          filename: z.string(),
+          serviceUserName: z.string(),
+          anonymize: z.boolean().default(true),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user?.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
+        }
+
+        // Get organization's OpenAI API key
+        const company = await db.getCompanyById(ctx.user.tenantId);
+        if (!company?.openaiApiKey) {
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message: "OpenAI API key not configured. Please contact your administrator.",
+          });
+        }
+
+        // Parse file
+        const { parseFile, validateFile } = await import('./file-parser');
+        const buffer = Buffer.from(input.fileData, 'base64');
+        
+        // Validate file
+        const validation = validateFile(buffer, input.filename, 10);
+        if (!validation.valid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: validation.error || "Invalid file",
+          });
+        }
+
+        // Parse file to extract text
+        const parsed = await parseFile(buffer, input.filename);
+        
+        // Analyze the extracted text
+        const { analyzeCareNotes } = await import('./ai-analysis');
+        
+        const result = await analyzeCareNotes(
+          company.openaiApiKey,
+          parsed.text,
+          input.serviceUserName,
+          input.anonymize
+        );
+
+        return {
+          ...result,
+          fileMetadata: parsed.metadata,
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
