@@ -122,6 +122,8 @@ export default function AIAudits() {
   };
 
   const handleDownloadPDF = async (auditId: number) => {
+    alert('AIAudits.tsx handleDownloadPDF called with auditId: ' + auditId);
+    console.log('[AIAudits] handleDownloadPDF called with auditId:', auditId);
     try {
       toast.info("Generating PDF report...");
       const { data, filename, mimeType } = await generatePDF.mutateAsync({ auditId });
