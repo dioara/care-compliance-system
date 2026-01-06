@@ -40,18 +40,28 @@ export const aiAuditJobsRouter = router({
       const now = new Date();
       const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
       
-      // Check if fileId is a data URL or a file reference
-      const documentUrl = input.fileId.startsWith('data:') 
-        ? input.fileId // Direct data URL
-        : `temp://${input.fileId}`; // Legacy temp file reference
+      // Fetch file from temp_files table and create data URL
+      const [tempFile] = await db.execute(
+        'SELECT file_data, mime_type FROM temp_files WHERE id = ?',
+        [input.fileId]
+      ) as any;
+      
+      if (!tempFile || tempFile.length === 0) {
+        throw new TRPCError({ 
+          code: "NOT_FOUND", 
+          message: "Uploaded file not found. Please upload again." 
+        });
+      }
+      
+      const dataUrl = `data:${tempFile[0].mime_type};base64,${tempFile[0].file_data}`;
       
       const [job] = await db.insert(aiAudits).values({
         tenantId: ctx.user.tenantId,
         locationId: 0,
         auditType: 'care_plan',
         documentName: input.fileName,
-        documentUrl: documentUrl,
-        documentKey: input.fileId.startsWith('data:') ? '' : input.fileId,
+        documentUrl: dataUrl, // Store full data URL in job
+        documentKey: input.fileId,
         serviceUserName: input.serviceUserName || '',
         anonymise: input.anonymise ? 1 : 0,
         status: 'pending',
@@ -60,6 +70,9 @@ export const aiAuditJobsRouter = router({
         createdAt: mysqlDatetime,
         updatedAt: mysqlDatetime,
       });
+      
+      // Delete temp file after creating job
+      await db.execute('DELETE FROM temp_files WHERE id = ?', [input.fileId]);
 
       console.log('[aiAuditJobs] Job created:', job.insertId);
 
