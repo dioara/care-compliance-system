@@ -118,10 +118,22 @@ export default function AiCarePlanAudits() {
           <h1 className="text-3xl font-bold">AI Care Plan Audits</h1>
           <p className="text-muted-foreground">View and manage your AI-powered care plan analyses</p>
         </div>
-        <Button onClick={() => setLocation('/ai-care-plan-audit')}>
-          <FileText className="mr-2 h-4 w-4" />
-          New Audit
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="destructive"
+            onClick={() => {
+              alert('TEST BUTTON CLICKED!');
+              console.log('[TEST] Button clicked');
+              handleDownload(11);
+            }}
+          >
+            🧪 Test Download (Job 11)
+          </Button>
+          <Button onClick={() => setLocation('/ai-care-plan-audit')}>
+            <FileText className="mr-2 h-4 w-4" />
+            New Audit
+          </Button>
+        </div>
       </div>
       
       {/* Statistics Cards */}
