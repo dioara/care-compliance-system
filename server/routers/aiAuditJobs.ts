@@ -45,16 +45,17 @@ export const aiAuditJobsRouter = router({
         SELECT file_data, mime_type FROM temp_files WHERE id = ${input.fileId}
       `) as any;
       
-      const tempFile = tempFileResult[0];
+      const rows = tempFileResult[0]; // First element is the rows array
       
-      if (!tempFile || tempFile.length === 0) {
+      if (!rows || rows.length === 0) {
         throw new TRPCError({ 
           code: "NOT_FOUND", 
           message: "Uploaded file not found. Please upload again." 
         });
       }
       
-      const dataUrl = `data:${tempFile[0].mime_type};base64,${tempFile[0].file_data}`;
+      const tempFile = rows[0]; // Get first row
+      const dataUrl = `data:${tempFile.mime_type};base64,${tempFile.file_data}`;
       
       const [job] = await db.insert(aiAudits).values({
         tenantId: ctx.user.tenantId,
