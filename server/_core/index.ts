@@ -12,6 +12,7 @@ import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
 import { stripeWebhookRouter } from "../stripe/webhook";
 import { tempUploadRouter } from "../temp-upload";
+import { workerHealthRouter } from "../worker-health";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -50,6 +51,9 @@ async function startServer() {
   
   // Temporary file upload endpoint (stores files on server filesystem)
   app.use("/api/temp-upload", tempUploadRouter);
+  
+  // Worker health check endpoint (no auth required for monitoring)
+  app.use(workerHealthRouter);
   
   // Job submission via tRPC (aiAuditJobs.submitCarePlanAudit)
   
