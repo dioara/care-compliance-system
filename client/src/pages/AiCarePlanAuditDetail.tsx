@@ -53,7 +53,9 @@ export default function AiCarePlanAuditDetail() {
     },
     onError: (error) => {
       console.error('[Download] Mutation error:', error);
-      toast.error(`Failed to download report: ${error.message}`);
+      console.error('[Download] Error details:', JSON.stringify(error, null, 2));
+      const errorMessage = error?.message || error?.data?.message || 'Unknown error';
+      toast.error(`Failed to download report: ${errorMessage}`);
     },
   });
   
