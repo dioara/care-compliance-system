@@ -46,6 +46,24 @@ export default function AiCarePlanAudit() {
     },
   });
 
+  const submitCarePlanAuditMutation = trpc.aiAuditJobs.submitCarePlanAudit.useMutation({
+    onSuccess: (result) => {
+      console.log('[Frontend] Job created successfully');
+      console.log('[Frontend] Job ID:', result.jobId);
+      toast.success('Analysis job submitted! Redirecting to audits list...');
+      
+      // Redirect to audits list after a short delay
+      setTimeout(() => {
+        window.location.href = '/ai-care-plan-audits';
+      }, 1500);
+    },
+    onError: (error) => {
+      console.error('[Frontend] ERROR: Failed to submit job');
+      console.error('[Frontend] Error:', error);
+      toast.error(error.message || 'Failed to submit analysis job');
+    },
+  });
+
   const handleAnalyse = async () => {
     if (!hasOpenAiKey) {
       toast.error('OpenAI API key not configured. Please contact your administrator.');
@@ -93,7 +111,7 @@ export default function AiCarePlanAudit() {
         setAnalysisResult(null);
         const toastId = toast.loading('Submitting analysis job...');
         
-        const result = await trpc.aiAuditJobs.submitCarePlanAudit.mutate({
+        submitCarePlanAuditMutation.mutate({
           fileData: fileBase64,
           fileName: selectedFile.name,
           fileType: selectedFile.type,
@@ -101,20 +119,11 @@ export default function AiCarePlanAudit() {
           anonymise,
         });
         
-        console.log('[Frontend] Job created successfully');
-        console.log('[Frontend] Job ID:', result.jobId);
-        
         toast.dismiss(toastId);
-        toast.success('Analysis job submitted! Redirecting to audits list...');
-        
-        // Redirect to audits list after a short delay
-        setTimeout(() => {
-          window.location.href = '/ai-care-plan-audits';
-        }, 1500);
       } catch (error) {
-        console.error('[Frontend] ERROR: Failed to submit job');
+        console.error('[Frontend] ERROR: Failed to convert file');
         console.error('[Frontend] Error:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to submit analysis job');
+        toast.error('Failed to process file');
       }
       return;
     }
