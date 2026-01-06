@@ -217,10 +217,15 @@ async function startServer() {
     });
     
     // Start background job worker for AI audits
+    console.log('[Server] ========================================');
+    console.log('[Server] Starting AI Audit Job Worker...');
+    console.log('[Server] ========================================');
     import("../job-worker").then(({ startJobWorker }) => {
       startJobWorker();
+      console.log('[Server] Job worker initialization complete');
     }).catch(error => {
-      console.error("Failed to start job worker:", error);
+      console.error('[Server] ❌ FAILED TO START JOB WORKER:', error);
+      console.error('[Server] Stack trace:', error.stack);
     });
   });
 }
