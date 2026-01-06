@@ -344,7 +344,7 @@ export default function AiCarePlanAudit() {
                           size="sm"
                           onClick={async () => {
                             try {
-                              const result = await trpc.aiAuditJobs.downloadReport.query({ jobId: job.id });
+                              const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
                               if (result.documentBase64) {
                                 const blob = new Blob(
                                   [Uint8Array.from(atob(result.documentBase64), c => c.charCodeAt(0))],
