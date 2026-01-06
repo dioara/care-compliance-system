@@ -14,7 +14,6 @@ import * as dbModule from './db';
 import { aiAudits } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { analyzeCarePlanMultiPass } from './multi-pass-analyzer';
-import { anonymizeSpecificName } from './anonymization';
 import { parseFile } from './file-parser';
 import { generateCarePlanAnalysisDocument } from './document-generator';
 import { Packer } from 'docx';
@@ -29,6 +28,11 @@ interface JobContext {
   documentKey: string;
   documentName: string;
   serviceUserName: string;
+  serviceUserFirstName: string | null;
+  serviceUserLastName: string | null;
+  replaceFirstNameWith: string | null;
+  replaceLastNameWith: string | null;
+  keepOriginalNames: boolean;
   anonymise: boolean;
   requestedById: number;
   openaiApiKey: string;
@@ -139,7 +143,7 @@ async function processNextJob() {
       throw new Error('OpenAI API key not configured for this organization');
     }
     
-    // Build job context
+    // Build job context with new name fields
     const context: JobContext = {
       jobId: job.id,
       tenantId: job.tenantId,
@@ -148,6 +152,11 @@ async function processNextJob() {
       documentKey: job.documentKey || '',
       documentName: job.documentName || 'Unknown',
       serviceUserName: job.serviceUserName || '',
+      serviceUserFirstName: job.serviceUserFirstName || null,
+      serviceUserLastName: job.serviceUserLastName || null,
+      replaceFirstNameWith: job.replaceFirstNameWith || null,
+      replaceLastNameWith: job.replaceLastNameWith || null,
+      keepOriginalNames: job.keepOriginalNames === 1,
       anonymise: job.anonymise === 1,
       requestedById: job.requestedById || 0,
       openaiApiKey: company.openaiApiKey,
@@ -168,10 +177,83 @@ async function processNextJob() {
 }
 
 /**
+ * Replace names in text with specified replacements
+ * Handles case variations and possessives
+ */
+function replaceNamesInText(
+  text: string,
+  firstName: string,
+  lastName: string,
+  replaceFirstWith: string,
+  replaceLastWith: string
+): { processedText: string; replacementsMade: number } {
+  let processedText = text;
+  let replacementsMade = 0;
+  
+  // Helper to create case-insensitive regex that preserves word boundaries
+  const createNameRegex = (name: string) => {
+    // Escape special regex characters
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    // Match the name with optional possessive 's
+    return new RegExp(`\\b${escaped}('s)?\\b`, 'gi');
+  };
+  
+  // Replace full name first (to avoid partial replacements)
+  const fullName = `${firstName} ${lastName}`;
+  const fullReplacement = `${replaceFirstWith} ${replaceLastWith}`;
+  const fullNameRegex = createNameRegex(fullName);
+  
+  processedText = processedText.replace(fullNameRegex, (match) => {
+    replacementsMade++;
+    // Preserve possessive if present
+    if (match.toLowerCase().endsWith("'s")) {
+      return `${fullReplacement}'s`;
+    }
+    return fullReplacement;
+  });
+  
+  // Replace first name
+  const firstNameRegex = createNameRegex(firstName);
+  processedText = processedText.replace(firstNameRegex, (match) => {
+    replacementsMade++;
+    if (match.toLowerCase().endsWith("'s")) {
+      return `${replaceFirstWith}'s`;
+    }
+    return replaceFirstWith;
+  });
+  
+  // Replace last name
+  const lastNameRegex = createNameRegex(lastName);
+  processedText = processedText.replace(lastNameRegex, (match) => {
+    replacementsMade++;
+    if (match.toLowerCase().endsWith("'s")) {
+      return `${replaceLastWith}'s`;
+    }
+    return replaceLastWith;
+  });
+  
+  return { processedText, replacementsMade };
+}
+
+/**
  * Process a single job
  */
 async function processJob(context: JobContext) {
-  const { jobId, tenantId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
+  const { 
+    jobId, 
+    tenantId, 
+    openaiApiKey, 
+    serviceUserName, 
+    serviceUserFirstName,
+    serviceUserLastName,
+    replaceFirstNameWith,
+    replaceLastNameWith,
+    keepOriginalNames,
+    anonymise, 
+    documentUrl, 
+    documentKey, 
+    documentName 
+  } = context;
   
   // Get database connection
   const db = await dbModule.getDb();
@@ -181,6 +263,7 @@ async function processJob(context: JobContext) {
   
   try {
     console.log(`[Job Worker] Processing job ${jobId}`);
+    console.log(`[Job Worker] Name settings: firstName=${serviceUserFirstName}, lastName=${serviceUserLastName}, keepOriginal=${keepOriginalNames}`);
     
     // Step 1: Download and parse the document
     await updateJobProgress(jobId, 'Downloading document...');
@@ -229,19 +312,38 @@ async function processJob(context: JobContext) {
     const parsed = await parseFile(fileBuffer, documentName);
     console.log(`[Job Worker] Document parsed: ${parsed.text.length} characters`);
     
-    // Step 3: Anonymize if requested
+    // Step 3: Apply name replacement if not keeping original names
     let processedContent = parsed.text;
-    let nameMappings;
+    let nameMappings: Array<{ original: string; replacement: string }> = [];
+    let displayName = serviceUserName; // Name to show in report
     
-    if (anonymise && serviceUserName) {
-      await updateJobProgress(jobId, 'Anonymizing content...');
-      const anonymized = anonymizeSpecificName(parsed.text, serviceUserName);
-      processedContent = anonymized.anonymizedText;
-      nameMappings = [{
-        original: serviceUserName,
-        abbreviated: anonymized.abbreviation
-      }];
-      console.log(`[Job Worker] Content anonymized: ${serviceUserName} -> ${anonymized.abbreviation}`);
+    if (!keepOriginalNames && serviceUserFirstName && serviceUserLastName && replaceFirstNameWith && replaceLastNameWith) {
+      await updateJobProgress(jobId, 'Applying name replacements...');
+      
+      const result = replaceNamesInText(
+        parsed.text,
+        serviceUserFirstName,
+        serviceUserLastName,
+        replaceFirstNameWith,
+        replaceLastNameWith
+      );
+      
+      processedContent = result.processedText;
+      displayName = `${replaceFirstNameWith} ${replaceLastNameWith}`;
+      
+      nameMappings = [
+        { original: serviceUserFirstName, replacement: replaceFirstNameWith },
+        { original: serviceUserLastName, replacement: replaceLastNameWith },
+      ];
+      
+      console.log(`[Job Worker] Name replacement applied: ${result.replacementsMade} replacements made`);
+      console.log(`[Job Worker] ${serviceUserFirstName} ${serviceUserLastName} -> ${replaceFirstNameWith} ${replaceLastNameWith}`);
+    } else if (keepOriginalNames) {
+      console.log(`[Job Worker] Keeping original names as requested (consent confirmed)`);
+      displayName = serviceUserName;
+    } else {
+      // Fallback to old anonymization if new fields not provided
+      console.log(`[Job Worker] No name replacement configured, using original content`);
     }
     
     // Step 4: Run multi-pass analysis with progress updates
@@ -251,17 +353,17 @@ async function processJob(context: JobContext) {
     const result = await analyzeCarePlanMultiPassWithProgress(
       openaiApiKey,
       processedContent,
-      anonymise && serviceUserName ? nameMappings![0].abbreviated : serviceUserName,
+      displayName,
       (progress: string) => updateJobProgress(jobId, progress)
     );
     
-    console.log(`[Job Worker] Analysis complete: ${result.sections.length} sections analyzed`);
+    console.log(`[Job Worker] Analysis complete: ${result.sections.length} sections analysed`);
     
     // Step 5: Generate Word document
     await updateJobProgress(jobId, 'Generating report document...');
     
     const doc = generateCarePlanAnalysisDocument(
-      serviceUserName,
+      displayName,
       new Date().toISOString().split('T')[0],
       result as any
     );
@@ -298,6 +400,7 @@ async function processJob(context: JobContext) {
           analysis: result,
           nameMappings: nameMappings,
           fileMetadata: parsed.metadata,
+          displayName: displayName,
         }),
         processedAt: now(),
         updatedAt: now(),
@@ -392,13 +495,13 @@ async function analyzeCarePlanMultiPassWithProgress(
   
   for (let i = 0; i < sections.length; i++) {
     const section = sections[i];
-    await onProgress(`Analyzing section ${i + 1}/${sections.length}: ${section.section_name}`);
+    await onProgress(`Analysing section ${i + 1}/${sections.length}: ${section.section_name}`);
     
     try {
       const result = await analyzeSingleSection(apiKey, section, serviceUserName);
       sectionResults.push(result);
     } catch (error) {
-      console.error(`[Multi-Pass] Failed to analyze section ${i + 1}:`, error);
+      console.error(`[Multi-Pass] Failed to analyse section ${i + 1}:`, error);
       // Add placeholder result
       sectionResults.push({
         section_name: section.section_name,

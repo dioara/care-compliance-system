@@ -21,6 +21,12 @@ export const aiAuditJobsRouter = router({
         fileName: z.string(),
         fileType: z.string(),
         serviceUserName: z.string(),
+        serviceUserFirstName: z.string(),
+        serviceUserLastName: z.string(),
+        keepOriginalNames: z.boolean().default(false),
+        replaceFirstNameWith: z.string().nullable().optional(),
+        replaceLastNameWith: z.string().nullable().optional(),
+        consentConfirmed: z.boolean().default(false),
         anonymise: z.boolean().default(true),
       })
     )
@@ -35,6 +41,13 @@ export const aiAuditJobsRouter = router({
       }
 
       console.log('[aiAuditJobs] Creating job for file:', input.fileId);
+      console.log('[aiAuditJobs] Name settings:', {
+        firstName: input.serviceUserFirstName,
+        lastName: input.serviceUserLastName,
+        keepOriginal: input.keepOriginalNames,
+        replaceFirst: input.replaceFirstNameWith,
+        replaceLast: input.replaceLastNameWith,
+      });
 
       // Create job record with temp file reference
       const now = new Date();
@@ -101,6 +114,12 @@ export const aiAuditJobsRouter = router({
         documentUrl: dataUrl, // Store full data URL in job
         documentKey: input.fileId,
         serviceUserName: input.serviceUserName || '',
+        serviceUserFirstName: input.serviceUserFirstName || null,
+        serviceUserLastName: input.serviceUserLastName || null,
+        replaceFirstNameWith: input.replaceFirstNameWith || null,
+        replaceLastNameWith: input.replaceLastNameWith || null,
+        keepOriginalNames: input.keepOriginalNames ? 1 : 0,
+        consentConfirmed: input.consentConfirmed ? 1 : 0,
         anonymise: input.anonymise ? 1 : 0,
         status: 'pending',
         progress: 'Queued for processing',
