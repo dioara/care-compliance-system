@@ -1,4 +1,7 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, int, mysqlEnum, varchar, date, timestamp, text, longtext, index, json, tinyint } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, int, mysqlEnum, varchar, date, timestamp, text, longtext, index, json, tinyint, customType } from "drizzle-orm/mysql-core"
+
+// Custom type for LONGBLOB
+const longblob = customType<{ data: Buffer }>({ dataType() { return 'longblob'; } });
 import { sql } from "drizzle-orm"
 
 export const aiAuditSchedules = mysqlTable("aiAuditSchedules", {
@@ -50,6 +53,7 @@ export const aiAudits = mysqlTable("aiAudits", {
 	detailedAnalysisJson: longtext(),
 	reportDocumentUrl: text(),
 	reportDocumentKey: text(),
+	reportDocumentData: longblob(),
 	notificationSent: tinyint().default(0),
 	notificationSentAt: timestamp({ mode: 'string' }),
 	processedAt: timestamp({ mode: 'string' }),

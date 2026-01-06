@@ -330,22 +330,73 @@ export const aiAuditJobsRouter = router({
         });
       }
 
-      // Check if report document URL exists
-      if (!job.reportDocumentUrl) {
-        console.error('[downloadReport] No reportDocumentUrl found');
-        throw new TRPCError({ 
-          code: "NOT_FOUND", 
-          message: "Report document not found" 
-        });
+      // Check if report document data exists in database
+      let documentBuffer: Buffer;
+      
+      if (!job.reportDocumentData) {
+        console.log('[downloadReport] No reportDocumentData found, attempting to regenerate from analysis...');
+        
+        // Try to regenerate from stored analysis data
+        if (!job.detailedAnalysisJson) {
+          console.error('[downloadReport] No analysis data found to regenerate document');
+          throw new TRPCError({ 
+            code: "NOT_FOUND", 
+            message: "Report document not found and cannot be regenerated." 
+          });
+        }
+        
+        try {
+          // Import document generator
+          const { generateCarePlanAnalysisDocument } = await import('../document-generator');
+          const { Packer } = await import('docx');
+          
+          // Parse stored analysis
+          const analysisData = JSON.parse(job.detailedAnalysisJson);
+          const result = analysisData.analysis;
+          const nameMappings = analysisData.nameMappings || {};
+          
+          console.log('[downloadReport] Regenerating document from stored analysis...');
+          
+          // Generate document
+          const doc = generateCarePlanAnalysisDocument(
+            job.serviceUserName || 'Service User',
+            job.documentName || 'Care Plan',
+            nameMappings,
+            result
+          );
+          
+          documentBuffer = await Packer.toBuffer(doc);
+          console.log('[downloadReport] Document regenerated:', documentBuffer.length, 'bytes');
+          
+          // Save regenerated document to database for future downloads
+          await db
+            .update(aiAudits)
+            .set({ reportDocumentData: documentBuffer })
+            .where(eq(aiAudits.id, input.id));
+          console.log('[downloadReport] Regenerated document saved to database');
+          
+        } catch (regenError) {
+          console.error('[downloadReport] Failed to regenerate document:', regenError);
+          throw new TRPCError({ 
+            code: "INTERNAL_SERVER_ERROR", 
+            message: "Failed to regenerate report document." 
+          });
+        }
+      } else {
+        documentBuffer = Buffer.from(job.reportDocumentData);
       }
 
-      // Return the download URL
-      const response = {
-        downloadUrl: job.reportDocumentUrl,
-        filename: job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`,
+      // Convert buffer to base64 for transmission
+      const base64Data = documentBuffer.toString('base64');
+      const filename = job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`;
+      
+      console.log('[downloadReport] Returning document data:', { filename, dataLength: base64Data.length });
+      
+      return {
+        data: base64Data,
+        filename: filename,
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       };
-      console.log('[downloadReport] Returning response:', response);
-      return response;
     }),
 
   /**

@@ -376,18 +376,30 @@ export default function AiCarePlanAudit() {
                             try {
                               console.log('[AiCarePlanAudit] Calling downloadReport via utils.client with id:', job.id);
                               const result = await utils.client.aiAuditJobs.downloadReport.query({ id: job.id });
-                              console.log('[AiCarePlanAudit] downloadReport result:', result);
-                              if (result.downloadUrl) {
-                                // Create a temporary link to download the file
+                              console.log('[AiCarePlanAudit] downloadReport result:', { filename: result.filename, dataLength: result.data?.length });
+                              
+                              if (result.data) {
+                                // Convert base64 to blob and download
+                                const binaryString = atob(result.data);
+                                const bytes = new Uint8Array(binaryString.length);
+                                for (let i = 0; i < binaryString.length; i++) {
+                                  bytes[i] = binaryString.charCodeAt(i);
+                                }
+                                const blob = new Blob([bytes], { type: result.mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+                                const url = URL.createObjectURL(blob);
+                                
                                 const a = document.createElement('a');
-                                a.href = result.downloadUrl;
+                                a.href = url;
                                 a.download = result.filename || `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
                                 document.body.appendChild(a);
                                 a.click();
                                 document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
                                 toast.success('Report downloaded successfully');
+                              } else {
+                                toast.error('No document data received');
                               }
-                            } catch (error) {
+                            } catch (error: any) {
                               console.error('[AiCarePlanAudit] Download error:', error);
                               console.error('[AiCarePlanAudit] Error details:', JSON.stringify(error, null, 2));
                               toast.error('Failed to download report: ' + (error?.message || 'Unknown error'));
