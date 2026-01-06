@@ -14,6 +14,7 @@ import { stripeWebhookRouter } from "../stripe/webhook";
 import { tempUploadRouter } from "../temp-upload";
 import { workerHealthRouter } from "../worker-health";
 import { reportsDownloadRouter } from "../reports-download";
+import { debugFailedJobsRouter } from "../debug-failed-jobs";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -55,6 +56,9 @@ async function startServer() {
   
   // Worker health check endpoint (no auth required for monitoring)
   app.use(workerHealthRouter);
+  
+  // Debug endpoint for failed jobs (temporary - remove in production)
+  app.use(debugFailedJobsRouter);
   
   // Reports download endpoint (serves generated Word documents)
   app.use(reportsDownloadRouter);

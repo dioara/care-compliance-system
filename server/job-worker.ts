@@ -345,6 +345,9 @@ async function processJob(context: JobContext) {
     
     // Send failure notification
     await sendJobFailureNotification(context, error);
+    
+    // Re-throw to update worker status
+    throw error;
   }
 }
 
