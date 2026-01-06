@@ -12,6 +12,7 @@ import { Badge } from '../components/ui/badge';
 import { Download, Eye, Trash2, RefreshCw, FileText } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function AiCarePlanAudits() {
   const [, setLocation] = useLocation();
@@ -45,24 +46,18 @@ export default function AiCarePlanAudits() {
   // Download mutation
   const downloadMutation = trpc.aiAuditJobs.downloadReport.useMutation({
     onSuccess: (data) => {
-      // Convert base64 to blob and download
-      const byteCharacters = atob(data.documentBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob);
+      console.log('[Download] Mutation success, received data:', data);
+      // Create a link element and trigger download
       const a = document.createElement('a');
-      a.href = url;
+      a.href = data.downloadUrl;
       a.download = data.filename;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+    },
+    onError: (error) => {
+      console.error('[Download] Mutation error:', error);
+      toast.error(`Failed to download report: ${error?.message || 'Unknown error'}`);
     },
   });
   
