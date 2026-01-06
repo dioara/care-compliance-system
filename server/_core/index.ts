@@ -67,8 +67,8 @@ async function startServer() {
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    // Skip rate limiting for health check endpoint
-    skip: (req) => req.path === "/api/trpc/system.health",
+    // Skip rate limiting for health check endpoints
+    skip: (req) => req.path === "/api/trpc/system.health" || req.path === "/api/worker-health",
   });
   
   // Apply rate limiter to all API routes
