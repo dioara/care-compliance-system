@@ -41,10 +41,11 @@ export const aiAuditJobsRouter = router({
       const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
       
       // Fetch file from temp_files table and create data URL
-      const [tempFile] = await db.execute(
-        'SELECT file_data, mime_type FROM temp_files WHERE id = ?',
-        [input.fileId]
-      ) as any;
+      const tempFileResult = await db.execute(sql`
+        SELECT file_data, mime_type FROM temp_files WHERE id = ${input.fileId}
+      `) as any;
+      
+      const tempFile = tempFileResult[0];
       
       if (!tempFile || tempFile.length === 0) {
         throw new TRPCError({ 
@@ -72,7 +73,7 @@ export const aiAuditJobsRouter = router({
       });
       
       // Delete temp file after creating job
-      await db.execute('DELETE FROM temp_files WHERE id = ?', [input.fileId]);
+      await db.execute(sql`DELETE FROM temp_files WHERE id = ${input.fileId}`);
 
       console.log('[aiAuditJobs] Job created:', job.insertId);
 

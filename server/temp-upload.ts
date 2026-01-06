@@ -10,7 +10,7 @@ import { readFile } from 'fs/promises';
 import jwt from 'jsonwebtoken';
 import * as dbModule from './db';
 import { aiAudits } from '../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -102,20 +102,19 @@ tempUploadRouter.post('/', upload.single('file'), async (req, res) => {
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const now = new Date();
     
-    await db.execute(
-      `INSERT INTO temp_files (id, file_data, file_name, mime_type, file_size, uploaded_by, created_at, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        fileId,
-        fileBase64,
-        req.file.originalname,
-        req.file.mimetype,
-        req.file.size,
-        user.userId,
-        now.toISOString().slice(0, 19).replace('T', ' '),
-        expiresAt.toISOString().slice(0, 19).replace('T', ' '),
-      ]
-    );
+    await db.execute(sql`
+      INSERT INTO temp_files (id, file_data, file_name, mime_type, file_size, uploaded_by, created_at, expires_at)
+      VALUES (
+        ${fileId},
+        ${fileBase64},
+        ${req.file.originalname},
+        ${req.file.mimetype},
+        ${req.file.size},
+        ${user.userId},
+        ${now.toISOString().slice(0, 19).replace('T', ' ')},
+        ${expiresAt.toISOString().slice(0, 19).replace('T', ' ')}
+      )
+    `);
     
     console.log('[Temp Upload] File stored in database with ID:', fileId);
     
