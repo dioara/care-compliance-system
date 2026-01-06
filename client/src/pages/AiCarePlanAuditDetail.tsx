@@ -32,21 +32,12 @@ export default function AiCarePlanAuditDetail() {
   // Download mutation
   const downloadMutation = trpc.aiAuditJobs.downloadReport.useMutation({
     onSuccess: (data) => {
-      const byteCharacters = atob(data.documentBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-      
-      const url = window.URL.createObjectURL(blob);
+      // Create a link element and trigger download
       const a = document.createElement('a');
-      a.href = url;
+      a.href = data.downloadUrl;
       a.download = data.filename;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     },
   });
