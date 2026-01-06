@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -26,6 +26,17 @@ export default function AiCarePlanAudit() {
   const { data: orgSettings } = trpc.organization.getSettings.useQuery();
   const hasOpenAiKey = !!orgSettings?.openaiApiKey;
 
+  // Fetch job history
+  const { data: jobHistory, refetch: refetchJobs } = trpc.aiAuditJobs.list.useQuery(
+    { limit: 10, status: undefined },
+    { refetchInterval: 5000 } // Auto-refresh every 5 seconds
+  );
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[AiCarePlanAudit] Job history data:', jobHistory);
+  }, [jobHistory]);
+
   const analyzeCarePlanMutation = trpc.ai.analyzeCarePlan.useMutation({
     onSuccess: (result) => {
       setAnalysisResult(result);
@@ -50,12 +61,14 @@ export default function AiCarePlanAudit() {
     onSuccess: (result) => {
       console.log('[Frontend] Job created successfully');
       console.log('[Frontend] Job ID:', result.jobId);
-      toast.success('Analysis job submitted! Redirecting to audits list...');
+      toast.success('Analysis job submitted successfully! Processing in background...');
       
-      // Redirect to audits list after a short delay
-      setTimeout(() => {
-        window.location.href = '/ai-care-plan-audits';
-      }, 1500);
+      // Refetch job history to show the new job
+      refetchJobs();
+      
+      // Clear form
+      setSelectedFile(null);
+      setServiceUserName('');
     },
     onError: (error) => {
       console.error('[Frontend] ERROR: Failed to submit job');
@@ -288,6 +301,93 @@ export default function AiCarePlanAudit() {
           Analysis typically takes 2-3 minutes
         </p>
       </div>
+
+      {/* Job History */}
+      {jobHistory && jobHistory.jobs.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Analysis Jobs</CardTitle>
+            <CardDescription>
+              View status and download completed analyses
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {jobHistory.jobs.map((job: any) => (
+                <div
+                  key={job.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="font-medium">{job.documentName}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {job.serviceUserName && `${job.serviceUserName} • `}
+                      {new Date(job.createdAt).toLocaleString()}
+                    </div>
+                    {job.progress && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {job.progress}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {job.status === 'pending' && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Pending
+                      </span>
+                    )}
+                    {job.status === 'processing' && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                        Processing
+                      </span>
+                    )}
+                    {job.status === 'completed' && (
+                      <>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Completed
+                        </span>
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
+                              if (result.documentBase64) {
+                                const blob = new Blob(
+                                  [Uint8Array.from(atob(result.documentBase64), c => c.charCodeAt(0))],
+                                  { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+                                );
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                                toast.success('Report downloaded successfully');
+                              }
+                            } catch (error) {
+                              toast.error('Failed to download report');
+                            }
+                          }}
+                        >
+                          Download
+                        </Button>
+                      </>
+                    )}
+                    {job.status === 'failed' && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        Failed
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Results */}
       {analysisResult && (
