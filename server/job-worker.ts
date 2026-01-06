@@ -19,6 +19,7 @@ import { parseFile } from './file-parser';
 import { generateCarePlanAnalysisDocument } from './document-generator';
 import { Packer } from 'docx';
 import { sendEmail } from './email';
+import { toMySQLDatetime, now } from './utils/datetime';
 
 interface JobContext {
   jobId: number;
@@ -91,7 +92,7 @@ async function processNextJob() {
       .set({
         status: 'processing',
         progress: 'Starting analysis...',
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       })
       .where(eq(aiAudits.id, job.id));
     
@@ -242,8 +243,8 @@ async function processJob(context: JobContext) {
           fileMetadata: parsed.metadata,
           documentBase64: documentBase64,
         }),
-        processedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        processedAt: now(),
+        updatedAt: now(),
       })
       .where(eq(aiAudits.id, jobId));
     
@@ -276,7 +277,7 @@ async function processJob(context: JobContext) {
       .set({
         status: 'failed',
         errorMessage: error instanceof Error ? error.message : String(error),
-        updatedAt: new Date().toISOString(),
+        updatedAt: now(),
       })
       .where(eq(aiAudits.id, jobId));
     
@@ -430,7 +431,7 @@ async function sendJobCompletionNotification(context: JobContext) {
       relatedEntityId: context.jobId,
       relatedEntityType: 'ai_audit',
       isRead: 0,
-      createdAt: new Date().toISOString(),
+        createdAt: now(),
     });
     
     // Mark notification as sent
@@ -438,7 +439,7 @@ async function sendJobCompletionNotification(context: JobContext) {
       .update(aiAudits)
       .set({
         notificationSent: 1,
-        notificationSentAt: new Date().toISOString(),
+        notificationSentAt: now(),
       })
       .where(eq(aiAudits.id, context.jobId));
     
