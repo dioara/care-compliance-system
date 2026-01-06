@@ -56,12 +56,14 @@ export default function AiCarePlanAudit() {
     onSuccess: (result) => {
       console.log('[Frontend] Job created successfully');
       console.log('[Frontend] Job ID:', result.jobId);
-      toast.success('Analysis job submitted! Redirecting to audits list...');
+      toast.success('Analysis job submitted successfully! Processing in background...');
       
-      // Redirect to audits list after a short delay
-      setTimeout(() => {
-        window.location.href = '/ai-care-plan-audits';
-      }, 1500);
+      // Refetch job history to show the new job
+      refetchJobs();
+      
+      // Clear form
+      setSelectedFile(null);
+      setServiceUserName('');
     },
     onError: (error) => {
       console.error('[Frontend] ERROR: Failed to submit job');
