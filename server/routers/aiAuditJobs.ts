@@ -40,13 +40,18 @@ export const aiAuditJobsRouter = router({
       const now = new Date();
       const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
       
+      // Check if fileId is a data URL or a file reference
+      const documentUrl = input.fileId.startsWith('data:') 
+        ? input.fileId // Direct data URL
+        : `temp://${input.fileId}`; // Legacy temp file reference
+      
       const [job] = await db.insert(aiAudits).values({
         tenantId: ctx.user.tenantId,
         locationId: 0,
         auditType: 'care_plan',
         documentName: input.fileName,
-        documentUrl: `temp://${input.fileId}`, // Reference to temp file
-        documentKey: input.fileId,
+        documentUrl: documentUrl,
+        documentKey: input.fileId.startsWith('data:') ? '' : input.fileId,
         serviceUserName: input.serviceUserName || '',
         anonymise: input.anonymise ? 1 : 0,
         status: 'pending',

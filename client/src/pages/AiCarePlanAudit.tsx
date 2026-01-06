@@ -147,13 +147,14 @@ export default function AiCarePlanAudit() {
         
         const uploadResult = await uploadResponse.json();
         console.log('[Frontend] File uploaded:', uploadResult.fileId);
+        console.log('[Frontend] Data URL length:', uploadResult.dataUrl?.length || 0);
         
         // Step 2: Submit job with file reference
         toast.dismiss(toastId);
         const submitToastId = toast.loading('Submitting analysis job...');
         
         submitCarePlanAuditMutation.mutate({
-          fileId: uploadResult.fileId,
+          fileId: uploadResult.dataUrl || uploadResult.fileId, // Use dataUrl if available
           fileName: selectedFile.name,
           fileType: selectedFile.type,
           serviceUserName,
