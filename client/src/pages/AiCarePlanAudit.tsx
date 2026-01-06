@@ -329,6 +329,25 @@ export default function AiCarePlanAudit() {
                         {job.progress}
                       </div>
                     )}
+                    {job.status === 'completed' && job.processedAt && (() => {
+                      const processedDate = new Date(job.processedAt);
+                      const expiryDate = new Date(processedDate.getTime() + (90 * 24 * 60 * 60 * 1000));
+                      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+                      
+                      if (daysUntilExpiry > 0) {
+                        return (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Report expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''} ({expiryDate.toLocaleDateString()})
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div className="text-xs text-red-600 mt-1">
+                            Report expired
+                          </div>
+                        );
+                      }
+                    })()}
                   </div>
                   <div className="flex items-center gap-3">
                     {job.status === 'pending' && (
@@ -352,19 +371,14 @@ export default function AiCarePlanAudit() {
                           onClick={async () => {
                             try {
                               const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
-                              if (result.documentBase64) {
-                                const blob = new Blob(
-                                  [Uint8Array.from(atob(result.documentBase64), c => c.charCodeAt(0))],
-                                  { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
-                                );
-                                const url = URL.createObjectURL(blob);
+                              if (result.downloadUrl) {
+                                // Create a temporary link to download the file
                                 const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
+                                a.href = result.downloadUrl;
+                                a.download = result.filename || `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
                                 document.body.appendChild(a);
                                 a.click();
                                 document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
                                 toast.success('Report downloaded successfully');
                               }
                             } catch (error) {
@@ -373,6 +387,24 @@ export default function AiCarePlanAudit() {
                           }}
                         >
                           Download
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={async () => {
+                            if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                              try {
+                                await trpc.aiAuditJobs.delete.mutate({ id: job.id });
+                                toast.success('Report deleted successfully');
+                                // Refetch to update the list
+                                window.location.reload();
+                              } catch (error) {
+                                toast.error('Failed to delete report');
+                              }
+                            }
+                          }}
+                        >
+                          Delete
                         </Button>
                       </>
                     )}

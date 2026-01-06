@@ -171,7 +171,7 @@ async function processNextJob() {
  * Process a single job
  */
 async function processJob(context: JobContext) {
-  const { jobId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
+  const { jobId, tenantId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
   
   try {
     console.log(`[Job Worker] Processing job ${jobId}`);
@@ -263,9 +263,28 @@ async function processJob(context: JobContext) {
     const documentBuffer = await Packer.toBuffer(doc);
     console.log(`[Job Worker] Document generated: ${documentBuffer.length} bytes`);
     
-    // Step 6: Store document (for now, store as base64 in JSON)
-    // TODO: Upload to S3 and store URL/key
-    const documentBase64 = documentBuffer.toString('base64');
+    // Step 6: Save document to local filesystem
+    await updateJobProgress(jobId, 'Saving report document...');
+    
+    const { writeFile, mkdir } = await import('fs/promises');
+    const { join } = await import('path');
+    
+    const timestamp = Date.now();
+    const sanitizedName = documentName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const fileName = `${timestamp}-${jobId}-${sanitizedName}.docx`;
+    
+    // Create reports directory if it doesn't exist
+    const reportsDir = join(process.cwd(), 'reports');
+    await mkdir(reportsDir, { recursive: true });
+    
+    const filePath = join(reportsDir, fileName);
+    await writeFile(filePath, documentBuffer);
+    
+    console.log(`[Job Worker] Document saved: ${filePath}`);
+    
+    // Store relative path for download endpoint
+    const reportKey = fileName;
+    const reportUrl = `/api/reports/${fileName}`;
     
     // Step 7: Save results to database
     await updateJobProgress(jobId, 'Saving results...');
@@ -276,11 +295,12 @@ async function processJob(context: JobContext) {
         status: 'completed',
         progress: 'Analysis complete',
         score: result.overall_score,
+        reportDocumentUrl: reportUrl,
+        reportDocumentKey: reportKey,
         detailedAnalysisJson: JSON.stringify({
           analysis: result,
           nameMappings: nameMappings,
           fileMetadata: parsed.metadata,
-          documentBase64: documentBase64,
         }),
         processedAt: now(),
         updatedAt: now(),
