@@ -15,6 +15,9 @@ import { CarePlanResults } from '@/components/CarePlanResults';
 import { fileToBase64 } from '@/lib/fileUtils';
 
 export default function AiCarePlanAudit() {
+  // Get tRPC utils for imperative calls
+  const utils = trpc.useUtils();
+  
   const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -371,8 +374,8 @@ export default function AiCarePlanAudit() {
                           onClick={async () => {
                             console.log('[AiCarePlanAudit] Download clicked for job:', job);
                             try {
-                              console.log('[AiCarePlanAudit] Calling downloadReport.query with id:', job.id);
-                              const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
+                              console.log('[AiCarePlanAudit] Calling downloadReport via utils.client with id:', job.id);
+                              const result = await utils.client.aiAuditJobs.downloadReport.query({ id: job.id });
                               console.log('[AiCarePlanAudit] downloadReport result:', result);
                               if (result.downloadUrl) {
                                 // Create a temporary link to download the file
