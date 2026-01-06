@@ -34,6 +34,26 @@ interface JobContext {
   openaiApiKey: string;
 }
 
+// Worker status tracking
+let workerStatus = {
+  isRunning: false,
+  startedAt: null as Date | null,
+  lastPollAt: null as Date | null,
+  jobsProcessed: 0,
+  currentJobId: null as number | null,
+  lastError: null as string | null,
+};
+
+/**
+ * Get current worker status
+ */
+export function getWorkerStatus() {
+  return {
+    ...workerStatus,
+    uptime: workerStatus.startedAt ? Date.now() - workerStatus.startedAt.getTime() : 0,
+  };
+}
+
 /**
  * Main worker loop
  */
@@ -42,18 +62,28 @@ export async function startJobWorker() {
   console.log('[Job Worker] Polling interval: 5 seconds');
   console.log('[Job Worker] Max concurrent jobs: 1');
   
+  // Update worker status
+  workerStatus.isRunning = true;
+  workerStatus.startedAt = new Date();
+  
   let isProcessing = false;
   
   // Poll for jobs every 5 seconds
   setInterval(async () => {
+    workerStatus.lastPollAt = new Date();
+    
     if (isProcessing) {
       return; // Skip if already processing a job
     }
     
     try {
+      isProcessing = true;
       await processNextJob();
+      isProcessing = false;
     } catch (error) {
       console.error('[Job Worker] Error in main loop:', error);
+      workerStatus.lastError = error instanceof Error ? error.message : String(error);
+      isProcessing = false;
     }
   }, 5000);
   
@@ -85,6 +115,9 @@ async function processNextJob() {
     
     const job = pendingJobs[0];
     console.log(`[Job Worker] Found pending job: ${job.id}`);
+    
+    // Update worker status
+    workerStatus.currentJobId = job.id;
     
     // Mark as processing
     await db
@@ -123,8 +156,14 @@ async function processNextJob() {
     // Process the job
     await processJob(context);
     
+    // Update worker status
+    workerStatus.jobsProcessed++;
+    workerStatus.currentJobId = null;
+    
   } catch (error) {
     console.error('[Job Worker] Error processing job:', error);
+    workerStatus.lastError = error instanceof Error ? error.message : String(error);
+    workerStatus.currentJobId = null;
   }
 }
 

@@ -12,6 +12,7 @@ import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
 import { stripeWebhookRouter } from "../stripe/webhook";
 import { tempUploadRouter } from "../temp-upload";
+import { workerHealthRouter } from "../worker-health";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -51,6 +52,9 @@ async function startServer() {
   // Temporary file upload endpoint (stores files on server filesystem)
   app.use("/api/temp-upload", tempUploadRouter);
   
+  // Worker health check endpoint (no auth required for monitoring)
+  app.use(workerHealthRouter);
+  
   // Job submission via tRPC (aiAuditJobs.submitCarePlanAudit)
   
   // Rate limiting middleware - 100 requests per 15 minutes per IP
@@ -63,8 +67,8 @@ async function startServer() {
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-    // Skip rate limiting for health check endpoint
-    skip: (req) => req.path === "/api/trpc/system.health",
+    // Skip rate limiting for health check endpoints
+    skip: (req) => req.path === "/api/trpc/system.health" || req.path === "/api/worker-health",
   });
   
   // Apply rate limiter to all API routes
@@ -217,10 +221,15 @@ async function startServer() {
     });
     
     // Start background job worker for AI audits
+    console.log('[Server] ========================================');
+    console.log('[Server] Starting AI Audit Job Worker...');
+    console.log('[Server] ========================================');
     import("../job-worker").then(({ startJobWorker }) => {
       startJobWorker();
+      console.log('[Server] Job worker initialization complete');
     }).catch(error => {
-      console.error("Failed to start job worker:", error);
+      console.error('[Server] ❌ FAILED TO START JOB WORKER:', error);
+      console.error('[Server] Stack trace:', error.stack);
     });
   });
 }
