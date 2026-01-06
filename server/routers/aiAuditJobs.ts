@@ -265,27 +265,18 @@ export const aiAuditJobsRouter = router({
         });
       }
 
-      // Get document from detailed analysis JSON
-      let documentBase64 = null;
-      if (job.detailedAnalysisJson) {
-        try {
-          const detailedAnalysis = JSON.parse(job.detailedAnalysisJson);
-          documentBase64 = detailedAnalysis.documentBase64;
-        } catch (error) {
-          console.error('[AI Audit Jobs] Failed to parse detailed analysis JSON:', error);
-        }
-      }
-
-      if (!documentBase64) {
+      // Check if report document URL exists
+      if (!job.reportDocumentUrl) {
         throw new TRPCError({ 
           code: "NOT_FOUND", 
           message: "Report document not found" 
         });
       }
 
+      // Return the download URL
       return {
-        documentBase64: documentBase64,
-        filename: `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`,
+        downloadUrl: job.reportDocumentUrl,
+        filename: job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`,
       };
     }),
 

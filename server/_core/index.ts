@@ -13,6 +13,7 @@ import { serveStatic, setupVite } from "./vite";
 import { stripeWebhookRouter } from "../stripe/webhook";
 import { tempUploadRouter } from "../temp-upload";
 import { workerHealthRouter } from "../worker-health";
+import { reportsDownloadRouter } from "../reports-download";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -54,6 +55,9 @@ async function startServer() {
   
   // Worker health check endpoint (no auth required for monitoring)
   app.use(workerHealthRouter);
+  
+  // Reports download endpoint (serves generated Word documents)
+  app.use(reportsDownloadRouter);
   
   // Job submission via tRPC (aiAuditJobs.submitCarePlanAudit)
   

@@ -352,19 +352,14 @@ export default function AiCarePlanAudit() {
                           onClick={async () => {
                             try {
                               const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
-                              if (result.documentBase64) {
-                                const blob = new Blob(
-                                  [Uint8Array.from(atob(result.documentBase64), c => c.charCodeAt(0))],
-                                  { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
-                                );
-                                const url = URL.createObjectURL(blob);
+                              if (result.downloadUrl) {
+                                // Create a temporary link to download the file
                                 const a = document.createElement('a');
-                                a.href = url;
-                                a.download = `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
+                                a.href = result.downloadUrl;
+                                a.download = result.filename || `Care_Plan_Analysis_${job.serviceUserName?.replace(/\s+/g, '_') || 'Report'}_${new Date(job.createdAt).toISOString().split('T')[0]}.docx`;
                                 document.body.appendChild(a);
                                 a.click();
                                 document.body.removeChild(a);
-                                URL.revokeObjectURL(url);
                                 toast.success('Report downloaded successfully');
                               }
                             } catch (error) {

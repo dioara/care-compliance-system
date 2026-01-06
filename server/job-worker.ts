@@ -20,7 +20,6 @@ import { generateCarePlanAnalysisDocument } from './document-generator';
 import { Packer } from 'docx';
 import { sendEmail } from './email';
 import { toMySQLDatetime, now } from './utils/datetime';
-import { storagePut } from './storage';
 
 interface JobContext {
   jobId: number;
@@ -264,21 +263,28 @@ async function processJob(context: JobContext) {
     const documentBuffer = await Packer.toBuffer(doc);
     console.log(`[Job Worker] Document generated: ${documentBuffer.length} bytes`);
     
-    // Step 6: Upload document to storage
-    await updateJobProgress(jobId, 'Uploading report document...');
+    // Step 6: Save document to local filesystem
+    await updateJobProgress(jobId, 'Saving report document...');
+    
+    const { writeFile, mkdir } = await import('fs/promises');
+    const { join } = await import('path');
     
     const timestamp = Date.now();
     const sanitizedName = documentName.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const storageKey = `ai-audits/${tenantId}/${jobId}/${timestamp}-${sanitizedName}.docx`;
+    const fileName = `${timestamp}-${jobId}-${sanitizedName}.docx`;
     
-    console.log(`[Job Worker] Uploading document to storage: ${storageKey}`);
-    const { url: reportUrl, key: reportKey } = await storagePut(
-      storageKey,
-      documentBuffer,
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    );
+    // Create reports directory if it doesn't exist
+    const reportsDir = join(process.cwd(), 'reports');
+    await mkdir(reportsDir, { recursive: true });
     
-    console.log(`[Job Worker] Document uploaded: ${reportUrl}`);
+    const filePath = join(reportsDir, fileName);
+    await writeFile(filePath, documentBuffer);
+    
+    console.log(`[Job Worker] Document saved: ${filePath}`);
+    
+    // Store relative path for download endpoint
+    const reportKey = fileName;
+    const reportUrl = `/api/reports/${fileName}`;
     
     // Step 7: Save results to database
     await updateJobProgress(jobId, 'Saving results...');
