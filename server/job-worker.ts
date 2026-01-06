@@ -269,26 +269,16 @@ async function processJob(context: JobContext) {
     const documentBuffer = await Packer.toBuffer(doc);
     console.log(`[Job Worker] Document generated: ${documentBuffer.length} bytes`);
     
-    // Step 6: Save document to local filesystem
+    // Step 6: Prepare document for database storage
     await updateJobProgress(jobId, 'Saving report document...');
-    
-    const { writeFile, mkdir } = await import('fs/promises');
-    const { join } = await import('path');
     
     const timestamp = Date.now();
     const sanitizedName = documentName.replace(/[^a-zA-Z0-9.-]/g, '_');
     const fileName = `${timestamp}-${jobId}-${sanitizedName}.docx`;
     
-    // Create reports directory if it doesn't exist
-    const reportsDir = join(process.cwd(), 'reports');
-    await mkdir(reportsDir, { recursive: true });
+    console.log(`[Job Worker] Document prepared: ${fileName} (${documentBuffer.length} bytes)`);
     
-    const filePath = join(reportsDir, fileName);
-    await writeFile(filePath, documentBuffer);
-    
-    console.log(`[Job Worker] Document saved: ${filePath}`);
-    
-    // Store relative path for download endpoint
+    // Store filename for download endpoint (actual data stored in database)
     const reportKey = fileName;
     const reportUrl = `/api/reports/${fileName}`;
     
@@ -303,6 +293,7 @@ async function processJob(context: JobContext) {
         score: result.overall_score,
         reportDocumentUrl: reportUrl,
         reportDocumentKey: reportKey,
+        reportDocumentData: documentBuffer, // Store document binary in database
         detailedAnalysisJson: JSON.stringify({
           analysis: result,
           nameMappings: nameMappings,

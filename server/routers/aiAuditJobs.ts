@@ -330,22 +330,26 @@ export const aiAuditJobsRouter = router({
         });
       }
 
-      // Check if report document URL exists
-      if (!job.reportDocumentUrl) {
-        console.error('[downloadReport] No reportDocumentUrl found');
+      // Check if report document data exists in database
+      if (!job.reportDocumentData) {
+        console.error('[downloadReport] No reportDocumentData found in database');
         throw new TRPCError({ 
           code: "NOT_FOUND", 
-          message: "Report document not found" 
+          message: "Report document not found. Please regenerate the report." 
         });
       }
 
-      // Return the download URL
-      const response = {
-        downloadUrl: job.reportDocumentUrl,
-        filename: job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`,
+      // Convert buffer to base64 for transmission
+      const base64Data = Buffer.from(job.reportDocumentData).toString('base64');
+      const filename = job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`;
+      
+      console.log('[downloadReport] Returning document data:', { filename, dataLength: base64Data.length });
+      
+      return {
+        data: base64Data,
+        filename: filename,
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       };
-      console.log('[downloadReport] Returning response:', response);
-      return response;
     }),
 
   /**
