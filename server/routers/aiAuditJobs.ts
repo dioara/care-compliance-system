@@ -41,11 +41,39 @@ export const aiAuditJobsRouter = router({
       const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
       
       // Fetch file from temp_files table and create data URL
-      const tempFileResult = await db.execute(sql`
-        SELECT file_data, mime_type FROM temp_files WHERE id = ${input.fileId}
-      `) as any;
+      let tempFileResult;
+      try {
+        tempFileResult = await db.execute(sql`
+          SELECT file_data, mime_type FROM temp_files WHERE id = ${input.fileId}
+        `) as any;
+        console.log('[aiAuditJobs] Query result type:', typeof tempFileResult);
+        console.log('[aiAuditJobs] Query result is array:', Array.isArray(tempFileResult));
+        console.log('[aiAuditJobs] Query result length:', tempFileResult?.length);
+      } catch (error) {
+        console.error('[aiAuditJobs] Query error:', error);
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Failed to fetch uploaded file from database." 
+        });
+      }
       
-      const rows = tempFileResult[0]; // First element is the rows array
+      // Handle different possible result structures
+      let rows;
+      if (Array.isArray(tempFileResult)) {
+        if (tempFileResult.length > 0 && Array.isArray(tempFileResult[0])) {
+          rows = tempFileResult[0]; // [rows, fields] format
+        } else {
+          rows = tempFileResult; // Direct rows array
+        }
+      } else {
+        console.error('[aiAuditJobs] Unexpected result structure:', tempFileResult);
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Unexpected database response format." 
+        });
+      }
+      
+      console.log('[aiAuditJobs] Rows:', rows?.length, 'rows found');
       
       if (!rows || rows.length === 0) {
         throw new TRPCError({ 
@@ -54,7 +82,15 @@ export const aiAuditJobsRouter = router({
         });
       }
       
-      const tempFile = rows[0]; // Get first row
+      const tempFile = rows[0];
+      if (!tempFile.mime_type || !tempFile.file_data) {
+        console.error('[aiAuditJobs] Invalid temp file data:', Object.keys(tempFile));
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Uploaded file data is incomplete." 
+        });
+      }
+      
       const dataUrl = `data:${tempFile.mime_type};base64,${tempFile.file_data}`;
       
       const [job] = await db.insert(aiAudits).values({
