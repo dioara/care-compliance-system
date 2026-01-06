@@ -7,6 +7,8 @@ import { Router } from 'express';
 import multer from 'multer';
 import { TRPCError } from '@trpc/server';
 import jwt from 'jsonwebtoken';
+import { getDb } from './db';
+import { aiAudits } from '../drizzle/schema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -133,12 +135,10 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
     
     // Create async job instead of processing immediately
     console.log('[Upload Endpoint] Creating async analysis job');
-    const dbModule = await import('./db');
-    const db = await dbModule.getDb();
+    const db = await getDb();
     if (!db) {
       return res.status(500).json({ error: 'Database not available' });
     }
-    const { aiAudits } = await import('../drizzle/schema');
     
     // Store file temporarily (in production, upload to S3)
     // For now, we'll store the file buffer as base64 in a temporary location
