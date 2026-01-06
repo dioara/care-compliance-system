@@ -369,7 +369,6 @@ export default function AiCarePlanAudit() {
                         <Button
                           size="sm"
                           onClick={async () => {
-                            alert('AiCarePlanAudit.tsx Download button clicked for job.id: ' + job.id);
                             console.log('[AiCarePlanAudit] Download clicked for job:', job);
                             try {
                               console.log('[AiCarePlanAudit] Calling downloadReport.query with id:', job.id);
@@ -386,7 +385,9 @@ export default function AiCarePlanAudit() {
                                 toast.success('Report downloaded successfully');
                               }
                             } catch (error) {
-                              toast.error('Failed to download report');
+                              console.error('[AiCarePlanAudit] Download error:', error);
+                              console.error('[AiCarePlanAudit] Error details:', JSON.stringify(error, null, 2));
+                              toast.error('Failed to download report: ' + (error?.message || 'Unknown error'));
                             }
                           }}
                         >
