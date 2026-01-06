@@ -53,7 +53,9 @@ export default function AiCarePlanAuditDetail() {
     },
     onError: (error) => {
       console.error('[Download] Mutation error:', error);
-      toast.error(`Failed to download report: ${error.message}`);
+      console.error('[Download] Error details:', JSON.stringify(error, null, 2));
+      const errorMessage = error?.message || error?.data?.message || 'Unknown error';
+      toast.error(`Failed to download report: ${errorMessage}`);
     },
   });
   
@@ -111,9 +113,17 @@ export default function AiCarePlanAuditDetail() {
           {job.status === 'completed' && (
             <Button
               onClick={() => {
+                alert('Button clicked! JobId: ' + jobId);
                 console.log('[Download] Button clicked, jobId:', jobId);
                 console.log('[Download] Mutation isPending:', downloadMutation.isPending);
-                downloadMutation.mutate({ id: jobId });
+                console.log('[Download] About to call downloadMutation.mutate');
+                try {
+                  downloadMutation.mutate({ id: jobId });
+                  console.log('[Download] Mutation called successfully');
+                } catch (err) {
+                  console.error('[Download] Error calling mutation:', err);
+                  alert('Error calling mutation: ' + err);
+                }
               }}
               disabled={downloadMutation.isPending}
             >
