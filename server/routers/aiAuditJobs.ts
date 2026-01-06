@@ -12,6 +12,53 @@ import { eq, and, desc } from "drizzle-orm";
 
 export const aiAuditJobsRouter = router({
   /**
+   * Submit a care plan audit job
+   */
+  submitCarePlanAudit: protectedProcedure
+    .input(
+      z.object({
+        fileData: z.string(), // base64 encoded file
+        fileName: z.string(),
+        fileType: z.string(),
+        serviceUserName: z.string(),
+        anonymise: z.boolean().default(true),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
+      }
+
+      const db = await dbModule.getDb();
+      if (!db) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      }
+
+      // Create job record
+      const [job] = await db.insert(aiAudits).values({
+        tenantId: ctx.user.tenantId,
+        locationId: 0,
+        auditType: 'care_plan',
+        documentName: input.fileName,
+        documentUrl: `data:${input.fileType};base64,${input.fileData}`,
+        documentKey: '',
+        serviceUserName: input.serviceUserName || '',
+        anonymise: input.anonymise ? 1 : 0,
+        status: 'pending',
+        progress: 'Queued for processing',
+        requestedById: ctx.user.userId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      return {
+        success: true,
+        jobId: job.insertId,
+        message: 'Analysis job submitted successfully',
+      };
+    }),
+
+  /**
    * Get all audit jobs for the current user's tenant
    */
   list: protectedProcedure
