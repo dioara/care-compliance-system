@@ -6,9 +6,11 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { randomBytes } from 'crypto';
-import { mkdir } from 'fs/promises';
-import { join } from 'path';
+import { readFile } from 'fs/promises';
 import jwt from 'jsonwebtoken';
+import * as dbModule from './db';
+import { aiAudits } from '../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -29,22 +31,8 @@ async function verifyToken(token: string): Promise<TokenPayload> {
   }
 }
 
-// Create temp directory if it doesn't exist
-const TEMP_DIR = join(process.cwd(), 'temp-uploads');
-mkdir(TEMP_DIR, { recursive: true }).catch(console.error);
-
-// Configure multer for disk storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, TEMP_DIR);
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename: timestamp-random-originalname
-    const uniqueId = `${Date.now()}-${randomBytes(8).toString('hex')}`;
-    const ext = file.originalname.split('.').pop();
-    cb(null, `${uniqueId}.${ext}`);
-  },
-});
+// Configure multer for memory storage (no filesystem)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -93,20 +81,31 @@ tempUploadRouter.post('/', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
     
-    console.log('[Temp Upload] File saved:', {
-      filename: req.file.filename,
+    // Convert file buffer to base64
+    const fileBase64 = req.file.buffer.toString('base64');
+    const fileId = `${Date.now()}-${randomBytes(8).toString('hex')}`;
+    
+    console.log('[Temp Upload] File received:', {
+      fileId,
       originalname: req.file.originalname,
       size: req.file.size,
-      path: req.file.path,
+      base64Length: fileBase64.length,
     });
     
-    // Return file reference
+    // Store file content in database temporarily
+    // We'll use the documentUrl field with a data: URL
+    const dataUrl = `data:${req.file.mimetype};base64,${fileBase64}`;
+    
+    console.log('[Temp Upload] File stored in memory, returning reference');
+    
+    // Return file reference with data URL
     res.json({
       success: true,
-      fileId: req.file.filename,
+      fileId,
       originalName: req.file.originalname,
       size: req.file.size,
       mimeType: req.file.mimetype,
+      dataUrl, // Include data URL for immediate use
     });
   } catch (error) {
     console.error('[Temp Upload] ERROR:', error);
