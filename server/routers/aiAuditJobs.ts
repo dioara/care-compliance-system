@@ -290,7 +290,11 @@ export const aiAuditJobsRouter = router({
   downloadReport: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
+      console.log('[downloadReport] Request received for job ID:', input.id);
+      console.log('[downloadReport] User tenantId:', ctx.user?.tenantId);
+      
       if (!ctx.user?.tenantId) {
+        console.error('[downloadReport] No tenantId found');
         throw new TRPCError({ code: "NOT_FOUND", message: "Company not found" });
       }
 
@@ -299,6 +303,7 @@ export const aiAuditJobsRouter = router({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
       }
 
+      console.log('[downloadReport] Querying database for job');
       const [job] = await db
         .select()
         .from(aiAudits)
@@ -311,10 +316,14 @@ export const aiAuditJobsRouter = router({
         .limit(1);
 
       if (!job) {
+        console.error('[downloadReport] Job not found');
         throw new TRPCError({ code: "NOT_FOUND", message: "Audit job not found" });
       }
+      
+      console.log('[downloadReport] Job found:', { id: job.id, status: job.status, reportDocumentUrl: job.reportDocumentUrl });
 
       if (job.status !== 'completed') {
+        console.error('[downloadReport] Job not completed, status:', job.status);
         throw new TRPCError({ 
           code: "BAD_REQUEST", 
           message: "Report is not ready yet. Job status: " + job.status 
@@ -323,6 +332,7 @@ export const aiAuditJobsRouter = router({
 
       // Check if report document URL exists
       if (!job.reportDocumentUrl) {
+        console.error('[downloadReport] No reportDocumentUrl found');
         throw new TRPCError({ 
           code: "NOT_FOUND", 
           message: "Report document not found" 
@@ -330,10 +340,12 @@ export const aiAuditJobsRouter = router({
       }
 
       // Return the download URL
-      return {
+      const response = {
         downloadUrl: job.reportDocumentUrl,
         filename: job.reportDocumentKey || `AI_Audit_${job.serviceUserName || job.documentName}_${new Date().toISOString().split('T')[0]}.docx`,
       };
+      console.log('[downloadReport] Returning response:', response);
+      return response;
     }),
 
   /**

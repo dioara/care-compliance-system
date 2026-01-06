@@ -31,14 +31,27 @@ export default function AiCarePlanAuditDetail() {
   
   // Download mutation
   const downloadMutation = trpc.aiAuditJobs.downloadReport.useMutation({
+    onMutate: (variables) => {
+      console.log('[Download] Mutation started with variables:', variables);
+    },
     onSuccess: (data) => {
+      console.log('[Download] Mutation success, received data:', data);
+      console.log('[Download] downloadUrl:', data.downloadUrl);
+      console.log('[Download] filename:', data.filename);
+      
       // Create a link element and trigger download
       const a = document.createElement('a');
       a.href = data.downloadUrl;
       a.download = data.filename;
       document.body.appendChild(a);
+      console.log('[Download] Link element created and appended');
       a.click();
+      console.log('[Download] Link clicked');
       document.body.removeChild(a);
+      console.log('[Download] Link removed');
+    },
+    onError: (error) => {
+      console.error('[Download] Mutation error:', error);
     },
   });
   
@@ -95,7 +108,11 @@ export default function AiCarePlanAuditDetail() {
         <div className="flex gap-2">
           {job.status === 'completed' && (
             <Button
-              onClick={() => downloadMutation.mutate({ id: jobId })}
+              onClick={() => {
+                console.log('[Download] Button clicked, jobId:', jobId);
+                console.log('[Download] Mutation isPending:', downloadMutation.isPending);
+                downloadMutation.mutate({ id: jobId });
+              }}
               disabled={downloadMutation.isPending}
             >
               <Download className="mr-2 h-4 w-4" />
