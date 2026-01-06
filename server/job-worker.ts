@@ -20,6 +20,7 @@ import { generateCarePlanAnalysisDocument } from './document-generator';
 import { Packer } from 'docx';
 import { sendEmail } from './email';
 import { toMySQLDatetime, now } from './utils/datetime';
+import { storagePut } from './storage';
 
 interface JobContext {
   jobId: number;
@@ -171,7 +172,7 @@ async function processNextJob() {
  * Process a single job
  */
 async function processJob(context: JobContext) {
-  const { jobId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
+  const { jobId, tenantId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
   
   try {
     console.log(`[Job Worker] Processing job ${jobId}`);
@@ -263,9 +264,21 @@ async function processJob(context: JobContext) {
     const documentBuffer = await Packer.toBuffer(doc);
     console.log(`[Job Worker] Document generated: ${documentBuffer.length} bytes`);
     
-    // Step 6: Store document (for now, store as base64 in JSON)
-    // TODO: Upload to S3 and store URL/key
-    const documentBase64 = documentBuffer.toString('base64');
+    // Step 6: Upload document to storage
+    await updateJobProgress(jobId, 'Uploading report document...');
+    
+    const timestamp = Date.now();
+    const sanitizedName = documentName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storageKey = `ai-audits/${tenantId}/${jobId}/${timestamp}-${sanitizedName}.docx`;
+    
+    console.log(`[Job Worker] Uploading document to storage: ${storageKey}`);
+    const { url: reportUrl, key: reportKey } = await storagePut(
+      storageKey,
+      documentBuffer,
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    );
+    
+    console.log(`[Job Worker] Document uploaded: ${reportUrl}`);
     
     // Step 7: Save results to database
     await updateJobProgress(jobId, 'Saving results...');
@@ -276,11 +289,12 @@ async function processJob(context: JobContext) {
         status: 'completed',
         progress: 'Analysis complete',
         score: result.overall_score,
+        reportDocumentUrl: reportUrl,
+        reportDocumentKey: reportKey,
         detailedAnalysisJson: JSON.stringify({
           analysis: result,
           nameMappings: nameMappings,
           fileMetadata: parsed.metadata,
-          documentBase64: documentBase64,
         }),
         processedAt: now(),
         updatedAt: now(),
