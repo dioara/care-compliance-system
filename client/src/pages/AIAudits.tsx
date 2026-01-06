@@ -124,19 +124,30 @@ export default function AIAudits() {
   const handleDownloadPDF = async (auditId: number) => {
     try {
       toast.info("Generating PDF report...");
-      const { url, filename } = await generatePDF.mutateAsync({ auditId });
+      const { data, filename, mimeType } = await generatePDF.mutateAsync({ auditId });
+      
+      // Convert base64 to blob
+      const byteCharacters = atob(data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType || 'application/pdf' });
       
       // Download the PDF
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
       link.download = filename;
-      link.target = "_blank";
       document.body.appendChild(link);
       link.click();
+      window.URL.revokeObjectURL(url);
       document.body.removeChild(link);
       
       toast.success("PDF report downloaded!");
     } catch (error: any) {
+      console.error('[handleDownloadPDF] Error:', error);
       toast.error(error.message || "Failed to generate PDF");
     }
   };
