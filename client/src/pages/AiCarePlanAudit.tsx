@@ -370,6 +370,8 @@ export default function AiCarePlanAudit() {
                           size="sm"
                           onClick={async () => {
                             console.log('[AiCarePlanAudit] Download clicked for job:', job);
+                            console.log('[AiCarePlanAudit] trpc.aiAuditJobs keys:', Object.keys(trpc.aiAuditJobs));
+                            console.log('[AiCarePlanAudit] downloadReport exists?', typeof trpc.aiAuditJobs.downloadReport);
                             try {
                               console.log('[AiCarePlanAudit] Calling downloadReport.query with id:', job.id);
                               const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
