@@ -173,6 +173,12 @@ async function processNextJob() {
 async function processJob(context: JobContext) {
   const { jobId, tenantId, openaiApiKey, serviceUserName, anonymise, documentUrl, documentKey, documentName } = context;
   
+  // Get database connection
+  const db = await dbModule.getDb();
+  if (!db) {
+    throw new Error('Database not available');
+  }
+  
   try {
     console.log(`[Job Worker] Processing job ${jobId}`);
     
