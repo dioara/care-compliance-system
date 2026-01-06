@@ -11,6 +11,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { ArrowLeft, Download, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function AiCarePlanAuditDetail() {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +53,7 @@ export default function AiCarePlanAuditDetail() {
     },
     onError: (error) => {
       console.error('[Download] Mutation error:', error);
+      toast.error(`Failed to download report: ${error.message}`);
     },
   });
   
