@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,6 +31,11 @@ export default function AiCarePlanAudit() {
     { limit: 10, status: undefined },
     { refetchInterval: 5000 } // Auto-refresh every 5 seconds
   );
+
+  // Debug logging
+  useEffect(() => {
+    console.log('[AiCarePlanAudit] Job history data:', jobHistory);
+  }, [jobHistory]);
 
   const analyzeCarePlanMutation = trpc.ai.analyzeCarePlan.useMutation({
     onSuccess: (result) => {
