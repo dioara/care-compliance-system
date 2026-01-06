@@ -8,7 +8,7 @@ import multer from 'multer';
 import { TRPCError } from '@trpc/server';
 import jwt from 'jsonwebtoken';
 import { getDb } from './db';
-import { aiAudits } from '../drizzle/schema';
+import * as schema from '../drizzle/schema';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -146,7 +146,7 @@ uploadRouter.post('/ai/analyze-care-plan-file', upload.single('file'), async (re
     const fileBase64 = req.file.buffer.toString('base64');
     
     // Create job record
-    const [job] = await db.insert(aiAudits).values({
+    const [job] = await db.insert(schema.aiAudits).values({
       tenantId: user.tenantId,
       locationId: 0, // TODO: Get from user context or request
       auditType: 'care_plan',
