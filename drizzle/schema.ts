@@ -1,4 +1,4 @@
-import { mysqlTable, mysqlSchema, AnyMySqlColumn, int, mysqlEnum, varchar, date, timestamp, text, index, json, tinyint } from "drizzle-orm/mysql-core"
+import { mysqlTable, mysqlSchema, AnyMySqlColumn, int, mysqlEnum, varchar, date, timestamp, text, longtext, index, json, tinyint } from "drizzle-orm/mysql-core"
 import { sql } from "drizzle-orm"
 
 export const aiAuditSchedules = mysqlTable("aiAuditSchedules", {
@@ -47,7 +47,7 @@ export const aiAudits = mysqlTable("aiAudits", {
 	recommendations: text(),
 	examples: text(),
 	cqcComplianceNotes: text(),
-	detailedAnalysisJson: text('longtext'),
+	detailedAnalysisJson: longtext(),
 	reportDocumentUrl: text(),
 	reportDocumentKey: text(),
 	notificationSent: tinyint().default(0),
