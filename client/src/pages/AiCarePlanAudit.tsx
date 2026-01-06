@@ -82,51 +82,27 @@ export default function AiCarePlanAudit() {
       });
 
       try {
-        console.log('[Frontend] Creating FormData for multipart upload');
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('serviceUserName', serviceUserName);
-        formData.append('anonymise', anonymise.toString());
+        console.log('[Frontend] Converting file to base64');
+        const fileBase64 = await fileToBase64(selectedFile);
         
-        console.log('[Frontend] Payload size (file only):', Math.round(selectedFile.size / 1024), 'KB');
-        console.log('[Frontend] Calling multipart upload endpoint');
-        
-        // Get auth token
-        const token = localStorage.getItem('auth_token');
-        if (!token) {
-          console.error('[Frontend] ERROR: No auth token found in localStorage');
-          toast.error('Authentication required. Please log in again.');
-          return;
-        }
-        console.log('[Frontend] Auth token found:', token ? 'Yes' : 'No');
+        console.log('[Frontend] File size:', Math.round(selectedFile.size / 1024), 'KB');
+        console.log('[Frontend] Base64 length:', fileBase64.length);
+        console.log('[Frontend] Submitting job via tRPC');
         
         // Set analyzing state
         setAnalysisResult(null);
-        const toastId = toast.loading('Analyzing care plan...');
+        const toastId = toast.loading('Submitting analysis job...');
         
-        const response = await fetch('/api/upload/ai/analyze-care-plan-file', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-          body: formData,
+        const result = await trpc.aiAuditJobs.submitCarePlanAudit.mutate({
+          fileData: fileBase64,
+          fileName: selectedFile.name,
+          fileType: selectedFile.type,
+          serviceUserName,
+          anonymise,
         });
         
-        console.log('[Frontend] Response status:', response.status);
-        console.log('[Frontend] Response headers:', Object.fromEntries(response.headers.entries()));
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-          console.error('[Frontend] ERROR: Request failed:', errorData);
-          toast.dismiss(toastId);
-          toast.error(`Analysis failed: ${errorData.error || response.statusText}`);
-          return;
-        }
-        
-        const result = await response.json();
         console.log('[Frontend] Job created successfully');
         console.log('[Frontend] Job ID:', result.jobId);
-        console.log('[Frontend] Status:', result.status);
         
         toast.dismiss(toastId);
         toast.success('Analysis job submitted! Redirecting to audits list...');
@@ -136,10 +112,9 @@ export default function AiCarePlanAudit() {
           window.location.href = '/ai-care-plan-audits';
         }, 1500);
       } catch (error) {
-        console.error('[Frontend] ERROR: Failed to analyze file');
-        console.error('[Frontend] Error type:', error?.constructor?.name);
-        console.error('[Frontend] Error message:', error instanceof Error ? error.message : String(error));
-        toast.error('Failed to analyze file');
+        console.error('[Frontend] ERROR: Failed to submit job');
+        console.error('[Frontend] Error:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to submit analysis job');
       }
       return;
     }
