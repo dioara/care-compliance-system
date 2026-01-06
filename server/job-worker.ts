@@ -141,8 +141,20 @@ async function processJob(context: JobContext) {
     
     let fileBuffer: Buffer;
     
-    // Check if we have a URL or need to fetch from S3
-    if (documentUrl && documentUrl.startsWith('data:')) {
+    // Check if we have a URL or need to fetch from temp storage
+    if (documentUrl && documentUrl.startsWith('temp://')) {
+      // Read from temporary file storage
+      const { readFile, unlink } = await import('fs/promises');
+      const { join } = await import('path');
+      const fileId = documentUrl.replace('temp://', '');
+      const tempPath = join(process.cwd(), 'temp-uploads', fileId);
+      
+      console.log(`[Job Worker] Reading temp file: ${tempPath}`);
+      fileBuffer = await readFile(tempPath);
+      console.log(`[Job Worker] Temp file read: ${fileBuffer.length} bytes`);
+      
+      // Note: File will be deleted after successful processing (see cleanup at end)
+    } else if (documentUrl && documentUrl.startsWith('data:')) {
       // Extract base64 data from data URL
       const base64Data = documentUrl.split(',')[1];
       if (!base64Data) {
@@ -237,7 +249,22 @@ async function processJob(context: JobContext) {
     
     console.log(`[Job Worker] Job ${jobId} completed successfully`);
     
-    // Step 8: Send notification
+    // Step 8: Clean up temp file if it exists
+    if (documentUrl && documentUrl.startsWith('temp://')) {
+      try {
+        const { unlink } = await import('fs/promises');
+        const { join } = await import('path');
+        const fileId = documentUrl.replace('temp://', '');
+        const tempPath = join(process.cwd(), 'temp-uploads', fileId);
+        await unlink(tempPath);
+        console.log(`[Job Worker] Temp file deleted: ${tempPath}`);
+      } catch (cleanupError) {
+        console.error(`[Job Worker] Failed to delete temp file:`, cleanupError);
+        // Don't fail the job if cleanup fails
+      }
+    }
+    
+    // Step 9: Send notification
     await sendJobCompletionNotification(context);
     
   } catch (error) {
