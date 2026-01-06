@@ -353,15 +353,14 @@ export const aiAuditJobsRouter = router({
           // Parse stored analysis
           const analysisData = JSON.parse(job.detailedAnalysisJson);
           const result = analysisData.analysis;
-          const nameMappings = analysisData.nameMappings || {};
           
           console.log('[downloadReport] Regenerating document from stored analysis...');
+          console.log('[downloadReport] Analysis has', result?.summary?.sections_analyzed || 0, 'sections');
           
-          // Generate document
+          // Generate document (3 parameters: clientName, analysisDate, analysis)
           const doc = generateCarePlanAnalysisDocument(
             job.serviceUserName || 'Service User',
-            job.documentName || 'Care Plan',
-            nameMappings,
+            new Date().toISOString().split('T')[0],
             result
           );
           
