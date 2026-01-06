@@ -62,7 +62,16 @@ export default function AiCarePlanAudits() {
   });
   
   const handleDownload = (jobId: number) => {
-    downloadMutation.mutate({ id: jobId });
+    alert('handleDownload called with jobId: ' + jobId);
+    console.log('[handleDownload] Called with jobId:', jobId);
+    console.log('[handleDownload] downloadMutation:', downloadMutation);
+    try {
+      downloadMutation.mutate({ id: jobId });
+      console.log('[handleDownload] Mutation called');
+    } catch (err) {
+      console.error('[handleDownload] Error:', err);
+      alert('Error in handleDownload: ' + err);
+    }
   };
   
   const handleView = (jobId: number) => {
