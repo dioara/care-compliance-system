@@ -37,6 +37,9 @@ export const aiAuditJobsRouter = router({
       console.log('[aiAuditJobs] Creating job for file:', input.fileId);
 
       // Create job record with temp file reference
+      const now = new Date();
+      const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+      
       const [job] = await db.insert(aiAudits).values({
         tenantId: ctx.user.tenantId,
         locationId: 0,
@@ -49,8 +52,8 @@ export const aiAuditJobsRouter = router({
         status: 'pending',
         progress: 'Queued for processing',
         requestedById: ctx.user.userId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: mysqlDatetime,
+        updatedAt: mysqlDatetime,
       });
 
       console.log('[aiAuditJobs] Job created:', job.insertId);
