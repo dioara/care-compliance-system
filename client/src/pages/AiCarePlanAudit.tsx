@@ -369,8 +369,12 @@ export default function AiCarePlanAudit() {
                         <Button
                           size="sm"
                           onClick={async () => {
+                            alert('AiCarePlanAudit.tsx Download button clicked for job.id: ' + job.id);
+                            console.log('[AiCarePlanAudit] Download clicked for job:', job);
                             try {
+                              console.log('[AiCarePlanAudit] Calling downloadReport.query with id:', job.id);
                               const result = await trpc.aiAuditJobs.downloadReport.query({ id: job.id });
+                              console.log('[AiCarePlanAudit] downloadReport result:', result);
                               if (result.downloadUrl) {
                                 // Create a temporary link to download the file
                                 const a = document.createElement('a');
