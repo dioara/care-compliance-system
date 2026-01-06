@@ -92,20 +92,40 @@ tempUploadRouter.post('/', upload.single('file'), async (req, res) => {
       base64Length: fileBase64.length,
     });
     
-    // Store file content in database temporarily
-    // We'll use the documentUrl field with a data: URL
-    const dataUrl = `data:${req.file.mimetype};base64,${fileBase64}`;
+    // Store file in temporary database table
+    const db = await dbModule.getDb();
+    if (!db) {
+      return res.status(500).json({ error: 'Database not available' });
+    }
     
-    console.log('[Temp Upload] File stored in memory, returning reference');
+    // Set expiry to 24 hours from now
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const now = new Date();
     
-    // Return file reference with data URL
+    await db.execute(
+      `INSERT INTO temp_files (id, file_data, file_name, mime_type, file_size, uploaded_by, created_at, expires_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        fileId,
+        fileBase64,
+        req.file.originalname,
+        req.file.mimetype,
+        req.file.size,
+        user.userId,
+        now.toISOString().slice(0, 19).replace('T', ' '),
+        expiresAt.toISOString().slice(0, 19).replace('T', ' '),
+      ]
+    );
+    
+    console.log('[Temp Upload] File stored in database with ID:', fileId);
+    
+    // Return file reference (small payload)
     res.json({
       success: true,
       fileId,
       originalName: req.file.originalname,
       size: req.file.size,
       mimeType: req.file.mimetype,
-      dataUrl, // Include data URL for immediate use
     });
   } catch (error) {
     console.error('[Temp Upload] ERROR:', error);
