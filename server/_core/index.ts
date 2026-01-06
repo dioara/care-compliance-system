@@ -11,7 +11,7 @@ import { createCustomContext } from "../customContext";
 import { sanitizeError } from "./errorHandler";
 import { serveStatic, setupVite } from "./vite";
 import { stripeWebhookRouter } from "../stripe/webhook";
-// Removed uploadRouter - using tRPC instead
+import { tempUploadRouter } from "../temp-upload";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -48,7 +48,10 @@ async function startServer() {
   // Stripe webhook endpoint (must be before body parser middleware)
   app.use("/api/webhooks/stripe", stripeWebhookRouter);
   
-  // File upload endpoints moved to tRPC (aiAuditJobs.submitCarePlanAudit)
+  // Temporary file upload endpoint (stores files on server filesystem)
+  app.use("/api/temp-upload", tempUploadRouter);
+  
+  // Job submission via tRPC (aiAuditJobs.submitCarePlanAudit)
   
   // Rate limiting middleware - 100 requests per 15 minutes per IP
   const limiter = rateLimit({

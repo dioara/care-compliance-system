@@ -17,7 +17,7 @@ export const aiAuditJobsRouter = router({
   submitCarePlanAudit: protectedProcedure
     .input(
       z.object({
-        fileData: z.string(), // base64 encoded file
+        fileId: z.string(), // temp file ID from upload
         fileName: z.string(),
         fileType: z.string(),
         serviceUserName: z.string(),
@@ -34,14 +34,16 @@ export const aiAuditJobsRouter = router({
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
       }
 
-      // Create job record
+      console.log('[aiAuditJobs] Creating job for file:', input.fileId);
+
+      // Create job record with temp file reference
       const [job] = await db.insert(aiAudits).values({
         tenantId: ctx.user.tenantId,
         locationId: 0,
         auditType: 'care_plan',
         documentName: input.fileName,
-        documentUrl: `data:${input.fileType};base64,${input.fileData}`,
-        documentKey: '',
+        documentUrl: `temp://${input.fileId}`, // Reference to temp file
+        documentKey: input.fileId,
         serviceUserName: input.serviceUserName || '',
         anonymise: input.anonymise ? 1 : 0,
         status: 'pending',
@@ -50,6 +52,8 @@ export const aiAuditJobsRouter = router({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
+
+      console.log('[aiAuditJobs] Job created:', job.insertId);
 
       return {
         success: true,

@@ -100,30 +100,58 @@ export default function AiCarePlanAudit() {
       });
 
       try {
-        console.log('[Frontend] Converting file to base64');
-        const fileBase64 = await fileToBase64(selectedFile);
-        
-        console.log('[Frontend] File size:', Math.round(selectedFile.size / 1024), 'KB');
-        console.log('[Frontend] Base64 length:', fileBase64.length);
-        console.log('[Frontend] Submitting job via tRPC');
+        console.log('[Frontend] Uploading file to temp storage');
         
         // Set analyzing state
         setAnalysisResult(null);
-        const toastId = toast.loading('Submitting analysis job...');
+        const toastId = toast.loading('Uploading file...');
+        
+        // Step 1: Upload file to temp storage
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          toast.dismiss(toastId);
+          toast.error('Authentication required. Please log in again.');
+          return;
+        }
+        
+        const uploadResponse = await fetch('/api/temp-upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json().catch(() => ({ error: 'Upload failed' }));
+          toast.dismiss(toastId);
+          toast.error(`Upload failed: ${errorData.error}`);
+          return;
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        console.log('[Frontend] File uploaded:', uploadResult.fileId);
+        
+        // Step 2: Submit job with file reference
+        toast.dismiss(toastId);
+        const submitToastId = toast.loading('Submitting analysis job...');
         
         submitCarePlanAuditMutation.mutate({
-          fileData: fileBase64,
+          fileId: uploadResult.fileId,
           fileName: selectedFile.name,
           fileType: selectedFile.type,
           serviceUserName,
           anonymise,
         });
         
-        toast.dismiss(toastId);
+        toast.dismiss(submitToastId);
       } catch (error) {
-        console.error('[Frontend] ERROR: Failed to convert file');
+        console.error('[Frontend] ERROR: Failed to upload file');
         console.error('[Frontend] Error:', error);
-        toast.error('Failed to process file');
+        toast.error('Failed to upload file');
       }
       return;
     }
