@@ -6,7 +6,6 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { TRPCError } from '@trpc/server';
-import * as db from './db';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
