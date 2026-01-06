@@ -272,14 +272,17 @@ async function processJob(context: JobContext) {
     console.error(`[Job Worker] Job ${jobId} failed:`, error);
     
     // Mark job as failed
-    await db
-      .update(aiAudits)
-      .set({
-        status: 'failed',
-        errorMessage: error instanceof Error ? error.message : String(error),
-        updatedAt: now(),
-      })
-      .where(eq(aiAudits.id, jobId));
+    const db = await dbModule.getDb();
+    if (db) {
+      await db
+        .update(aiAudits)
+        .set({
+          status: 'failed',
+          errorMessage: error instanceof Error ? error.message : String(error),
+          updatedAt: now(),
+        })
+        .where(eq(aiAudits.id, jobId));
+    }
     
     // Send failure notification
     await sendJobFailureNotification(context, error);
@@ -292,11 +295,17 @@ async function processJob(context: JobContext) {
 async function updateJobProgress(jobId: number, progress: string) {
   console.log(`[Job Worker] Job ${jobId} progress: ${progress}`);
   
+  const db = await dbModule.getDb();
+  if (!db) {
+    console.error('[Job Worker] Database not available for progress update');
+    return;
+  }
+  
   await db
     .update(aiAudits)
     .set({
       progress: progress,
-      updatedAt: new Date().toISOString(),
+      updatedAt: now(),
     })
     .where(eq(aiAudits.id, jobId));
 }
