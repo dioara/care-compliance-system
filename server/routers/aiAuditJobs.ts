@@ -289,7 +289,7 @@ export const aiAuditJobsRouter = router({
    */
   downloadReport: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       console.log('[downloadReport] Request received for job ID:', input.id);
       console.log('[downloadReport] User tenantId:', ctx.user?.tenantId);
       
