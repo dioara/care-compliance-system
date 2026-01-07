@@ -36,9 +36,6 @@ export default function AiCareNotesAudit() {
   const { data: orgSettings } = trpc.organization.getSettings.useQuery();
   const hasOpenAiKey = !!orgSettings?.openaiApiKey;
 
-  // File upload mutation
-  const uploadFileMutation = trpc.files.uploadTempFile.useMutation();
-
   // Job submission mutation
   const submitJobMutation = trpc.aiAuditJobs.submitCareNotesAudit.useMutation({
     onSuccess: (result) => {
@@ -124,19 +121,33 @@ export default function AiCareNotesAudit() {
     try {
       setIsUploading(true);
       
-      // Upload file to temp storage
-      const reader = new FileReader();
-      const fileData = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(selectedFile);
+      // Upload file to temp storage via HTTP POST (same as care plan audit)
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        toast.error('Authentication required. Please log in again.');
+        setIsUploading(false);
+        return;
+      }
+      
+      const uploadResponse = await fetch('/api/temp-upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
       });
       
-      const uploadResult = await uploadFileMutation.mutateAsync({
-        fileName: selectedFile.name,
-        fileData: fileData.split(',')[1], // Remove data URL prefix
-        mimeType: selectedFile.type,
-      });
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({ error: 'Upload failed' }));
+        toast.error(`Upload failed: ${errorData.error}`);
+        setIsUploading(false);
+        return;
+      }
+      
+      const uploadResult = await uploadResponse.json();
 
       setIsUploading(false);
       setIsSubmitting(true);
@@ -265,7 +276,7 @@ export default function AiCareNotesAudit() {
                   <Progress value={50} className="h-2" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  You will receive a notification when the analysis is complete. You can also check the Audit History tab.
+                  You can close this page. You'll receive a notification when the analysis is complete.
                 </p>
               </CardContent>
             </Card>
@@ -281,16 +292,11 @@ export default function AiCareNotesAudit() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm">Your care notes audit report is ready for download.</p>
-                <div className="flex gap-2">
-                  <Button onClick={() => handleDownload(currentJobId)}>
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Report
-                  </Button>
-                  <Button variant="outline" onClick={() => setCurrentJobId(null)}>
-                    Start New Audit
-                  </Button>
-                </div>
+                <p>Your care notes audit is ready to download.</p>
+                <Button onClick={() => handleDownload(currentJobId)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Report
+                </Button>
               </CardContent>
             </Card>
           )}
@@ -304,194 +310,170 @@ export default function AiCareNotesAudit() {
                   Analysis Failed
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-red-600">{jobStatus.errorMessage || 'An error occurred during analysis.'}</p>
-                <Button variant="outline" onClick={() => setCurrentJobId(null)}>
-                  Try Again
-                </Button>
+              <CardContent>
+                <p className="text-red-600">{jobStatus.error || 'An error occurred during analysis. Please try again.'}</p>
               </CardContent>
             </Card>
           )}
 
-          {/* Service User Details Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Service User Details</CardTitle>
-              <CardDescription>
-                Enter the service user's name for accurate analysis and anonymisation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Name Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="firstName"
-                    placeholder="e.g., John or Jane"
-                    value={serviceUserFirstName}
-                    onChange={(e) => setServiceUserFirstName(e.target.value)}
-                    disabled={isLoading}
-                  />
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Service User Details */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Service User Details</CardTitle>
+                <CardDescription>
+                  Enter the service user's name as it appears in the care notes. 
+                  <span className="text-amber-600 font-medium"> If the filename contains the service user's name, please rename it before uploading.</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name *</Label>
+                    <Input
+                      id="firstName"
+                      placeholder="e.g., John or Jane"
+                      value={serviceUserFirstName}
+                      onChange={(e) => setServiceUserFirstName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Input
+                      id="lastName"
+                      placeholder="e.g., Smith"
+                      value={serviceUserLastName}
+                      onChange={(e) => setServiceUserLastName(e.target.value)}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="lastName"
-                    placeholder="e.g., Smith"
-                    value={serviceUserLastName}
-                    onChange={(e) => setServiceUserLastName(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
 
-              {/* Anonymisation Options */}
-              <div className="space-y-4">
-                <Label>Name Handling in Report</Label>
-                <RadioGroup
-                  value={anonymisationOption}
-                  onValueChange={(value) => setAnonymisationOption(value as 'replace' | 'keep')}
-                  className="space-y-3"
+                <div className="space-y-3 pt-2">
+                  <Label>Name Handling in Report</Label>
+                  <RadioGroup
+                    value={anonymisationOption}
+                    onValueChange={(v) => setAnonymisationOption(v as 'replace' | 'keep')}
+                  >
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="replace" id="replace" />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="replace" className="font-normal cursor-pointer">
+                          Replace names in report (recommended for confidentiality)
+                        </Label>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2">
+                      <RadioGroupItem value="keep" id="keep" />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label htmlFor="keep" className="font-normal cursor-pointer">
+                          Keep original names in report
+                        </Label>
+                      </div>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                {anonymisationOption === 'replace' && (
+                  <div className="grid grid-cols-2 gap-4 pt-2 pl-6 border-l-2 border-primary/20">
+                    <div className="space-y-2">
+                      <Label htmlFor="replaceFirst">Replace First Name With</Label>
+                      <Input
+                        id="replaceFirst"
+                        placeholder="e.g., J or Jane"
+                        value={replaceFirstNameWith}
+                        onChange={(e) => setReplaceFirstNameWith(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="replaceLast">Replace Last Name With</Label>
+                      <Input
+                        id="replaceLast"
+                        placeholder="e.g., S or Smith"
+                        value={replaceLastNameWith}
+                        onChange={(e) => setReplaceLastNameWith(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {anonymisationOption === 'keep' && (
+                  <div className="pt-2 pl-6 border-l-2 border-amber-200">
+                    <div className="flex items-start space-x-2">
+                      <Checkbox
+                        id="consent"
+                        checked={consentConfirmed}
+                        onCheckedChange={(checked) => setConsentConfirmed(checked === true)}
+                      />
+                      <Label htmlFor="consent" className="font-normal text-sm cursor-pointer">
+                        I confirm that I have appropriate consent to include the service user's real name in the audit report, and understand this may have data protection implications.
+                      </Label>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* File Upload */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Upload Care Notes</CardTitle>
+                <CardDescription>
+                  Upload care notes exported from your care management system (PDF, Word, Excel, or CSV).
+                  <span className="text-amber-600 font-medium block mt-1">
+                    Important: Remove the service user's name from the filename before uploading for confidentiality.
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <FileUpload
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                  onFileSelect={setSelectedFile}
+                  selectedFile={selectedFile}
                   disabled={isLoading}
-                >
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem value="replace" id="replace" className="mt-1" />
-                    <div className="space-y-1">
-                      <Label htmlFor="replace" className="font-medium cursor-pointer">
-                        Replace names in report (recommended)
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        The service user's name will be replaced throughout the report
-                      </p>
-                    </div>
+                />
+                
+                {selectedFile && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <FileText className="w-4 h-4" />
+                    <span className="truncate">{selectedFile.name}</span>
+                    <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
                   </div>
-                  
-                  <div className="flex items-start space-x-3">
-                    <RadioGroupItem value="keep" id="keep" className="mt-1" />
-                    <div className="space-y-1">
-                      <Label htmlFor="keep" className="font-medium cursor-pointer">
-                        Keep original names
-                      </Label>
-                      <p className="text-sm text-muted-foreground">
-                        The real name will appear in the report (requires consent)
-                      </p>
-                    </div>
-                  </div>
-                </RadioGroup>
-              </div>
+                )}
 
-              {/* Replacement Name Fields */}
-              {anonymisationOption === 'replace' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 border-l-2 border-primary/20">
-                  <div className="space-y-2">
-                    <Label htmlFor="replaceFirst">Replace First Name With <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="replaceFirst"
-                      placeholder="e.g., J, Jane, Service User"
-                      value={replaceFirstNameWith}
-                      onChange={(e) => setReplaceFirstNameWith(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="replaceLast">Replace Last Name With <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="replaceLast"
-                      placeholder="e.g., S, Smith, [Redacted]"
-                      value={replaceLastNameWith}
-                      onChange={(e) => setReplaceLastNameWith(e.target.value)}
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Consent Checkbox */}
-              {anonymisationOption === 'keep' && (
-                <div className="flex items-start space-x-3 pl-6 border-l-2 border-destructive/20">
-                  <Checkbox
-                    id="consent"
-                    checked={consentConfirmed}
-                    onCheckedChange={(checked) => setConsentConfirmed(checked === true)}
-                    className="mt-1"
-                    disabled={isLoading}
-                  />
-                  <div className="space-y-1">
-                    <Label htmlFor="consent" className="font-medium cursor-pointer">
-                      I confirm I have appropriate consent to use the real name <span className="text-red-500">*</span>
-                    </Label>
-                    <p className="text-sm text-muted-foreground">
-                      By checking this box, you confirm that you have obtained the necessary consent to include the service user's real name in the audit report.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* File Upload Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Care Notes</CardTitle>
-              <CardDescription>
-                Upload a file containing care notes (PDF, Word, Excel, or CSV)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Important:</strong> If the filename contains the service user's name, please rename it before uploading to maintain confidentiality.
-                </AlertDescription>
-              </Alert>
-              <FileUpload
-                selectedFile={selectedFile}
-                onFileSelect={setSelectedFile}
-                onFileRemove={() => setSelectedFile(null)}
-                maxSizeMB={10}
-                acceptedFormats={['.pdf', '.doc', '.docx', '.csv', '.xlsx', '.xls']}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-muted-foreground">
-                Maximum file size: 10MB. Supported formats: PDF (including Nourish exports), Word, CSV, Excel
-              </p>
-            </CardContent>
-          </Card>
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    Analysis typically takes less than an hour depending on the number of notes. You'll receive a notification when complete.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Submit Button */}
-          <div className="space-y-2">
+          <div className="flex justify-end">
             <Button
-              onClick={handleSubmit}
-              disabled={isLoading || !hasOpenAiKey || !selectedFile}
               size="lg"
-              className="w-full"
+              onClick={handleSubmit}
+              disabled={isLoading || !hasOpenAiKey || !selectedFile || !serviceUserFirstName || !serviceUserLastName}
             >
-              {isUploading ? (
+              {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Uploading File...
-                </>
-              ) : isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Submitting Job...
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {isUploading ? 'Uploading...' : 'Submitting...'}
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-5 w-5" />
+                  <Sparkles className="w-4 h-4 mr-2" />
                   Start Care Notes Audit
                 </>
               )}
             </Button>
-            <p className="text-sm text-muted-foreground text-center">
-              Analysis typically takes less than an hour depending on the number of notes. You will be notified when complete.
-            </p>
           </div>
         </TabsContent>
 
         {/* History Tab */}
-        <TabsContent value="history" className="space-y-4">
+        <TabsContent value="history">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
