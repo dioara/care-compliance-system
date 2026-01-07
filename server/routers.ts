@@ -3159,6 +3159,10 @@ export const appRouter = router({
           content: z.string(),
           serviceUserName: z.string(),
           anonymise: z.boolean().default(true),
+          serviceUserFirstName: z.string().optional(),
+          serviceUserLastName: z.string().optional(),
+          replaceFirstNameWith: z.string().optional(),
+          replaceLastNameWith: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3181,7 +3185,11 @@ export const appRouter = router({
           company.openaiApiKey,
           input.content,
           input.serviceUserName,
-          input.anonymise
+          input.anonymise,
+          input.serviceUserFirstName,
+          input.serviceUserLastName,
+          input.replaceFirstNameWith,
+          input.replaceLastNameWith
         );
 
         return result;
@@ -3294,6 +3302,10 @@ export const appRouter = router({
           filename: z.string(),
           serviceUserName: z.string(),
           anonymise: z.boolean().default(true),
+          serviceUserFirstName: z.string().optional(),
+          serviceUserLastName: z.string().optional(),
+          replaceFirstNameWith: z.string().optional(),
+          replaceLastNameWith: z.string().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -3333,7 +3345,11 @@ export const appRouter = router({
           company.openaiApiKey,
           parsed.text,
           input.serviceUserName,
-          input.anonymise
+          input.anonymise,
+          input.serviceUserFirstName,
+          input.serviceUserLastName,
+          input.replaceFirstNameWith,
+          input.replaceLastNameWith
         );
 
         return {
