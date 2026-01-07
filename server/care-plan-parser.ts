@@ -4,6 +4,7 @@
  * 
  * Supports multiple formats:
  * - Nourish PDF exports
+ * - Access Care Planning exports
  * - Copy/paste text
  * - Word documents
  * - Excel exports
@@ -29,13 +30,14 @@ export interface CarePlanSection {
     level_of_need?: string;
     reviewer?: string;
     review_date?: string;
+    visit_time?: string;
+    visit_days?: string;
     [key: string]: string | undefined;
   };
 }
 
 /**
  * Metadata and footer patterns to remove from content
- * These appear in Nourish and other care management systems
  */
 const METADATA_PATTERNS_TO_REMOVE = [
   // Nourish footer patterns
@@ -43,6 +45,11 @@ const METADATA_PATTERNS_TO_REMOVE = [
   /Created\s*\d{1,2}\/\d{1,2}\/\d{2,4}\s*-?\s*\d{1,2}:\d{2}/gi,
   /by\s*©?\s*Nourish\s*Care\s*Systems?\s*Ltd\.?/gi,
   /©\s*Nourish\s*Care\s*Systems?\s*Ltd\.?/gi,
+  
+  // Access Care Planning footer patterns
+  /Generated\s*by\s*Access\s*Care\s*Planning/gi,
+  /\d{1,2}\/[A-Za-z]{3}\/\d{2,4}\s*\d{1,2}:\d{2}/gi,
+  /\d+\s*of\s*\d+$/gm,
   
   // Generic footer patterns
   /Page\s*\d+/gi,
@@ -55,7 +62,6 @@ const METADATA_PATTERNS_TO_REMOVE = [
 
 /**
  * Section categories to EXCLUDE from analysis
- * These are assessments, not care plans
  */
 const EXCLUDED_SECTION_TYPES = [
   'needs assessing',
@@ -79,11 +85,90 @@ const EXCLUDED_SECTION_TYPES = [
   'version history',
   'change log',
   'audit trail',
+  'case id',
+  'case:',
+  'printed by',
+  'printed date',
 ];
 
 /**
+ * Access Care Planning visit types
+ */
+const ACCESS_VISIT_TYPES = [
+  'breakfast visit',
+  'lunch visit',
+  'tea visit',
+  'dinner visit',
+  'bedtime visit',
+  'night visit',
+  'morning visit',
+  'afternoon visit',
+  'evening visit',
+  'medication collection',
+  'medication visit',
+  'sitting',
+  'other',
+  'domiciliary care',
+  'personal care visit',
+  'welfare check',
+  'shopping',
+  'appointment',
+];
+
+/**
+ * Access Care Planning task types (map to CQC domains)
+ */
+const ACCESS_TASK_TO_CQC_DOMAIN: Record<string, string> = {
+  'personal care': 'Personal Care & Hygiene',
+  'cloth change': 'Personal Care & Hygiene',
+  'dressing': 'Personal Care & Hygiene',
+  'washing': 'Personal Care & Hygiene',
+  'bathing': 'Personal Care & Hygiene',
+  'shower': 'Personal Care & Hygiene',
+  'grooming': 'Personal Care & Hygiene',
+  'oral care': 'Personal Care & Hygiene',
+  'pad check': 'Continence Care',
+  'continence': 'Continence Care',
+  'toileting': 'Continence Care',
+  'breakfast': 'Nutrition & Hydration',
+  'lunch': 'Nutrition & Hydration',
+  'tea': 'Nutrition & Hydration',
+  'dinner': 'Nutrition & Hydration',
+  'meal': 'Nutrition & Hydration',
+  'food': 'Nutrition & Hydration',
+  'hydration': 'Nutrition & Hydration',
+  'drink': 'Nutrition & Hydration',
+  'medication': 'Medication Management',
+  'medicines': 'Medication Management',
+  'prompt medication': 'Medication Management',
+  'morphine': 'Medication Management',
+  'pregabalin': 'Medication Management',
+  'mobility': 'Mobility & Moving/Handling',
+  'transfer': 'Mobility & Moving/Handling',
+  'hoist': 'Mobility & Moving/Handling',
+  'walking': 'Mobility & Moving/Handling',
+  'pendant': 'Emergency & Safety',
+  'secure': 'Access & Key Safe',
+  'door': 'Access & Key Safe',
+  'key': 'Access & Key Safe',
+  'domestic': 'Accommodation & Cleanliness',
+  'make bed': 'Accommodation & Cleanliness',
+  'clean': 'Accommodation & Cleanliness',
+  'wash dishes': 'Accommodation & Cleanliness',
+  'curtains': 'Accommodation & Cleanliness',
+  'wellness': 'Mental Health & Emotional Wellbeing',
+  'mood': 'Mental Health & Emotional Wellbeing',
+  'emotional': 'Mental Health & Emotional Wellbeing',
+  'daily task': 'Social Needs & Relationships',
+  'planning': 'Social Needs & Relationships',
+  'shopping': 'Social Needs & Relationships',
+  'appointment': 'Healthcare Professionals',
+  'gp': 'Healthcare Professionals',
+  'hospital': 'Healthcare Professionals',
+};
+
+/**
  * Valid care plan section titles (normalised)
- * Used to identify actual care plan content
  */
 const CARE_PLAN_SECTION_TITLES = [
   'accommodation cleanliness and comfort',
@@ -215,18 +300,320 @@ function shouldExcludeSection(title: string): boolean {
 }
 
 /**
- * Check if a title matches a known care plan section
+ * Detect if the content is from Access Care Planning
  */
-function isKnownCarePlanSection(title: string): boolean {
-  const normalised = title.toLowerCase().trim();
+function isAccessCarePlanningFormat(text: string): boolean {
+  const accessIndicators = [
+    /access\s*Care\s*Planning/i,
+    /Active\s*Care\s*Plans/i,
+    /Domiciliary\s*Care/i,
+    /CASE\s*ID:\s*CASE-/i,
+    /Breakfast\s*Visit/i,
+    /Lunch\s*Visit/i,
+    /Bedtime\s*Visit/i,
+    /Tea\s*Visit/i,
+    /ID:\s*\d{4,}/i,
+    /Mon\s*Tue\s*Wed\s*Thu\s*Fri/i,
+    /Every\s*Week/i,
+  ];
   
-  for (const known of CARE_PLAN_SECTION_TITLES) {
-    if (normalised.includes(known) || known.includes(normalised)) {
-      return true;
+  let matches = 0;
+  for (const indicator of accessIndicators) {
+    if (indicator.test(text)) {
+      matches++;
     }
   }
   
-  return false;
+  return matches >= 3;
+}
+
+/**
+ * Parse Access Care Planning format
+ */
+function parseAccessCarePlanningFormat(text: string): CarePlanSection[] {
+  const sections: CarePlanSection[] = [];
+  
+  console.log('[Care Plan Parser] Detected Access Care Planning format');
+  
+  // Clean the text first
+  let cleanedText = cleanMetadata(text);
+  
+  // Find all visit sections
+  // Pattern: Visit name followed by "Domiciliary Care" and schedule info
+  const visitPattern = /(?:^|\n)([A-Za-z\s]+(?:Visit|Sitting|Other|Medication\s*Collection))\s*(?:ID:\s*\d+)?\s*(?:Domiciliary\s*Care)?\s*(?:\d{1,2}\/[A-Za-z]{3}\/\d{2,4}\s*-\s*\d{1,2}\/[A-Za-z]{3}\/\d{2,4})?\s*(?:\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2})?\s*(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun|Every\s*Week)?/gi;
+  
+  // Alternative: Look for visit headers more loosely
+  const visitHeaders: { name: string; startIndex: number }[] = [];
+  
+  // Find visit type headers
+  for (const visitType of ACCESS_VISIT_TYPES) {
+    const pattern = new RegExp(`(?:^|\\n)(${visitType.replace(/\s+/g, '\\s*')})\\s*(?:ID:|Domiciliary|\\d{1,2}[/:]|$)`, 'gi');
+    let match;
+    while ((match = pattern.exec(cleanedText)) !== null) {
+      const name = match[1].trim();
+      // Avoid duplicates at same position
+      if (!visitHeaders.some(h => Math.abs(h.startIndex - match.index) < 50)) {
+        visitHeaders.push({ name, startIndex: match.index });
+      }
+    }
+  }
+  
+  // Sort by position in document
+  visitHeaders.sort((a, b) => a.startIndex - b.startIndex);
+  
+  console.log(`[Care Plan Parser] Found ${visitHeaders.length} visit sections in Access format`);
+  
+  // Extract content for each visit
+  for (let i = 0; i < visitHeaders.length; i++) {
+    const current = visitHeaders[i];
+    const next = visitHeaders[i + 1];
+    
+    const startPos = current.startIndex;
+    const endPos = next ? next.startIndex : cleanedText.length;
+    
+    const rawContent = cleanMetadata(cleanedText.substring(startPos, endPos));
+    
+    // Extract tasks from this visit
+    const tasks = extractAccessTasks(rawContent);
+    const medications = extractAccessMedications(rawContent);
+    const scheduleInfo = extractAccessSchedule(rawContent);
+    
+    // Build the fields
+    const fields: CarePlanSection['fields'] = {};
+    
+    // Identified Need - combine tasks into a description
+    if (tasks.length > 0 || medications.length > 0) {
+      const needParts: string[] = [];
+      
+      for (const task of tasks) {
+        needParts.push(`${task.name}: ${task.description}`);
+      }
+      
+      if (medications.length > 0) {
+        needParts.push(`Medications: ${medications.map(m => `${m.name} - ${m.instructions}`).join('; ')}`);
+      }
+      
+      fields.identified_need = needParts.join('\n');
+    }
+    
+    // How to Achieve - list the specific tasks
+    if (tasks.length > 0) {
+      fields.how_to_achieve = tasks.map(t => `${t.name}: ${t.description}`).join('\n');
+    }
+    
+    // Format the section name nicely
+    const formattedTitle = current.name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+    
+    sections.push({
+      section_name: formattedTitle,
+      raw_content: rawContent,
+      fields,
+      metadata: {
+        visit_time: scheduleInfo.time,
+        visit_days: scheduleInfo.days,
+      },
+    });
+    
+    console.log(`[Care Plan Parser] Extracted Access section: ${formattedTitle} with ${tasks.length} tasks`);
+  }
+  
+  // If no visit sections found, try to extract individual tasks as sections
+  if (sections.length === 0) {
+    console.log('[Care Plan Parser] No visit sections found, extracting tasks as sections');
+    const allTasks = extractAccessTasks(cleanedText);
+    const allMedications = extractAccessMedications(cleanedText);
+    
+    // Group tasks by CQC domain
+    const domainGroups: Record<string, { tasks: typeof allTasks; medications: typeof allMedications }> = {};
+    
+    for (const task of allTasks) {
+      const domain = mapTaskToCQCDomain(task.name);
+      if (!domainGroups[domain]) {
+        domainGroups[domain] = { tasks: [], medications: [] };
+      }
+      domainGroups[domain].tasks.push(task);
+    }
+    
+    // Add medications to Medication Management domain
+    if (allMedications.length > 0) {
+      if (!domainGroups['Medication Management']) {
+        domainGroups['Medication Management'] = { tasks: [], medications: [] };
+      }
+      domainGroups['Medication Management'].medications = allMedications;
+    }
+    
+    // Create sections from domain groups
+    for (const [domain, group] of Object.entries(domainGroups)) {
+      const contentParts: string[] = [];
+      
+      for (const task of group.tasks) {
+        contentParts.push(`${task.name}: ${task.description}`);
+      }
+      
+      for (const med of group.medications) {
+        contentParts.push(`${med.name}: ${med.instructions}`);
+      }
+      
+      if (contentParts.length > 0) {
+        sections.push({
+          section_name: domain,
+          raw_content: contentParts.join('\n'),
+          fields: {
+            identified_need: contentParts.join('\n'),
+            how_to_achieve: contentParts.join('\n'),
+          },
+        });
+      }
+    }
+  }
+  
+  return sections;
+}
+
+/**
+ * Extract tasks from Access Care Planning content
+ */
+function extractAccessTasks(content: string): { name: string; description: string }[] {
+  const tasks: { name: string; description: string }[] = [];
+  
+  // Pattern: checkbox (✓ or ☐) followed by task name and description
+  // Also matches without checkbox
+  const taskPatterns = [
+    /[✓☐✔☑]\s*([A-Za-z][A-Za-z\s\/\-]+?)\s+([A-Z][^✓☐✔☑\n]+)/g,
+    /(?:^|\n)([A-Za-z][A-Za-z\s\/\-]{2,30}?)\s{2,}([A-Z][^\n]{10,})/gm,
+  ];
+  
+  for (const pattern of taskPatterns) {
+    let match;
+    while ((match = pattern.exec(content)) !== null) {
+      const name = match[1].trim();
+      const description = match[2].trim();
+      
+      // Filter out non-tasks
+      if (name.length > 2 && name.length < 50 && description.length > 5) {
+        // Avoid duplicates
+        if (!tasks.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+          tasks.push({ name, description });
+        }
+      }
+    }
+  }
+  
+  // Also look for specific known task patterns
+  const knownTaskPatterns = [
+    { pattern: /Door\s+([^\n]+)/i, name: 'Door' },
+    { pattern: /Personal\s*Care\s+([^\n]+)/i, name: 'Personal Care' },
+    { pattern: /Cloth\s*change\s+([^\n]+)/i, name: 'Cloth Change' },
+    { pattern: /Curtains?\s+([^\n]+)/i, name: 'Curtains' },
+    { pattern: /Domestic[^\n]*\s+([^\n]+)/i, name: 'Domestic' },
+    { pattern: /Breakfast\s+([^\n]+)/i, name: 'Breakfast' },
+    { pattern: /Lunch\.?\s+([^\n]+)/i, name: 'Lunch' },
+    { pattern: /Tea\s+([^\n]+)/i, name: 'Tea' },
+    { pattern: /Dinner\s+([^\n]+)/i, name: 'Dinner' },
+    { pattern: /Pendant[^\n]*\s+([^\n]+)/i, name: 'Pendant' },
+    { pattern: /Medication[^\n]*\s+([^\n]+)/i, name: 'Medication' },
+    { pattern: /Hydration\s+([^\n]+)/i, name: 'Hydration' },
+    { pattern: /Wellness\s+([^\n]+)/i, name: 'Wellness' },
+    { pattern: /Mood\s+([^\n]+)/i, name: 'Mood' },
+    { pattern: /Secure\s+([^\n]+)/i, name: 'Secure' },
+    { pattern: /Pad\s*Check\s+([^\n]+)/i, name: 'Pad Check' },
+    { pattern: /Daily\s*Task[^\n]*\s+([^\n]+)/i, name: 'Daily Task' },
+  ];
+  
+  for (const { pattern, name } of knownTaskPatterns) {
+    const match = content.match(pattern);
+    if (match && match[1]) {
+      const description = match[1].trim();
+      if (description.length > 5 && !tasks.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+        tasks.push({ name, description });
+      }
+    }
+  }
+  
+  return tasks;
+}
+
+/**
+ * Extract medications from Access Care Planning content
+ */
+function extractAccessMedications(content: string): { name: string; instructions: string }[] {
+  const medications: { name: string; instructions: string }[] = [];
+  
+  // Common medication patterns
+  const medPatterns = [
+    /(?:^|\n)(?:[✓☐✔☑⊘]\s*)?([A-Za-z]+(?:\s*\d+\s*(?:mg|mcg|ml|tabs?|capsules?))?)\s+(Take\s+[^\n]+)/gi,
+    /(?:^|\n)([A-Za-z]+)\s*[-–]\s*(Take\s+[^\n]+)/gi,
+    /(?:^|\n)([A-Za-z]+)\s+(ONE|TWO|THREE|FOUR|FIVE|\d+)\s+(?:tablet|capsule|ml)[^\n]*/gi,
+  ];
+  
+  // Known medication names
+  const knownMeds = [
+    'Morphine', 'Pregabalin', 'Folic acid', 'Colecalciferol', 'Modafinil',
+    'Sodium Bicarbonate', 'Lactulose', 'Diazepam', 'Paracetamol', 'Ibuprofen',
+    'Omeprazole', 'Metformin', 'Amlodipine', 'Ramipril', 'Simvastatin',
+    'Levothyroxine', 'Warfarin', 'Aspirin', 'Clopidogrel', 'Bisoprolol',
+  ];
+  
+  for (const medName of knownMeds) {
+    const pattern = new RegExp(`${medName}[^\\n]*?(Take[^\\n]+|ONE[^\\n]+|TWO[^\\n]+)`, 'gi');
+    const match = content.match(pattern);
+    if (match) {
+      const fullMatch = match[0];
+      const instructionMatch = fullMatch.match(/Take[^\n]+|ONE[^\n]+|TWO[^\n]+/i);
+      if (instructionMatch) {
+        medications.push({
+          name: medName,
+          instructions: instructionMatch[0].trim(),
+        });
+      }
+    }
+  }
+  
+  return medications;
+}
+
+/**
+ * Extract schedule information from Access Care Planning content
+ */
+function extractAccessSchedule(content: string): { time?: string; days?: string } {
+  const schedule: { time?: string; days?: string } = {};
+  
+  // Time pattern: HH:MM - HH:MM
+  const timeMatch = content.match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  if (timeMatch) {
+    schedule.time = `${timeMatch[1]} - ${timeMatch[2]}`;
+  }
+  
+  // Days pattern
+  const daysMatch = content.match(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?[\s,]*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)?/i);
+  if (daysMatch) {
+    schedule.days = daysMatch[0].trim();
+  }
+  
+  // Every Week pattern
+  if (/Every\s*Week/i.test(content)) {
+    schedule.days = (schedule.days || '') + ' (Every Week)';
+  }
+  
+  return schedule;
+}
+
+/**
+ * Map a task name to CQC domain
+ */
+function mapTaskToCQCDomain(taskName: string): string {
+  const normalised = taskName.toLowerCase().trim();
+  
+  for (const [keyword, domain] of Object.entries(ACCESS_TASK_TO_CQC_DOMAIN)) {
+    if (normalised.includes(keyword)) {
+      return domain;
+    }
+  }
+  
+  return 'General Care';
 }
 
 /**
@@ -264,10 +651,6 @@ function parseNourishFormat(text: string): CarePlanSection[] {
   let cleanedText = cleanMetadata(text);
   
   // Pattern to find care plan sections in Nourish format
-  // Look for "CARE PLAN" header followed by structured content
-  const carePlanBlockPattern = /CARE\s*PLAN[\s\S]*?Title\s*\n([^\n]+)\s*\n[\s\S]*?(?=CARE\s*PLAN|2\.\s*Care\s*Plans|$)/gi;
-  
-  // Alternative: Look for "2. Care Plans" followed by section title
   const sectionHeaderPattern = /2\.\s*Care\s*Plans\s*\n([A-Z][A-Z\s,]+)\s*\n/gi;
   
   // First, try to find all section titles from "2. Care Plans" headers
@@ -372,7 +755,7 @@ function extractNourishFields(content: string): CarePlanSection['fields'] {
     fields.risk_impact = `${impactMatch[1]} ${impactMatch[2]}`.trim();
   }
   
-  const scoreMatch = content.match(/(?:Total\s*score|Risk)\s*\n?(\d+)\s*(?:Total\s*score)?/i);
+  const scoreMatch = content.match(/(?:Risk\s*)?Score\s*\n?(\d+)/i);
   if (scoreMatch) {
     fields.risk_score = scoreMatch[1].trim();
   }
@@ -387,9 +770,9 @@ function extractNourishMetadata(content: string): CarePlanSection['metadata'] {
   const metadata: CarePlanSection['metadata'] = {};
   
   // Next review date
-  const reviewDateMatch = content.match(/Next\s*review\s*date\s*\n?(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
-  if (reviewDateMatch) {
-    metadata.next_review_date = reviewDateMatch[1];
+  const reviewMatch = content.match(/Next\s*review\s*date\s*\n?(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+  if (reviewMatch) {
+    metadata.next_review_date = reviewMatch[1].trim();
   }
   
   // Level of need
@@ -399,103 +782,71 @@ function extractNourishMetadata(content: string): CarePlanSection['metadata'] {
   }
   
   // Reviewer
-  const reviewerMatch = content.match(/Reviewer\s*\n([^\n]+)/i);
+  const reviewerMatch = content.match(/Reviewed?\s*by\s*\n?([^\n]+)/i);
   if (reviewerMatch) {
     metadata.reviewer = reviewerMatch[1].trim();
-  }
-  
-  // Review date (from review note)
-  const reviewNoteDateMatch = content.match(/Review\s*date\s*\n?(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
-  if (reviewNoteDateMatch) {
-    metadata.review_date = reviewNoteDateMatch[1];
   }
   
   return metadata;
 }
 
 /**
- * Parse generic care plan format (non-Nourish)
+ * Parse generic format care plans
  */
 function parseGenericFormat(text: string): CarePlanSection[] {
   const sections: CarePlanSection[] = [];
   
   console.log('[Care Plan Parser] Using generic format parser');
   
-  // Clean the text
+  // Clean the text first
   let cleanedText = cleanMetadata(text);
   
-  // Try multiple patterns to find sections
+  // Try to find sections by common headers
   const sectionPatterns = [
-    // Pattern 1: "Section: NAME" or "SECTION: NAME"
-    /(?:^|\n)(?:Section|SECTION):\s*([^\n]+)/gi,
-    
-    // Pattern 2: Numbered sections like "2. Personal Care"
-    /(?:^|\n)(\d+\.\s*[A-Z][A-Za-z\s&,]+)(?:\n|$)/g,
-    
-    // Pattern 3: All caps headers (care plan titles)
-    /(?:^|\n)([A-Z][A-Z\s&,]{5,})(?:\n|$)/g,
-    
-    // Pattern 4: Headers with colons
-    /(?:^|\n)([A-Z][A-Za-z\s&,]+):\s*\n/g,
-    
-    // Pattern 5: Bold/emphasised headers (from Word docs)
-    /(?:^|\n)\*\*([A-Z][A-Za-z\s&,]+)\*\*/g,
+    // All caps headers
+    /(?:^|\n)([A-Z][A-Z\s&,]+)(?:\n|$)/gm,
+    // Title case headers with colon
+    /(?:^|\n)([A-Z][a-z]+(?:\s+[A-Za-z]+)*)\s*:/gm,
+    // Numbered sections
+    /(?:^|\n)\d+\.\s*([A-Z][a-z]+(?:\s+[A-Za-z]+)*)/gm,
   ];
   
-  // Collect all potential section headers
-  const potentialSections: Array<{ title: string; index: number }> = [];
+  const foundSections: { title: string; startIndex: number }[] = [];
   
   for (const pattern of sectionPatterns) {
     let match;
     while ((match = pattern.exec(cleanedText)) !== null) {
       const title = match[1].trim();
       
-      // Skip if too short or excluded
-      if (title.length < 5 || shouldExcludeSection(title)) {
-        continue;
-      }
-      
-      // Prefer known care plan sections
-      if (isKnownCarePlanSection(title)) {
-        potentialSections.push({
-          title,
-          index: match.index,
-        });
+      // Check if this is a valid care plan section
+      if (!shouldExcludeSection(title) && (isKnownCarePlanSection(title) || title.length > 5)) {
+        // Avoid duplicates at similar positions
+        if (!foundSections.some(s => Math.abs(s.startIndex - match.index) < 20)) {
+          foundSections.push({ title, startIndex: match.index });
+        }
       }
     }
   }
   
-  // Sort by position and remove duplicates
-  potentialSections.sort((a, b) => a.index - b.index);
+  // Sort by position
+  foundSections.sort((a, b) => a.startIndex - b.startIndex);
   
-  const uniqueSections: Array<{ title: string; index: number }> = [];
-  for (const section of potentialSections) {
-    const isDuplicate = uniqueSections.some(
-      s => Math.abs(s.index - section.index) < 100 || 
-           s.title.toLowerCase() === section.title.toLowerCase()
-    );
-    if (!isDuplicate) {
-      uniqueSections.push(section);
-    }
-  }
-  
-  console.log(`[Care Plan Parser] Found ${uniqueSections.length} sections in generic format`);
+  console.log(`[Care Plan Parser] Found ${foundSections.length} sections in generic format`);
   
   // Extract content for each section
-  for (let i = 0; i < uniqueSections.length; i++) {
-    const current = uniqueSections[i];
-    const next = uniqueSections[i + 1];
+  for (let i = 0; i < foundSections.length; i++) {
+    const current = foundSections[i];
+    const next = foundSections[i + 1];
     
-    const startIndex = current.index;
-    const endIndex = next ? next.index : cleanedText.length;
+    const startPos = current.startIndex;
+    const endPos = next ? next.startIndex : cleanedText.length;
     
-    const rawContent = cleanMetadata(cleanedText.substring(startIndex, endIndex));
+    const rawContent = cleanMetadata(cleanedText.substring(startPos, endPos));
     const fields = extractGenericFields(rawContent);
     
-    // Format title nicely
+    // Format the section name nicely
     const formattedTitle = current.title
       .toLowerCase()
-      .replace(/^\d+\.\s*/, '') // Remove leading numbers
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
@@ -520,6 +871,21 @@ function parseGenericFormat(text: string): CarePlanSection[] {
   }
   
   return sections;
+}
+
+/**
+ * Check if a title matches a known care plan section
+ */
+function isKnownCarePlanSection(title: string): boolean {
+  const normalised = title.toLowerCase().trim();
+  
+  for (const known of CARE_PLAN_SECTION_TITLES) {
+    if (normalised.includes(known) || known.includes(normalised)) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
 /**
@@ -568,6 +934,16 @@ export function parseCarePlanIntoSections(carePlanText: string): CarePlanSection
   console.log(`[Care Plan Parser] Parsing care plan (${carePlanText.length} characters)`);
   
   // Detect format and parse
+  // Check Access Care Planning first (more specific format)
+  if (isAccessCarePlanningFormat(carePlanText)) {
+    const sections = parseAccessCarePlanningFormat(carePlanText);
+    if (sections.length > 0) {
+      console.log(`[Care Plan Parser] Successfully parsed ${sections.length} Access Care Planning sections`);
+      return sections;
+    }
+  }
+  
+  // Check Nourish format
   if (isNourishFormat(carePlanText)) {
     const sections = parseNourishFormat(carePlanText);
     if (sections.length > 0) {
