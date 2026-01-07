@@ -346,10 +346,26 @@ IMPORTANT RULES:
     try {
       analysis = JSON.parse(cleanedText) as CareNoteAnalysisResult;
     } catch (parseError) {
+      console.error('[AI Analysis] JSON parse error:', parseError instanceof Error ? parseError.message : String(parseError));
+      console.error('[AI Analysis] Attempting to fix common JSON issues...');
+      
       // Try to fix common JSON issues
       let fixedText = cleanedText;
+      
+      // Fix bad escape sequences - replace invalid escapes with proper ones
+      // This handles cases where the AI outputs things like \n inside strings that should be \\n
+      fixedText = fixedText.replace(/\\(?!["\\bfnrtu\/])/g, '\\\\');
+      
+      // Fix unescaped newlines inside strings
+      fixedText = fixedText.replace(/([^\\])\n/g, '$1\\n');
+      
+      // Fix unescaped tabs inside strings
+      fixedText = fixedText.replace(/([^\\])\t/g, '$1\\t');
+      
+      // Fix trailing commas
       fixedText = fixedText.replace(/,\s*([}\]])/g, '$1');
       
+      // Fix missing closing brackets/braces
       const openBraces = (fixedText.match(/{/g) || []).length;
       const closeBraces = (fixedText.match(/}/g) || []).length;
       const openBrackets = (fixedText.match(/\[/g) || []).length;
@@ -362,7 +378,35 @@ IMPORTANT RULES:
         fixedText += '}';
       }
       
-      analysis = JSON.parse(fixedText) as CareNoteAnalysisResult;
+      try {
+        analysis = JSON.parse(fixedText) as CareNoteAnalysisResult;
+        console.log('[AI Analysis] JSON parsed successfully after fixes');
+      } catch (secondError) {
+        console.error('[AI Analysis] Still unable to parse JSON after basic fixes');
+        
+        // Last resort: try to extract valid JSON by finding the outermost braces
+        try {
+          const firstBrace = fixedText.indexOf('{');
+          const lastBrace = fixedText.lastIndexOf('}');
+          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            const jsonSubstring = fixedText.substring(firstBrace, lastBrace + 1);
+            // Replace any remaining problematic characters
+            const sanitized = jsonSubstring
+              .replace(/[\x00-\x1F\x7F]/g, ' ') // Remove control characters
+              .replace(/\\'/g, "'") // Fix escaped single quotes (not valid in JSON)
+              .replace(/'/g, "'"); // Normalize quotes
+            analysis = JSON.parse(sanitized) as CareNoteAnalysisResult;
+            console.log('[AI Analysis] JSON parsed successfully after sanitization');
+          } else {
+            throw secondError;
+          }
+        } catch (thirdError) {
+          console.error('[AI Analysis] All JSON parsing attempts failed');
+          console.error('[AI Analysis] First 500 chars:', cleanedText.substring(0, 500));
+          console.error('[AI Analysis] Last 500 chars:', cleanedText.substring(cleanedText.length - 500));
+          throw parseError;
+        }
+      }
     }
 
     // Calculate summary statistics
