@@ -16,6 +16,9 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function AiCareNotesAudit() {
+  // Get tRPC utils for imperative calls
+  const utils = trpc.useUtils();
+  
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -174,33 +177,37 @@ export default function AiCareNotesAudit() {
   };
 
   const handleDownload = async (jobId: number) => {
+    console.log('[AiCareNotesAudit] Download clicked for job:', jobId);
     try {
-      const result = await trpc.aiAuditJobs.downloadReport.query({ id: jobId });
+      console.log('[AiCareNotesAudit] Calling downloadReport via utils.client with id:', jobId);
+      const result = await utils.client.aiAuditJobs.downloadReport.query({ id: jobId });
+      console.log('[AiCareNotesAudit] downloadReport result:', { filename: result.filename, dataLength: result.data?.length });
       
       if (result.data) {
         // Convert base64 to blob and download
-        const byteCharacters = atob(result.data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        const binaryString = atob(result.data);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: result.mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const blob = new Blob([bytes], { type: result.mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const url = URL.createObjectURL(blob);
         
-        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = result.filename || 'care-notes-audit-report.docx';
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        
+        URL.revokeObjectURL(url);
         toast.success('Report downloaded successfully');
+      } else {
+        toast.error('No document data received');
       }
-    } catch (error) {
-      console.error('Download error:', error);
-      toast.error('Failed to download report');
+    } catch (error: any) {
+      console.error('[AiCareNotesAudit] Download error:', error);
+      console.error('[AiCareNotesAudit] Error details:', JSON.stringify(error, null, 2));
+      toast.error('Failed to download report: ' + (error?.message || 'Unknown error'));
     }
   };
 
