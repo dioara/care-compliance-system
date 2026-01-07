@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { RichTextEditor } from '@/components/RichTextEditor';
 import { FileUpload } from '@/components/FileUpload';
 import { trpc } from '@/lib/trpc';
@@ -12,17 +13,25 @@ import { toast } from 'sonner';
 import { Sparkles, Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CarePlanResults } from '@/components/CarePlanResults';
-import { fileToBase64 } from '@/lib/fileUtils';
 
 export default function AiCarePlanAudit() {
   // Get tRPC utils for imperative calls
   const utils = trpc.useUtils();
   
-  const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('editor');
+  const [inputMethod, setInputMethod] = useState<'editor' | 'file'>('file');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [serviceUserName, setServiceUserName] = useState('');
-  const [anonymise, setAnonymise] = useState(true);
+  
+  // Name fields
+  const [serviceUserFirstName, setServiceUserFirstName] = useState('');
+  const [serviceUserLastName, setServiceUserLastName] = useState('');
+  
+  // Anonymisation options
+  const [anonymisationOption, setAnonymisationOption] = useState<'replace' | 'keep'>('replace');
+  const [replaceFirstNameWith, setReplaceFirstNameWith] = useState('');
+  const [replaceLastNameWith, setReplaceLastNameWith] = useState('');
+  const [consentConfirmed, setConsentConfirmed] = useState(false);
+  
   const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Check if OpenAI key is configured
@@ -71,7 +80,12 @@ export default function AiCarePlanAudit() {
       
       // Clear form
       setSelectedFile(null);
-      setServiceUserName('');
+      setServiceUserFirstName('');
+      setServiceUserLastName('');
+      setReplaceFirstNameWith('');
+      setReplaceLastNameWith('');
+      setConsentConfirmed(false);
+      setAnonymisationOption('replace');
     },
     onError: (error) => {
       console.error('[Frontend] ERROR: Failed to submit job');
@@ -80,24 +94,81 @@ export default function AiCarePlanAudit() {
     },
   });
 
+  // Validate form
+  const isFormValid = () => {
+    if (!serviceUserFirstName.trim() || !serviceUserLastName.trim()) {
+      return false;
+    }
+    
+    if (anonymisationOption === 'replace') {
+      if (!replaceFirstNameWith.trim() || !replaceLastNameWith.trim()) {
+        return false;
+      }
+    } else {
+      // Keep original names - must confirm consent
+      if (!consentConfirmed) {
+        return false;
+      }
+    }
+    
+    if (inputMethod === 'file' && !selectedFile) {
+      return false;
+    }
+    
+    if (inputMethod === 'editor') {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
+      if (!textContent.trim()) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
   const handleAnalyse = async () => {
     if (!hasOpenAiKey) {
       toast.error('OpenAI API key not configured. Please contact your administrator.');
       return;
     }
 
-    let textContent = '';
+    if (!isFormValid()) {
+      if (!serviceUserFirstName.trim() || !serviceUserLastName.trim()) {
+        toast.error('Please enter the service user\'s first and last name');
+        return;
+      }
+      if (anonymisationOption === 'replace' && (!replaceFirstNameWith.trim() || !replaceLastNameWith.trim())) {
+        toast.error('Please enter replacement names for anonymisation');
+        return;
+      }
+      if (anonymisationOption === 'keep' && !consentConfirmed) {
+        toast.error('Please confirm you have consent to use the real name');
+        return;
+      }
+      toast.error('Please complete all required fields');
+      return;
+    }
+
+    // Build service user name for display
+    const serviceUserName = `${serviceUserFirstName} ${serviceUserLastName}`;
 
     if (inputMethod === 'editor') {
       // Extract plain text from HTML
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = content;
-      textContent = tempDiv.textContent || tempDiv.innerText || '';
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
       
       if (!textContent.trim()) {
         toast.error('Please enter care plan content');
         return;
       }
+
+      analyzeCarePlanMutation.mutate({
+        content: textContent,
+        serviceUserName,
+        anonymise: anonymisationOption === 'replace',
+      });
     } else if (inputMethod === 'file') {
       console.log('[Frontend] File upload analysis starting');
       console.log('[Frontend] Selected file:', selectedFile);
@@ -151,16 +222,22 @@ export default function AiCarePlanAudit() {
         const uploadResult = await uploadResponse.json();
         console.log('[Frontend] File uploaded:', uploadResult.fileId);
         
-        // Step 2: Submit job with file reference
+        // Step 2: Submit job with file reference and name fields
         toast.dismiss(toastId);
         const submitToastId = toast.loading('Submitting analysis job...');
         
         submitCarePlanAuditMutation.mutate({
-          fileId: uploadResult.fileId, // Small reference ID
+          fileId: uploadResult.fileId,
           fileName: selectedFile.name,
           fileType: selectedFile.type,
           serviceUserName,
-          anonymise,
+          serviceUserFirstName: serviceUserFirstName.trim(),
+          serviceUserLastName: serviceUserLastName.trim(),
+          keepOriginalNames: anonymisationOption === 'keep',
+          replaceFirstNameWith: anonymisationOption === 'replace' ? replaceFirstNameWith.trim() : null,
+          replaceLastNameWith: anonymisationOption === 'replace' ? replaceLastNameWith.trim() : null,
+          consentConfirmed: anonymisationOption === 'keep' ? consentConfirmed : false,
+          anonymise: anonymisationOption === 'replace',
         });
         
         toast.dismiss(submitToastId);
@@ -171,12 +248,6 @@ export default function AiCarePlanAudit() {
       }
       return;
     }
-
-    analyzeCarePlanMutation.mutate({
-      content: textContent,
-      serviceUserName,
-      anonymise,
-    });
   };
 
   const characterCount = content.replace(/<[^>]*>/g, '').length;
@@ -197,25 +268,134 @@ export default function AiCarePlanAudit() {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            OpenAI API key is not configured. Please contact your administrator to set up the API key in organization settings.
+            OpenAI API key is not configured. Please contact your administrator to set up the API key in organisation settings.
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Service User Details Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Service User Details</CardTitle>
+          <CardDescription>
+            Enter the service user's name as it appears in the care plan
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Name Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="serviceUserFirstName">First Name <span className="text-red-500">*</span></Label>
+              <Input
+                id="serviceUserFirstName"
+                placeholder="e.g., Anne"
+                value={serviceUserFirstName}
+                onChange={(e) => setServiceUserFirstName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="serviceUserLastName">Last Name <span className="text-red-500">*</span></Label>
+              <Input
+                id="serviceUserLastName"
+                placeholder="e.g., Holliday"
+                value={serviceUserLastName}
+                onChange={(e) => setServiceUserLastName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Anonymisation Options */}
+          <div className="space-y-4">
+            <Label>Name Handling in Report</Label>
+            <RadioGroup
+              value={anonymisationOption}
+              onValueChange={(value) => setAnonymisationOption(value as 'replace' | 'keep')}
+              className="space-y-4"
+            >
+              <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                <RadioGroupItem value="replace" id="replace" className="mt-1" />
+                <div className="flex-1 space-y-3">
+                  <Label htmlFor="replace" className="font-medium cursor-pointer">
+                    Replace names (recommended for confidentiality)
+                  </Label>
+                  {anonymisationOption === 'replace' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="replaceFirstNameWith" className="text-sm">
+                          Replace first name with <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="replaceFirstNameWith"
+                          placeholder="e.g., A or Jane or [Redacted]"
+                          value={replaceFirstNameWith}
+                          onChange={(e) => setReplaceFirstNameWith(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="replaceLastNameWith" className="text-sm">
+                          Replace last name with <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="replaceLastNameWith"
+                          placeholder="e.g., H or Smith or [Redacted]"
+                          value={replaceLastNameWith}
+                          onChange={(e) => setReplaceLastNameWith(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                <RadioGroupItem value="keep" id="keep" className="mt-1" />
+                <div className="flex-1 space-y-3">
+                  <Label htmlFor="keep" className="font-medium cursor-pointer">
+                    Keep original names
+                  </Label>
+                  {anonymisationOption === 'keep' && (
+                    <div className="flex items-start space-x-2 pt-2">
+                      <Checkbox
+                        id="consentConfirmed"
+                        checked={consentConfirmed}
+                        onCheckedChange={(checked) => setConsentConfirmed(checked === true)}
+                      />
+                      <Label htmlFor="consentConfirmed" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
+                        I confirm that I have appropriate consent and authorisation to process and store the service user's real name in this audit report. <span className="text-red-500">*</span>
+                      </Label>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Input Card */}
       <Card>
         <CardHeader>
           <CardTitle>Care Plan Input</CardTitle>
           <CardDescription>
-            Choose an audit type to manage its question KLOEs
+            Upload a care plan document or paste the content directly
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Tabs value={inputMethod} onValueChange={(v) => setInputMethod(v as 'editor' | 'file')}>
             <TabsList>
-              <TabsTrigger value="editor">Rich Text Editor</TabsTrigger>
               <TabsTrigger value="file">Upload File</TabsTrigger>
+              <TabsTrigger value="editor">Rich Text Editor</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="file">
+              <FileUpload
+                selectedFile={selectedFile}
+                onFileSelect={setSelectedFile}
+                onFileRemove={() => setSelectedFile(null)}
+                maxSizeMB={10}
+                acceptedFormats={['.pdf', '.doc', '.docx', '.csv', '.xlsx', '.xls']}
+              />
+            </TabsContent>
 
             <TabsContent value="editor" className="space-y-2">
               <RichTextEditor
@@ -228,16 +408,6 @@ export default function AiCarePlanAudit() {
                 {characterCount.toLocaleString()} / {maxCharacters.toLocaleString()} characters
               </div>
             </TabsContent>
-
-            <TabsContent value="file">
-              <FileUpload
-                selectedFile={selectedFile}
-                onFileSelect={setSelectedFile}
-                onFileRemove={() => setSelectedFile(null)}
-                maxSizeMB={10}
-                acceptedFormats={['.pdf', '.doc', '.docx', '.csv', '.xlsx', '.xls']}
-              />
-            </TabsContent>
           </Tabs>
 
           <p className="text-xs text-muted-foreground">
@@ -246,52 +416,18 @@ export default function AiCarePlanAudit() {
         </CardContent>
       </Card>
 
-      {/* Analysis Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Analysis Settings</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="serviceUserName">Service User Name</Label>
-            <Input
-              id="serviceUserName"
-              placeholder="e.g., John Smith"
-              value={serviceUserName}
-              onChange={(e) => setServiceUserName(e.target.value)}
-            />
-            <p className="text-sm text-muted-foreground">
-              Used for context in the AI analysis
-            </p>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="anonymise">Anonymise names (e.g., John Smith → JS)</Label>
-              <p className="text-sm text-muted-foreground">
-                Names will be abbreviated in the analysis results
-              </p>
-            </div>
-            <Switch
-              id="anonymise"
-              checked={anonymise}
-              onCheckedChange={setAnonymise}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Analyse Button */}
       <div className="space-y-2">
         <Button
           onClick={handleAnalyse}
-          disabled={analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending || !hasOpenAiKey}
+          disabled={analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending || submitCarePlanAuditMutation.isPending || !hasOpenAiKey || !isFormValid()}
           size="lg"
           className="w-full"
         >
-          {(analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending) ? (
+          {(analyzeCarePlanMutation.isPending || analyzeCarePlanFileMutation.isPending || submitCarePlanAuditMutation.isPending) ? (
             <>
               <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Analysing...
+              Submitting...
             </>
           ) : (
             <>
@@ -301,7 +437,7 @@ export default function AiCarePlanAudit() {
           )}
         </Button>
         <p className="text-sm text-muted-foreground text-center">
-          Analysis typically takes 2-3 minutes
+          Analysis typically takes less than an hour
         </p>
       </div>
 
@@ -414,10 +550,9 @@ export default function AiCarePlanAudit() {
                           onClick={async () => {
                             if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
                               try {
-                                await trpc.aiAuditJobs.delete.mutate({ id: job.id });
+                                await utils.client.aiAuditJobs.delete.mutate({ id: job.id });
                                 toast.success('Report deleted successfully');
-                                // Refetch to update the list
-                                window.location.reload();
+                                refetchJobs();
                               } catch (error) {
                                 toast.error('Failed to delete report');
                               }
@@ -463,7 +598,7 @@ export default function AiCarePlanAudit() {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `Care_Plan_Analysis_${serviceUserName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.docx`;
+                    a.download = `Care_Plan_Analysis_${serviceUserFirstName}_${serviceUserLastName}_${new Date().toISOString().split('T')[0]}.docx`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);

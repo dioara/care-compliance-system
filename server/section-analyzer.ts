@@ -1,6 +1,8 @@
 /**
  * Per-Section Ultra-Pedantic Analysis
- * Analyzes individual care plan sections in extreme detail
+ * Analyses individual care plan sections in extreme detail
+ * 
+ * Updated to use British spelling throughout
  */
 
 import OpenAI from 'openai';
@@ -37,7 +39,7 @@ export interface SectionAnalysisResult {
 }
 
 /**
- * Analyze a single section with ultra-pedantic detail
+ * Analyse a single section with ultra-pedantic detail
  */
 export async function analyzeSingleSection(
   apiKey: string,
@@ -46,9 +48,20 @@ export async function analyzeSingleSection(
 ): Promise<SectionAnalysisResult> {
   const openai = new OpenAI({ apiKey });
   
-  const systemMessage = `You are an ULTRA-PEDANTIC CQC compliance expert with ZERO TOLERANCE. Analyze with extreme scrutiny.`;
+  const systemMessage = `You are an ULTRA-PEDANTIC CQC compliance expert with ZERO TOLERANCE. Analyse with extreme scrutiny. You MUST use British English spelling throughout (e.g., analyse, personalised, organisation, behaviour, colour, centre, programme).`;
   
-  const userPrompt = `You are an ULTRA-PEDANTIC CQC compliance expert. Analyze this SINGLE SECTION of a care plan for ${clientName} in EXTREME DETAIL.
+  const userPrompt = `You are an ULTRA-PEDANTIC CQC compliance expert. Analyse this SINGLE SECTION of a care plan for ${clientName} in EXTREME DETAIL.
+
+**IMPORTANT**: You MUST use British English spelling throughout your response. Examples:
+- Use "analyse" not "analyze"
+- Use "personalised" not "personalized"
+- Use "organisation" not "organization"
+- Use "behaviour" not "behavior"
+- Use "colour" not "color"
+- Use "centre" not "center"
+- Use "programme" not "program"
+- Use "summarise" not "summarize"
+- Use "recognise" not "recognize"
 
 **SECTION NAME**: ${section.section_name}
 
@@ -56,7 +69,7 @@ export async function analyzeSingleSection(
 ${section.raw_content}
 
 **YOUR TASK**:
-Analyze EVERY FIELD in this section with ZERO TOLERANCE. Find 5-10+ specific problems per field.
+Analyse EVERY FIELD in this section with ZERO TOLERANCE. Find 5-10+ specific problems per field.
 
 **OUTPUT FORMAT** (JSON):
 {
@@ -90,7 +103,7 @@ Analyze EVERY FIELD in this section with ZERO TOLERANCE. Find 5-10+ specific pro
 
 **CRITICAL REQUIREMENTS**:
 
-1. **ANALYZE THESE FIELDS** (if present in section):
+1. **ANALYSE THESE FIELDS** (if present in section):
    - **Identified Need**: Must be first-person ("I need..."), explain WHY, describe abilities vs needs, explain impact, include personal significance
    - **Planned Outcomes**: Must be SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound)
    - **How to Achieve**: Must specify WHO, WHEN, WHERE, HOW, WHAT, SAFETY, PREFERENCES
@@ -123,6 +136,7 @@ Analyze EVERY FIELD in this section with ZERO TOLERANCE. Find 5-10+ specific pro
    - Personal significance and impact
    - Professional CQC-compliant language
    - Ready to copy and paste
+   - MUST use British English spelling
 
 4. **CQC REGULATIONS TO REFERENCE**:
    - Regulation 9: Person-centred care
@@ -144,11 +158,16 @@ Analyze EVERY FIELD in this section with ZERO TOLERANCE. Find 5-10+ specific pro
    - Deduct 1-3 points per MINOR issue
    - Be harsh - zero tolerance approach
 
+7. **REVIEW NOTES HANDLING**:
+   - When summarising review notes or changes, focus on WHAT changed, not WHO made the change
+   - Do not repeat auditor names or reviewer names in summaries
+   - Focus on the substance of changes: dates, content updates, care modifications
+
 Return ONLY valid JSON. No markdown, no explanations outside the JSON structure.`;
 
   try {
-    console.log(`[Section Analyzer] Analyzing section: ${section.section_name}`);
-    console.log(`[Section Analyzer] Content length: ${section.raw_content.length} characters`);
+    console.log(`[Section Analyser] Analysing section: ${section.section_name}`);
+    console.log(`[Section Analyser] Content length: ${section.raw_content.length} characters`);
     
     const response = await openai.chat.completions.create({
       model: 'gpt-4.1-mini',
@@ -161,8 +180,8 @@ Return ONLY valid JSON. No markdown, no explanations outside the JSON structure.
       response_format: { type: 'json_object' },
     });
     
-    console.log(`[Section Analyzer] Analysis complete for: ${section.section_name}`);
-    console.log(`[Section Analyzer] Token usage:`, response.usage);
+    console.log(`[Section Analyser] Analysis complete for: ${section.section_name}`);
+    console.log(`[Section Analyser] Token usage:`, response.usage);
     
     const resultText = response.choices[0]?.message?.content || '{}';
     const parsedResult = JSON.parse(resultText);
@@ -176,14 +195,14 @@ Return ONLY valid JSON. No markdown, no explanations outside the JSON structure.
       issues: parsedResult.issues || [],
     };
     
-    console.log(`[Section Analyzer] Section score: ${result.section_score}%`);
-    console.log(`[Section Analyzer] Issues found: ${result.issues.length}`);
+    console.log(`[Section Analyser] Section score: ${result.section_score}%`);
+    console.log(`[Section Analyser] Issues found: ${result.issues.length}`);
     
     return result;
     
   } catch (error) {
-    console.error(`[Section Analyzer] ERROR analyzing section: ${section.section_name}`);
-    console.error('[Section Analyzer] Error:', error instanceof Error ? error.message : String(error));
+    console.error(`[Section Analyser] ERROR analysing section: ${section.section_name}`);
+    console.error('[Section Analyser] Error:', error instanceof Error ? error.message : String(error));
     throw error;
   }
 }
