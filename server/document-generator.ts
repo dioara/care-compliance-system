@@ -55,13 +55,19 @@ interface AnalysisResult {
     critical_issues: number;
     major_issues: number;
     minor_issues: number;
+    sections_coverage?: number;
+    missing_critical_sections?: number;
+    missing_high_sections?: number;
+    missing_medium_sections?: number;
   };
   sections: AnalysisSection[];
   missing_sections?: Array<{
     section_name: string;
     why_required: string;
     cqc_requirement: string;
+    priority?: 'critical' | 'high' | 'medium' | 'low';
   }>;
+  missing_sections_report?: string;
 }
 
 /**
@@ -200,7 +206,86 @@ export function generateCarePlanAnalysisDocument(
         new TextRun({ text: String(analysis.summary.minor_issues), color: '888888', bold: true }),
         new TextRun(' (Action required within 30 days)'),
       ],
-      spacing: { after: 400 },
+      spacing: { after: 200 },
+    })
+  );
+
+  // Add section coverage if available
+  if (analysis.summary.sections_coverage !== undefined) {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'Care Plan Coverage: ', bold: true }),
+          new TextRun({ 
+            text: `${analysis.summary.sections_coverage}%`, 
+            color: analysis.summary.sections_coverage >= 80 ? '00AA00' : analysis.summary.sections_coverage >= 50 ? 'FF8800' : 'FF0000',
+            bold: true 
+          }),
+          new TextRun(' of required CQC sections'),
+        ],
+        spacing: { after: 100 },
+      })
+    );
+  }
+
+  // Add missing sections summary
+  if (analysis.missing_sections && analysis.missing_sections.length > 0) {
+    const missingCritical = analysis.summary.missing_critical_sections || 0;
+    const missingHigh = analysis.summary.missing_high_sections || 0;
+    const missingMedium = analysis.summary.missing_medium_sections || 0;
+    
+    children.push(
+      new Paragraph({
+        text: 'Missing Care Plan Sections',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 300, after: 200 },
+      })
+    );
+
+    if (missingCritical > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'Critical Sections Missing: ', bold: true }),
+            new TextRun({ text: String(missingCritical), color: 'FF0000', bold: true }),
+            new TextRun(' (Must be added immediately)'),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+    }
+
+    if (missingHigh > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'High Priority Sections Missing: ', bold: true }),
+            new TextRun({ text: String(missingHigh), color: 'FF8800', bold: true }),
+            new TextRun(' (Add within 7 days)'),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+    }
+
+    if (missingMedium > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'Medium Priority Sections Missing: ', bold: true }),
+            new TextRun({ text: String(missingMedium), color: '888888', bold: true }),
+            new TextRun(' (Add within 30 days)'),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+    }
+  }
+
+  children.push(
+    new Paragraph({
+      text: '',
+      spacing: { after: 200 },
     })
   );
 
@@ -489,33 +574,159 @@ export function generateCarePlanAnalysisDocument(
         pageBreakBefore: true,
       }),
       new Paragraph({
-        text: 'The following sections are required for CQC compliance but were not found in the care plan:',
-        spacing: { after: 200 },
+        text: 'The following sections are required for CQC compliance but were not found in the care plan. These must be added to ensure comprehensive, person-centred care documentation.',
+        spacing: { after: 300 },
       })
     );
 
-    for (const missing of analysis.missing_sections) {
+    // Group by priority
+    const criticalMissing = analysis.missing_sections.filter(s => s.priority === 'critical');
+    const highMissing = analysis.missing_sections.filter(s => s.priority === 'high');
+    const mediumMissing = analysis.missing_sections.filter(s => s.priority === 'medium');
+    const lowMissing = analysis.missing_sections.filter(s => s.priority === 'low' || !s.priority);
+
+    // Critical Missing Sections
+    if (criticalMissing.length > 0) {
       children.push(
         new Paragraph({
-          text: missing.section_name,
-          heading: HeadingLevel.HEADING_3,
-          spacing: { before: 200, after: 100 },
-        }),
-        new Paragraph({
           children: [
-            new TextRun({ text: 'Why Required: ', bold: true }),
-            new TextRun(missing.why_required),
+            new TextRun({ text: 'CRITICAL - Must Be Added Immediately', bold: true, color: 'FF0000' }),
           ],
-          spacing: { after: 100 },
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'CQC Requirement: ', bold: true }),
-            new TextRun(missing.cqc_requirement),
-          ],
-          spacing: { after: 200 },
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 200 },
         })
       );
+
+      for (const missing of criticalMissing) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: '⚠ ', bold: true }),
+              new TextRun({ text: missing.section_name, bold: true }),
+            ],
+            spacing: { before: 150, after: 100 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Description: ', bold: true }),
+              new TextRun(missing.why_required),
+            ],
+            spacing: { after: 50, left: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'CQC Requirement: ', bold: true }),
+              new TextRun(missing.cqc_requirement),
+            ],
+            spacing: { after: 150, left: 400 },
+          })
+        );
+      }
+    }
+
+    // High Priority Missing Sections
+    if (highMissing.length > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'HIGH PRIORITY - Add Within 7 Days', bold: true, color: 'FF8800' }),
+          ],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 200 },
+        })
+      );
+
+      for (const missing of highMissing) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: '• ', bold: true }),
+              new TextRun({ text: missing.section_name, bold: true }),
+            ],
+            spacing: { before: 150, after: 100 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Description: ', bold: true }),
+              new TextRun(missing.why_required),
+            ],
+            spacing: { after: 50, left: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'CQC Requirement: ', bold: true }),
+              new TextRun(missing.cqc_requirement),
+            ],
+            spacing: { after: 150, left: 400 },
+          })
+        );
+      }
+    }
+
+    // Medium Priority Missing Sections
+    if (mediumMissing.length > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'MEDIUM PRIORITY - Add Within 30 Days', bold: true, color: '888888' }),
+          ],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 200 },
+        })
+      );
+
+      for (const missing of mediumMissing) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: '• ', bold: true }),
+              new TextRun({ text: missing.section_name, bold: true }),
+            ],
+            spacing: { before: 150, after: 100 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Description: ', bold: true }),
+              new TextRun(missing.why_required),
+            ],
+            spacing: { after: 50, left: 400 },
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'CQC Requirement: ', bold: true }),
+              new TextRun(missing.cqc_requirement),
+            ],
+            spacing: { after: 150, left: 400 },
+          })
+        );
+      }
+    }
+
+    // Low Priority Missing Sections
+    if (lowMissing.length > 0) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'LOW PRIORITY - Review at Next Care Plan Update', bold: true }),
+          ],
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 200 },
+        })
+      );
+
+      for (const missing of lowMissing) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: '• ' }),
+              new TextRun({ text: missing.section_name }),
+              new TextRun({ text: ' - ' }),
+              new TextRun({ text: missing.why_required, italics: true }),
+            ],
+            spacing: { before: 100, after: 100 },
+          })
+        );
+      }
     }
   }
 
