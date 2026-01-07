@@ -197,13 +197,13 @@ export default function RoleManagement() {
   const savePermissions = async () => {
     if (!selectedRole) return;
     try {
-      // Save location permissions
+      // Save location permissions - ensure boolean values
       const permsToSave = permissions
         .filter(p => p.canRead || p.canWrite)
         .map(p => ({
           locationId: p.locationId,
-          canRead: p.canRead,
-          canWrite: p.canWrite,
+          canRead: Boolean(p.canRead),
+          canWrite: Boolean(p.canWrite),
         }));
       await setPermissionsMutation.mutateAsync({ roleId: selectedRole.id, permissions: permsToSave });
       
