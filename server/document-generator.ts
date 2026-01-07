@@ -237,7 +237,25 @@ export function generateCarePlanAnalysisDocument(
             bold: true,
           }),
         ],
-        spacing: { after: 200 },
+        spacing: { after: 100 },
+      })
+    );
+
+    // Add Audit Date and Next Review Due for each section
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'Audit Date: ', bold: true }),
+          new TextRun(currentDate),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'Next Review Due: ', bold: true }),
+          new TextRun(nextReviewDate),
+        ],
+        spacing: { after: 100 },
       })
     );
 
