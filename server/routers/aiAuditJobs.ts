@@ -272,6 +272,7 @@ export const aiAuditJobsRouter = router({
         limit: z.number().min(1).max(100).default(50),
         offset: z.number().min(0).default(0),
         status: z.enum(['pending', 'processing', 'completed', 'failed']).optional(),
+        auditType: z.enum(['care_plan', 'daily_notes']).optional(),
       }).optional()
     )
     .query(async ({ ctx, input }) => {
@@ -287,31 +288,27 @@ export const aiAuditJobsRouter = router({
       const limit = input?.limit || 50;
       const offset = input?.offset || 0;
       const status = input?.status;
+      const auditType = input?.auditType;
 
-      // Build query
-      let query = db
+      // Build where conditions
+      const conditions = [eq(aiAudits.tenantId, ctx.user.tenantId)];
+      
+      if (status) {
+        conditions.push(eq(aiAudits.status, status));
+      }
+      
+      if (auditType) {
+        conditions.push(eq(aiAudits.auditType, auditType));
+      }
+
+      // Build query with all conditions
+      const query = db
         .select()
         .from(aiAudits)
-        .where(eq(aiAudits.tenantId, ctx.user.tenantId))
+        .where(and(...conditions))
         .orderBy(desc(aiAudits.createdAt))
         .limit(limit)
         .offset(offset);
-
-      // Add status filter if provided
-      if (status) {
-        query = db
-          .select()
-          .from(aiAudits)
-          .where(
-            and(
-              eq(aiAudits.tenantId, ctx.user.tenantId),
-              eq(aiAudits.status, status)
-            )
-          )
-          .orderBy(desc(aiAudits.createdAt))
-          .limit(limit)
-          .offset(offset);
-      }
 
       const jobs = await query;
 
@@ -326,6 +323,7 @@ export const aiAuditJobsRouter = router({
           createdAt: job.createdAt,
           processedAt: job.processedAt,
           errorMessage: job.errorMessage,
+          auditType: job.auditType,
         })),
         total: jobs.length,
         hasMore: jobs.length === limit,
