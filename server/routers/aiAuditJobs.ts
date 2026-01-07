@@ -141,6 +141,129 @@ export const aiAuditJobsRouter = router({
     }),
 
   /**
+   * Submit a care notes audit job
+   */
+  submitCareNotesAudit: protectedProcedure
+    .input(
+      z.object({
+        fileId: z.string(), // temp file ID from upload
+        fileName: z.string(),
+        fileType: z.string(),
+        serviceUserName: z.string(),
+        serviceUserFirstName: z.string(),
+        serviceUserLastName: z.string(),
+        keepOriginalNames: z.boolean().default(false),
+        replaceFirstNameWith: z.string().nullable().optional(),
+        replaceLastNameWith: z.string().nullable().optional(),
+        consentConfirmed: z.boolean().default(false),
+        anonymise: z.boolean().default(true),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "Not authenticated" });
+      }
+
+      const db = await dbModule.getDb();
+      if (!db) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+      }
+
+      console.log('[aiAuditJobs] Creating care notes job for file:', input.fileId);
+      console.log('[aiAuditJobs] Name settings:', {
+        firstName: input.serviceUserFirstName,
+        lastName: input.serviceUserLastName,
+        keepOriginal: input.keepOriginalNames,
+        replaceFirst: input.replaceFirstNameWith,
+        replaceLast: input.replaceLastNameWith,
+      });
+
+      // Create job record with temp file reference
+      const now = new Date();
+      const mysqlDatetime = now.toISOString().slice(0, 19).replace('T', ' ');
+      
+      // Fetch file from temp_files table and create data URL
+      let tempFileResult;
+      try {
+        tempFileResult = await db.execute(sql`
+          SELECT file_data, mime_type FROM temp_files WHERE id = ${input.fileId}
+        `) as any;
+      } catch (error) {
+        console.error('[aiAuditJobs] Query error:', error);
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Failed to fetch uploaded file from database." 
+        });
+      }
+      
+      // Handle different possible result structures
+      let rows;
+      if (Array.isArray(tempFileResult)) {
+        if (tempFileResult.length > 0 && Array.isArray(tempFileResult[0])) {
+          rows = tempFileResult[0]; // [rows, fields] format
+        } else {
+          rows = tempFileResult; // Direct rows array
+        }
+      } else {
+        console.error('[aiAuditJobs] Unexpected result structure:', tempFileResult);
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Unexpected database response format." 
+        });
+      }
+      
+      if (!rows || rows.length === 0) {
+        throw new TRPCError({ 
+          code: "NOT_FOUND", 
+          message: "Uploaded file not found. Please upload again." 
+        });
+      }
+      
+      const tempFile = rows[0];
+      if (!tempFile.mime_type || !tempFile.file_data) {
+        throw new TRPCError({ 
+          code: "INTERNAL_SERVER_ERROR", 
+          message: "Uploaded file data is incomplete." 
+        });
+      }
+      
+      const dataUrl = `data:${tempFile.mime_type};base64,${tempFile.file_data}`;
+      
+      const [job] = await db.insert(aiAudits).values({
+        tenantId: ctx.user.tenantId,
+        locationId: 0,
+        auditType: 'daily_notes', // Different audit type
+        documentName: input.fileName,
+        documentUrl: dataUrl,
+        documentKey: input.fileId,
+        serviceUserName: input.serviceUserName || '',
+        serviceUserFirstName: input.serviceUserFirstName || null,
+        serviceUserLastName: input.serviceUserLastName || null,
+        replaceFirstNameWith: input.replaceFirstNameWith || null,
+        replaceLastNameWith: input.replaceLastNameWith || null,
+        keepOriginalNames: input.keepOriginalNames ? 1 : 0,
+        consentConfirmed: input.consentConfirmed ? 1 : 0,
+        anonymise: input.anonymise ? 1 : 0,
+        status: 'pending',
+        progress: 'Queued for processing',
+        requestedById: ctx.user.userId,
+        createdAt: mysqlDatetime,
+        updatedAt: mysqlDatetime,
+      });
+      
+      // Delete temp file after creating job
+      await db.execute(sql`DELETE FROM temp_files WHERE id = ${input.fileId}`);
+
+      console.log('[aiAuditJobs] Care notes job created:', job.insertId);
+
+      return {
+        success: true,
+        jobId: job.insertId,
+        message: 'Care notes analysis job submitted successfully',
+      };
+    }),
+
+  /**
    * Get all audit jobs for the current user's tenant
    */
   list: protectedProcedure
