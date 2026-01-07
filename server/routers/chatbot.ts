@@ -188,29 +188,26 @@ export const chatbotRouter = router({
     .mutation(async ({ ctx, input }) => {
       console.log('[Chatbot] Received message:', input.message.substring(0, 50) + '...');
       
-      // Get OpenAI API key from organization settings or environment
-      let apiKey = process.env.OPENAI_API_KEY;
+      // Get OpenAI API key from organization settings (same as AI audits)
+      const { getCompanyByTenantId } = await import('../db');
       
-      // Try to get from organization settings if available
-      try {
-        const db = await import('../db').then(m => m.getDb());
-        if (db && ctx.user?.tenantId) {
-          const { organizations } = await import('../../drizzle/schema');
-          const { eq } = await import('drizzle-orm');
-          const [org] = await db
-            .select({ openaiApiKey: organizations.openaiApiKey })
-            .from(organizations)
-            .where(eq(organizations.id, ctx.user.tenantId))
-            .limit(1);
-          if (org?.openaiApiKey) {
-            apiKey = org.openaiApiKey;
-          }
-        }
-      } catch (e) {
-        console.log('[Chatbot] Could not get org API key, using default');
+      if (!ctx.user?.tenantId) {
+        throw new TRPCError({
+          code: 'UNAUTHORIZED',
+          message: 'User not authenticated'
+        });
       }
-
-      const openai = getOpenAIClient(apiKey);
+      
+      const company = await getCompanyByTenantId(ctx.user.tenantId);
+      
+      if (!company?.openaiApiKey) {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'OpenAI API key not configured. Please ask your administrator to add an API key in Company Profile.'
+        });
+      }
+      
+      const openai = getOpenAIClient(company.openaiApiKey);
 
       // Build messages array with conversation history
       const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
