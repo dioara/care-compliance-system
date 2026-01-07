@@ -278,7 +278,7 @@ export default function AiCarePlanAudit() {
         <CardHeader>
           <CardTitle>Service User Details</CardTitle>
           <CardDescription>
-            Enter the service user's name as it appears in the care plan
+            Enter the service user's name as it appears in the care plan. If the filename contains the service user's name, please rename the file before uploading.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -288,7 +288,7 @@ export default function AiCarePlanAudit() {
               <Label htmlFor="serviceUserFirstName">First Name <span className="text-red-500">*</span></Label>
               <Input
                 id="serviceUserFirstName"
-                placeholder="e.g., Anne"
+                placeholder="e.g., John or Jane"
                 value={serviceUserFirstName}
                 onChange={(e) => setServiceUserFirstName(e.target.value)}
               />
@@ -297,7 +297,7 @@ export default function AiCarePlanAudit() {
               <Label htmlFor="serviceUserLastName">Last Name <span className="text-red-500">*</span></Label>
               <Input
                 id="serviceUserLastName"
-                placeholder="e.g., Holliday"
+                placeholder="e.g., Smith"
                 value={serviceUserLastName}
                 onChange={(e) => setServiceUserLastName(e.target.value)}
               />
@@ -411,7 +411,7 @@ export default function AiCarePlanAudit() {
           </Tabs>
 
           <p className="text-xs text-muted-foreground">
-            Maximum file size: 10MB. Supported formats: PDF, Word, CSV, Excel
+            Maximum file size: 10MB. Supported formats: PDF, Word, CSV, Excel. Important: Please remove the service user's name from the filename before uploading if present.
           </p>
         </CardContent>
       </Card>

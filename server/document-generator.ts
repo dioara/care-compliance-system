@@ -1,6 +1,12 @@
 /**
  * Document Generator for Care Plan Analysis Reports
- * Generates Word documents matching the 299-page detailed format
+ * Generates Word documents with detailed CQC compliance analysis
+ * 
+ * Updated to:
+ * - Use current date as audit date
+ * - Set next review date to 3 months from now
+ * - Improve section structure and formatting
+ * - Use British English throughout
  */
 
 import { Document, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, Table, TableRow, TableCell, WidthType } from 'docx';
@@ -27,6 +33,16 @@ interface AnalysisSection {
     planned_outcomes?: string;
     how_to_achieve?: string;
     risk?: string;
+    risk_likelihood?: string;
+    risk_impact?: string;
+    risk_score?: string;
+    [key: string]: string | undefined;
+  };
+  metadata?: {
+    next_review_date?: string;
+    level_of_need?: string;
+    reviewer?: string;
+    review_date?: string;
     [key: string]: string | undefined;
   };
   issues: AnalysisIssue[];
@@ -48,12 +64,47 @@ interface AnalysisResult {
   }>;
 }
 
+/**
+ * Format date as DD/MM/YYYY (British format)
+ */
+function formatDateBritish(date: Date): string {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+/**
+ * Get the next review date (3 months from now)
+ */
+function getNextReviewDate(): string {
+  const now = new Date();
+  const nextReview = new Date(now);
+  nextReview.setMonth(nextReview.getMonth() + 3);
+  return formatDateBritish(nextReview);
+}
+
+/**
+ * Format field name for display (Title Case with proper spacing)
+ */
+function formatFieldName(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, l => l.toUpperCase())
+    .replace('How To Achieve', 'How to Achieve')
+    .replace('Whats Missing', "What's Missing");
+}
+
 export function generateCarePlanAnalysisDocument(
   clientName: string,
   analysisDate: string,
   analysis: AnalysisResult
 ): Document {
   const children: Paragraph[] = [];
+  
+  // Get current date and next review date
+  const currentDate = formatDateBritish(new Date());
+  const nextReviewDate = getNextReviewDate();
 
   // Title Page
   children.push(
@@ -70,32 +121,39 @@ export function generateCarePlanAnalysisDocument(
       spacing: { after: 400 },
     }),
     new Paragraph({
-      text: 'Ultra-Pedantic Zero-Tolerance Analysis',
+      text: 'Comprehensive CQC Compliance Analysis',
       alignment: AlignmentType.CENTER,
       spacing: { after: 600 },
     }),
     new Paragraph({
-      text: 'Client Information',
+      text: 'Service User Information',
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 400, after: 200 },
     }),
     new Paragraph({
       children: [
-        new TextRun({ text: 'Client Name: ', bold: true }),
+        new TextRun({ text: 'Service User: ', bold: true }),
         new TextRun(clientName),
       ],
       spacing: { after: 100 },
     }),
     new Paragraph({
       children: [
-        new TextRun({ text: 'Analysis Date: ', bold: true }),
-        new TextRun(analysisDate),
+        new TextRun({ text: 'Audit Date: ', bold: true }),
+        new TextRun(currentDate),
       ],
       spacing: { after: 100 },
     }),
     new Paragraph({
       children: [
-        new TextRun({ text: 'Overall Score: ', bold: true }),
+        new TextRun({ text: 'Next Review Due: ', bold: true }),
+        new TextRun(nextReviewDate),
+      ],
+      spacing: { after: 100 },
+    }),
+    new Paragraph({
+      children: [
+        new TextRun({ text: 'Overall Compliance Score: ', bold: true }),
         new TextRun({
           text: `${analysis.overall_score}%`,
           color: analysis.overall_score >= 85 ? '00AA00' : analysis.overall_score >= 60 ? 'FF8800' : 'FF0000',
@@ -106,16 +164,16 @@ export function generateCarePlanAnalysisDocument(
     })
   );
 
-  // Summary
+  // Executive Summary
   children.push(
     new Paragraph({
-      text: 'Summary',
+      text: 'Executive Summary',
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 400, after: 200 },
     }),
     new Paragraph({
       children: [
-        new TextRun({ text: 'Sections Analyzed: ', bold: true }),
+        new TextRun({ text: 'Sections Analysed: ', bold: true }),
         new TextRun(String(analysis.summary.sections_analyzed)),
       ],
       spacing: { after: 100 },
@@ -123,21 +181,24 @@ export function generateCarePlanAnalysisDocument(
     new Paragraph({
       children: [
         new TextRun({ text: 'Critical Issues: ', bold: true }),
-        new TextRun({ text: String(analysis.summary.critical_issues), color: 'FF0000' }),
+        new TextRun({ text: String(analysis.summary.critical_issues), color: 'FF0000', bold: true }),
+        new TextRun(' (Immediate action required)'),
       ],
       spacing: { after: 100 },
     }),
     new Paragraph({
       children: [
         new TextRun({ text: 'Major Issues: ', bold: true }),
-        new TextRun({ text: String(analysis.summary.major_issues), color: 'FF8800' }),
+        new TextRun({ text: String(analysis.summary.major_issues), color: 'FF8800', bold: true }),
+        new TextRun(' (Action required within 7 days)'),
       ],
       spacing: { after: 100 },
     }),
     new Paragraph({
       children: [
         new TextRun({ text: 'Minor Issues: ', bold: true }),
-        new TextRun({ text: String(analysis.summary.minor_issues), color: '888888' }),
+        new TextRun({ text: String(analysis.summary.minor_issues), color: '888888', bold: true }),
+        new TextRun(' (Action required within 30 days)'),
       ],
       spacing: { after: 400 },
     })
@@ -155,41 +216,17 @@ export function generateCarePlanAnalysisDocument(
 
   // Process each section
   for (const section of analysis.sections) {
-    // Section Header
+    // Section Header - properly formatted
     children.push(
       new Paragraph({
-        text: `Section: ${section.section_name}`,
+        text: `Section: ${section.section_name.toUpperCase()}`,
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 400, after: 200 },
         pageBreakBefore: true,
       })
     );
 
-    // Section Metadata
-    if (section.next_review_date) {
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Next Review Date: ', bold: true }),
-            new TextRun(section.next_review_date),
-          ],
-          spacing: { after: 100 },
-        })
-      );
-    }
-
-    if (section.level_of_need) {
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Level of Need: ', bold: true }),
-            new TextRun(section.level_of_need),
-          ],
-          spacing: { after: 100 },
-        })
-      );
-    }
-
+    // Section Score
     children.push(
       new Paragraph({
         children: [
@@ -204,6 +241,31 @@ export function generateCarePlanAnalysisDocument(
       })
     );
 
+    // Section Metadata (if available from parsing)
+    if (section.metadata?.next_review_date) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'Care Plan Review Date: ', bold: true }),
+            new TextRun(section.metadata.next_review_date),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+    }
+
+    if (section.metadata?.level_of_need || section.extracted_content?.level_of_need) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: 'Level of Need: ', bold: true }),
+            new TextRun(section.metadata?.level_of_need || section.extracted_content?.level_of_need || ''),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+    }
+
     // Extracted Content
     children.push(
       new Paragraph({
@@ -213,12 +275,37 @@ export function generateCarePlanAnalysisDocument(
       })
     );
 
-    for (const [key, value] of Object.entries(section.extracted_content)) {
+    // Display fields in a logical order
+    const fieldOrder = ['identified_need', 'planned_outcomes', 'how_to_achieve', 'risk', 'risk_likelihood', 'risk_impact', 'risk_score'];
+    const displayedFields = new Set<string>();
+
+    // First display in order
+    for (const key of fieldOrder) {
+      const value = section.extracted_content[key];
       if (value) {
+        displayedFields.add(key);
         children.push(
           new Paragraph({
             children: [
-              new TextRun({ text: `${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: `, bold: true }),
+              new TextRun({ text: `${formatFieldName(key)}: `, bold: true }),
+            ],
+            spacing: { before: 100 },
+          }),
+          new Paragraph({
+            text: value,
+            spacing: { after: 100, left: 400 },
+          })
+        );
+      }
+    }
+
+    // Then display any remaining fields
+    for (const [key, value] of Object.entries(section.extracted_content)) {
+      if (value && !displayedFields.has(key) && key !== 'level_of_need') {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: `${formatFieldName(key)}: `, bold: true }),
             ],
             spacing: { before: 100 },
           }),
@@ -263,85 +350,95 @@ export function generateCarePlanAnalysisDocument(
             spacing: { before: 100, after: 50 },
           }),
           new Paragraph({
-            text: issue.current_text,
+            text: issue.current_text || '-',
             spacing: { after: 100, left: 400 },
             italics: true,
           })
         );
 
         // Problems Identified
-        children.push(
-          new Paragraph({
-            text: 'Problems Identified:',
-            bold: true,
-            spacing: { before: 100, after: 50 },
-          })
-        );
-
-        for (const problem of issue.problems_identified) {
+        if (issue.problems_identified && issue.problems_identified.length > 0) {
           children.push(
             new Paragraph({
-              text: problem,
-              spacing: { after: 50, left: 400 },
-              bullet: { level: 0 },
+              text: 'Problems Identified:',
+              bold: true,
+              spacing: { before: 100, after: 50 },
             })
           );
+
+          for (const problem of issue.problems_identified) {
+            children.push(
+              new Paragraph({
+                text: problem,
+                spacing: { after: 50, left: 400 },
+                bullet: { level: 0 },
+              })
+            );
+          }
         }
 
         // What's Missing
-        children.push(
-          new Paragraph({
-            text: "What's Missing:",
-            bold: true,
-            spacing: { before: 100, after: 50 },
-          })
-        );
-
-        for (const missing of issue.whats_missing) {
+        if (issue.whats_missing && issue.whats_missing.length > 0) {
           children.push(
             new Paragraph({
-              text: missing,
-              spacing: { after: 50, left: 400 },
-              bullet: { level: 0 },
+              text: "What's Missing:",
+              bold: true,
+              spacing: { before: 100, after: 50 },
+            })
+          );
+
+          for (const missing of issue.whats_missing) {
+            children.push(
+              new Paragraph({
+                text: missing,
+                spacing: { after: 50, left: 400 },
+                bullet: { level: 0 },
+              })
+            );
+          }
+        }
+
+        // Ideal Example
+        if (issue.ideal_example) {
+          children.push(
+            new Paragraph({
+              text: '✨ COMPLETE IDEAL EXAMPLE (Ready to Copy & Customise):',
+              bold: true,
+              spacing: { before: 200, after: 100 },
+            }),
+            new Paragraph({
+              text: issue.ideal_example,
+              spacing: { after: 200, left: 400 },
+              shading: { fill: 'F0F8FF' },
             })
           );
         }
 
-        // Ideal Example
-        children.push(
-          new Paragraph({
-            text: '✨ COMPLETE IDEAL EXAMPLE (Ready to Copy & Customize):',
-            bold: true,
-            spacing: { before: 200, after: 100 },
-          }),
-          new Paragraph({
-            text: issue.ideal_example,
-            spacing: { after: 200, left: 400 },
-            shading: { fill: 'F0F8FF' },
-          })
-        );
-
         // CQC Requirement
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: 'CQC Requirement: ', bold: true }),
-              new TextRun(issue.cqc_requirement),
-            ],
-            spacing: { before: 100, after: 50 },
-          })
-        );
+        if (issue.cqc_requirement) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'CQC Requirement: ', bold: true }),
+                new TextRun(issue.cqc_requirement),
+              ],
+              spacing: { before: 100, after: 50 },
+            })
+          );
+        }
 
         // Recommendation
-        children.push(
-          new Paragraph({
-            children: [
-              new TextRun({ text: 'Recommendation: ', bold: true }),
-              new TextRun(issue.recommendation),
-            ],
-            spacing: { after: 200 },
-          })
-        );
+        if (issue.recommendation) {
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: 'Recommendation: ', bold: true }),
+                new TextRun(issue.recommendation),
+              ],
+              spacing: { after: 200 },
+            })
+          );
+        }
 
         // Separator
         children.push(
@@ -352,6 +449,15 @@ export function generateCarePlanAnalysisDocument(
           })
         );
       }
+    } else {
+      // No issues found for this section
+      children.push(
+        new Paragraph({
+          text: 'No issues identified in this section.',
+          spacing: { before: 100, after: 200 },
+          italics: true,
+        })
+      );
     }
   }
 
@@ -363,6 +469,10 @@ export function generateCarePlanAnalysisDocument(
         heading: HeadingLevel.HEADING_1,
         spacing: { before: 400, after: 200 },
         pageBreakBefore: true,
+      }),
+      new Paragraph({
+        text: 'The following sections are required for CQC compliance but were not found in the care plan:',
+        spacing: { after: 200 },
       })
     );
 
@@ -390,6 +500,34 @@ export function generateCarePlanAnalysisDocument(
       );
     }
   }
+
+  // Footer with audit information
+  children.push(
+    new Paragraph({
+      text: 'Audit Information',
+      heading: HeadingLevel.HEADING_1,
+      spacing: { before: 400, after: 200 },
+      pageBreakBefore: true,
+    }),
+    new Paragraph({
+      text: `This audit was conducted on ${currentDate} using AI-powered analysis.`,
+      spacing: { after: 100 },
+    }),
+    new Paragraph({
+      text: `The next review of this care plan should be completed by ${nextReviewDate}.`,
+      spacing: { after: 100 },
+    }),
+    new Paragraph({
+      text: 'This report should be used as a guide for improving care plan documentation and ensuring CQC compliance. All recommendations should be reviewed by qualified care professionals before implementation.',
+      spacing: { after: 200 },
+    }),
+    new Paragraph({
+      text: 'Generated by Care Compliance Management System',
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 400 },
+      italics: true,
+    })
+  );
 
   return new Document({
     sections: [{
