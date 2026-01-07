@@ -137,8 +137,9 @@ export default function RoleManagement() {
     
     setIsPermissionsOpen(true);
     
-    // Fetch existing location permissions
+    // Fetch existing location permissions (invalidate cache first to get fresh data)
     try {
+      await trpcUtils.roles.getPermissions.invalidate({ roleId: role.id });
       const existingPerms = await trpcUtils.roles.getPermissions.fetch({ roleId: role.id });
       
       if (existingPerms && existingPerms.length > 0) {
@@ -154,8 +155,9 @@ export default function RoleManagement() {
       console.error("Failed to fetch location permissions", error);
     }
     
-    // Fetch existing feature permissions
+    // Fetch existing feature permissions (invalidate cache first to get fresh data)
     try {
+      await trpcUtils.roles.getFeaturePermissions.invalidate({ roleId: role.id });
       const existingFeatures = await trpcUtils.roles.getFeaturePermissions.fetch({ roleId: role.id });
       if (existingFeatures && existingFeatures.length > 0) {
         setSelectedFeatures(existingFeatures);
