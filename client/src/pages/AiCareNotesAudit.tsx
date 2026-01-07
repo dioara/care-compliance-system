@@ -65,17 +65,12 @@ export default function AiCareNotesAudit() {
 
   // Job history query
   const { data: jobHistory, refetch: refetchHistory } = trpc.aiAuditJobs.list.useQuery(
-    { limit: 50 },
+    { limit: 50, auditType: 'daily_notes' },
     { enabled: activeTab === 'history' }
   );
 
-  // Filter care notes audits from history
-  const careNotesJobs = jobHistory?.jobs?.filter(job => 
-    job.documentName?.toLowerCase().includes('note') || 
-    job.documentName?.toLowerCase().includes('diary') ||
-    // Check if it's a daily_notes audit type (we'd need to add this to the list query)
-    true // For now show all, will filter properly when auditType is returned
-  ) || [];
+  // Care notes jobs from filtered history
+  const careNotesJobs = jobHistory?.jobs || [];
 
   // Download report mutation
   const { data: reportData, refetch: downloadReport } = trpc.aiAuditJobs.downloadReport.useQuery(
@@ -182,20 +177,20 @@ export default function AiCareNotesAudit() {
     try {
       const result = await trpc.aiAuditJobs.downloadReport.query({ id: jobId });
       
-      if (result.documentData) {
+      if (result.data) {
         // Convert base64 to blob and download
-        const byteCharacters = atob(result.documentData);
+        const byteCharacters = atob(result.data);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
           byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
         const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+        const blob = new Blob([byteArray], { type: result.mimeType || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
         
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = result.fileName || 'care-notes-audit-report.docx';
+        a.download = result.filename || 'care-notes-audit-report.docx';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

@@ -38,9 +38,9 @@ export default function AiCarePlanAudit() {
   const { data: orgSettings } = trpc.organization.getSettings.useQuery();
   const hasOpenAiKey = !!orgSettings?.openaiApiKey;
 
-  // Fetch job history
+  // Fetch job history - filter by care_plan audit type
   const { data: jobHistory, refetch: refetchJobs } = trpc.aiAuditJobs.list.useQuery(
-    { limit: 10, status: undefined },
+    { limit: 10, auditType: 'care_plan' },
     { refetchInterval: 5000 } // Auto-refresh every 5 seconds
   );
 
