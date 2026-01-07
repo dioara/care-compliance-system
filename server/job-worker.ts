@@ -24,6 +24,7 @@ interface JobContext {
   jobId: number;
   tenantId: number;
   locationId: number;
+  auditType: 'care_plan' | 'daily_notes';
   documentUrl: string;
   documentKey: string;
   documentName: string;
@@ -148,6 +149,7 @@ async function processNextJob() {
       jobId: job.id,
       tenantId: job.tenantId,
       locationId: job.locationId,
+      auditType: job.auditType as 'care_plan' | 'daily_notes',
       documentUrl: job.documentUrl || '',
       documentKey: job.documentKey || '',
       documentName: job.documentName || 'Unknown',
@@ -242,6 +244,7 @@ async function processJob(context: JobContext) {
   const { 
     jobId, 
     tenantId, 
+    auditType,
     openaiApiKey, 
     serviceUserName, 
     serviceUserFirstName,
@@ -254,6 +257,8 @@ async function processJob(context: JobContext) {
     documentKey, 
     documentName 
   } = context;
+  
+  console.log(`[Job Worker] Processing ${auditType} audit job ${jobId}`);
   
   // Get database connection
   const db = await dbModule.getDb();
@@ -346,29 +351,56 @@ async function processJob(context: JobContext) {
       console.log(`[Job Worker] No name replacement configured, using original content`);
     }
     
-    // Step 4: Run multi-pass analysis with progress updates
+    // Step 4: Run analysis based on audit type
     await updateJobProgress(jobId, 'Starting AI analysis...');
     
-    // Wrap the analyzer to capture progress
-    const result = await analyzeCarePlanMultiPassWithProgress(
-      openaiApiKey,
-      processedContent,
-      displayName,
-      (progress: string) => updateJobProgress(jobId, progress)
-    );
+    let result: any;
+    let documentBuffer: Buffer;
     
-    console.log(`[Job Worker] Analysis complete: ${result.sections.length} sections analysed`);
+    if (auditType === 'daily_notes') {
+      // Care Notes Analysis
+      const { analyzeCareNotesWithProgress, generateCareNotesDocument } = await import('./care-notes-worker');
+      
+      result = await analyzeCareNotesWithProgress(
+        openaiApiKey,
+        processedContent,
+        displayName,
+        serviceUserFirstName || '',
+        serviceUserLastName || '',
+        replaceFirstNameWith || '',
+        replaceLastNameWith || '',
+        keepOriginalNames,
+        (progress: string) => updateJobProgress(jobId, progress)
+      );
+      
+      console.log(`[Job Worker] Care notes analysis complete: ${result.summary?.totalNotes || 0} notes analysed`);
+      
+      // Generate Word document for care notes
+      await updateJobProgress(jobId, 'Generating report document...');
+      const doc = generateCareNotesDocument(displayName, result);
+      documentBuffer = await Packer.toBuffer(doc);
+      
+    } else {
+      // Care Plan Analysis (default)
+      result = await analyzeCarePlanMultiPassWithProgress(
+        openaiApiKey,
+        processedContent,
+        displayName,
+        (progress: string) => updateJobProgress(jobId, progress)
+      );
+      
+      console.log(`[Job Worker] Care plan analysis complete: ${result.sections?.length || 0} sections analysed`);
+      
+      // Generate Word document for care plan
+      await updateJobProgress(jobId, 'Generating report document...');
+      const doc = generateCarePlanAnalysisDocument(
+        displayName,
+        new Date().toISOString().split('T')[0],
+        result as any
+      );
+      documentBuffer = await Packer.toBuffer(doc);
+    }
     
-    // Step 5: Generate Word document
-    await updateJobProgress(jobId, 'Generating report document...');
-    
-    const doc = generateCarePlanAnalysisDocument(
-      displayName,
-      new Date().toISOString().split('T')[0],
-      result as any
-    );
-    
-    const documentBuffer = await Packer.toBuffer(doc);
     console.log(`[Job Worker] Document generated: ${documentBuffer.length} bytes`);
     
     // Step 6: Prepare document for database storage
@@ -574,13 +606,18 @@ async function sendJobCompletionNotification(context: JobContext) {
     }
     
     // Send email
+    const auditTypeName = context.auditType === 'daily_notes' ? 'Care Notes' : 'Care Plan';
+    const auditPageUrl = context.auditType === 'daily_notes' 
+      ? 'https://app.ccms.co.uk/ai-care-notes-audit'
+      : `https://app.ccms.co.uk/ai-care-plan-audits/${context.jobId}`;
+    
     await sendEmail({
       to: user.email,
-      subject: 'AI Care Plan Audit Complete',
+      subject: `AI ${auditTypeName} Audit Complete`,
       html: `
-        <h2>Your AI Care Plan Audit is Ready</h2>
+        <h2>Your AI ${auditTypeName} Audit is Ready</h2>
         <p>The AI analysis for <strong>${context.serviceUserName || context.documentName}</strong> has been completed.</p>
-        <p><a href="https://app.ccms.co.uk/ai-care-plan-audits/${context.jobId}">View Results</a></p>
+        <p><a href="${auditPageUrl}">View Results</a></p>
         <p>You can also download the detailed report from the audits page.</p>
       `,
     });
@@ -597,8 +634,8 @@ async function sendJobCompletionNotification(context: JobContext) {
       tenantId: context.tenantId,
       userId: context.requestedById,
       notificationType: 'ai_audit_complete',
-      title: 'AI Care Plan Audit Complete',
-      message: `The AI analysis for ${context.serviceUserName || context.documentName} has been completed. View the results now.`,
+      title: `AI ${auditTypeName} Audit Complete`,
+      message: `The AI ${auditTypeName.toLowerCase()} analysis for ${context.serviceUserName || context.documentName} has been completed. View the results now.`,
       relatedEntityId: context.jobId,
       relatedEntityType: 'ai_audit',
       isRead: 0,
@@ -635,11 +672,13 @@ async function sendJobFailureNotification(context: JobContext, error: unknown) {
       return;
     }
     
+    const auditTypeName = context.auditType === 'daily_notes' ? 'Care Notes' : 'Care Plan';
+    
     await sendEmail({
       to: user.email,
-      subject: 'AI Care Plan Audit Failed',
+      subject: `AI ${auditTypeName} Audit Failed`,
       html: `
-        <h2>AI Care Plan Audit Failed</h2>
+        <h2>AI ${auditTypeName} Audit Failed</h2>
         <p>Unfortunately, the AI analysis for <strong>${context.serviceUserName || context.documentName}</strong> could not be completed.</p>
         <p><strong>Error:</strong> ${error instanceof Error ? error.message : String(error)}</p>
         <p>Please try again or contact support if the problem persists.</p>
