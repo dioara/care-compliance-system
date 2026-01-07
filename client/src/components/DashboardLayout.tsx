@@ -94,19 +94,21 @@ function ThemeToggleItem() {
   );
 }
 
+// Menu items with feature mapping for access control
+// feature: null means always visible, otherwise requires that feature permission
 const menuItems = [
-  { icon: SquaresFour, label: "Dashboard", path: "/", description: "Overview & metrics" },
-  { icon: HeartStraight, label: "Service Users", path: "/service-users", description: "Manage residents" },
-  { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management" },
-  { icon: ListChecks, label: "Audits", path: "/audits", description: "Compliance audits" },
-  { icon: CalendarBlank, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track" },
-  { icon: FileText, label: "Audit History", path: "/audit-history", description: "View all audits" },
-  { icon: Brain, label: "AI Care Plan Audit", path: "/ai-care-plan-audit", description: "CQC compliance check" },
-  { icon: Brain, label: "AI Care Notes Audit", path: "/ai-care-notes-audit", description: "Carer feedback" },
-  { icon: Warning, label: "Incidents", path: "/incidents", description: "Track incidents" },
-  { icon: ChartBar, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends" },
-  { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports" },
-  { icon: ClipboardText, label: "Action Log", path: "/action-log", description: "Track actions" },
+  { icon: SquaresFour, label: "Dashboard", path: "/", description: "Overview & metrics", feature: null },
+  { icon: HeartStraight, label: "Service Users", path: "/service-users", description: "Manage residents", feature: "service_users" },
+  { icon: UserCheck, label: "Staff", path: "/staff", description: "Team management", feature: "staff" },
+  { icon: ListChecks, label: "Audits", path: "/audits", description: "Compliance audits", feature: "audits" },
+  { icon: CalendarBlank, label: "Audit Calendar", path: "/audit-calendar", description: "Schedule & track", feature: "audits" },
+  { icon: FileText, label: "Audit History", path: "/audit-history", description: "View all audits", feature: "audits" },
+  { icon: Brain, label: "AI Care Plan Audit", path: "/ai-care-plan-audit", description: "CQC compliance check", feature: "ai_care_plan_audit" },
+  { icon: Brain, label: "AI Care Notes Audit", path: "/ai-care-notes-audit", description: "Carer feedback", feature: "ai_care_notes_audit" },
+  { icon: Warning, label: "Incidents", path: "/incidents", description: "Track incidents", feature: "incidents" },
+  { icon: ChartBar, label: "Incident Analytics", path: "/incident-analytics", description: "Incident trends", feature: "incidents" },
+  { icon: FileText, label: "Reports", path: "/reports", description: "Generate reports", feature: "reports" },
+  { icon: ClipboardText, label: "Action Log", path: "/action-log", description: "Track actions", feature: null },
 ];
 
 // Admin-only menu items (shown only to super admins)
@@ -290,8 +292,26 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+
+  // Fetch user's feature permissions
+  const { data: userFeatures = [] } = trpc.roles.getMyFeatures.useQuery(
+    undefined,
+    { enabled: !!user }
+  );
+
+  // Filter menu items based on user's feature permissions
+  // Super admins see everything, otherwise filter by feature
+  const filteredMenuItems = user?.superAdmin
+    ? menuItems
+    : menuItems.filter(item => {
+        // Items with no feature requirement are always visible
+        if (item.feature === null) return true;
+        // Check if user has permission for this feature
+        return userFeatures.includes(item.feature);
+      });
+
+  const activeMenuItem = filteredMenuItems.find(item => item.path === location);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -407,7 +427,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0 py-2">
             <SidebarMenu className="px-3 space-y-1">
-              {menuItems.map(item => {
+              {filteredMenuItems.map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>

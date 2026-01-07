@@ -107,6 +107,33 @@ export const rolesRouter = router({
     }),
 
   // ============================================================================
+  // ROLE-FEATURE PERMISSIONS
+  // ============================================================================
+
+  getAvailableFeatures: protectedProcedure.query(() => {
+    return db.AVAILABLE_FEATURES;
+  }),
+
+  getFeaturePermissions: protectedProcedure
+    .input(z.object({ roleId: z.number() }))
+    .query(async ({ input }) => {
+      const permissions = await db.getRoleFeaturePermissions(input.roleId);
+      return permissions.map(p => p.feature);
+    }),
+
+  setFeaturePermissions: superAdminProcedure
+    .input(
+      z.object({
+        roleId: z.number(),
+        features: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ input }) => {
+      await db.setRoleFeaturePermissions(input.roleId, input.features);
+      return { success: true };
+    }),
+
+  // ============================================================================
   // USER-ROLE ASSIGNMENTS
   // ============================================================================
 
@@ -148,5 +175,15 @@ export const rolesRouter = router({
 
     // Regular users get permissions from their roles
     return await db.getUserLocationPermissions(ctx.user.id);
+  }),
+
+  getMyFeatures: protectedProcedure.query(async ({ ctx }) => {
+    // Super admins have access to all features
+    if (ctx.user.superAdmin === 1) {
+      return db.AVAILABLE_FEATURES.map(f => f.id);
+    }
+
+    // Regular users get features from their roles
+    return await db.getUserFeaturePermissions(ctx.user.id);
   }),
 });

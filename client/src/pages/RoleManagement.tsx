@@ -9,10 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-import { Spinner, Plus, PencilSimple, Trash, Shield, MapPin, Users } from "@phosphor-icons/react";
+import { Spinner, Plus, PencilSimple, Trash, Shield, MapPin, Users, Gear } from "@phosphor-icons/react";
+
 interface LocationPermission {
   locationId: number;
   locationName: string;
@@ -20,15 +22,23 @@ interface LocationPermission {
   canWrite: boolean;
 }
 
+interface Feature {
+  id: string;
+  label: string;
+  description: string;
+}
+
 export default function RoleManagement() {
   const { data: user } = trpc.auth.me.useQuery();
   const { data: roles = [], isLoading: rolesLoading, refetch: refetchRoles } = trpc.roles.list.useQuery();
   const { data: locations = [] } = trpc.locations.list.useQuery();
+  const { data: availableFeatures = [] } = trpc.roles.getAvailableFeatures.useQuery();
   
   const createRole = trpc.roles.create.useMutation();
   const updateRole = trpc.roles.update.useMutation();
   const deleteRole = trpc.roles.delete.useMutation();
   const setPermissionsMutation = trpc.roles.setPermissions.useMutation();
+  const setFeaturePermissionsMutation = trpc.roles.setFeaturePermissions.useMutation();
   
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -36,6 +46,8 @@ export default function RoleManagement() {
   const [selectedRole, setSelectedRole] = useState<any>(null);
   const [formData, setFormData] = useState({ name: "", description: "" });
   const [permissions, setPermissionsState] = useState<LocationPermission[]>([]);
+  const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
+  const [permissionsTab, setPermissionsTab] = useState("features");
 
   // Check if user is super admin
   if (!user?.superAdmin) {
@@ -109,7 +121,9 @@ export default function RoleManagement() {
   
   const openPermissions = async (role: any) => {
     setSelectedRole(role);
-    // Initialize permissions with all locations
+    setPermissionsTab("features");
+    
+    // Initialize location permissions with all locations
     const initialPermissions = locations.map(loc => ({
       locationId: loc.id,
       locationName: loc.name,
@@ -117,9 +131,13 @@ export default function RoleManagement() {
       canWrite: false,
     }));
     setPermissionsState(initialPermissions);
+    
+    // Initialize features as empty
+    setSelectedFeatures([]);
+    
     setIsPermissionsOpen(true);
     
-    // Fetch existing permissions for this role using tRPC utils
+    // Fetch existing location permissions
     try {
       const existingPerms = await trpcUtils.roles.getPermissions.fetch({ roleId: role.id });
       
@@ -133,7 +151,17 @@ export default function RoleManagement() {
         }));
       }
     } catch (error) {
-      console.error("Failed to fetch permissions", error);
+      console.error("Failed to fetch location permissions", error);
+    }
+    
+    // Fetch existing feature permissions
+    try {
+      const existingFeatures = await trpcUtils.roles.getFeaturePermissions.fetch({ roleId: role.id });
+      if (existingFeatures && existingFeatures.length > 0) {
+        setSelectedFeatures(existingFeatures);
+      }
+    } catch (error) {
+      console.error("Failed to fetch feature permissions", error);
     }
   };
 
@@ -154,9 +182,20 @@ export default function RoleManagement() {
     }));
   };
 
+  const handleFeatureToggle = (featureId: string) => {
+    setSelectedFeatures(prev => {
+      if (prev.includes(featureId)) {
+        return prev.filter(f => f !== featureId);
+      } else {
+        return [...prev, featureId];
+      }
+    });
+  };
+
   const savePermissions = async () => {
     if (!selectedRole) return;
     try {
+      // Save location permissions
       const permsToSave = permissions
         .filter(p => p.canRead || p.canWrite)
         .map(p => ({
@@ -165,6 +204,10 @@ export default function RoleManagement() {
           canWrite: p.canWrite,
         }));
       await setPermissionsMutation.mutateAsync({ roleId: selectedRole.id, permissions: permsToSave });
+      
+      // Save feature permissions
+      await setFeaturePermissionsMutation.mutateAsync({ roleId: selectedRole.id, features: selectedFeatures });
+      
       toast.success("Permissions saved successfully");
       setIsPermissionsOpen(false);
       setSelectedRole(null);
@@ -180,7 +223,7 @@ export default function RoleManagement() {
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">Role Management</h1>
             <p className="text-muted-foreground">
-              Create and manage roles with location-based permissions
+              Create and manage roles with feature and location-based permissions
             </p>
           </div>
           <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -195,7 +238,7 @@ export default function RoleManagement() {
                 <DialogHeader>
                   <DialogTitle>Create New Role</DialogTitle>
                   <DialogDescription>
-                    Create a role to group location permissions. You can assign this role to users.
+                    Create a role to group feature and location permissions. You can assign this role to users.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -235,17 +278,18 @@ export default function RoleManagement() {
         </div>
 
         {/* Info Card */}
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
           <CardContent className="pt-6">
             <div className="flex gap-4">
-              <Shield className="h-8 w-8 text-blue-600 flex-shrink-0" weight="bold" />
+              <Shield className="h-8 w-8 text-blue-600 dark:text-blue-400 flex-shrink-0" weight="bold" />
               <div>
-                <h3 className="font-semibold text-blue-900">How Role-Based Access Control Works</h3>
-                <p className="text-sm text-blue-700 mt-1">
-                  1. Create roles (e.g., "North Region QO", "Location A Manager")<br/>
-                  2. Assign location permissions to each role (read-only or read-write)<br/>
-                  3. Assign users to one or more roles<br/>
-                  4. Users can only see data from locations their roles allow
+                <h3 className="font-semibold text-blue-900 dark:text-blue-100">How Role-Based Access Control Works</h3>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                  1. Create roles (e.g., "Quality Officer", "Care Manager")<br/>
+                  2. Assign <strong>feature permissions</strong> - which tabs/modules the role can access<br/>
+                  3. Assign <strong>location permissions</strong> - which locations the role can see data for<br/>
+                  4. Assign users to one or more roles<br/>
+                  5. Users only see features and data their roles allow (Super Admins see everything)
                 </p>
               </div>
             </div>
@@ -272,7 +316,7 @@ export default function RoleManagement() {
               <div className="text-center py-8 text-muted-foreground">
                 <Shield className="h-12 w-12 mx-auto mb-4 opacity-50" weight="bold" />
                 <p>No roles created yet</p>
-                <p className="text-sm">Create a role to start assigning location permissions</p>
+                <p className="text-sm">Create a role to start assigning permissions</p>
               </div>
             ) : (
               <Table>
@@ -306,7 +350,7 @@ export default function RoleManagement() {
                             size="sm"
                             onClick={() => openPermissions(role)}
                           >
-                            <MapPin className="mr-1 h-3 w-3" weight="bold" />
+                            <Gear className="mr-1 h-3 w-3" weight="bold" />
                             Permissions
                           </Button>
                           <Button
@@ -378,68 +422,129 @@ export default function RoleManagement() {
 
         {/* Permissions Dialog */}
         <Dialog open={isPermissionsOpen} onOpenChange={setIsPermissionsOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
             <DialogHeader>
-              <DialogTitle>Location Permissions for "{selectedRole?.name}"</DialogTitle>
+              <DialogTitle>Permissions for "{selectedRole?.name}"</DialogTitle>
               <DialogDescription>
-                Select which locations this role can access and whether they have read-only or read-write access
+                Configure which features and locations this role can access
               </DialogDescription>
             </DialogHeader>
-            <div className="py-4">
-              {locations.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">
-                  No locations available. Create locations first.
-                </p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Location</TableHead>
-                      <TableHead className="text-center">Read Access</TableHead>
-                      <TableHead className="text-center">Write Access</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {permissions.map((perm) => (
-                      <TableRow key={perm.locationId}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-muted-foreground" weight="bold" />
-                            {perm.locationName}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            checked={perm.canRead}
-                            onCheckedChange={(checked) => 
-                              handlePermissionChange(perm.locationId, "canRead", !!checked)
-                            }
-                          />
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox
-                            checked={perm.canWrite}
-                            onCheckedChange={(checked) => 
-                              handlePermissionChange(perm.locationId, "canWrite", !!checked)
-                            }
-                          />
-                        </TableCell>
-                      </TableRow>
+            
+            <Tabs value={permissionsTab} onValueChange={setPermissionsTab} className="flex-1 overflow-hidden flex flex-col">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="features" className="flex items-center gap-2">
+                  <Gear className="h-4 w-4" weight="bold" />
+                  Features
+                </TabsTrigger>
+                <TabsTrigger value="locations" className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" weight="bold" />
+                  Locations
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="features" className="flex-1 overflow-auto mt-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Select which features/tabs users with this role can access. Users will only see the tabs they have permission for.
+                  </p>
+                  <div className="grid gap-3">
+                    {availableFeatures.map((feature: Feature) => (
+                      <div
+                        key={feature.id}
+                        className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors ${
+                          selectedFeatures.includes(feature.id)
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:bg-muted/50"
+                        }`}
+                        onClick={() => handleFeatureToggle(feature.id)}
+                      >
+                        <Checkbox
+                          checked={selectedFeatures.includes(feature.id)}
+                          onCheckedChange={() => handleFeatureToggle(feature.id)}
+                          className="mt-0.5"
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">{feature.label}</div>
+                          <div className="text-sm text-muted-foreground">{feature.description}</div>
+                        </div>
+                      </div>
                     ))}
-                  </TableBody>
-                </Table>
-              )}
-              <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
-                <p><strong>Read Access:</strong> Can view data from this location</p>
-                <p><strong>Write Access:</strong> Can create, edit, and delete data (includes read access)</p>
-              </div>
-            </div>
-            <DialogFooter>
+                  </div>
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg text-sm">
+                    <p className="text-amber-800 dark:text-amber-200">
+                      <strong>Note:</strong> Super Admins always have access to all features regardless of role assignments.
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="locations" className="flex-1 overflow-auto mt-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Select which locations this role can access and whether they have read-only or read-write access.
+                  </p>
+                  {locations.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-4">
+                      No locations available. Create locations first.
+                    </p>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Location</TableHead>
+                          <TableHead className="text-center">Read Access</TableHead>
+                          <TableHead className="text-center">Write Access</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {permissions.map((perm) => (
+                          <TableRow key={perm.locationId}>
+                            <TableCell className="font-medium">
+                              <div className="flex items-center gap-2">
+                                <MapPin className="h-4 w-4 text-muted-foreground" weight="bold" />
+                                {perm.locationName}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Checkbox
+                                checked={perm.canRead}
+                                onCheckedChange={(checked) => 
+                                  handlePermissionChange(perm.locationId, "canRead", !!checked)
+                                }
+                              />
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Checkbox
+                                checked={perm.canWrite}
+                                onCheckedChange={(checked) => 
+                                  handlePermissionChange(perm.locationId, "canWrite", !!checked)
+                                }
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                  <div className="p-3 bg-muted rounded-lg text-sm">
+                    <p><strong>Read Access:</strong> Can view data from this location</p>
+                    <p><strong>Write Access:</strong> Can create, edit, and delete data (includes read access)</p>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+            
+            <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={() => setIsPermissionsOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={savePermissions} disabled={setPermissionsMutation.isPending}>
-                {setPermissionsMutation.isPending && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
+              <Button 
+                onClick={savePermissions} 
+                disabled={setPermissionsMutation.isPending || setFeaturePermissionsMutation.isPending}
+              >
+                {(setPermissionsMutation.isPending || setFeaturePermissionsMutation.isPending) && (
+                  <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Save Permissions
               </Button>
             </DialogFooter>

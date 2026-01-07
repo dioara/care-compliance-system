@@ -587,6 +587,17 @@ export const roles = mysqlTable("roles", {
 	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
 });
 
+// Feature-based permissions for roles
+// Features: staff, service_users, audits, ai_care_plan_audit, ai_care_notes_audit, incidents, reports
+export const roleFeaturePermissions = mysqlTable("role_feature_permissions", {
+	id: int().autoincrement().notNull(),
+	roleId: int().notNull(),
+	feature: varchar({ length: 50 }).notNull(), // staff, service_users, audits, ai_care_plan_audit, ai_care_notes_audit, incidents, reports
+	canAccess: tinyint().default(1).notNull(),
+	createdAt: timestamp({ mode: 'string' }).default('CURRENT_TIMESTAMP').notNull(),
+	updatedAt: timestamp({ mode: 'string' }).defaultNow().onUpdateNow().notNull(),
+});
+
 export const serviceUserHistory = mysqlTable("serviceUserHistory", {
 	id: int().autoincrement().notNull(),
 	serviceUserId: int().notNull(),
@@ -847,6 +858,8 @@ export type UserRole = typeof userRoles.$inferSelect;
 export type InsertUserRole = typeof userRoles.$inferInsert;
 export type RoleLocationPermission = typeof roleLocationPermissions.$inferSelect;
 export type InsertRoleLocationPermission = typeof roleLocationPermissions.$inferInsert;
+export type RoleFeaturePermission = typeof roleFeaturePermissions.$inferSelect;
+export type InsertRoleFeaturePermission = typeof roleFeaturePermissions.$inferInsert;
 export type ServiceUser = typeof serviceUsers.$inferSelect;
 export type InsertServiceUser = typeof serviceUsers.$inferInsert;
 export type StaffMember = typeof staffMembers.$inferSelect;

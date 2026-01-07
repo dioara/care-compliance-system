@@ -24,6 +24,7 @@ import {
   locations,
   roles,
   roleLocationPermissions,
+  roleFeaturePermissions,
   userRoles,
   serviceUsers,
   staffMembers,
@@ -68,6 +69,7 @@ import {
   type InsertLocation,
   type InsertRole,
   type InsertRoleLocationPermission,
+  type InsertRoleFeaturePermission,
   type InsertUserRole,
   type InsertServiceUser,
   type InsertStaffMember,
@@ -603,6 +605,84 @@ export async function getRoleLocationPermissions(roleId: number) {
   if (!db) return [];
 
   return await db.select().from(roleLocationPermissions).where(eq(roleLocationPermissions.roleId, roleId));
+}
+
+// ============================================================================
+// ROLE-FEATURE PERMISSIONS
+// ============================================================================
+
+// Available features that can be assigned to roles
+export const AVAILABLE_FEATURES = [
+  { id: 'staff', label: 'Staff', description: 'Access to Staff management' },
+  { id: 'service_users', label: 'Service Users', description: 'Access to Service Users management' },
+  { id: 'audits', label: 'Audits', description: 'Access to Audits, Audit Calendar, and Audit History' },
+  { id: 'ai_care_plan_audit', label: 'AI Care Plan Audit', description: 'Access to AI Care Plan Audit' },
+  { id: 'ai_care_notes_audit', label: 'AI Care Notes Audit', description: 'Access to AI Care Notes Audit' },
+  { id: 'incidents', label: 'Incidents', description: 'Access to Incidents and Incident Analytics' },
+  { id: 'reports', label: 'Reports', description: 'Access to Reports' },
+] as const;
+
+export type FeatureId = typeof AVAILABLE_FEATURES[number]['id'];
+
+export async function setRoleFeaturePermissions(roleId: number, features: string[]) {
+  const db = await getDb();
+  if (!db) throw new Error(ERROR_MESSAGES.SERVICE_UNAVAILABLE);
+
+  // Delete existing feature permissions
+  await db.delete(roleFeaturePermissions).where(eq(roleFeaturePermissions.roleId, roleId));
+
+  // Insert new feature permissions
+  if (features.length > 0) {
+    const values = features.map(feature => ({ roleId, feature, canAccess: 1 }));
+    await db.insert(roleFeaturePermissions).values(values);
+  }
+}
+
+export async function getRoleFeaturePermissions(roleId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(roleFeaturePermissions).where(eq(roleFeaturePermissions.roleId, roleId));
+}
+
+/**
+ * Get all features a user can access based on their assigned roles
+ * Returns array of feature IDs
+ */
+export async function getUserFeaturePermissions(userId: number): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Get user's roles
+  const userRolesList = await db.select().from(userRoles).where(eq(userRoles.userId, userId));
+  
+  if (userRolesList.length === 0) return [];
+
+  const roleIds = userRolesList.map(ur => ur.roleId);
+
+  // Get all feature permissions for these roles
+  const permissions = await db
+    .select()
+    .from(roleFeaturePermissions)
+    .where(inArray(roleFeaturePermissions.roleId, roleIds));
+
+  // Get unique features
+  const features = new Set<string>();
+  for (const perm of permissions) {
+    if (perm.canAccess) {
+      features.add(perm.feature);
+    }
+  }
+
+  return Array.from(features);
+}
+
+/**
+ * Check if user can access a specific feature
+ */
+export async function canUserAccessFeature(userId: number, feature: string): Promise<boolean> {
+  const features = await getUserFeaturePermissions(userId);
+  return features.includes(feature);
 }
 
 // ============================================================================

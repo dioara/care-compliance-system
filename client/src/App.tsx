@@ -5,6 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LocationProvider } from "./contexts/LocationContext";
 import DashboardLayout from "./components/DashboardLayout";
+import { ProtectedRoute, FEATURES } from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
 // Pages
@@ -65,6 +66,7 @@ import ScrollToTop from "./components/ScrollToTop";
 function Router() {
   return (
     <Switch>
+      {/* Public routes */}
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
       <Route path="/forgot-password" component={ForgotPassword} />
@@ -75,12 +77,14 @@ function Router() {
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/subscription-required" component={SubscriptionRequired} />
       
+      {/* Dashboard - always accessible */}
       <Route path="/">
         <DashboardLayout>
           <Dashboard />
         </DashboardLayout>
       </Route>
       
+      {/* Admin-only routes (handled by page-level checks) */}
       <Route path="/company-profile">
         <DashboardLayout>
           <CompanyProfile />
@@ -132,15 +136,21 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      {/* Staff - protected by feature */}
       <Route path="/staff">
         <DashboardLayout>
-          <Staff />
+          <ProtectedRoute feature={FEATURES.STAFF}>
+            <Staff />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
+      {/* Service Users - protected by feature */}
       <Route path="/service-users">
         <DashboardLayout>
-          <ServiceUsers />
+          <ProtectedRoute feature={FEATURES.SERVICE_USERS}>
+            <ServiceUsers />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
@@ -158,19 +168,26 @@ function Router() {
       
       <Route path="/staff/:id/compliance">
         <DashboardLayout>
-          <PersonCompliance personType="staff" />
+          <ProtectedRoute feature={FEATURES.STAFF}>
+            <PersonCompliance personType="staff" />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/service-users/:id/compliance">
         <DashboardLayout>
-          <PersonCompliance personType="service_user" />
+          <ProtectedRoute feature={FEATURES.SERVICE_USERS}>
+            <PersonCompliance personType="service_user" />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
+      {/* Audits - protected by feature */}
       <Route path="/audits">
         <DashboardLayout>
-          <Audits />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <Audits />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
@@ -186,17 +203,23 @@ function Router() {
         </DashboardLayout>
       </Route>
 
+      {/* Incidents - protected by feature */}
       <Route path="/incidents">
         <DashboardLayout>
-          <Incidents />
+          <ProtectedRoute feature={FEATURES.INCIDENTS}>
+            <Incidents />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
 
       <Route path="/incident-analytics">
         <DashboardLayout>
-          <IncidentAnalytics />
+          <ProtectedRoute feature={FEATURES.INCIDENTS}>
+            <IncidentAnalytics />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
+      
       <Route path="/email-settings">
         <DashboardLayout>
           <EmailSettings />
@@ -205,30 +228,33 @@ function Router() {
 
       <Route path="/audit-schedules">
         <DashboardLayout>
-          <AuditSchedules />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditSchedules />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/audit-history">
         <DashboardLayout>
-          <AuditHistory />
-        </DashboardLayout>
-      </Route>
-
-      <Route path="/audit-schedules">        <DashboardLayout>
-          <Incidents />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditHistory />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/conduct-audit/:id">
         <DashboardLayout>
-          <ConductAudit />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <ConductAudit />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/audits/:id/results">
         <DashboardLayout>
-          <AuditResults />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditResults />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
@@ -240,31 +266,25 @@ function Router() {
       
       <Route path="/audit-calendar">
         <DashboardLayout>
-          <AuditCalendar />
-        </DashboardLayout>
-      </Route>
-      
-      <Route path="/audits">
-        <DashboardLayout>
-          <Audits />
-        </DashboardLayout>
-      </Route>
-      
-
-      <Route path="/audit-schedules">        <DashboardLayout>
-          <Incidents />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditCalendar />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/audit-scheduling">
         <DashboardLayout>
-          <AuditScheduling />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditScheduling />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/audit-comparison">
         <DashboardLayout>
-          <AuditComparison />
+          <ProtectedRoute feature={FEATURES.AUDITS}>
+            <AuditComparison />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
@@ -279,8 +299,6 @@ function Router() {
           <DataPrivacy />
         </DashboardLayout>
       </Route>
-      
-      <Route path="/terms-of-service" component={TermsOfService} />
       
       <Route path="/role-management">
         <DashboardLayout>
@@ -300,33 +318,46 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      {/* AI Care Plan Audit - protected by feature */}
       <Route path="/ai-care-plan-audit">
         <DashboardLayout>
-          <AiCarePlanAudit />
+          <ProtectedRoute feature={FEATURES.AI_CARE_PLAN_AUDIT}>
+            <AiCarePlanAudit />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/ai-care-plan-audits">
         <DashboardLayout>
-          <AiCarePlanAudits />
+          <ProtectedRoute feature={FEATURES.AI_CARE_PLAN_AUDIT}>
+            <AiCarePlanAudits />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
       <Route path="/ai-care-plan-audits/:id">
         <DashboardLayout>
-          <AiCarePlanAuditDetail />
+          <ProtectedRoute feature={FEATURES.AI_CARE_PLAN_AUDIT}>
+            <AiCarePlanAuditDetail />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
+      {/* AI Care Notes Audit - protected by feature */}
       <Route path="/ai-care-notes-audit">
         <DashboardLayout>
-          <AiCareNotesAudit />
+          <ProtectedRoute feature={FEATURES.AI_CARE_NOTES_AUDIT}>
+            <AiCareNotesAudit />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
       
+      {/* Reports - protected by feature */}
       <Route path="/reports">
         <DashboardLayout>
-          <Reports />
+          <ProtectedRoute feature={FEATURES.REPORTS}>
+            <Reports />
+          </ProtectedRoute>
         </DashboardLayout>
       </Route>
 
