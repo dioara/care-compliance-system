@@ -1,10 +1,19 @@
 /**
  * Multi-Pass Care Plan Analyzer
  * Orchestrates section-by-section analysis for comprehensive reports
+ * 
+ * Updated to use comprehensive care plan sections definition
+ * based on Nourish template + CQC requirements
  */
 
 import { parseCarePlanIntoSections, validateSections, type CarePlanSection } from './care-plan-parser';
 import { analyzeSingleSection, type SectionAnalysisResult } from './section-analyzer';
+import { 
+  ALL_CARE_PLAN_SECTIONS, 
+  detectPresentSections, 
+  generateMissingSectionsReport,
+  type CarePlanSectionDefinition 
+} from './care-plan-sections';
 
 export interface MultiPassAnalysisResult {
   overall_score: number;
@@ -13,29 +22,48 @@ export interface MultiPassAnalysisResult {
     critical_issues: number;
     major_issues: number;
     minor_issues: number;
+    sections_coverage: number;
+    missing_critical_sections: number;
+    missing_high_sections: number;
+    missing_medium_sections: number;
   };
   sections: SectionAnalysisResult[];
   missing_sections: Array<{
     section_name: string;
     why_required: string;
     cqc_requirement: string;
+    priority: 'critical' | 'high' | 'medium' | 'low';
   }>;
+  missing_sections_report: string;
 }
 
 /**
- * CQC-required sections that should be present in care plans
+ * Check if a section definition is covered by the parsed sections
  */
-const REQUIRED_CQC_SECTIONS = [
-  { name: 'Personal Care & Hygiene', why: 'Essential for dignity and health', regulation: 'Regulation 9 - Person-centred care' },
-  { name: 'Nutrition & Hydration', why: 'Fundamental to health and wellbeing', regulation: 'Regulation 14 - Meeting nutritional needs' },
-  { name: 'Mobility & Positioning', why: 'Prevents pressure sores and maintains independence', regulation: 'Regulation 12 - Safe care' },
-  { name: 'Communication Needs', why: 'Ensures person can express needs and preferences', regulation: 'Regulation 9 - Person-centred care' },
-  { name: 'Mental Health & Wellbeing', why: 'Holistic care includes emotional and psychological needs', regulation: 'Regulation 9 - Person-centred care' },
-  { name: 'Social Needs & Activities', why: 'Prevents isolation and promotes quality of life', regulation: 'Regulation 9 - Person-centred care' },
-  { name: 'Medication Management', why: 'Safe administration is a legal requirement', regulation: 'Regulation 12 - Safe care' },
-  { name: 'Health Conditions & Monitoring', why: 'Ongoing health management required', regulation: 'Regulation 12 - Safe care' },
-  { name: 'Risk Assessments', why: 'Legal requirement to assess and mitigate risks', regulation: 'Regulation 12(2)(a) - Risk assessment' },
-];
+function isSectionCovered(
+  sectionDef: CarePlanSectionDefinition,
+  parsedSections: CarePlanSection[],
+  fullText: string
+): boolean {
+  const textLower = fullText.toLowerCase();
+  
+  // Check if any keywords are present in the full text
+  const hasKeyword = sectionDef.keywords.some(keyword => 
+    textLower.includes(keyword.toLowerCase())
+  );
+  
+  // Check if any parsed section name matches
+  const hasMatchingSection = parsedSections.some(section => {
+    const sectionNameLower = section.section_name.toLowerCase();
+    return sectionDef.keywords.some(keyword => 
+      sectionNameLower.includes(keyword.toLowerCase())
+    ) || sectionDef.aliases.some(alias =>
+      sectionNameLower.includes(alias.toLowerCase())
+    );
+  });
+  
+  return hasKeyword || hasMatchingSection;
+}
 
 /**
  * Perform multi-pass analysis of entire care plan
@@ -100,25 +128,39 @@ export async function analyzeCarePlanMultiPass(
     }
   }
   
-  // Step 3: Check for missing CQC-required sections
+  // Step 3: Check for missing CQC-required sections using comprehensive definition
   console.log('[Multi-Pass Analyzer] Step 3: Checking for missing CQC-required sections');
   const missingSections: MultiPassAnalysisResult['missing_sections'] = [];
   
-  for (const required of REQUIRED_CQC_SECTIONS) {
-    const found = sectionResults.some(section => 
-      section.section_name.toLowerCase().includes(required.name.toLowerCase()) ||
-      required.name.toLowerCase().includes(section.section_name.toLowerCase().split(' ')[0])
-    );
+  // Check each required section against the parsed content
+  for (const sectionDef of ALL_CARE_PLAN_SECTIONS) {
+    const isCovered = isSectionCovered(sectionDef, sections, carePlanContent);
     
-    if (!found) {
-      console.log(`[Multi-Pass Analyzer]   Missing: ${required.name}`);
+    if (!isCovered) {
+      console.log(`[Multi-Pass Analyzer]   Missing [${sectionDef.priority.toUpperCase()}]: ${sectionDef.name}`);
       missingSections.push({
-        section_name: required.name,
-        why_required: required.why,
-        cqc_requirement: required.regulation,
+        section_name: sectionDef.name,
+        why_required: sectionDef.description,
+        cqc_requirement: sectionDef.cqcRegulation,
+        priority: sectionDef.priority,
       });
     }
   }
+  
+  // Sort missing sections by priority
+  const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+  missingSections.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+  
+  // Count missing by priority
+  const missingCritical = missingSections.filter(s => s.priority === 'critical').length;
+  const missingHigh = missingSections.filter(s => s.priority === 'high').length;
+  const missingMedium = missingSections.filter(s => s.priority === 'medium').length;
+  
+  // Generate missing sections report
+  const missingSectionDefs = missingSections.map(ms => 
+    ALL_CARE_PLAN_SECTIONS.find(def => def.name === ms.section_name)!
+  ).filter(Boolean);
+  const missingSectionsReport = generateMissingSectionsReport(missingSectionDefs);
   
   // Step 4: Calculate overall statistics
   console.log('[Multi-Pass Analyzer] Step 4: Calculating overall statistics');
@@ -141,17 +183,30 @@ export async function analyzeCarePlanMultiPass(
     ? Math.round(totalScore / sectionResults.length)
     : 0;
   
-  // Deduct for missing sections
-  const missingSectionPenalty = missingSections.length * 5;
+  // Calculate section coverage
+  const totalRequiredSections = ALL_CARE_PLAN_SECTIONS.length;
+  const coveredSections = totalRequiredSections - missingSections.length;
+  const sectionsCoverage = Math.round((coveredSections / totalRequiredSections) * 100);
+  
+  // Deduct for missing sections (weighted by priority)
+  const missingSectionPenalty = 
+    (missingCritical * 10) + // Critical sections: 10 points each
+    (missingHigh * 5) +      // High priority: 5 points each
+    (missingMedium * 2);     // Medium priority: 2 points each
+  
   const finalScore = Math.max(0, overallScore - missingSectionPenalty);
   
   console.log('[Multi-Pass Analyzer] Analysis complete');
   console.log(`[Multi-Pass Analyzer] Overall score: ${finalScore}%`);
+  console.log(`[Multi-Pass Analyzer] Section coverage: ${sectionsCoverage}%`);
   console.log(`[Multi-Pass Analyzer] Total issues: ${criticalCount + majorCount + minorCount}`);
   console.log(`[Multi-Pass Analyzer]   Critical: ${criticalCount}`);
   console.log(`[Multi-Pass Analyzer]   Major: ${majorCount}`);
   console.log(`[Multi-Pass Analyzer]   Minor: ${minorCount}`);
   console.log(`[Multi-Pass Analyzer] Missing sections: ${missingSections.length}`);
+  console.log(`[Multi-Pass Analyzer]   Critical: ${missingCritical}`);
+  console.log(`[Multi-Pass Analyzer]   High: ${missingHigh}`);
+  console.log(`[Multi-Pass Analyzer]   Medium: ${missingMedium}`);
   
   return {
     overall_score: finalScore,
@@ -160,8 +215,13 @@ export async function analyzeCarePlanMultiPass(
       critical_issues: criticalCount,
       major_issues: majorCount,
       minor_issues: minorCount,
+      sections_coverage: sectionsCoverage,
+      missing_critical_sections: missingCritical,
+      missing_high_sections: missingHigh,
+      missing_medium_sections: missingMedium,
     },
     sections: sectionResults,
     missing_sections: missingSections,
+    missing_sections_report: missingSectionsReport,
   };
 }
