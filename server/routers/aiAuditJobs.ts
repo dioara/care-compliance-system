@@ -149,14 +149,14 @@ export const aiAuditJobsRouter = router({
         fileId: z.string(), // temp file ID from upload
         fileName: z.string(),
         fileType: z.string(),
-        serviceUserName: z.string(),
-        serviceUserFirstName: z.string(),
-        serviceUserLastName: z.string(),
-        keepOriginalNames: z.boolean().default(false),
+        serviceUserName: z.string().nullable().optional(),
+        serviceUserFirstName: z.string().nullable().optional(),
+        serviceUserLastName: z.string().nullable().optional(),
+        keepOriginalNames: z.boolean().default(true),
         replaceFirstNameWith: z.string().nullable().optional(),
         replaceLastNameWith: z.string().nullable().optional(),
-        consentConfirmed: z.boolean().default(false),
-        anonymise: z.boolean().default(true),
+        consentConfirmed: z.boolean().default(true),
+        anonymise: z.boolean().default(false), // No anonymisation for care notes
       })
     )
     .mutation(async ({ ctx, input }) => {

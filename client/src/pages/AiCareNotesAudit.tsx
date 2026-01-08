@@ -2,15 +2,11 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
 import { FileUpload } from '@/components/FileUpload';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Sparkles, Loader2, AlertCircle, Info, Download, Clock, CheckCircle, XCircle, FileText, History, RefreshCw, Upload, ClipboardPaste, FileDown } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, Info, Download, Clock, CheckCircle, XCircle, FileText, History, RefreshCw, Upload, ClipboardPaste, FileDown, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -27,14 +23,6 @@ export default function AiCareNotesAudit() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Service user name fields
-  const [serviceUserFirstName, setServiceUserFirstName] = useState('');
-  const [serviceUserLastName, setServiceUserLastName] = useState('');
-  const [anonymisationOption, setAnonymisationOption] = useState<'replace' | 'keep'>('replace');
-  const [replaceFirstNameWith, setReplaceFirstNameWith] = useState('');
-  const [replaceLastNameWith, setReplaceLastNameWith] = useState('');
-  const [consentConfirmed, setConsentConfirmed] = useState(false);
-
   // Job tracking
   const [currentJobId, setCurrentJobId] = useState<number | null>(null);
 
@@ -50,11 +38,6 @@ export default function AiCareNotesAudit() {
       // Reset form
       setSelectedFile(null);
       setPastedText('');
-      setServiceUserFirstName('');
-      setServiceUserLastName('');
-      setReplaceFirstNameWith('');
-      setReplaceLastNameWith('');
-      setConsentConfirmed(false);
     },
     onError: (error) => {
       toast.error(`Failed to submit job: ${error.message}`);
@@ -100,23 +83,6 @@ export default function AiCareNotesAudit() {
   const handleSubmit = async () => {
     if (!hasOpenAiKey) {
       toast.error('OpenAI API key not configured. Please contact your administrator.');
-      return;
-    }
-
-    // Validate service user name
-    if (!serviceUserFirstName.trim() || !serviceUserLastName.trim()) {
-      toast.error('Please enter the service user\'s first and last name');
-      return;
-    }
-
-    // Validate anonymisation options
-    if (anonymisationOption === 'replace') {
-      if (!replaceFirstNameWith.trim() || !replaceLastNameWith.trim()) {
-        toast.error('Please enter replacement names for anonymisation');
-        return;
-      }
-    } else if (anonymisationOption === 'keep' && !consentConfirmed) {
-      toast.error('Please confirm you have consent to use the real name');
       return;
     }
 
@@ -207,21 +173,19 @@ export default function AiCareNotesAudit() {
       setIsUploading(false);
       setIsSubmitting(true);
 
-      // Submit job
-      const serviceUserName = `${serviceUserFirstName.trim()} ${serviceUserLastName.trim()}`;
-      
+      // Submit job without anonymisation fields
       await submitJobMutation.mutateAsync({
         fileId,
         fileName,
         fileType,
-        serviceUserName,
-        serviceUserFirstName: serviceUserFirstName.trim(),
-        serviceUserLastName: serviceUserLastName.trim(),
-        keepOriginalNames: anonymisationOption === 'keep',
-        replaceFirstNameWith: anonymisationOption === 'replace' ? replaceFirstNameWith.trim() : null,
-        replaceLastNameWith: anonymisationOption === 'replace' ? replaceLastNameWith.trim() : null,
-        consentConfirmed: anonymisationOption === 'keep' ? consentConfirmed : false,
-        anonymise: anonymisationOption === 'replace',
+        serviceUserName: null,
+        serviceUserFirstName: null,
+        serviceUserLastName: null,
+        keepOriginalNames: true,
+        replaceFirstNameWith: null,
+        replaceLastNameWith: null,
+        consentConfirmed: true,
+        anonymise: false,
       });
 
     } catch (error) {
@@ -372,210 +336,122 @@ export default function AiCareNotesAudit() {
             </Card>
           )}
 
-          <div className="grid gap-6 md:grid-cols-2">
-            {/* Service User Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Service User Details</CardTitle>
-                <CardDescription>
-                  Enter the service user's name as it appears in the care notes. 
-                  <span className="text-amber-600 font-medium"> If the filename contains the service user's name, please rename it before uploading.</span>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name *</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="e.g., John or Jane"
-                      value={serviceUserFirstName}
-                      onChange={(e) => setServiceUserFirstName(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name *</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="e.g., Smith"
-                      value={serviceUserLastName}
-                      onChange={(e) => setServiceUserLastName(e.target.value)}
-                    />
-                  </div>
-                </div>
+          {/* Data Privacy Notice */}
+          <Alert className="border-amber-200 bg-amber-50">
+            <ShieldAlert className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Data Privacy:</strong> Care notes may contain multiple service user and staff names. 
+              If you need to anonymise the data for confidentiality, please do so before uploading. 
+              The system will analyse the notes as provided.
+            </AlertDescription>
+          </Alert>
 
-                <div className="space-y-3 pt-2">
-                  <Label>Name Handling in Report</Label>
-                  <RadioGroup
-                    value={anonymisationOption}
-                    onValueChange={(v) => setAnonymisationOption(v as 'replace' | 'keep')}
-                  >
-                    <div className="flex items-start space-x-2">
-                      <RadioGroupItem value="replace" id="replace" />
-                      <div className="grid gap-1.5 leading-none">
-                        <Label htmlFor="replace" className="font-normal cursor-pointer">
-                          Replace names in report (recommended for confidentiality)
-                        </Label>
+          {/* Care Notes Input */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Care Notes</CardTitle>
+              <CardDescription>
+                Upload a file or paste your care notes directly for CQC compliance analysis.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Input Method Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  variant={inputMethod === 'upload' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setInputMethod('upload')}
+                  className="flex-1"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Upload File
+                </Button>
+                <Button
+                  variant={inputMethod === 'paste' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setInputMethod('paste')}
+                  className="flex-1"
+                >
+                  <ClipboardPaste className="w-4 h-4 mr-2" />
+                  Paste Text
+                </Button>
+              </div>
+
+              {inputMethod === 'upload' ? (
+                <>
+                  <FileUpload
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                    onFileSelect={setSelectedFile}
+                    selectedFile={selectedFile}
+                    disabled={isLoading}
+                  />
+                  
+                  {selectedFile && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <FileText className="w-4 h-4" />
+                      <span className="truncate">{selectedFile.name}</span>
+                      <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                  )}
+
+                  {/* Template Download */}
+                  <div className="p-3 bg-muted/50 rounded-lg border border-dashed">
+                    <div className="flex items-start gap-3">
+                      <FileDown className="w-5 h-5 text-primary mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">Optimal Analysis Template</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          For best results, download our CSV template and format your notes accordingly. You can also upload notes directly from your care system.
+                        </p>
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="h-auto p-0 mt-2"
+                          onClick={handleDownloadTemplate}
+                        >
+                          <Download className="w-3 h-3 mr-1" />
+                          Download Template
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-start space-x-2">
-                      <RadioGroupItem value="keep" id="keep" />
-                      <div className="grid gap-1.5 leading-none">
-                        <Label htmlFor="keep" className="font-normal cursor-pointer">
-                          Keep original names in report
-                        </Label>
-                      </div>
-                    </div>
-                  </RadioGroup>
-                </div>
-
-                {anonymisationOption === 'replace' && (
-                  <div className="grid grid-cols-2 gap-4 pt-2 pl-6 border-l-2 border-primary/20">
-                    <div className="space-y-2">
-                      <Label htmlFor="replaceFirst">Replace First Name With</Label>
-                      <Input
-                        id="replaceFirst"
-                        placeholder="e.g., J or Jane"
-                        value={replaceFirstNameWith}
-                        onChange={(e) => setReplaceFirstNameWith(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="replaceLast">Replace Last Name With</Label>
-                      <Input
-                        id="replaceLast"
-                        placeholder="e.g., S or Smith"
-                        value={replaceLastNameWith}
-                        onChange={(e) => setReplaceLastNameWith(e.target.value)}
-                      />
-                    </div>
                   </div>
-                )}
-
-                {anonymisationOption === 'keep' && (
-                  <div className="pt-2 pl-6 border-l-2 border-amber-200">
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="consent"
-                        checked={consentConfirmed}
-                        onCheckedChange={(checked) => setConsentConfirmed(checked === true)}
-                      />
-                      <Label htmlFor="consent" className="font-normal text-sm cursor-pointer">
-                        I confirm that I have appropriate consent to include the service user's real name in the audit report, and understand this may have data protection implications.
-                      </Label>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Care Notes Input */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Care Notes</CardTitle>
-                <CardDescription>
-                  Upload a file or paste your care notes directly.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Input Method Toggle */}
-                <div className="flex gap-2">
-                  <Button
-                    variant={inputMethod === 'upload' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setInputMethod('upload')}
-                    className="flex-1"
-                  >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload File
-                  </Button>
-                  <Button
-                    variant={inputMethod === 'paste' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setInputMethod('paste')}
-                    className="flex-1"
-                  >
-                    <ClipboardPaste className="w-4 h-4 mr-2" />
-                    Paste Text
-                  </Button>
-                </div>
-
-                {inputMethod === 'upload' ? (
-                  <>
-                    <FileUpload
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
-                      onFileSelect={setSelectedFile}
-                      selectedFile={selectedFile}
-                      disabled={isLoading}
-                    />
-                    
-                    {selectedFile && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <FileText className="w-4 h-4" />
-                        <span className="truncate">{selectedFile.name}</span>
-                        <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
-                      </div>
-                    )}
-
-                    {/* Template Download */}
-                    <div className="p-3 bg-muted/50 rounded-lg border border-dashed">
-                      <div className="flex items-start gap-3">
-                        <FileDown className="w-5 h-5 text-primary mt-0.5" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">Optimal Analysis Template</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            For best results, download our CSV template and format your notes accordingly. You can also upload notes directly from your care system.
-                          </p>
-                          <Button
-                            variant="link"
-                            size="sm"
-                            className="h-auto p-0 mt-2"
-                            onClick={handleDownloadTemplate}
-                          >
-                            <Download className="w-3 h-3 mr-1" />
-                            Download Template
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Textarea
-                      placeholder="Paste your care notes here...
+                </>
+              ) : (
+                <>
+                  <Textarea
+                    placeholder="Paste your care notes here...
 
 Example format:
 08/01/2026 - Morning Visit - Carer: Jane Smith
-Arrived at 8:30am. Greeted service user who was in good spirits..."
-                      className="min-h-[200px] font-mono text-sm"
-                      value={pastedText}
-                      onChange={(e) => setPastedText(e.target.value)}
-                      disabled={isLoading}
-                    />
-                    {pastedText && (
-                      <p className="text-xs text-muted-foreground">
-                        {pastedText.length} characters
-                      </p>
-                    )}
-                  </>
-                )}
+Arrived at 8:30am. Greeted service user who was in good spirits. Consent obtained before providing personal care..."
+                    className="min-h-[250px] font-mono text-sm"
+                    value={pastedText}
+                    onChange={(e) => setPastedText(e.target.value)}
+                    disabled={isLoading}
+                  />
+                  {pastedText && (
+                    <p className="text-xs text-muted-foreground">
+                      {pastedText.length} characters
+                    </p>
+                  )}
+                </>
+              )}
 
-                <Alert>
-                  <Info className="h-4 w-4" />
-                  <AlertDescription>
-                    Analysis typically takes less than an hour depending on the number of notes. You'll receive a notification when complete.
-                  </AlertDescription>
-                </Alert>
-              </CardContent>
-            </Card>
-          </div>
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Analysis typically takes less than an hour depending on the number of notes. You'll receive a notification when complete.
+                </AlertDescription>
+              </Alert>
+            </CardContent>
+          </Card>
 
           {/* Submit Button */}
           <div className="flex justify-end">
             <Button
               size="lg"
               onClick={handleSubmit}
-              disabled={isLoading || !hasOpenAiKey || !hasValidInput || !serviceUserFirstName || !serviceUserLastName}
+              disabled={isLoading || !hasOpenAiKey || !hasValidInput}
             >
               {isLoading ? (
                 <>
@@ -617,7 +493,6 @@ Arrived at 8:30am. Greeted service user who was in good spirits..."
                   <TableHeader>
                     <TableRow>
                       <TableHead>Document</TableHead>
-                      <TableHead>Service User</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Score</TableHead>
                       <TableHead>Date</TableHead>
@@ -630,10 +505,9 @@ Arrived at 8:30am. Greeted service user who was in good spirits..."
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-muted-foreground" />
-                            <span className="truncate max-w-[200px]">{job.documentName}</span>
+                            <span className="truncate max-w-[250px]">{job.documentName}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{job.serviceUserName || '-'}</TableCell>
                         <TableCell>{getStatusBadge(job.status)}</TableCell>
                         <TableCell>
                           {job.score !== null && job.score !== undefined ? (
