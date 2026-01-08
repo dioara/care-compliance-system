@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FileUpload } from '@/components/FileUpload';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Sparkles, Loader2, AlertCircle, Info, Download, Clock, CheckCircle, XCircle, FileText, History, RefreshCw } from 'lucide-react';
+import { Sparkles, Loader2, AlertCircle, Info, Download, Clock, CheckCircle, XCircle, FileText, History, RefreshCw, Upload, ClipboardPaste, FileDown } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +21,9 @@ export default function AiCareNotesAudit() {
   const utils = trpc.useUtils();
   
   const [activeTab, setActiveTab] = useState<'new' | 'history'>('new');
+  const [inputMethod, setInputMethod] = useState<'upload' | 'paste'>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [pastedText, setPastedText] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -46,6 +49,7 @@ export default function AiCareNotesAudit() {
       toast.success('Care notes audit job submitted! You will be notified when complete.');
       // Reset form
       setSelectedFile(null);
+      setPastedText('');
       setServiceUserFirstName('');
       setServiceUserLastName('');
       setReplaceFirstNameWith('');
@@ -75,18 +79,23 @@ export default function AiCareNotesAudit() {
   // Care notes jobs from filtered history
   const careNotesJobs = jobHistory?.jobs || [];
 
-  // Download report mutation
-  const { data: reportData, refetch: downloadReport } = trpc.aiAuditJobs.downloadReport.useQuery(
-    { id: currentJobId! },
-    { enabled: false }
-  );
-
   // Stop polling when job completes
   useEffect(() => {
     if (jobStatus?.status === 'completed' || jobStatus?.status === 'failed') {
       refetchHistory();
     }
   }, [jobStatus?.status]);
+
+  const handleDownloadTemplate = () => {
+    // Download the CSV template
+    const link = document.createElement('a');
+    link.href = '/templates/care-notes-template.csv';
+    link.download = 'care-notes-template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Template downloaded');
+  };
 
   const handleSubmit = async () => {
     if (!hasOpenAiKey) {
@@ -111,41 +120,89 @@ export default function AiCareNotesAudit() {
       return;
     }
 
-    if (!selectedFile) {
+    // Validate input
+    if (inputMethod === 'upload' && !selectedFile) {
       toast.error('Please select a file to upload');
+      return;
+    }
+    if (inputMethod === 'paste' && !pastedText.trim()) {
+      toast.error('Please paste your care notes');
       return;
     }
 
     try {
       setIsUploading(true);
       
-      // Upload file to temp storage via HTTP POST (same as care plan audit)
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      
-      const token = localStorage.getItem('auth_token');
-      if (!token) {
-        toast.error('Authentication required. Please log in again.');
-        setIsUploading(false);
-        return;
+      let fileId: string;
+      let fileName: string;
+      let fileType: string;
+
+      if (inputMethod === 'upload' && selectedFile) {
+        // Upload file to temp storage via HTTP POST
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          toast.error('Authentication required. Please log in again.');
+          setIsUploading(false);
+          return;
+        }
+        
+        const uploadResponse = await fetch('/api/temp-upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json().catch(() => ({ error: 'Upload failed' }));
+          toast.error(`Upload failed: ${errorData.error}`);
+          setIsUploading(false);
+          return;
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        fileId = uploadResult.fileId;
+        fileName = selectedFile.name;
+        fileType = selectedFile.type;
+      } else {
+        // Create a text file from pasted content
+        const textBlob = new Blob([pastedText], { type: 'text/plain' });
+        const textFile = new File([textBlob], 'pasted-care-notes.txt', { type: 'text/plain' });
+        
+        const formData = new FormData();
+        formData.append('file', textFile);
+        
+        const token = localStorage.getItem('auth_token');
+        if (!token) {
+          toast.error('Authentication required. Please log in again.');
+          setIsUploading(false);
+          return;
+        }
+        
+        const uploadResponse = await fetch('/api/temp-upload', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+        
+        if (!uploadResponse.ok) {
+          const errorData = await uploadResponse.json().catch(() => ({ error: 'Upload failed' }));
+          toast.error(`Upload failed: ${errorData.error}`);
+          setIsUploading(false);
+          return;
+        }
+        
+        const uploadResult = await uploadResponse.json();
+        fileId = uploadResult.fileId;
+        fileName = 'pasted-care-notes.txt';
+        fileType = 'text/plain';
       }
-      
-      const uploadResponse = await fetch('/api/temp-upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-      
-      if (!uploadResponse.ok) {
-        const errorData = await uploadResponse.json().catch(() => ({ error: 'Upload failed' }));
-        toast.error(`Upload failed: ${errorData.error}`);
-        setIsUploading(false);
-        return;
-      }
-      
-      const uploadResult = await uploadResponse.json();
 
       setIsUploading(false);
       setIsSubmitting(true);
@@ -154,9 +211,9 @@ export default function AiCareNotesAudit() {
       const serviceUserName = `${serviceUserFirstName.trim()} ${serviceUserLastName.trim()}`;
       
       await submitJobMutation.mutateAsync({
-        fileId: uploadResult.fileId,
-        fileName: selectedFile.name,
-        fileType: selectedFile.type,
+        fileId,
+        fileName,
+        fileType,
         serviceUserName,
         serviceUserFirstName: serviceUserFirstName.trim(),
         serviceUserLastName: serviceUserLastName.trim(),
@@ -177,11 +234,8 @@ export default function AiCareNotesAudit() {
   };
 
   const handleDownload = async (jobId: number) => {
-    console.log('[AiCareNotesAudit] Download clicked for job:', jobId);
     try {
-      console.log('[AiCareNotesAudit] Calling downloadReport via utils.client with id:', jobId);
       const result = await utils.client.aiAuditJobs.downloadReport.query({ id: jobId });
-      console.log('[AiCareNotesAudit] downloadReport result:', { filename: result.filename, dataLength: result.data?.length });
       
       if (result.data) {
         // Convert base64 to blob and download
@@ -205,8 +259,7 @@ export default function AiCareNotesAudit() {
         toast.error('No document data received');
       }
     } catch (error: any) {
-      console.error('[AiCareNotesAudit] Download error:', error);
-      console.error('[AiCareNotesAudit] Error details:', JSON.stringify(error, null, 2));
+      console.error('Download error:', error);
       toast.error('Failed to download report: ' + (error?.message || 'Unknown error'));
     }
   };
@@ -225,6 +278,7 @@ export default function AiCareNotesAudit() {
   };
 
   const isLoading = isUploading || isSubmitting;
+  const hasValidInput = inputMethod === 'upload' ? !!selectedFile : !!pastedText.trim();
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
@@ -415,31 +469,95 @@ export default function AiCareNotesAudit() {
               </CardContent>
             </Card>
 
-            {/* File Upload */}
+            {/* Care Notes Input */}
             <Card>
               <CardHeader>
-                <CardTitle>Upload Care Notes</CardTitle>
+                <CardTitle>Care Notes</CardTitle>
                 <CardDescription>
-                  Upload care notes exported from your care management system (PDF, Word, Excel, or CSV).
-                  <span className="text-amber-600 font-medium block mt-1">
-                    Important: Remove the service user's name from the filename before uploading for confidentiality.
-                  </span>
+                  Upload a file or paste your care notes directly.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <FileUpload
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
-                  onFileSelect={setSelectedFile}
-                  selectedFile={selectedFile}
-                  disabled={isLoading}
-                />
-                
-                {selectedFile && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <FileText className="w-4 h-4" />
-                    <span className="truncate">{selectedFile.name}</span>
-                    <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
-                  </div>
+                {/* Input Method Toggle */}
+                <div className="flex gap-2">
+                  <Button
+                    variant={inputMethod === 'upload' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setInputMethod('upload')}
+                    className="flex-1"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload File
+                  </Button>
+                  <Button
+                    variant={inputMethod === 'paste' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setInputMethod('paste')}
+                    className="flex-1"
+                  >
+                    <ClipboardPaste className="w-4 h-4 mr-2" />
+                    Paste Text
+                  </Button>
+                </div>
+
+                {inputMethod === 'upload' ? (
+                  <>
+                    <FileUpload
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt"
+                      onFileSelect={setSelectedFile}
+                      selectedFile={selectedFile}
+                      disabled={isLoading}
+                    />
+                    
+                    {selectedFile && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <FileText className="w-4 h-4" />
+                        <span className="truncate">{selectedFile.name}</span>
+                        <span>({(selectedFile.size / 1024).toFixed(1)} KB)</span>
+                      </div>
+                    )}
+
+                    {/* Template Download */}
+                    <div className="p-3 bg-muted/50 rounded-lg border border-dashed">
+                      <div className="flex items-start gap-3">
+                        <FileDown className="w-5 h-5 text-primary mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">Optimal Analysis Template</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            For best results, download our CSV template and format your notes accordingly. You can also upload notes directly from your care system.
+                          </p>
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0 mt-2"
+                            onClick={handleDownloadTemplate}
+                          >
+                            <Download className="w-3 h-3 mr-1" />
+                            Download Template
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Textarea
+                      placeholder="Paste your care notes here...
+
+Example format:
+08/01/2026 - Morning Visit - Carer: Jane Smith
+Arrived at 8:30am. Greeted service user who was in good spirits..."
+                      className="min-h-[200px] font-mono text-sm"
+                      value={pastedText}
+                      onChange={(e) => setPastedText(e.target.value)}
+                      disabled={isLoading}
+                    />
+                    {pastedText && (
+                      <p className="text-xs text-muted-foreground">
+                        {pastedText.length} characters
+                      </p>
+                    )}
+                  </>
                 )}
 
                 <Alert>
@@ -457,7 +575,7 @@ export default function AiCareNotesAudit() {
             <Button
               size="lg"
               onClick={handleSubmit}
-              disabled={isLoading || !hasOpenAiKey || !selectedFile || !serviceUserFirstName || !serviceUserLastName}
+              disabled={isLoading || !hasOpenAiKey || !hasValidInput || !serviceUserFirstName || !serviceUserLastName}
             >
               {isLoading ? (
                 <>
